@@ -62,28 +62,6 @@ Contributions are welcome!If you feel this excites you feel free to contribute! 
 
 ### Open Stats 
 ```yml
-- Lines of Code in mainline drivers Kernel
-- Lines of Code in drivers RC versions 
-- Number of patches in mainline Kernel
-- Number of patches in staging
-- Subsystem evolution, Drivers evolution
-- Extension of mainline Kernel files
-- Number of version published yearly
-- Number of days from RC to the latest mainline Kernel
-- Core Kernel evolution, Linux Kernel diffstat
-- Number of times memory allocation and deallocation
-- Kernel APIs count
-- LWN.net articles published during a version publish
-- Deletion and Addition of Driver
-- Coccinelle Patches, Static Analyser Patches
-- Strong negative words used while reviewing patches
-- Strong negative words used while doing an rc/mainline release
-- Frequency of repeated patches
-- Frequency of review latency
-- Iterations on Patches
-- Number Mailing Lists counts
-- Number of mails per mailing list per version
-- Memory manipulation evolution in mainline kernel
 
 ```
 ### Raise a PR
