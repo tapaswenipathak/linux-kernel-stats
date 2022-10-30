@@ -16,16 +16,16 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 ## Abstract
 
 ## Table of Contents
-- [How to run the scripts](How-to-run-the-scripts)
-  - [Clone / download]()
-  - [Run files separately using commands]()
-  - [Run using makeFile]()
-- [Contributing Guide]()
-  - [Open Stats]()
-  - [Raise a PR]()
-  - [Create tickets]()
-  - [Report issue]()
-- [Contact Us]()
+- [How to run the scripts](#how-to-run-the-scripts)
+  - [Clone / download](#clone--download)
+  - [Run files separately using commands](#run-files-separately-using-commands)
+  - [Run using makeFile](#run-using-makefile)
+- [Contributing Guide](#contributing-guide)
+  - [Open Stats](#open-stats)
+  - [Raise a PR](#raise-a-pr)
+  - [Create tickets](#create-tickets)
+  - [Report issue](#report-issue)
+- [Contact Us](#contact-us)
 
 ## How to run the scripts   
 #### Clone / download
@@ -58,7 +58,7 @@ So here's a script that writes your username: ``` echo whoami.sh```
 ## Contributing Guide
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-Contributions are always welcome! We have already implemented so much, amd are still on the process. If you feel this excites you feel free to contribute! Below are some open stats which still needs your attention. Happy open Source!
+Contributions are welcome!If you feel this excites you feel free to contribute! Below are some open stats which are open for contribution. Happy open Source!
 
 ### Open Stats 
 ```yml
@@ -91,7 +91,6 @@ Contributions are always welcome! We have already implemented so much, amd are s
 
 Various linux kernel stats are open for the contribution. To contribute Fork the Repo and create a Branch for any issue that you are working upon.Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
 
-New to openSource? Follow this - https://github.com/firstcontributions/first-contributions 
 
 ### Create tickets
 Take a look at the Existing Issues or create your own Tickets.
