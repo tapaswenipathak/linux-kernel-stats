@@ -1,102 +1,89 @@
-# linux-Kernel-stats
 
-This repository has statistical study about linux Kernel which includes
+----------------------
+Linus Kernel Statistics
+----------------------
+This repository has statistical study about linux Kernel which includes several linux-kernel stats.
 
-## Lines of Code in mainline versions
 
-![](./results/loc.png)
+## Introduction
+Evolution is essential and indispensable for a software System "else it will become progressively less satisfactory". The software evolution can be characterized using various parameters version number, lines of code, number of patches and other software matrices. Linux has an interesting history and is arguably the most popular open source operating system, its history is actually quite short considering the timeline of operating systems.  In the early days of computing, programmers developed on the bare hardware in the hardware's language. The lack of an operating system meant that only one application (and one user) could use the large and expensive device at a time. Early operating systems were developed in the 1950s to provide a simpler development experience. Examples include the General Motors Operating System (GMOS) developed for the IBM 701 and the FORTRAN Monitor System (FMS) developed by North American Aviation for the IBM 709.
+In the 1960s, Massachusetts Institute of Technology (MIT) and a host of companies developed an experimental operating system called Multics (or Multiplexed Information and Computing Service) for the GE-645. One of the developers of this operating system, AT&T, dropped out of Multics and developed their own operating system in 1970 called Unics. Along with this operating system was the C language, for which C was developed and then rewritten to make operating system development portable.
 
-## Lines of Code in RC versions
+Twenty years later, Andrew Tanenbaum created a microkernel version of UNIX®, called MINIX (for minimal UNIX), that ran on small personal computers. This open source operating system inspired Linus Torvalds' initial development of Linux in the early 1990s. And is still evolving.
 
-## Lines of Code in mainline drivers Kernel
+We have conducted a thorough review of the evolution of the Kernel from 17 Sept 1991 to the present in this post and attached the results obtained. 
 
-## Lines of Code in drivers RC versions
+## Abstract
 
-### 1.x
+## Table of Contents
+- [How to run the scripts](#how-to-run-the-scripts)
+  - [Clone / download](#clone--download)
+  - [Run files separately using commands](#run-files-separately-using-commands)
+  - [Run using makeFile](#run-using-makefile)
+- [Contributing Guide](#contributing-guide)
+  - [Open Stats](#open-stats)
+  - [Raise a PR](#raise-a-pr)
+  - [Create tickets](#create-tickets)
+  - [Report issue](#report-issue)
+- [Contact Us](#contact-us)
 
-### 2.6.xx
+## How to run the scripts   
+#### Clone / download
+##### Step 1
+Make a folder named "torvalds" in the home location : home/username
 
-### 3.x
+clone the repo in the folder "torvalds" using ``` git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git ```
 
-### 4.xx
+"This will download the current kernel source repository"
 
-### 5.x
+##### Step 2
+Now, Clone the repository that contains scripts using : ``` git clone https://github.com/tapaswenipathak/ linux-kernel-stats ```
 
-## Number of patches in mainline Kernel
+Now, Run the script files using : 
+- ``` bash loc.sh ```
+- ``` bash glimpseindex_cocci.sh ```
+- ``` bash patches.sh```
 
-![](./results/numberofpatches.png)
+#### Run files separately using commands 
+First, your script must declare which interpreter to use. You do this in the first line of the file. If it's a shell script, it should be #!/bin/sh or #!/bin/bash.
 
-## Number of patches in staging
+So here's a script that writes your username: ``` echo whoami.sh```
+- To make it executable, use:
+```chmod +x echo-whoami.sh```
+- Then you can run it using:
+```./echo-whoami.sh```
 
-## Numer of lines of code increase
+#### Run using makeFile
 
-## Subsystem evolution
+## Contributing Guide
+[![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-### 1.x
+Contributions are welcome!If you feel this excites you feel free to contribute! Below are some open stats which are open for contribution. Happy open Source!
 
-### 2.6.xx
+### Open Stats 
+```yml
 
-### 3.x
+```
+### Raise a PR
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-### 4.xx
+Various linux kernel stats are open for the contribution. To contribute Fork the Repo and create a Branch for any issue that you are working upon.Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
 
-![](./results/subsystem-4-x.png)
 
-### 5.x
+### Create tickets
+Take a look at the Existing Issues or create your own Tickets.
 
-## Drivers evolution
+### Report issue
+If you find any incorrect information on this repository, kindly report an issue mentioning the reason, and attaching screenshot.
 
-### 1.x versions
+## Contact Us
+Feel free to connect with us for discussing regarding our findings.
 
-### 2.6.xx versions
+- Kavita Meena <kavita23meena.2002@gmail.com>
+- Madhu Patel <Patelmadhu06@gmail.com>
+- Tapasweni Pathak <tapaswenipathak@gmail.com>
 
-### 3.xx versions
 
-### 4.xx versions
-![](./results/drivers-4-x.png)
 
-### 5.x versions
 
-## Extension of mainline Kernel files
 
-## Number of version published yearly
-
-## Number of days from RC to the latest mainline Kernel
-
-## Core Kernel evolution
-
-## Linux Kernel diffstat
-
-## Number of times memory allocation and deallocation
-
-## Kernel APIs count
-
-## LWN.net articles published during a version publish
-
-## RC versions per mainline kernel version
-
-## Deletion and Addition of Drivers
-
-## Cocinelle Patches
-
-### 1.x
-
-### 2.6.xx
-
-### 3.xx
-
-### 4.xx
-
-### 5.x
-
-## Static Analyser Patches
-
-### 1.x
-
-### 2.6.xx
-
-### 3.xx
-
-### 4.xx
-
-### 5.x
