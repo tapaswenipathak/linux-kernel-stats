@@ -102,14 +102,6 @@ for ((i=2; i<=62; i++)); do
     echo v2.6.16.$(($i-1))..v2.6.16.$i
     git log --oneline v2.6.16.$(($i-1))..v2.6.16.$i| wc -l
 done
-###############################################
-# for ((i=28; i<=62; i++)); do
-#     for tbl in $(git tag -l| grep v2.6.16.$i); do
-#         echo $tbl
-#         git checkout -fq $tbl
-#         find -type f -name '*.[chS]' -exec wc -l {} \;| awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-#     done
-# done
 
 # v2.6.17
 echo v2.6.16.62..v2.6.17
