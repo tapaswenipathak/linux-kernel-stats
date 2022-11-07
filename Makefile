@@ -2,12 +2,16 @@
 all : scripts/loc.o scripts/patches.o scripts/stable_lines.o scripts/glimpseindex_cocci.o
 
 
-# PREREQUISITE - To clone the Linux-Kernel-Source-Tree inside the folder named torvalds run the following commands in your terminal\
+# PREREQUISITE - 
+# A. To clone the Linux Kernel Stable Tree, run the following command in your terminal
+# Step 1. git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git 
+
+# B. To clone the Linux-Kernel-Source-Tree inside the folder named torvalds run the following commands in your terminal
 # Step 1. mkdir torvalds;
 # Step 2. cd torvalds
 # Step 3. git clone https://github.com/torvalds/linux.git
 
-#If torvalds/linux directory already exists in your system, then you can directly run the Makefile using "make" command
+#If both of the above mentioned repositories already exist in your system, then you can directly run the Makefile using "make" command in the terminal
 
 
 #  Following command will run the file named loc.sh
