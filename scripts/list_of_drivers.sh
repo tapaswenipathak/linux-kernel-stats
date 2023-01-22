@@ -21,4 +21,4 @@ for ((i=0; i<=$n; i++)); do
     else
         continue
     fi   
-done > /home/madhu/Desktop/Research_Work/linux-kernel-stats/scripts/list_of_drivers_output.txt
+done 
