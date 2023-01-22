@@ -1,29 +1,19 @@
 #!/bin/bash
 
-SRCDIR=~/torvalds/linux
-
+SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR
 
-for ((i=12;i<=39;i++)) ; do
-	echo v2.6.$i
-	git checkout -fq v2.6.$i
-	find -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-done
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))  
 
-for ((i=0;i<=19;i++)) ; do
-	echo v3.$i
-	git checkout -fq v3.$i
-	find -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-done
+#total no. of versions
+n=${#all_versions[@]}  
 
-for ((i=0;i<=20;i++)) ; do
-	echo v4.$i
-	git checkout -fq v4.$i
-	find -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-done
-
-for ((i=0;i<=1;i++)) ; do
-	echo v5.$i
-	git checkout -fq v5.$i
-	find -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
+for ((i=0; i<=$n; i++)); do
+    git checkout -fq ${all_versions[$i]}
+    if [[ $? -eq 0 ]]; then
+        paste <(echo "${all_versions[$i]}") <(find -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}') | column -s $'\t' -t
+    else
+        continue
+    fi
 done
