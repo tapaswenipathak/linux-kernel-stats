@@ -63,3 +63,21 @@ scripts/subsystems.o:
 scripts/glimpseindex_cocci.o:
 	(echo "Number of glimpseindex_cocci in each version of linux kernel")
 	(cd scripts; bash glimpseindex_cocci.sh)
+
+# Following command will run the file named list_of_drivers.sh
+
+scripts/list_of_drivers.o:
+	(echo "List of drivers in each version of linux kernel")
+	(cd scripts; bash list_of_drivers.sh)
+
+# Following command will run the file named no_of_directories_drivers.sh
+
+scripts/no_of_directories_drivers.o:
+	(echo "Number of directories for drivers in each version of linux kernel")
+	(cd scripts; bash no_of_directories_drivers.sh)
+
+# Following command will run the file named commits.sh
+
+scripts/commits.o:
+	(echo "Commits made in each version of linux kernel")
+	(cd scripts; bash commits.sh)
