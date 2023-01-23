@@ -19,4 +19,4 @@ for ((i=0; i<=$n; i++)); do
     else
         continue
     fi   
-done > /home/madhu/Desktop/Research_Work/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
+done 
