@@ -1,33 +1,27 @@
 #!/bin/bash
 
-SRCDIR=~/torvalds/linux
+SRCDIR=~/linux-stable/linux-stable
 
 cd $SRCDIR
+#!/bin/bash
 
-for ((i=12;i<=39;i++)) ; do
-	LATEST=$(git tag | sed -n -e "s/v2\.6\.$i\.\([0-9]*\)$/\1/p" | sort -nr | head -1)
-	echo -ne "v2.6.$i\t"
-	git checkout -fq v2.6.$i.$LATEST
-	find . -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-done
+SRCDIR=~/linux-stable/linux-stable
+cd $SRCDIR
 
-for ((i=0;i<=19;i++)) ; do
-	LATEST=$(git tag | sed -n -e "s/v3\.$i\.\([0-9]*\)$/\1/p" | sort -nr | head -1)
-	echo -ne "v3.$i\t"
-	git checkout -fq v3.$i.$LATEST
-	find . -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-done
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))  
 
-for ((i=0;i<=20;i++)) ; do
-	LATEST=$(git tag | sed -n -e "s/v4\.$i\.\([0-9]*\)$/\1/p" | sort -nr | head -1)
-	echo -ne "v4.$i\t"
-	git checkout -fq v4.$i.$LATEST
-	find . -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
-done
+#total no. of versions
+n=${#all_versions[@]}  
 
-for ((i=0;i<=2;i++)) ; do
-	LATEST=$(git tag | sed -n -e "s/v5\.$i\.\([0-9]*\)$/\1/p" | sort -nr | head -1)
-	echo -ne "v5.$i\t"
-	git checkout -fq v5.$i.$LATEST
-	find . -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
+for ((i=0; i<=$n; i++)); do
+	LATEST=$(git tag | sed -n -e "s/${all_versions[$i]}\([0-9]*\)$/\1/p" | sort -nr | head -1)
+    git checkout -fq ${all_versions[$i]}$LATEST
+    if [[ $? -eq 0 ]]; then
+        echo -ne "${all_versions[$i]}\t"
+        find . -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}'
+        # paste <(echo "${all_versions[$i]}") <(find -type f -name '*.[chS]' -exec wc -l {} \; | awk 'BEGIN{lines=0}{lines+=$1}END{print lines}') | column -s $'\t' -t
+    else
+        continue
+    fi
 done
