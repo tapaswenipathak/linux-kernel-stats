@@ -81,3 +81,10 @@ scripts/no_of_directories_drivers.o:
 scripts/commits.o:
 	(echo "Commits made in each version of linux kernel")
 	(cd scripts; bash commits.sh)
+
+
+# Following command will run the file named files.sh
+
+scripts/files.o:
+	(echo "List of files present in each version of linux kernel")
+	(cd scripts; bash files.sh)
