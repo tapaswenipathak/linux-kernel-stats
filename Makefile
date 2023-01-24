@@ -3,6 +3,7 @@ all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scri
 
 
 # PREREQUISITE - 
+
 # A. To clone the Linux Kernel Stable Tree inside the folder named 'linux-stable', run the following command in your terminal
 # Step 1. mkdir linux-stable;
 # Step 2. cd linux-stable
@@ -13,78 +14,74 @@ all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scri
 # Step 2. cd torvalds
 # Step 3. git clone https://github.com/torvalds/linux.git
 
-#If both of the above mentioned repositories already exist in your system, then you can directly run the Makefile using "make" command in the terminal
+# C. git clone https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git
+
+# D. git clone https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git
+
+# E. git clone https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git
+
+# F. git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive
+
+#If the above mentioned repositories already exist in your system, then you can directly run the Makefile using "make" command in the terminal
 
 
 #  Following command will run the file named loc.sh
-
 scripts/loc.o:
 	(echo "lines of code in each version of linux kernel")
 	(cd scripts; bash loc.sh)
 
-
 # Following command will run the file named patches.sh
-
 scripts/patches.o:
 	(echo "Number of patches in each version of linux kernel")
 	(cd scripts; bash patches.sh)
 
-
 # Following command will run the file named extension.sh
-
 scripts/extension.o:
 	(echo "Extensions in each version of linux kernel")
 	(cd scripts; bash extension.sh)
 
 
 # Following command will run the file named drivers.sh
-
 scripts/drivers.o:
 	(echo "Number of lines in drivers present in each version of linux kernel")
 	(cd scripts; bash drivers.sh)
 
 
 # Following command will run the file named stable_lines.sh
-
 scripts/stable_lines.o:
 	(echo "Number of stable lines in each version of linux kernel")
 	(cd scripts; bash stable_lines.sh)
 
 
 # Following command will run the file named subsystems.sh
-
 scripts/subsystems.o:
 	(echo "subsystems in each version of linux kernel")
 	(cd scripts; bash subsystems.sh)
 
 
 # Following command will run the file named glimpseindex_cocci.sh
-
 scripts/glimpseindex_cocci.o:
 	(echo "Number of glimpseindex_cocci in each version of linux kernel")
 	(cd scripts; bash glimpseindex_cocci.sh)
 
 # Following command will run the file named list_of_drivers.sh
-
 scripts/list_of_drivers.o:
 	(echo "List of drivers in each version of linux kernel")
 	(cd scripts; bash list_of_drivers.sh)
 
 # Following command will run the file named no_of_directories_drivers.sh
-
 scripts/no_of_directories_drivers.o:
 	(echo "Number of directories for drivers in each version of linux kernel")
 	(cd scripts; bash no_of_directories_drivers.sh)
 
-# Following command will run the file named commits.sh
 
+# Following command will run the file named commits.sh
 scripts/commits.o:
 	(echo "Commits made in each version of linux kernel")
 	(cd scripts; bash commits.sh)
 
 
 # Following command will run the file named files.sh
-
 scripts/files.o:
 	(echo "List of files present in each version of linux kernel")
 	(cd scripts; bash files.sh)
