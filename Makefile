@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o 
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o
 
 
 # PREREQUISITE - 
@@ -85,3 +85,13 @@ scripts/commits.o:
 scripts/files.o:
 	(echo "List of files present in each version of linux kernel")
 	(cd scripts; bash files.sh)
+
+# Following command will run the file named no.of_lines_files.sh
+scripts/no.of_lines_files.o:
+	(echo "No. of lines in each file present in each version of linux kernel")
+	(cd scripts; bash no.of_lines_files.sh)
+
+# Following command will run the file named diffstat_allVersions.sh
+scripts/diffstat_allVersions.o:
+	(echo "Diffstat between two continous versions of linux kernel")
+	(cd scripts; bash diffstat_allVersions.sh)
