@@ -1,0 +1,96 @@
+#!/bin/bash
+
+SRCDIR_a=~/archive
+cd $SRCDIR_a
+
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))
+
+#total no. of versions
+n=${#all_versions[@]}
+echo -ne "$all_versions\t"
+for ((i=0; i<$n; i++)); do
+ git checkout -fq ${all_versions[$i]}
+first=$(git - -no-pager log -1 –format="%ai")
+ first1=date -d "$first"  '+%s'
+ last=$(git log - -reverse - -format="format:%ci" | sed -n 1p)
+last1=date -d "$last" '+%s'
+duration=$((last1 – first1) / 86400)
+echo "$duration"
+done
+
+
+SRCDIR_b=~/erofs-utils
+cd $SRCDIR_b
+
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))
+
+#total no. of versions
+n=${#all_versions[@]}
+for ((i=1; i<$n; i++)); do
+ git checkout -fq ${all_versions[$i]}
+echo -ne "$all_versions\t"
+first=$(git - -no-pager log -1 –format="%ai")
+ first1=date -d "$first"  '+%s'
+ last=$(git log - -reverse - -format="format:%ci" | sed -n 1p)
+last1=date -d "$last" '+%s'
+duration=$((last1 – first1) / 86400)
+echo "$duration\t"
+done
+
+
+SRCDIR_c=~/kbd
+cd $SRCDIR_c
+
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))
+
+for ((i=39; i<46; i++)); do
+ git checkout -fq ${all_versions[$i]}
+echo -ne "$all_versions\t"
+first=$(git - -no-pager log -1 –format="%ai")
+ first1=date -d "$first"  '+%s'
+ last=$(git log - -reverse - -format="format:%ci" | sed -n 1p)
+last1=date -d "$last" '+%s'
+duration=$((last1 – first1) / 86400)
+echo "$duration"
+done
+
+SRCDIR_d=~/history
+cd $SRCDIR_d
+
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))
+
+for ((i=9; i<168; i++)); do
+ git checkout -fq ${all_versions[$i]}
+echo -ne "$all_versions\t"
+first=$(git - -no-pager log -1 –format="%ai")
+ first1=date -d "$first"  '+%s'
+ last=$(git log - -reverse - -format="format:%ci" | sed -n 1p)
+last1=date -d "$last" '+%s'
+duration=$((last1 – first1) / 86400)
+echo "$duration"
+done
+
+/*SRCDIR_e=~/linux-stable/linux-stable
+cd $SRCDIR_e
+
+#declaring an array containing all versions
+declare -a all_versions=($(git tag -l | sort -V))
+
+#total no. of versions
+n=${#all_versions[@]}
+
+for ((i=2; i<=$n; i++)); do
+ git checkout -fq ${all_versions[$i]}
+echo -ne "$all_versions\t"
+first=$(git - -no-pager log -1 –format="%ai")
+ first1=date -d "$first"  '+%s'
+ last=$(git log - -reverse - -format="format:%ci" | sed -n 1p)
+last1=date -d "$last" '+%s'
+duration=$((last1 – first1) / 86400)
+echo "$duration"
+done
+*/`
