@@ -16,14 +16,14 @@ for ((i=8;i<=9;i++)) ; do
 done
 
 diffstat=$(git diff --shortstat "v0.99..v1.0")
-echo -ne "v0.99..v1.0"
+echo -ne "v0.99..v1.0\t"
 echo "$diffstat"
 
 
 SRCDIR_b=~/erofs-utils
 cd $SRCDIR_b
 
-for ((i=2; i<6; i++)); do
+for ((i=1; i<6; i++)); do
     diffstat=$(git diff --shortstat v1.$(($i-1))..v1.$i)
     echo -ne "v1.$(($i-1))..v1.$i\t"
     echo "$diffstat"
