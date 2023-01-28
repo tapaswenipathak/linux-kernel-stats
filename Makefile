@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o
 
 
 # PREREQUISITE - 
@@ -95,3 +95,8 @@ scripts/no.of_lines_files.o:
 scripts/diffstat_allVersions.o:
 	(echo "Diffstat between two continous versions of linux kernel")
 	(cd scripts; bash diffstat_allVersions.sh)
+
+# Following command will run the file named diffstat_mainVersions.sh
+scripts/diffstat_mainVersions.o:
+	(echo "Diffstat between two main versions of linux kernel")
+	(cd scripts; bash diffstat_mainVersions.sh)
