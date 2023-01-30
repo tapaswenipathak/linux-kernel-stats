@@ -1,0 +1,3 @@
+- https://elixir.bootlin.com/linux/latest/source
+- https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+- https://mirrors.edge.kernel.org/pub/linux/kernel/

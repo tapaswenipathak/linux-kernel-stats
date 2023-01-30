@@ -61,8 +61,9 @@ So here's a script that writes your username: ``` echo whoami.sh```
 Contributions are welcome!If you feel this excites you feel free to contribute! Below are some open stats which are open for contribution. Happy open Source!
 
 ### Open Stats 
-```yml
-
+A brief summary of various devices in the drivers directory can be found in the link below.
+```ymlus 
+ https://www.dropbox.com/scl/fi/z5mz0uol3zl0xy166wqpe/Drivers.paper?dl=0&rlkey=wt412tfnsnxq7uznaie4x88rp
 ```
 ### Raise a PR
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
