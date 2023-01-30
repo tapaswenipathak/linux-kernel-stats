@@ -37,7 +37,7 @@ clone the repo in the folder "Linux-versions" using ``` git clone http://git.ker
 "This will download the current kernel source repository"
 
 ##### Step 2
-Now, Clone the repository that contains scripts using : ``` git clone https://github.com/tapaswenipathak/ linux-kernel-stats ```
+Now, Clone the repository that contains scripts using : ``` git clone http://github.com/tapaswenipathak/ linux-kernel-stats ```
 
 Now, Run the script files using : 
 - ``` bash loc.sh ```
