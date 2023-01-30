@@ -30,9 +30,9 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 ## How to run the scripts   
 #### Clone / download
 ##### Step 1
-Make a folder named "torvalds" in the home location : home/username
+Make a folder named "Linux-stable" in the home location : home/username
 
-clone the repo in the folder "torvalds" using ``` git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git ```
+clone the repo in the folder "Linux-stable" using ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git ```
 
 "This will download the current kernel source repository"
 
