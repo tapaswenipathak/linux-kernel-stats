@@ -100,3 +100,8 @@ scripts/diffstat_allVersions.o:
 scripts/diffstat_mainVersions.o:
 	(echo "Diffstat between two main versions of linux kernel")
 	(cd scripts; bash diffstat_mainVersions.sh)
+	
+# Following command will find the Duration of development for each version (rc)
+scripts/Duration_allVersions.o:
+	(echo "Duration of development for each version(rc)")
+	(cd scripts; bash Duration_allVersions.sh)
