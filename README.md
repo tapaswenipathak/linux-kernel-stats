@@ -24,7 +24,7 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
   - [Open Stats](#open-stats)
   - [Raise a PR](#raise-a-pr)
   - [Create tickets](#create-tickets)
-  - [Report issue](#report-issue)
+2 mins  - [Report issue](#report-issue)
 - [Contact Us](#contact-us)
 
 ## How to run the scripts   
@@ -37,7 +37,7 @@ clone the repo in the folder "Linux-versions" using ``` git clone http://git.ker
 "This will download the current kernel source repository"
 
 ##### Step 2
-Now, Clone the repository that contains scripts using : ``` git clone http://github.com/tapaswenipathak/ linux-kernel-stats ```
+Now, Clone the repository that contains scripts using : ``` git clone https://github.com/tapaswenipathak/ linux-kernel-stats ```
 
 Now, Run the script files using : 
 - ``` bash loc.sh ```
