@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o
 
 
 # PREREQUISITE - 
@@ -100,3 +100,9 @@ scripts/diffstat_allVersions.o:
 scripts/diffstat_mainVersions.o:
 	(echo "Diffstat between two main versions of linux kernel")
 	(cd scripts; bash diffstat_mainVersions.sh)
+	
+# Following command will run the file named get_release_notes.sh
+scripts/get_release_notes.o:
+	(echo "Release notes for all the versions stored")
+	(cd scripts; bash get_release_notes.sh)
+	
