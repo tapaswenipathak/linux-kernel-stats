@@ -100,3 +100,10 @@ scripts/diffstat_allVersions.o:
 scripts/diffstat_mainVersions.o:
 	(echo "Diffstat between two main versions of linux kernel")
 	(cd scripts; bash diffstat_mainVersions.sh)
+	
+# Following command will run the file named get_release_notes.sh
+scripts/get_release_notes.o:
+	(echo "Release notes for all the versions stored")
+	(cd scripts; bash get_release_notes.sh)
+	
+
