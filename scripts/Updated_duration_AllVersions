@@ -1,5 +1,4 @@
 #!/bin/bash
-
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 
@@ -103,3 +102,6 @@ done
 #     duration=$(($d / $sec))
 #     echo "$duration"
 # # done
+
+
+ 
