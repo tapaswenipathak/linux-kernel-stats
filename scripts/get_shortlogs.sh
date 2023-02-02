@@ -5,7 +5,7 @@ if [ ! -d "shortlogs" ]; then
   mkdir shortlogs
 fi
 
-repos=("archive" "erofs-utils" "kbd" "history linux-stable")
+repos=("~/archive" "~/erofs-utils" "~/kbd" "~/history" "~/linux-stable/linux-stable")
 
 # For each repository excluding linux
 for repo in ${repos[@]}; do
@@ -36,7 +36,7 @@ for repo in ${repos[@]}; do
 
     # Extract shortlog for the tag and store it in the appropriate main version directory
     git shortlog $tag -- > "../shortlogs/$main_version/$tag.txt"
-    echo "$tag done"
+    # echo "$tag done"
   done
 
   # Move back to parent directory
