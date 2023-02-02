@@ -1,5 +1,4 @@
 #!/bin/bash
-
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 
