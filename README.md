@@ -24,8 +24,8 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
   - [Open Stats](#open-stats)
   - [Raise a PR](#raise-a-pr)
   - [Create tickets](#create-tickets)
-2 mins  - [Report issue](#report-issue)
-- [Contact Us](#contact-us)
+  - [Report issue](#report-issue)
+  - [Contact Us](#contact-us)
 
 ## How to run the scripts   
 #### Clone / download
