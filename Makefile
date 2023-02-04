@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o
 
 
 # PREREQUISITE - 
@@ -105,4 +105,13 @@ scripts/diffstat_mainVersions.o:
 scripts/get_release_notes.o:
 	(echo "Release notes for all the versions stored")
 	(cd scripts; bash get_release_notes.sh)
+
+# Following command will run the file named get_shortlogs.sh
+scripts/get_shortlogs.o:
+	(echo "Shortlogs for all versions of linux kernel")
+	(cd scripts; bash get_shortlogs.sh)
 	
+# following command will run the file named versions_till_now.sh
+scripts/versions_till_now.o:
+	(echo "All versions of linux kernel till now")
+	(cd scripts; bash versions_till_now.sh)
