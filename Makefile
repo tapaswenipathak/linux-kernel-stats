@@ -106,8 +106,17 @@ scripts/get_release_notes.o:
 	(echo "Release notes for all the versions stored")
 	(cd scripts; bash get_release_notes.sh)
 
-#
+# Following command will run the file named get_shortlogs.sh
 scripts/get_shortlogs.o:
 	(echo "Shortlogs for all versions of linux kernel")
 	(cd scripts; bash get_shortlogs.sh)
 	
+# following command will run the file named versions_till_now.sh
+scripts/versions_till_now.o:
+	(echo "All versions of linux kernel till now")
+	(cd scripts; bash versions_till_now.sh)
+
+# following command will run the file named no_of_directories_staging.sh
+scripts/no_of_directories_staging.o:
+	(echo "Number of directories in staging in linux kernel till now")
+	(cd scripts; bash no_of_directories_staging.sh)
