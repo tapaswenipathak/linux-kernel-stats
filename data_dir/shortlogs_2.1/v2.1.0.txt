@@ -1,0 +1,698 @@
+Aaro Koskinen (1):
+      libkeymap: fix kmap on big-endian machines
+
+Alexandru Szasz (1):
+      Add more romanian keymaps
+
+Alexey Gladkov (458):
+      0.99
+      1.01wip
+      1.03wip
+      1.04
+      1.05
+      1.06
+      1.08
+      1.10
+      1.12
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [BUILD] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from SUSE.
+      [SYSTEM] Apply patch from Fedora.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from ALTLinux.
+      [SYSTEM] Apply patch from ALTLinux.
+      [SYSTEM] Apply patch from ALTLinux.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      [SYSTEM] Apply patch from Debian.
+      Update unicode_start/unicode_stop scripts.
+      openvt utility build with src/getfd.c.
+      Check return code for chown and dup
+      [BUILD] Fix build warnings
+      Fix race condition.
+      Fix race condition
+      [SYSTEM] Update ru.map keymap
+      Update MAC German keymap
+      Fix some keys with kbd-1.12-mac-dk.diff
+      Apply patch kbd-1.12-prtscr_no_sigquit.diff from SUSE
+      Apply patch kbd-1.12-swiss.diff from SUSE
+      Apply patch kbd-1.12-cz-us-qwertz.diff from SUSE
+      Apply patchkbd-1.12-Meta-Tab.diff from SUSE
+      Apply patch kbd-1.08-compose.patch from ALT Linux
+      Update pl keymaps
+      Fix find file
+      Add note message to setfont.8
+      splitfont.1, setlogcons.8, and vcstime.8 are copied from console-tools
+      Don't overwrite CFLAGS and RPM_OPT_FLAGS variables
+      openvt: set the session controlling terminal
+      getfd.c: Add check a descriptor refers to a terminal
+      Apply cumulative patch
+      Revert "[SYSTEM] Apply patch from Debian."
+      Revert "[SYSTEM] Apply patch from Fedora."
+      Patch fix kbdrate for Sparc architecture
+      codepage.c: Fix output formating
+      Revert "Apply patch kbd-1.12-prtscr_no_sigquit.diff from SUSE"
+      Revert "[SYSTEM] Apply patch from SUSE."
+      openvt: Avoid use of GNU-specific function error()
+      Add unicode cyrillic fonts
+      Add more russian keymaps
+      Add Tatar keymaps
+      Add Bashkir (Russia) keymap
+      Add Kyrgyz keymap
+      Add Kazakh keymap
+      Add Belarusian (Belarus) keymaps
+      Add another ukrainian keymap
+      Migrate to autoconf
+      Fix man-pages installation
+      Move openvt into main sources tree
+      Install loadkeys into bindir
+      Move psf.magic into contrib
+      Rename --enable-samples to --enable-optional-progs
+      Fix font unicode mapping table
+      Add Terminus font
+      POTFILES.in: Remove openvt/ directory
+      Fix for autoconf-2.60
+      Fix build warnings
+      mapscrn: Add '.acm' suffix for compatibility with console-tools
+      Fix scripts coding style
+      Fix keymap name: by-cp1251.kmap -> by-cp1251.map
+      Add OLPC specific keymaps
+      unicode_start: remove -e from script
+      Update Changelog
+      Change bug report address
+      Fix more build warnings
+      Add i386/olpc into Makefile.in
+      Update README file
+      configure.ac: Fix options handling
+      Update CHANGES
+      configure.ac: Fix AC_DEFINE warning
+      Add turkish F (trf) keyboard map
+      Norwegian dvorak keymap
+      Update CHANGES
+      Add analyze.c and loadkeys.c sources
+      Fix DESTDIR handling
+      unicode_{start,stop}: To run loadkeys is allowed only to root
+      Move qwerty/cz.map -> qwertz/cz.map
+      include/*euro.map: Change 'currency' to 'euro' symbol
+      Update CHANGES
+      Update release version
+      Add qwerty/cz.map keymap
+      Recognize Ctrl-[ as Escape
+      Add --enable-strip configure option
+      loadunimap should use UNIMAPDIR
+      Use automake
+      Process a return code of 'write' function
+      Revert "include/*euro.map: Change 'currency' to 'euro' symbol"
+      loadkeys.c: Regenerate source
+      unicode_start: Without any arguments utility will only set unicode mode
+      [keymaps] Cleanup of formatting
+      [keymaps] ruwin_*: Use qwerty-layout.inc
+      [consoletrans] Update 8859-7_to_uni.trans
+      analyze.l: Add warning for on U+xxxx keysym specifications >= 0xf000
+      po/cat-id-tbl.c: Update messages
+      Update changelog and increase version
+      po: update po/ stuff
+      Remove kbio.h include
+      [keymaps] Use -n option for gzip command
+      [BUILD] Fix build warnings
+      Fix format error
+      Update analyze.c
+      Update .gitignore
+      [keymaps] bg_pho-utf8 keycode 38 assignment fix
+      [consolefonts] Add U+2010, U+2012, U+2013, U+2018, U+2019, U+2212 to the embedded character table
+      loadkeys: Document -q option
+      Regenerate loadkeys.c
+      [keymaps] Add Kirghiz keymap
+      Rename kir_alt_sh-UTF-8.map -> ky_alt_sh-UTF-8.map
+      Merge branch 'auto-convert-keymaps'
+      [BUILD] klibc port
+      Merge branch 'klibc/1.15-dev'
+      [keymaps] Add keymap for Colemak
+      [keymaps] Add keymap for German Intel based Macs
+      [keymaps] Add UK keymap for the Sun Type-6 keyboard
+      [keymaps] Add French keymap Dvorak
+      [BUILD] Fix problems at cross-compiling
+      Add depcomp
+      Update changelog and increase version
+      [keymaps] Add Tajik keymap
+      po: update translations
+      [build] Use automake to build translations
+      Fix translation
+      po: update indonesian translation
+      Regenerate loadkeys.c
+      Add georgian font
+      psffontop: Fix possible alignment issues, wrt -Wcast-align
+      vcstime: Fix build warning
+      [keymaps] Fix colemak installation
+      Update changelog and increase version
+      Makefile.am: Add ACLOCAL_AMFLAGS variable to handle m4/ directory
+      Update po/ directory
+      Change automake behavior
+      Remove obsolete file
+      loadkeys -a: Switch to ASCII mode
+      Do not set prefer_unicode for iso-8859-1
+      Drop klibc support
+      Use MAXPATHLEN constant
+      Add LatGrkCyr fonts
+      loadkeys: Fix some memory leaks
+      Add xstrndup()
+      findfile: Simplify loop code
+      findfile(): Remove duplicate declarations
+      Move search by fullname into separate function
+      findfile: Reduce memory usage and simplify code
+      loadkeys: Fix some memory leaks
+      loadkeys: redesign parser
+      loadkeys: fatal errors - change to varargs
+      loadkeys: Use Linux coding style
+      loadkeys: Use EXIT_FAILURE and EXIT_SUCCESS
+      loadkeys: Reorganize code
+      loadkeys: Add LOADKEYS_KEYMAP_PATH env variable
+      Remove debug messages
+      kbdinfo: Add new utility to obtain information about console
+      setvtrgb: New utility to set the virtual terminal RGB colors
+      openvt: Indent code
+      [keymaps] Add dvorak-ru keymap
+      Merge branch 'loadkeys'
+      Remove AC_PROG_YACC dup
+      kbdinfo: Change help message
+      Update translations
+      Update changelog and increase version (1.15.3wip)
+      openvt: Fixed race condition between the two run the utility
+      openvt: Fix verbose message
+      openvt: Use xmalloc
+      openvt: Change error messages and error handling
+      openvt: Add -V option
+      openvt: Move copyright information to COPYING
+      openvt: Remove openvt.h
+      openvt: Change authenticate_user() and usage() declaration
+      openvt: Use long options
+      openvt: Add --exec option
+      openvt: Update man-page
+      Merge branch 'openvt'
+      Update kbd.pot file
+      Update distribution files
+      po: Update translations (from translationproject.org)
+      Set 1.15.3 version
+      Fix extra files
+      Fix translations
+      Fix "make distcheck"
+      Add vlock sources
+      loadkeys: Read from stdin, when no keymaps specified in command line
+      [keymaps] Add dvorak-es keymap
+      Regenerate loadkeys.c
+      Change the handling of -C option
+      Change default keymap
+      Fix -d option
+      Don't read stdin if -d specified
+      vlock: Add manpage
+      Use more devices in getfd() function
+      Merge branch 'vlock'
+      openvt: Add --exec option to usage
+      Allow resizecons on x86_64
+      configure: Add silent rules
+      configure: Add configure summary
+      configure: check compile flags
+      Update the flex scanner to use a stack for its start conditions
+      Dont use flex internal variable
+      Use internal libraries
+      Moved old code into a separate directory
+      Fix error message
+      Use lkfile_t as base file structure
+      findfile: Do not use pathname[] inside
+      findfile: optimize maybe_pipe_open()
+      findfile: Use lkfile_t inside
+      findfile: Add pathname buffer to lkfile_t
+      Use lkfile_t in all utilities
+      findfile: do not use the functions that prints messages
+      loadkeys: Do not output messages from the parser
+      loadkeys: Remove error-free functions
+      loadkeys: Reformat code for better readability
+      loadkeys: Add lkverbose function
+      loadkeys: Use lkerror() to output error messages
+      loadkeys: Use the output stream as an argument
+      loadkeys: Use lkerror only inside parser
+      loadkeys: Do not call exit() the parser
+      loadkeys: Use the local buffer for function key string entry
+      loadkeys: Remove unused global variable private_error_ct
+      loadkeys: Use enum for options
+      loadkeys: Move code changes prefer_unicode variable from set_charset()
+      loadkeys: Move prefer_unicode to loadkeys.y
+      loadkeys: Fix lkerror
+      loadkeys: Remove OPT_QUIET option
+      loadkeys: Split flags that are used in the rules parser and flags that are used in the utility
+      loadkeys: Split variables between loadkeys.y and loadkeys.analyze.l
+      loadkeys: Move to a separate structure all keymap depend variables
+      loadkeys: Use kbsentry only inside parser
+      [keymaps] Add dvorak-sv-a1 and dvorak-sv-a5 keymaps
+      loadkeys: Rewrite the parser to reentrant mode
+      loadkeys: Fix yylineno
+      Rewrite parser logging
+      Define logging levels
+      Workaround a mutual dependence between loadkeyes.h and loadkeys.analize.h
+      Delete the files generated by flex and bison
+      Split loadkeys utility and parser
+      Add the generated files to CLEANFILES
+      Function do_constant went back to the internal context
+      dumpkeys: Add the missing short options
+      Reorder functions in source code
+      Fix unused parameters
+      ksyms: Use struct keymap
+      ksyms: Do not output messages directly
+      ksyms: Remove unused chosen_charset
+      findfile: Mark as "const" read only arguments
+      Add libkeymap internal library
+      Remove unnecessary include
+      Fix configure.ac
+      Fix regression in 16117ce6ab
+      Delete the files generated by flex and bison
+      configure: Rename --enable-vlock to --disable-vlock
+      vlock: Internationalization
+      Added output functions with temporary names to avoid the conflicts in the dumpkeys
+      Remove src/vlock
+      Update translations
+      Update changelog and increase version (1.15.4wip)
+      Move libkeymap to separate directory
+      po: Update translations (from translationproject.org)
+      Set 1.15.4 version
+      Fix msgstr in es.po and update translations
+      Update changelog and increase version (1.15.5wip)
+      po: Update vi.po from translationproject.org
+      Set 1.15.5 version
+      Fix regression in 16117ce6ab
+      dump: Fix overflow of 'defining' variable
+      Add functions to load data from the kernel
+      libkeymap: Add Makefile.am
+      Add get_diacrs() and top level functions
+      Ignore K_NOSUCHMAP keycode
+      Add summary functions
+      dumpkeys: Use libkeymap
+      Merge branch 'master' into loadkeys
+      Make it possible to build libkeymap out-of-tree
+      Split header files on public and private and add lk_ prefix for all public functions
+      Split ksyms source
+      ksyms: Global syms[] and charsets[] shouldn't be modified
+      Set charset through the struct kmap
+      ksyms: All arrays are readonly
+      libkeymap: Export only lk_* symbols
+      libkeymap: Fix build warnings
+      Big rename functions and source files
+      lk_free: Free func_table
+      libkeymap: Add lk_add_diacr function
+      libkeymap: Do not dump diacr values if lk_dump_keymap called
+      Check incoming pointer
+      Change return code from lk_free
+      Rewrite logging
+      Drop attr_* defines
+      Do not use _GNU_SOURCE
+      Add lk_get_key function
+      Add lk_get_func function
+      Add some tests
+      Utils use _GNU_SOURCE
+      Show all keymap if FULL_TABLE specified
+      dump: Remove new line from output
+      tests: Add tests for dumpkeys functions
+      tests: Add lost testcase
+      tests: Add test for keymaps line
+      Remove extra argument of lk_add_map
+      kmap: Change indentation
+      analyze.l: Fix potential memory leak
+      Fix undefined return value
+      Fix memory leak
+      Add functions to setup the logging
+      Rename lk_remove_key to lk_del_key, unify arguments order of lk_*_key functions
+      Add lk_get_charset function
+      tests: Fix distcheck
+      Add goals for packaging and publication
+      Fix keymaps stack processing
+      Remove state_ptr variable
+      Replace variables for keywords with flags
+      Replace prefer_unicode with LKFLAG_PREFER_UNICODE
+      Rename LKFLAG_* on LK_FLAG_*
+      Fix bug in previous commit
+      Remove static arrays for keymaps and keys
+      Remove static arrays that is used internally for the parser
+      lk_dump_bkeymap takes the output stream as argument
+      Rewrite accent_table to dynamic array
+      Rewrite func_table to dynamic array
+      Rename struct keymap to lk_ctx
+      Create lk_table_shape flag
+      Add pkgconfig file
+      Fix distcheck
+      Add wrapper to initialize array
+      Add generation of documentation using doxygen
+      Fix libkeymap.pc installation
+      Rename *_exist to *_exists
+      Add getter and setter for parser flags
+      Move lk_ctx content to private part of library
+      Add bepo keyboard layout
+      Merge branch 'libkeymap'
+      Set 2.0.0 version
+      Fix alt_is_meta regression
+      parser: Merge fullline and singleline rule
+      Rename bepo keymaps
+      Disable arch-specific test for now
+      contrib: Add utility to remove all kernel keymaps
+      Set 2.0.1 version
+      Add lk_fpopen
+      Fix runtime warinings
+      Add functions to get the total number of elements
+      Add functions to convert ksyms
+      docs: Add header for libkeymap
+      eurlatgr - new Linux console font
+      Hide syms array
+      Add information about the total number of elements
+      Change lk_add_diacr declaration
+      Add function to obtain items from the diacritical table
+      Change the API for working with the diacritical table
+      Change API for working with list of functions
+      Add functions to check diacr/func existance
+      Add pancyrillic font
+      Add license block
+      po: Update translations (from translationproject.org)
+      Set 2.0.2-rc2 version
+      Set 2.0.2 version
+      Add sun fonts
+      fr-bepo.map: Add missing keycode definitions
+      dvorak-es.map: Fix include
+      loadkeys: Add option to search and parse keymap
+      Revert part of 1.12-9-gc6af796
+      Replace error() by kbd_error()
+      Fix kbd_error
+      Reduce perror usage
+      Update README
+      Add Latin American Dvorak keymap
+      Close descriptor after use
+      Fix memory leak
+      Update pot
+      po: Update translations (from translationproject.org)
+      v2.0.3
+      Add bar to turkish keymap
+      Update pancyrillic
+      loadkeys: require a console device only to load keymap
+      Remove duplicate rules from makefile
+      Fix tests
+      Rename README to README.md
+      Include config.h first
+      Check the return code of getfd
+      Reformat source code in the single style
+      Fix implicit function declaration
+      Update po
+      po: Update translations (from translationproject.org)
+      v2.0.4
+      Add libfindfile
+      libfindfile: Fix build warnings
+      Add includes to fix build
+      Rename libfindfile -> src/libkbdfile
+      Update docs and add info how to contribute
+      Fix keymaps compression
+      dvorak-programmer keymap key error
+      Merge COPYING and CREDITS, add LICENSE
+      Remove garbage
+      Add code coverage
+      Move common code to separate internal library
+      Rewrite libkbdfile library
+      Fix memory leak
+      vlock: Fix build warnings
+      Fix build warnings (part 1)
+      Fix build warnings (part 2)
+      Update travis file
+      Fix build warnings (part 3)
+      Revert "Fix memory leaks"
+      Fix build error
+      Add help and version options
+      Add help and version options
+      Add Arabic layout from Debian
+      openvt: initialize variable to make a static analyzer happy
+      kbdrate: Add help and long options
+      kbdrate: Add option to print current values
+      kbdrate: Do not define useless function
+      Update kbdrate.8 manpage
+      kbdinfo: Add long options and manpage
+      setvtrgb: Add long options and --console option
+      Rewrite autogen.sh and update autotools stuff
+      Refactor tests and remove dependency on libcheck
+      libkbdfile: Check pathname variable size when it is filled
+      setmetamode: Add long options and update manpage
+      Move attributes to headers
+      Update Travis CI
+      Add verbosity for charset generation
+      Use EX_USAGE exit code for bad usage
+      libkeymap: Fix build warnings
+      openvt: Check vtname variable size when it is filled
+      libkbdfile: free namelist
+      Initialize the kbdfile context internally if necessary
+      Update Doxyfile and add some documentation
+      Update po
+      v2.0.90
+      Update help messages
+      v2.1.0
+
+Alexey Voinov (3):
+      Don't use func_buf in mktable
+      Simplify addfunc
+      Remove unused func_buf and fp
+
+Andreas Henriksson (1):
+      setmetamode: use unsigned int type for KDGKBMETA / KDSKBMETA
+
+Balint Reczey (1):
+      kbd_mode: Add -f option and deny dangerous mode switches without it
+
+Ben Blain (1):
+      Add dvorak-ukp.map
+
+Benno Schulenberg (4):
+      Fix internationalization
+      Add a missing word to an error message.
+      Add the handling of plurals to the extraction of translatable strings.
+      Properly pluralize some progress messages.
+
+Charles Clément (1):
+      Propagates configure options
+
+Dmitriy Perlow (1):
+      [keymaps] Add ruwin_alt_sh-UTF-8 keymap
+
+Dmitry V. Levin (5):
+      vlock: implement PAM account and password management
+      vlock: rename ERROR_TIMEOUT macro to LONG_DELAY
+      vlock: introduce short delays after non-fatal PAM errors
+      vlock: move some code around
+      vlock: handle disappearing ttys gracefully
+
+Dustin Kirkland (1):
+      Color scheme of the console in Ubuntu
+
+Dāvis (1):
+      Added Latvian keymap
+
+Emanuele Tomasi (1):
+      New it.map
+
+Eric S. Raymond (2):
+      Problems with codepage.1
+      Problems with loadkeys.1
+
+Erlend Pedersen (1):
+      Renamed dvorak/no keymap to avoid shadowing qwerty/no.
+
+Felix Janda (12):
+      src/kbdrate: iconv from iso-8859-2 to utf8
+      libkeymap: include <sys/types.h> for u_short
+      kbdrate.c, openvt.c: include <fcntl.h> for open()
+      openvt.c: include <limits.h> for NAME_MAX
+      <sys/io.h> is already enough to get ioperm()
+      setvtrgb: Don't gratuitously use malloc
+      setvtrgb: simplify loop
+      setvtrgb: inline set_colormap
+      kbd_error(0,...) -> kbd_warning(), so that kbd_error can be reverted to previous version
+      Remove dependency on <linux/types.h> by writing out u_char and u_short
+      ksyms: Fix out of bounds memory read in codetoksym
+      tests: Fix typo in dumpkeys-fulltable
+
+Fredrik Noring (5):
+      Add Apple USB keyboard model A1048 with keypad, plastic, Swedish
+      Add Apple USB keyboard model A1243 with keypad, aluminium, Swedish
+      Add Apple USB keyboard model A1243, Swedish, reverse function keys
+      Add Apple USB keyboard/trackpad (ISO), Swedish
+      Add Apple USB keyboard/trackpad (ISO), Swedish, reverse function keys
+
+Garry Filakhtov (1):
+      configure.ac: Fix logic of vlock configure switch
+
+Hagbard Celine (1):
+      Please accept this patch to make Norwegian kb-layout actually match the markings on most Norwegian keyboards.
+
+Herton Ronaldo Krzesinski (2):
+      be-latin1 keycode 7 assignment fix
+      Fix errors when building with -Werror=format-security gcc option
+
+Joe MacMahon (1):
+      [keymaps] Add dvorak-uk keymap
+
+Lefteris Dimitroulakis (1):
+      iso07u-16.psfu: Update font
+
+Leonard Lausen (1):
+      Add neo layout and neo.map
+
+Lucas De Marchi (1):
+      loadkeys: Fix -C option
+
+Ludwig Nussel (1):
+      fix double free
+
+Maarten ter Huurne (1):
+      Replace index() and rindex() with strchr() and strrchr()
+
+Marko Myllynen (12):
+      Add README.eurlatgr
+      eurlatgr: fix U+2191 / U+2192
+      eurlatgr: readd accidentally dropped remappings
+      Remove old and obsolete fi.map
+      Add new fi.map combining fi-latin1 and fi-latin9
+      Remove now redundant fi-latin1 and fi-latin9 maps
+      eurlatgr: add U+27E8/U+27E9 for man(1)
+      README.eurlatgr: describe differences with other often used fonts
+      Add README.eurlatgr.mappings
+      eurlatgr: add Adobe Latin 2 / 3 support
+      eurlatgr: add support for U+202F
+      Update README.eurlatgr to match the updated list
+
+Marty Jack (1):
+      Do not strip shell scripts
+
+Mateusz Piotrowski (1):
+      Fix a typo in the openvt help message
+
+Merlin Dou (1):
+      Add dvorak-programmer keymap
+
+Michael Forney (2):
+      libkeymap: Include sys/types.h in array.h for ssize_t
+      libkeymap: Avoid pointer arithmetic on `void *`
+
+Michael Schutte (23):
+      [kbd] [PATCH] Updated German translation
+      Understand the CapsShift modifiers
+      openvt: Document the -f switch
+      Print an error message when calls to exec* functions fail
+      kbd_mode(1): Document the -C option
+      loadkeys: Auto-convert “traditional”/Unicode keysyms
+      Fix two problems with the keymap auto-conversion patch
+      Support bidirectional conversion of keysyms
+      Support Unicode compose tables
+      Regenerate analyze.c and loadkeys.c
+      Use static memory for chosen_charset
+      Clarify convert_code() and ksymtocode()
+      showconsolefont: Print adequate space chars
+      Add documentation for loadkeys’s -q option to loadkeys.y
+      dumpkeys: Use U+… in “compose” lines if KDGKBDIACRUC is available
+      Replace “-” by “\-” in some manpages when options are mentioned
+      Update setkeycodes manpage information about hardwired keycodes
+      Add support for Brl_dot9 and Brl_dot10
+      Never handle plain ASCII characters as Unicode
+      Enable UNUMBERs in compose definitions
+      [kbd] [PATCH] loadkeys -u: Switch to Unicode mode, if necessary
+      vcstime: Use either /dev/vcs[a] or /dev/vcs[a]0
+      Fix "compose as usual" for Unicode diacritics
+
+Michel Stempin (1):
+      loadkeys: dump binary keymap
+
+Mike Frysinger (11):
+      ignore all files ending in ~
+      dvorak-ru.map: uncompress file
+      fix various vlock build errors
+      fix loadkeys.analyze lex handling
+      ignore config.cache files
+      fix up libtool warnings
+      delete unused var
+      fix parallel builds
+      ignore new files
+      libkeymap: include stdarg.h where used
+      add configure flag to disable tests
+
+Nicolas Delvaux (1):
+      [consolefonts]: Add unicode spaces
+
+Oleg Bulatov (18):
+      Fix loop limits for unicode case
+      Fill empty fields in syms.*.h
+      Extend iso_8859_9_syms
+      Simplify charset related code
+      Remove autogenerated files
+      Fix handling of K_NOSUCHMAP
+      Fix unicode and diacs dump
+      Fix strings dump
+      Generate some syms.*.h from consoletrans files
+      Fix reduce/reduce conflict
+      Use unicode name for cyrillic letter dzhe (was dze)
+      Use unicode name for letter ghe with upturn
+      Use keysyms in diacs dump
+      Respect charset in non-unicode dumpkeys
+      Fix reading KT_LETTER from hex
+      Generate cp1250 from consoletrans file
+      Add .travis.yml
+      Check existance of map before dumping it
+
+Olivier Mehani (1):
+      Don't open console on --bkeymap
+
+Ozgur Murat Homurlu (1):
+      Fix turkish Q (trq) keymap
+
+Perry Thompson (1):
+      Add carpalx keymap
+
+Petr Pisar (1):
+      vlock: erases scroll-back buffer
+
+Petter Thorsen (1):
+      Create mac-no-latin1.map keymap
+
+Richard Zidlicky (1):
+      [keymaps] Add "mobii" specific keymap
+
+Robert White (1):
+      openvt: Fix -w option
+
+Thomas Petazzoni (1):
+      Link against libintl when needed
+
+Vinícius dos Santos Oliveira (1):
+      br-abnt2: added support for AltGr + Q and AltGr + W key combinations.
+
+Vitezslav Crhonek (5):
+      [keymaps] Add dvorak-ca-fr keymap
+      Improve consistency of man pages and usage messages.
+      Fix infinite loop of vlock if locked VC is closed
+      Fix memory leaks
+      Fix typo in man loadkeys
+
+Xose Vazquez Perez (1):
+      kbd: install getkeycodes/setkecodes binaries on SPARC
+
+Zt (1):
+      Add sr-latin keymap
+
+Álvar Ibeas (1):
+      keymaps.5: Fix markup
+
