@@ -32,7 +32,7 @@ do
     echo "Downloading release notes for $version"
     if [ "$version" == "1.0" ]; then
         wget -q $base_url/v$version/CHANGES -O release_notes/$version/$first_ver.txt
-        echo "Release Notes stored in $dir_name/$version/"
+        echo "Release Notes stored in $dir_name/$version"
     elif [[ "$version" == "1.1" ]] || [[ "$version" == "1.2" ]] || [[ "$version" == "1.3" ]] || [[ "$version" == "2.0" ]] || [[ "$version" == "2.1" ]] || [[ "$version" == "2.2" ]]  || [[ "$version" == "2.3" ]] || [[ "$version" == "2.4" ]] || [[ "$version" == "2.5" ]] || [[ "$version" == "2.6" ]]; then
         wget  -q $base_url/v$version -O sub_version.html 
         sub_versions=($(grep -oP "linux-[0-9]+\.[0-9]+\.[0-9]+\.tar+\.xz" sub_version.html | sort -u |sed 's/linux-\([0-9.]\{1,\}\)\..*/\1/'))
@@ -41,7 +41,7 @@ do
             # Download the file for the version
             wget -q $base_url/v$version/linux-$sub_version.tar.gz
             # Unzip the file for the version
-            tar xvzf linux-$sub_version.tar.gz
+            tar xzf linux-$sub_version.tar.gz
             # Copy the release notes file for the version
             if [ ! -d Documentation/Changes ]; then
                 cp linux/CHANGES $dir_name/$version/$sub_version.txt
@@ -64,7 +64,7 @@ do
             wget -q $base_url/v$version/ChangeLog-$sub_version -O $dir_name/$version/$sub_version.txt
         done
         rm -r sub_version.html
-    echo "Release Notes stored in $dir_name/$version/"
+    echo "Release Notes stored in $dir_name/$version"
     fi
     rm -r version.html
 done
