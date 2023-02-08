@@ -48,7 +48,6 @@ for id in ids:
     href = a.get("href")
     hrefs.append(href)
 
-# Write the extracted hrefs to a new file
 with open("hrefs.txt", "w") as f:
     for href in hrefs:
         f.write(href + "\n")
