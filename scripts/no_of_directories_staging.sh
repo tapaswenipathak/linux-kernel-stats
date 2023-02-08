@@ -25,7 +25,9 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
+
     done
+
 
 SRCDIR_a=~/erofs-utils
 cd $SRCDIR_a
@@ -52,7 +54,9 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
+
     done 
+
 
 SRCDIR_a=~/kbd
 cd $SRCDIR_a
@@ -79,7 +83,9 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
+
     done 
+
 SRCDIR_a=~/history
 cd $SRCDIR_a
     #declaring an array containing all versions
@@ -105,8 +111,8 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
-    done 
 
+    done
 
 SRCDIR_a=~/linux-stable/linux-stable
 cd $SRCDIR_a
@@ -133,7 +139,5 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
+
     done 
-
-
-
