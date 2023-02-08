@@ -2,6 +2,7 @@
 all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o releaseDates_mainVersions.o
 
 
+
 # PREREQUISITE - 
 
 # A. To clone the Linux Kernel Stable Tree inside the folder named 'linux-stable', run the following command in your terminal
@@ -130,3 +131,4 @@ scripts/duration_mainVersions.o:
 scripts/releaseDates_mainVersions.o:
 	(echo "Release dates of main versions of linux kernel")
 	(cd scripts; bash releaseDates_mainVersions.sh)
+

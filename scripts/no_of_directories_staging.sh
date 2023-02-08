@@ -28,6 +28,7 @@ cd $SRCDIR_a
 
     done
 
+
 SRCDIR_a=~/erofs-utils
 cd $SRCDIR_a
     #declaring an array containing all versions
@@ -55,6 +56,7 @@ cd $SRCDIR_a
         fi
 
     done 
+
 
 SRCDIR_a=~/kbd
 cd $SRCDIR_a
