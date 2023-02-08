@@ -27,6 +27,7 @@ cd $SRCDIR_a
         fi
     done
 
+
 SRCDIR_a=~/erofs-utils
 cd $SRCDIR_a
     #declaring an array containing all versions
@@ -53,6 +54,7 @@ cd $SRCDIR_a
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
     done 
+
 
 SRCDIR_a=~/kbd
 cd $SRCDIR_a
