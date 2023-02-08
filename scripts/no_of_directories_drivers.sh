@@ -1,22 +1,105 @@
 #!/bin/bash
 
-SRCDIR=~/linux-stable
-cd $SRCDIR/drivers
+SRCDIR_a=~/archive
+cd $SRCDIR_a
+    #declaring an array containing all versions
+    declare -a all_versions=($(git tag -l | sort -V))  
 
-#declaring an array containing all versions
-declare -a all_versions=($(git tag -l | sort -V))  
+    #total no. of versions
+    n=${#all_versions[@]}  
 
-#total no. of versions
-n=${#all_versions[@]}  
+    for ((i=0; i<$n; i++)); do
+        git checkout -fq ${all_versions[$i]}
+        SRCDIR_b=$SRCDIR_a/drivers
+        if [ -d "$SRCDIR_b" ]; then 
+            cd $SRCDIR_b
+            echo ${all_versions[$i]} 
+            ls -ld */ | wc -l
+        else
+            paste <(echo "${all_versions[$i]}", "no drivers directory")
+        fi
+    done >> /home/madhu/Desktop/Research_Work/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
 
+SRCDIR_a=~/erofs-utils
+cd $SRCDIR_a
+    #declaring an array containing all versions
+    declare -a all_versions=($(git tag -l | sort -V))  
 
-for ((i=0; i<=$n; i++)); do
-    git checkout -fq ${all_versions[$i]}
-    if [[ $? -eq 0 ]]; then
-        echo ""
-        echo ${all_versions[$i]}
-        ls -ld */ | wc -l
-    else
-        continue
-    fi   
-done 
+    #total no. of versions
+    n=${#all_versions[@]}  
+
+    for ((i=0; i<$n; i++)); do
+        git checkout -fq ${all_versions[$i]}
+        SRCDIR_b=$SRCDIR_a/drivers
+        if [ -d "$SRCDIR_b" ]; then 
+            cd $SRCDIR_b
+            echo ${all_versions[$i]} 
+            ls -ld */ | wc -l
+            continue
+        else
+            paste <(echo "${all_versions[$i]}", "no drivers directory")
+        fi
+    done >> /home/madhu/Desktop/Research_Work/linux-kernel-stats/data_dir/no_of_directories_drivers.txt
+
+SRCDIR_a=~/kbd
+cd $SRCDIR_a
+    #declaring an array containing all versions
+    declare -a all_versions=($(git tag -l | sort -V))  
+
+    #total no. of versions
+    n=${#all_versions[@]}  
+
+    for ((i=0; i<$n; i++)); do
+        git checkout -fq ${all_versions[$i]}
+        SRCDIR_b=$SRCDIR_a/drivers
+        if [ -d "$SRCDIR_b" ]; then 
+            cd $SRCDIR_b
+            echo ${all_versions[$i]} 
+            ls -ld */ | wc -l
+            continue
+        else
+            paste <(echo "${all_versions[$i]}", "no drivers directory")
+        fi
+    done >> /home/madhu/Desktop/Research_Work/linux-kernel-stats/data_dir/no_of_directories_drivers.txt
+
+SRCDIR_a=~/history
+cd $SRCDIR_a
+    #declaring an array containing all versions
+    declare -a all_versions=($(git tag -l | sort -V))  
+
+    #total no. of versions
+    n=${#all_versions[@]}  
+
+    for ((i=0; i<$n; i++)); do
+        git checkout -fq ${all_versions[$i]}
+        SRCDIR_b=$SRCDIR_a/drivers
+        if [ -d "$SRCDIR_b" ]; then 
+            cd $SRCDIR_b
+            echo ${all_versions[$i]} 
+            ls -ld */ | wc -l
+            continue
+        else
+            paste <(echo "${all_versions[$i]}", "no drivers directory")
+        fi
+    done >> /home/madhu/Desktop/Research_Work/linux-kernel-stats/data_dir/no_of_directories_drivers.txt
+
+SRCDIR_a=~/linux-stable/linux-stable
+cd $SRCDIR_a
+    #declaring an array containing all versions
+    declare -a all_versions=($(git tag -l | sort -V))  
+
+    #total no. of versions
+    n=${#all_versions[@]}  
+
+    for ((i=0; i<$n; i++)); do
+        git checkout -fq ${all_versions[$i]}
+        SRCDIR_b=$SRCDIR_a/drivers
+        if [ -d "$SRCDIR_b" ]; then 
+            cd $SRCDIR_b
+            echo ${all_versions[$i]} 
+            ls -ld */ | wc -l
+            continue
+        else
+            paste <(echo "${all_versions[$i]}", "no drivers directory")
+        fi
+    done >>/home/madhu/Desktop/Research_Work/linux-kernel-stats/data_dir/no_of_directories_drivers.txt
