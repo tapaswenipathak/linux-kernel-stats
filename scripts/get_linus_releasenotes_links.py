@@ -8,27 +8,25 @@ html_content = requests.get(url).text
 soup = BeautifulSoup(html_content, 'html.parser')
 
 links = []
-for td in soup.find_all('td'):
-    if td.find('a') and td.find('sup'):
-        links.append(td.find('a')['href'])
 
-with open("links2.txt", "w") as f:
+for tag in soup.select("td:nth-of-type(3) a"):
+    links.append(tag['href'])
+
+with open("links4.txt", "w") as f:
     for link in links:
         f.write(link + "\n")
 
-# Open the original file for reading
-with open('links2.txt', 'r') as f:
+with open("links4.txt", "r") as f:
     lines = f.readlines()
 
-# Create a new file for writing the filtered lines
-with open('links3.txt', 'w') as f:
-    for line in lines:
-        if line.startswith('#'):
-            f.write(line)
+filtered_lines = [line for line in lines if line.startswith("#") and "#cite_note-KERNELARCHIVES-24" not in line]
 
-os.remove("links2.txt")
+with open("filtered_ids.txt", "w") as f:
+    f.writelines(filtered_lines)
 
-with open("links3.txt", "r") as f:
+os.remove("links4.txt")
+
+with open("filtered_ids.txt", "r") as f:
     ids = f.readlines()
 
 # Remove newline characters from the ids
@@ -48,8 +46,9 @@ for id in ids:
     href = a.get("href")
     hrefs.append(href)
 
+# Write the extracted hrefs to a new file
 with open("hrefs.txt", "w") as f:
     for href in hrefs:
         f.write(href + "\n")
 
-os.remove("links3.txt")
+os.remove("filtered_ids.txt")
