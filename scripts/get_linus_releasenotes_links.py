@@ -11,6 +11,9 @@ links = []
 
 for tag in soup.select("td:nth-of-type(3) a"):
     links.append(tag['href'])
+    
+for tag in soup.select("td:nth-of-type(2) a"):
+    links.append(tag['href'])
 
 with open("links4.txt", "w") as f:
     for link in links:
