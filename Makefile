@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o releaseDates_mainVersions.o scripts/get_linus_releasenotes_links.py 
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o releaseDates_mainVersions.o scripts/get_linus_releasenotes_links.py scripts/firmwares.sh
 
 
 
@@ -136,3 +136,7 @@ scripts/releaseDates_mainVersions.o:
 scripts/get_linus_releasenotes_links.py:
 	(echo "Links to Linus's Release notes")
 	(cd scripts; python get_linus_releasenotes_links.py)
+
+scripts/firmwares.sh:
+	(echo "List of firmwares supported")
+	(cd scripts; bash firmwares.sh)
