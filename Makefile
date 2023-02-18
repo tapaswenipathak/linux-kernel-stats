@@ -1,5 +1,7 @@
 
+
 all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o
+
 
 
 # PREREQUISITE - 
@@ -119,4 +121,21 @@ scripts/versions_till_now.o:
 # following command will run the file named no_of_directories_staging.sh
 scripts/no_of_directories_staging.o:
 	(echo "Number of directories in staging in linux kernel till now")
+
 	(cd scripts; bash no_of_directories_staging.sh)
+
+# following command will run the file named duration_mainVersions.sh
+scripts/duration_mainVersions.o:
+	(echo "Duration of development of main versions of linux kernel")
+	(cd scripts; bash duration_mainVersions.sh)
+
+# following command will run the file named releaseDates_mainVersions.sh
+scripts/releaseDates_mainVersions.o:
+	(echo "Release dates of main versions of linux kernel")
+	(cd scripts; bash releaseDates_mainVersions.sh)
+
+#following command will run the file named get_linus_releasenotes_links.py
+scripts/get_linus_releasenotes_links.py:
+	(echo "Links to Linus's Release notes")
+	(cd scripts; python get_linus_releasenotes_links.py)
+
