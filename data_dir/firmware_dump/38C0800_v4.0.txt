@@ -1,0 +1,12 @@
+    Split AdvLoadMicrocode out of AdvInitAsc3550Driver, AdvInitAsc38C0800Driver
+    AdvInitAsc38C0800Driver and AdvInitAsc38C1600Driver.
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7a22) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7a4e) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7a79) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7aa2) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7abb) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7ae0) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b0c) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b37) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b60) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b79) and 'AdvSet38C1600EEPConfig'

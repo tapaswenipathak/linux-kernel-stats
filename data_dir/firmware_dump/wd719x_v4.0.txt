@@ -1,0 +1,12 @@
+      wd719x: add missing .module to wd719x_template
+    wd719x: add missing .module to wd719x_template
+    wd719x_template is missing the .module field, causing module refcount
+      NCR5380, fnic, 53c974, ses, wd719x, hpsa, megaraid_sas).
+      wd719x: remove dma_cache_sync call
+      wd719x: Add firmware documentation
+      wd719x: Introduce Western Digital WD7193/7197/7296 PCI SCSI card driver
+    wd719x: remove dma_cache_sync call
+    wd719x: Add firmware documentation
+    wd719x: Introduce Western Digital WD7193/7197/7296 PCI SCSI card driver
+    Introduce wd719x, a driver for Western Digital WD7193, WD7197 and WD7296 PCI
+    This will be used by wd719x driver.

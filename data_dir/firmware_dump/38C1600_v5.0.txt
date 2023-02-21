@@ -1,0 +1,13 @@
+    and AdvInitAsc38C1600Driver.
+    AdvInitAsc38C0800Driver and AdvInitAsc38C1600Driver.
+    AdvInitFrom38C1600EEP where we need to modify the default EEPROM
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7ae0) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b0c) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b37) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b60) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b79) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7b9e) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7bca) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7bf5) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7c1e) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7c37) and 'AdvExeScsiQueue'
