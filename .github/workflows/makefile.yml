@@ -13,6 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    - name: Clone Linux kernel source code
+      run: |
+        git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git /home/runner/linux-stable
+        cd /home/runner/linux-stable
+        git checkout v5.4.100
 
     - name: Build and test code
       run: |
