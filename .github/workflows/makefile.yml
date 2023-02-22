@@ -14,14 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: configure
-      run: ./configure
+    - name: Build and test code
+      run: |
+        make
+        make test
 
-    - name: Install dependencies
-      run: make
-
-    - name: Run check
-      run: make check
-
-    - name: Run distcheck
-      run: make distcheck
+    - name: Deploy to production
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: make deploy
