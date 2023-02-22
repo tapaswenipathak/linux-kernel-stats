@@ -1,31 +1,24 @@
-name: Makefile CI
+name: Makefile CI/CD
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    
-    -name: clone erofs-utils
-     run: git clone https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git
-     
-    -name: clone kbd
-     run: git clone https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git
-     
-    -name: clone history
-     run: git clone https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git
-     
-    - name: clone archive
-      run: git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive
+    - name: Checkout code
+      uses: actions/checkout@v2
 
+    - name: Build and test code
+      run: |
+        make
+        make test
 
-    - name: Run make
-      run: make
+    - name: Deploy to production
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: make deploy
