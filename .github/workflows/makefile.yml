@@ -40,4 +40,10 @@ jobs:
         cd /home/runner/erofs-utils
 
     - name: Build and test code
-      run: make
+      run: |
+        make
+        make test
+
+    - name: Deploy to production
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: make deploy
