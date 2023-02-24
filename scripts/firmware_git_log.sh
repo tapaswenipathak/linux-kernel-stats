@@ -27,11 +27,11 @@ for ((i=n-1; i>=0; --i)); do
     git checkout -fq ${all_versions[$i]}
     if [[ $? -eq 0 ]]; then
         for keyword in ${firmwareArray[@]}; do
-           if git log | grep -E "$keyword" | grep -q .
+           if git log --all | grep -E "$keyword" | grep -q .
            then 
             echo -e "\e[6;35m \n ${all_versions[$i]} \n \e[0m"
             file_name="${keyword}_${all_versions[$i]}.txt"
-            git log | grep -E "$keyword" > ~/linux-kernel-stats/data_dir/firmware_dump/$file_name
+            git log --all | grep -E "$keyword" > ~/linux-kernel-stats/data_dir/firmware_dump/$file_name
            else
            echo -e "\e[6;35m \n ${all_versions[$i]}\n \e[0m"
            echo "No such string '$keyword' exists in the git log."

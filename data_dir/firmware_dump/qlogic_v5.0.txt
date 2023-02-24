@@ -1,12 +1,392 @@
+    In file included from drivers/net/ethernet/qlogic/qed/qed.h:23,
+                     from drivers/net/ethernet/qlogic/qed/qed_debug.c:10:
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump_addr_range':
+    In file included from drivers/net/ethernet/qlogic/qed/qed.h:23,
+                     from drivers/net/ethernet/qlogic/qed/qed_debug.c:10:
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump_addr_range':
+    Cc: Arun Easi <arun.easi@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    In file included from drivers/net/ethernet/qlogic/qed/qed.h:23,
+                     from drivers/net/ethernet/qlogic/qed/qed_debug.c:10:
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump_addr_range':
+    Cc: Arun Easi <arun.easi@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    In file included from drivers/net/ethernet/qlogic/qed/qed.h:23,
+                     from drivers/net/ethernet/qlogic/qed/qed_debug.c:10:
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump_addr_range':
+    Cc: Arun Easi <arun.easi@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_ethtool.c:714 qlcnic_validate_ring_count() warn: inconsistent indenting.
+    Cc: Arun Easi <arun.easi@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    In file included from drivers/net/ethernet/qlogic/qed/qed.h:23,
+                     from drivers/net/ethernet/qlogic/qed/qed_debug.c:10:
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump_addr_range':
+    * drivers/net/ethernet/qlogic/qed
+    * drivers/net/ethernet/qlogic/qede
+    scsi: qlogicpti: Fix dma_map_sg() check
+    qlogic: qed: fix clang -Wformat warnings
+    | drivers/net/ethernet/qlogic/qed/qed_dev.c:416:30: error: format
+    | drivers/net/ethernet/qlogic/qed/qed_dev.c:630:13: error: format
+    qlogic/qed: fix repeated words in comments
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_ethtool.c:1358:17: warning:
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    net: qlogic: check the return value of dma_alloc_coherent() in qed_vf_hw_prepare()
+    The BR-series installation guide from https://driverdownloads.qlogic.com/
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+      net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
+    drivers/net/ethernet/qlogic/qed/qed_main.c:1298 qed_slowpath_start()
+    drivers/net/ethernet/qlogic/qed/qed_main.c:1298 qed_slowpath_start()
+    drivers/net/ethernet/qlogic/qed/qed_main.c:1298 qed_slowpath_start()
+    drivers/net/ethernet/qlogic/qed/qed_main.c:1298 qed_slowpath_start()
+    drivers/net/ethernet/qlogic/qed/qed_main.c:1298 qed_slowpath_start()
+    scsi: qlogicpti: Call scsi_done() directly
+    scsi: qlogicfas408: Call scsi_done() directly
+    drivers/net/ethernet/qlogic/qed/qed_main.c:1298 qed_slowpath_start()
+    drivers/net/ethernet/qlogic/qed/qed_dev.c: In function
+    drivers/net/ethernet/qlogic/qed/qed_dev.c:2390:3: error: implicit
+    drivers/net/ethernet/qlogic/qed/qed_dev.c: In function
+    drivers/net/ethernet/qlogic/qed/qed_dev.c:2410:10: error: implicit
+    scsi: qlogicpti: Use scsi_cmd_to_rq() instead of scsi_cmnd.request
+      52895   10976       0   63871    f97f ../qlogic/qlcnic/qlcnic_ethtool.o
+      52701   11104       0   63805    f93d ../qlogic//qlcnic/qlcnic_ethtool.o
+    ethernet/qlogic: Use list_for_each_entry() to simplify code in qlcnic_hw.c
+    ./drivers/net/ethernet/qlogic/qed/qed_nvmetcp_fw_funcs.h: linux/kernel.h
+    scsi: qlogicfas408: Whitespace cleanup
+    scsi: qlogicfas408: make ql_pcmd() a void function
+     drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c:761: warning: expecting prototype for qlcnic_83xx_idc_cold_state(). Prototype was for qlcnic_83xx_idc_cold_state_handler() instead
+     drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_vnic.c:192: warning: expecting prototype for qlcnic_83xx_vnic_opmode(). Prototype was for qlcnic_83xx_config_vnic_opmode() instead
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Fixes: 7061b2bdd620e ("qlogic: Deletion of unnecessary checks before two function calls")
+    staging: qlge: use qlge_* prefix to avoid namespace clashes with other qlogic drivers
+    To avoid namespace clashes with other qlogic drivers and also for the
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_grc_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_idle_chk_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_mcp_trace_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_dbg_reg_fifo_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o:qed_debug.c:(.text+0x6aa4): more undefined references to `crc32_le' follow
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_grc_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_idle_chk_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_mcp_trace_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_dbg_reg_fifo_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o:qed_debug.c:(.text+0x6aa4): more undefined references to `crc32_le' follow
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_grc_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_idle_chk_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_mcp_trace_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o: in function `qed_dbg_reg_fifo_dump':
+    arm-linux-gnueabi-ld: drivers/net/ethernet/qlogic/qed/qed_debug.o:qed_debug.c:(.text+0x6aa4): more undefined references to `crc32_le' follow
+      WARNING: CPU: 11 PID: 11990 at drivers/net/ethernet/qlogic/qed/qed_dev.c:93 qed_db_rec_sanity.isra.12+0x48/0x70 [qed]
+      * Fixed broken qlogic build.
+      scsi: qlogicpti: Use module_platform_driver to simplify the code
+    scsi: qlogicpti: Use module_platform_driver to simplify the code
+    In file included from drivers/net/ethernet/qlogic/netxen/netxen_nic_hw.c:10:
+    drivers/net/ethernet/qlogic/netxen/netxen_nic.h:1193:18: warning: ‘FW_DUMP_LEVELS’ defined but not used [-Wunused-const-variable=]
+    drivers/net/ethernet/qlogic/qed/qed_rdma.c:1465:2-13: WARNING:
+    drivers/net/ethernet/qlogic/qed/qed_rdma.c:1468:2-14: WARNING:
+    drivers/net/ethernet/qlogic/qed/qed_rdma.c:1471:2-13: WARNING:
+    drivers/net/ethernet/qlogic/qed/qed_rdma.c:1472:2-14: WARNING:
+    Documentation/networking/device_drivers/qlogic/. The file contains:
+        driver tarball which was available from the qlogic website contained
+        got probably forgotten when the other qlogic license files were
+    Documentation/networking/device_drivers/qlogic/. The file contains:
+    Documentation/networking/device_drivers/qlogic/. The file contains:
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c:661:6: warning:
+    MAINTAINERS: fix location of qlogic/LICENSE.qla3xxx
+    ethernet/qlogic/LICENSE.qla3xxx -> qlogic/LICENSE.qla3xxx
+            drivers/net/ethernet/qlogic/qed/qed_chain.c:299 qed_chain_alloc_pbl()
+    drivers/net/ethernet/qlogic/qed/qed_chain.c
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    Cc: QLogic-Storage-Upstream@qlogic.com
+    drivers/net/ethernet/qlogic/qed/qed_hw.c: In function
+    drivers/net/ethernet/qlogic/qed/qed_hw.c:851:3: warning: function
+    drivers/net/ethernet/qlogic/qed/qed_dcbx.c:2402:32: warning:
+    drivers/net/ethernet/qlogic/qed/qed_ll2.c:2754:26: warning: symbol
+    drivers/net/ethernet/qlogic/qed/qed_ptp.c:449:30: warning: symbol
+    drivers/net/ethernet/qlogic/qed/qed_sriov.c:5265:29: warning:
+    In file included from drivers/net/ethernet/qlogic/qed/qed.h:51:0,
+                     from drivers/net/ethernet/qlogic/qed/qed_ooo.c:40:
+    drivers/net/ethernet/qlogic/qed/qed_hsi.h:4421:18: warning: 'iro_arr'
+    Merge branch 'qlogic-use-generic-power-management'
+    qlogic: use generic power management
+    from qlogic ethernet drivers.
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_hw.c and are used only in
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c.
+    drivers/net/ethernet/qlogic/qed/qed_main.c:2480:6: warning:
+                     from drivers/net/ethernet/qlogic/qed/qed_dev.c:35:
+    drivers/net/ethernet/qlogic/qed/qed_dev.c: In function 'qed_llh_add_mac_filter':
+    drivers/net/ethernet/qlogic/qed/qed_dev.c:983:17: note: 'abs_ppfid' was declared
+    qlogic/qede: Add XDP frame size to driver
+    drivers/net/ethernet/qlogic/qede/qede_main.c:1717:5-19: WARNING:
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c:1585:3-25:
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c:1588:3-25:
+    drivers/net/ethernet/qlogic/qed/qed_ll2.c:2334:20: warning: symbol 'll2_cbs'
+    drivers/net/ethernet/qlogic/qed/qed_dev.c:4395:2-34: WARNING:
+    drivers/net/ethernet/qlogic/qed/qed_dev.c:1975:2-34: WARNING:
+    drivers/net/ethernet/qlogic/qede/qede_ethtool.c: In function qede_selftest_receive_traffic:
+    drivers/net/ethernet/qlogic/qede/qede_ethtool.c:1569:20:
+    drivers/net/ethernet/qlogic/qede/qede_ethtool.c: In function qede_selftest_receive_traffic:
+    drivers/net/ethernet/qlogic/qede/qede_ethtool.c:1569:6:
+    scsi: docs: convert qlogicfas.txt to ReST
+    qlogic: Replace zero-length array with flexible-array member
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    Signed-off-by: Joe Carnuccio <joe.carnuccio@qlogic.com>
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    Signed-off-by: Joe Carnuccio <joe.carnuccio@qlogic.com>
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    Signed-off-by: Joe Carnuccio <joe.carnuccio@qlogic.com>
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    Signed-off-by: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    drivers/net/ethernet/qlogic/qed/qed_cxt.c: In function 'qed_qm_init_pf':
+    drivers/net/ethernet/qlogic/qed/qed_cxt.c:1401:29: warning:
+    drivers/net/ethernet/qlogic/qlge/ to drivers/staging/qlge/"), meaning
+    drivers/net/ethernet/qlogic/qed/qed_l2.c:1889:13: error: stack frame size of 1128 bytes in function '_qed_get_vport_stats' [-Werror,-Wframe-larger-than=]
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    drivers/net/ethernet/qlogic/qed/qed_l2.c:1889:13: error: stack frame size of 1128 bytes in function '_qed_get_vport_stats' [-Werror,-Wframe-larger-than=]
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    drivers/net/ethernet/qlogic/qed/qed_l2.c:1889:13: error: stack frame size of 1128 bytes in function '_qed_get_vport_stats' [-Werror,-Wframe-larger-than=]
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    net: qlogic: Fix error paths in ql_alloc_large_buffers()
+    3. Commit 1acb8f2a7a9f ("net: qlogic: Fix memory leak in
+    Fixes: 1acb8f2a7a9f ("net: qlogic: Fix memory leak in ql_alloc_large_buffers")
+    ["drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c", "netxen_tx_timeout"],
+    ["drivers/net/ethernet/qlogic/qla3xxx.c", "ql3xxx_tx_timeout"],
+    ["drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c", "qlcnic_tx_timeout"],
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1832 qlcnic_sriov_set_vf_mac() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1864 qlcnic_sriov_set_vf_tx_rate() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1937 qlcnic_sriov_set_vf_vlan() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2005 qlcnic_sriov_get_vf_config() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2036 qlcnic_sriov_set_vf_spoofchk() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1832 qlcnic_sriov_set_vf_mac() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1864 qlcnic_sriov_set_vf_tx_rate() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1937 qlcnic_sriov_set_vf_vlan() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2005 qlcnic_sriov_get_vf_config() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2036 qlcnic_sriov_set_vf_spoofchk() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1832 qlcnic_sriov_set_vf_mac() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1864 qlcnic_sriov_set_vf_tx_rate() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1937 qlcnic_sriov_set_vf_vlan() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2005 qlcnic_sriov_get_vf_config() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2036 qlcnic_sriov_set_vf_spoofchk() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1832 qlcnic_sriov_set_vf_mac() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1864 qlcnic_sriov_set_vf_tx_rate() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1937 qlcnic_sriov_set_vf_vlan() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2005 qlcnic_sriov_get_vf_config() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2036 qlcnic_sriov_set_vf_spoofchk() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1832 qlcnic_sriov_set_vf_mac() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1864 qlcnic_sriov_set_vf_tx_rate() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1937 qlcnic_sriov_set_vf_vlan() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2005 qlcnic_sriov_get_vf_config() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2036 qlcnic_sriov_set_vf_spoofchk() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qed/qed_ll2.c:799:32: warning: implicit
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1832 qlcnic_sriov_set_vf_mac() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1864 qlcnic_sriov_set_vf_tx_rate() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1937 qlcnic_sriov_set_vf_vlan() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2005 qlcnic_sriov_get_vf_config() warn: can 'vf' underflow 's32min-254'
+    drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:2036 qlcnic_sriov_set_vf_spoofchk() warn: can 'vf' underflow 's32min-254'
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+      net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    net: qlogic: Fix memory leak in ql_alloc_large_buffers
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    drivers/net/ethernet/qlogic/qed/qed_iwarp.c:385:1: warning:
+    net/ethernet/qlogic/qed: force the string buffer NULL-terminated
+    net/ethernet/qlogic/qed: force the string buffer NULL-terminated
+    net/ethernet/qlogic/qed: force the string buffer NULL-terminated
+    scsi: qlogicpti: Mark expected switch fall-throughs
+    drivers/scsi/qlogicpti.c: In function 'qlogicpti_mbox_command':
+    drivers/scsi/qlogicpti.c:202:10: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:203:2: note: here
+    drivers/scsi/qlogicpti.c:203:10: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:204:2: note: here
+    drivers/scsi/qlogicpti.c:204:10: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:205:2: note: here
+    drivers/scsi/qlogicpti.c:205:10: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:206:2: note: here
+    drivers/scsi/qlogicpti.c:206:10: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:207:2: note: here
+    drivers/scsi/qlogicpti.c:256:19: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:257:2: note: here
+    drivers/scsi/qlogicpti.c:257:19: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:258:2: note: here
+    drivers/scsi/qlogicpti.c:258:19: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:259:2: note: here
+    drivers/scsi/qlogicpti.c:259:19: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:260:2: note: here
+    drivers/scsi/qlogicpti.c:260:19: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    drivers/scsi/qlogicpti.c:261:2: note: here
+    net/ethernet/qlogic/qed: force the string buffer NULL-terminated
+    drivers/net/ethernet/qlogic/qed/qed_l2.c:1889:13: error: stack frame size of 1128 bytes in function '_qed_get_vport_stats' [-Werror,-Wframe-larger-than=]
+    Fixes: 955315b0dc8c ("qlge: Move drivers/net/ethernet/qlogic/qlge/ to drivers/staging/qlge/")
+    qlge: Move drivers/net/ethernet/qlogic/qlge/ to drivers/staging/qlge/
+    drivers/net/ethernet/qlogic/qed/qed_dev.c: In function 'qed_llh_set_ppfid_affinity':
+    drivers/net/ethernet/qlogic/qed/qed_dev.c:798:47: error: 'abs_ppfid' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/net/ethernet/qlogic/qede/qede_main.c:963:6:
+    drivers/net/ethernet/qlogic/qede/qede_main.c:969:6:
+    drivers/net/ethernet/qlogic/qed/qed_main.o: In function `qed_remove':
+    Cc: Arun Easi <arun.easi@qlogic.com>
+      qlogic: qlcnic: fix use of SPEED_UNKNOWN ethtool constant
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    qlogic: qlcnic: fix use of SPEED_UNKNOWN ethtool constant
+    scsi: qlogicfas408: clean up a couple of indentation issues
+      net: qlogic: fix a potential NULL pointer dereference
+    net: qlogic: fix a potential NULL pointer dereference
+    scsi: qlogicpti: Use of_node_name_eq for node name comparisons
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: qla2xxx-upstream@qlogic.com
+    Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>
+    drivers/net/ethernet/qlogic/qed/qed_cxt.c:2126:4: warning: this statement may fall through [-Wimplicit-fallthrough=]
+    Acked-by: Sudarsana Kalluru <Sudarsana.Kalluru@qlogic.com>
+    Acked-by: Sudarsana Kalluru <Sudarsana.Kalluru@qlogic.com>
+    Acked-by: Sudarsana Kalluru <Sudarsana.Kalluru@qlogic.com>
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1070:5: warning:
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_pf.c:1342:5: warning:
+    drivers/net/ethernet/qlogic/qed/qed_rdma.h: fix typo
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump':
+    drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump':
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c:4011:5:
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c:4013:6:
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c:2996:25:
+    drivers/net/ethernet/qlogic/qla3xxx.c:384:24: warning: signed shift
+    drivers/net/ethernet/qlogic/qla3xxx.c:384:24: warning: signed shift
+    qlogic: check kstrtoul() for errors
+    scsi: qlogicpti: Fix an error handling path in 'qpti_sbus_probe()'
+    ("[SCSI] qlogicpti: Convert to new SBUS device framework.")
+    Fixes: 3d4253d9afab ("[SCSI] qlogicpti: Convert to new SBUS device framework.")
       drivers/net/ethernet/qlogic/qed/qed_rdma.h: fix typo
     drivers/net/ethernet/qlogic/qed/qed_rdma.h: fix typo
+    drivers/net/ethernet/qlogic/qla3xxx.c:384:24: warning: signed shift
+    drivers/net/ethernet/qlogic/qla3xxx.c:384:24: warning: signed shift
+    drivers/net/ethernet/qlogic/qla3xxx.c:384:24: warning: signed shift
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: warning: use of logical
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: note: use '&' for a
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: note: remove constant
+    drivers/net/ethernet/qlogic/qed/qed_roce.c:153:12: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_roce.c:156:12: warning: implicit
     drivers/net/ethernet/qlogic/qlge/qlge_main.c:
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c:
+    drivers/net/ethernet/qlogic/qed/qed_iwarp.c:1713:25: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_iwarp.c:1733:25: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: warning: use of logical
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: note: use '&' for a
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: note: remove constant
+    drivers/net/ethernet/qlogic/qed/qed_roce.c:153:12: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_roce.c:156:12: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:686:6: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:163:25: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:165:26: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:167:26: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:169:29: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:171:29: warning:
+    drivers/net/ethernet/qlogic/qed/qed_iwarp.c:1713:25: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_iwarp.c:1733:25: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: warning: use of logical
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: note: use '&' for a
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:415:27: note: remove constant
+    drivers/net/ethernet/qlogic/qed/qed_roce.c:153:12: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_roce.c:156:12: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_vf.c:686:6: warning: implicit
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:163:25: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:165:26: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:167:26: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:169:29: warning:
+    drivers/net/ethernet/qlogic/qed/qed_sp_commands.c:171:29: warning:
     drivers/net/ethernet/qlogic/qed/qed_mcp.c: In function 'qed_mcp_trans_speed_mask':
     drivers/net/ethernet/qlogic/qed/qed_mcp.c:1955:2: error: 'transceiver_type' may be used uninitialized in this function [-Werror=maybe-uninitialized]
             drivers/net/ethernet/qlogic/qed/qed_main.c:1510 qed_fill_link_capability()
@@ -39,6 +419,13 @@
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c:907:6: warning:
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c: In function 'qlcnic_sriov_issue_bc_post':
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c:939:16: warning:
+    qlogic: check kstrtoul() for errors
+    qlogic: check kstrtoul() for errors
+    qlogic: check kstrtoul() for errors
+    qlogic: check kstrtoul() for errors
+    Signed-off-by: Manish Rangankar <manish.rangankar@qlogic.com>
+    qlogic: check kstrtoul() for errors
+    Signed-off-by: Manish Rangankar <manish.rangankar@qlogic.com>
     ethernet/qlogic: remove unused array msi_tgt_status
     Cc: <qla2xxx-upstream@qlogic.com>
     Cc: <qla2xxx-upstream@qlogic.com>
@@ -78,20 +465,49 @@
     ("[SCSI] qlogicpti: Convert to new SBUS device framework.")
     Fixes: 3d4253d9afab ("[SCSI] qlogicpti: Convert to new SBUS device framework.")
     Cc: <qla2xxx-upstream@qlogic.com>
+    Hung task timeouts can result if a qlogic board breaks unexpectedly
     qlogic/qed: Constify *pkt_type_str[]
                      from drivers/net/ethernet/qlogic/qlge/qlge_main.c:26:
     drivers/net/ethernet/qlogic/qlge/qlge_main.c: In function 'ql_realign_skb':
     drivers/net/ethernet/qlogic/qed/qed_debug.c: In function 'qed_grc_dump':
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
 Author: Quinn Tran <quinn.tran@qlogic.com>
     Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
     the binaries provided by qlogic for SLES10/11 and RHEL5/6 are not
     drivers/net/ethernet/qlogic/qed: Fix __qed_spq_block() ordering
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    Signed-off-by: Joe Carnuccio <joe.carnuccio@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
+Author: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Signed-off-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Tested-by : Sudarasana Kalluru <sudarsana.kalluru@qlogic.com>
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
     drivers/net/ethernet/qlogic/qlge/qlge_mpi.c:209:22: warning:
     Cc: qla2xxx-upstream@qlogic.com
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
     Cc: QLogic-Storage-Upstream@qlogic.com
     Cc: QLogic-Storage-Upstream@qlogic.com
     Cc: QLogic-Storage-Upstream@qlogic.com
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
     drivers: net: qlogic: use setup_timer() helper.
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
+        inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
+    drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Quinn Tran <quinn.tran@qlogic.com>
     Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
     scsi: qlogicpti: fixup qlogicpti_reset() definition
@@ -104,22 +520,47 @@ Author: Quinn Tran <quinn.tran@qlogic.com>
         inlined from 'ql_core_dump' at drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:1106:2:
     drivers/net/ethernet/qlogic/qlge/qlge_dbg.c:708:2: error: 'memcpy' reading 15 bytes from a region of size 14 [-Werror=stringop-overflow=]
     qlogic: make device_attribute const
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
     drivers/net//ethernet/qlogic/qed/qed_l2.c:
     drivers/net//ethernet/qlogic/qed/qed_l2.c:2137:8: error:
       19032    2136      64   21232    52f0 drivers/net/ethernet/qlogic/qlcnic/qlcnic_minidump.o
       19020    2048       0   21068    524c drivers/net/ethernet/qlogic/qlcnic/qlcnic_minidump.o
     drivers/net/ethernet/qlogic/qed/qed_iwarp.c:585 qed_iwarp_print_tcp_ramrod()
     drivers/net/ethernet/qlogic/qed/qed_iwarp.c:1521 qed_iwarp_print_cm_info()
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
+Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
     Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
     drivers/net/ethernet/qlogic/qed/qed_int.c: In function 'qed_int_sb_init':
     drivers/net/ethernet/qlogic/qed/qed_int.c:1499:4: error: implicit declaration of function 'qed_vf_set_sb_info'; did you mean 'qed_mcp_get_resc_info'? [-Werror=implicit-function-declaration]
     Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
     Hung task timeouts can result if a qlogic board breaks unexpectedly
 Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
       ethernet/qlogic/qed/qed_init_fw_funcs.c: In function 'qed_set_rfs_mode_disable':
       ethernet/qlogic/qed/qed_init_fw_funcs.c:993:3: error: '*((void *)&ramline+4)' is used uninitialized in this function [-Werror=uninitialized]
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
     Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
     Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
+    drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
      1) Some 'const'ing in qlogic networking drivers, from Bhumika Goyal.
     qlogic: netxen: constify bin_attribute structures
     qlogic: qlcnic_sysfs: constify bin_attribute structures
@@ -130,6 +571,9 @@ Author: Arun Easi <arun.easi@qlogic.com>
     net: qlogic: netxen: use new api ethtool_{get|set}_link_ksettings
     drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: error: insn does not satisfy its constraints:
     drivers/net/ethernet/qlogic/qlge/qlge_main.c:4819:1: internal compiler error: in extract_constrain_insn, at recog.c:2190
+Author: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Signed-off-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Tested-by : Sudarasana Kalluru <sudarsana.kalluru@qlogic.com>
     drivers/net/ethernet/qlogic/qed/qed_ll2.c: In function 'qed_ll2_start':
     drivers/net/ethernet/qlogic/qed/qed_ll2.c:2159:1: error: the frame size of 1056 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
     Acked-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
@@ -158,9 +602,17 @@ Author: Arun Easi <arun.easi@qlogic.com>
     drivers/scsi/qlogicpti.c:822: warning: passing argument 3 of ‘dma_alloc_coherent’ from incompatible pointer type
     For the record, qlogicpti never executes on sun4v. Therefore even
     though 64bit DMA is enabled on SPARC, qlogicpti continues to use
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    A system can get hung task timeouts if a qlogic board fails during
+    A system can get hung task timeouts if a qlogic board fails during
     Acked-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Cc: QLogic-Storage-Upstream@qlogic.com
     A system can get hung task timeouts if a qlogic board fails during
+Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     MAINTAINERS: Update qlogic networking drivers
     Following Cavium's acquisition of qlogic we need to update all the qlogic
 Author: Manish Chopra <manish.chopra@qlogic.com>
@@ -179,6 +631,9 @@ Author: Manish Chopra <manish.chopra@qlogic.com>
     Cc: Dept-HSGLinuxNICDev@qlogic.com
     drivers/net/ethernet/qlogic/qed/qed_roce.c: In function ‘qed_get_rdma_ops’:
     drivers/net/ethernet/qlogic/qed/qed_roce.c:2950:28: error: old-style function definition [-Werror=old-style-definition]
+Author: Sawan Chandak <sawan.chandak@qlogic.com>
+    Signed-off-by: Sawan Chandak <sawan.chandak@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     qlogic's Kconfig. The second series would then remove that option
     'contaminate' non-qlogic configuration files with half-baked options].
     Cc: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -188,6 +643,7 @@ Author: Manish Chopra <manish.chopra@qlogic.com>
     Cc: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Cc: Ariel Elior <Ariel.Elior@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
             drivers/net/ethernet/qlogic/qed/qed_dcbx.c
     drivers/net/ethernet/qlogic/qed/qed_l2.c:112:5: warning: no previous prototype for 'qed_sp_vport_start' [-Wmissing-prototypes]
     drivers/net/ethernet/qlogic/qed/qed_sriov.c:110:6: warning: no previous prototype for 'qed_iov_is_valid_vfid' [-Wmissing-prototypes]
@@ -255,6 +711,24 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -280,6 +754,15 @@ Author: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Tested-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Reviewed-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Tested-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -292,6 +775,7 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Signed-off-by: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
 Author: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Signed-off-by: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -396,6 +880,20 @@ Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Reviewed-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Acked-by: Quinn Tran <quinn.tran@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
@@ -464,6 +962,9 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
     Acked-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -571,6 +1072,16 @@ Author: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Signed-off-by: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
@@ -601,6 +1112,34 @@ Author: Manish Chopra <manish.chopra@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Yuval Mintz <yuval.mintz@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -644,16 +1183,53 @@ Author: Sudarsana Reddy Kalluru <sudarsana.kalluru@qlogic.com>
 Author: Rahul Verma <rahul.verma@qlogic.com>
     Signed-off-by: Rahul Verma <rahul.verma@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
-    Cc: Quinn Tran <quinn.tran@qlogic.com>
-    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
-    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
-    Acked-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
-Author: Manish Chopra <manish.chopra@qlogic.com>
-    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
 Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Acked-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+Author: Manish Chopra <manish.chopra@qlogic.com>
+    Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Tested-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
@@ -662,6 +1238,8 @@ Author: Manish Chopra <manish.chopra@qlogic.com>
     Acked-By: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Zvi Nachmani <Zvi.Nachmani@qlogic.com>
@@ -685,6 +1263,19 @@ Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
 Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
@@ -693,7 +1284,66 @@ Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
     Cc: Quinn Tran <quinn.tran@qlogic.com>
     Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    tags.  Without this, the qlogic driver doesn't work properly with storvsc.
+Author: Manish Chopra <Manish.Chopra@qlogic.com>
+    Signed-off-by: Manish Chopra <Manish.Chopra@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
     CC: Ariel Elior <ariel.elior@qlogic.com>
+    tags.  Without this, the qlogic driver doesn't work properly with storvsc.
+Author: Manish Chopra <Manish.Chopra@qlogic.com>
+    Signed-off-by: Manish Chopra <Manish.Chopra@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Cc: qla2xxx-upstream@qlogic.com
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: <qla2xxx-upstream@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -716,6 +1366,16 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Cc: Rasesh Mody <rasesh.mody@qlogic.com>
     Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Cc: qla2xxx-upstream@qlogic.com
+    Reviewed-by: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: <qla2xxx-upstream@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -728,6 +1388,7 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-By: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
     CC: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
@@ -766,6 +1427,15 @@ Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Chad Dupuis <chad.dupuis@qlogic.com>
     Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -843,6 +1513,9 @@ Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Cc: Rasesh Mody <rasesh.mody@qlogic.com>
     Reviewed-by: Rasesh Mody <rasesh.mody@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Quinn Tran <quinn.tran@qlogic.com>
     Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
@@ -887,6 +1560,7 @@ Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
+    tags.  Without this, the qlogic driver doesn't work properly with storvsc.
     Cc: Ariel Elior <ariel.elior@qlogic.com>
 Author: Sudarsana Kalluru <Sudarsana.Kalluru@qlogic.com>
     Signed-off-by: Sudarsana Kalluru <Sudarsana.Kalluru@qlogic.com>
@@ -1022,12 +1696,18 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
+    Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Sony Chacko <sony.chacko@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
             drivers/net/ethernet/qlogic/netxen/netxen_nic_hw.c
+    Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
+    Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Cc: Rasesh Mody <rasesh.mody@qlogic.com>
     Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
     I got this automated message from <shahed.shaikh@qlogic.com> when submitting
@@ -1049,6 +1729,13 @@ Author: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
     Tested-by : Sudarasana Kalluru <sudarsana.kalluru@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
 Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
@@ -1110,6 +1797,7 @@ Author: Rajesh Borundia <Rajesh.Borundia@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Acked-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
@@ -1129,6 +1817,20 @@ Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
 Author: Harish Patil <harish.patil@qlogic.com>
     Signed-off-by: Harish Patil <harish.patil@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+    Acked-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Kanoj Sarcar <kanoj.sarcar@qlogic.com>
+    Signed-off-by: Kanoj Sarcar <kanoj.sarcar@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Acked-by: Rasesh Mody <rasesh.mody@qlogic.com>
 Author: Joe Carnuccio <joe.carnuccio@qlogic.com>
     Signed-off-by: Joe Carnuccio <joe.carnuccio@qlogic.com>
@@ -1143,6 +1845,18 @@ Author: Adheer Chandravanshi <adheer.chandravanshi@qlogic.com>
 Author: Tej Parkash <tej.parkash@qlogic.com>
     Signed-off-by: Tej Parkash <tej.parkash@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
@@ -1215,7 +1929,19 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
     CC: Ariel Elior <ariel.elior@qlogic.com>
     Acked-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+    Cc: Michal Kalderon <Michal.Kalderon@qlogic.com>
+    Cc: Ariel Elior <Ariel.Elior@qlogic.com>
+    Cc: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Acked-by: Sony Chacko <sony.chacko@qlogic.com>
+    Cc: Michal Kalderon <Michal.Kalderon@qlogic.com>
+    Cc: Ariel Elior <Ariel.Elior@qlogic.com>
+    Cc: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Acked-by: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
+    Cc: Michal Kalderon <Michal.Kalderon@qlogic.com>
+    Cc: Ariel Elior <Ariel.Elior@qlogic.com>
+    Cc: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Acked-by: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Michal Kalderon <Michal.Kalderon@qlogic.com>
     Cc: Ariel Elior <Ariel.Elior@qlogic.com>
     Cc: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -1253,6 +1979,7 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Acked-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Acked-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Nilesh Javali <nilesh.javali@qlogic.com>
     Signed-off-by: Nilesh Javali <nilesh.javali@qlogic.com>
 Author: Tej Parkash <tej.parkash@qlogic.com>
@@ -1270,7 +1997,11 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Cc: <qla2xxx-upstream@qlogic.com>
     Reported-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Acked-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Acked-by: Nilesh Javali <nilesh.javali@qlogic.com>
+    Cc: Manish Chopra <manish.chopra@qlogic.com>
+    Acked-by: Manish Chopra <manish.chopra@qlogic.com>
     Acked-By: Manish Chopra <manish.chopra@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -1280,7 +2011,16 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
     Cc: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
     Cc: <qla2xxx-upstream@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
 Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
@@ -1324,6 +2064,8 @@ Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
     Cc: Quinn Tran <quinn.tran@qlogic.com>
     Cc: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
@@ -1348,15 +2090,24 @@ Author: Yaniv Rosner <Yaniv.Rosner@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
     Acked-by: Sony Chacko <sony.chacko@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
+    Cc: Harish Patil <harish.patil@qlogic.com>
     Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Cc: Quinn Tran <quinn.tran@qlogic.com>
     Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Cc: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Dept-HSGLinuxNICDev@qlogic.com
+    Cc: Manish Chopra <manish.chopra@qlogic.com>
+    Acked-by: Manish Chopra <manish.chopra@qlogic.com>
+    Cc: Manish Chopra <manish.chopra@qlogic.com>
+    Acked-by: Manish Chopra <manish.chopra@qlogic.com>
+    Cc: Manish Chopra <manish.chopra@qlogic.com>
+    Acked-by: Manish Chopra <manish.chopra@qlogic.com>
 Author: Rasesh Mody <rasesh.mody@qlogic.com>
     Signed-off-by: Rasesh Mody <rasesh.mody@qlogic.com>
 Author: Rasesh Mody <rasesh.mody@qlogic.com>
@@ -1367,12 +2118,21 @@ Author: Rasesh Mody <rasesh.mody@qlogic.com>
     Signed-off-by: Rasesh Mody <rasesh.mody@qlogic.com>
 Author: Rasesh Mody <rasesh.mody@qlogic.com>
     Signed-off-by: Rasesh Mody <rasesh.mody@qlogic.com>
+Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
+    Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+    Cc: Manish Chopra <manish.chopra@qlogic.com>
+    Acked-by: Manish Chopra <manish.chopra@qlogic.com>
+    Cc: Manish Chopra <manish.chopra@qlogic.com>
+    Acked-by: Manish Chopra <manish.chopra@qlogic.com>
     qlogic: Deletion of unnecessary checks before two function calls
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Cc: Harish Patil <harish.patil@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Cc: Manish Chopra <manish.chopra@qlogic.com>
     Acked-by: Manish Chopra <manish.chopra@qlogic.com>
      "Just one fix: a qlogic busy wait regression"
@@ -1381,7 +2141,12 @@ Author: Nilesh Javali <nilesh.javali@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Cc: Ariel Elior <ariel.elior@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
@@ -1390,20 +2155,71 @@ Author: Yaniv Rosner <Yaniv.Rosner@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Cc: Ariel Elior <ariel.elior@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    dummy-module.ko).  Note, in the "real world" this occurred with the qlogic
     Cc: Rasesh Mody <rasesh.mody@qlogic.com>
     Cc: Ariel Elior <ariel.elior@qlogic.com>
     Acked-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    dummy-module.ko).  Note, in the "real world" this occurred with the qlogic
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    dummy-module.ko).  Note, in the "real world" this occurred with the qlogic
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    dummy-module.ko).  Note, in the "real world" this occurred with the qlogic
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    dummy-module.ko).  Note, in the "real world" this occurred with the qlogic
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Cc: Ariel Elior <ariel.elior@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Tej Parkash <tej.parkash@qlogic.com>
     Signed-off-by: Tej Parkash <tej.parkash@qlogic.com>
     Cc: Rasesh Mody <rasesh.mody@qlogic.com>
+Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
+    Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
     dummy-module.ko).  Note, in the "real world" this occurred with the qlogic
 Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
@@ -1603,6 +2419,10 @@ Author: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
     Cc: qla2xxx-upstream@qlogic.com
+    Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
 Author: Tej Parkash <tej.parkash@qlogic.com>
     Signed-off-by: Tej Parkash <tej.parkash@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
@@ -1622,6 +2442,7 @@ Author: Chad Dupuis <chad.dupuis@qlogic.com>
     Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Cc: qla2xxx-upstream@qlogic.com
+    Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
 Author: Yaniv Rosner <Yaniv.Rosner@qlogic.com>
     Signed-off-by: Yaniv Rosner <Yaniv.Rosner@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -1715,6 +2536,14 @@ Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
 Author: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+Author: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+    Signed-off-by: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+Author: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+    Signed-off-by: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+Author: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+    Signed-off-by: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+Author: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+    Signed-off-by: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
       net: ethernet: qlogic: qlcnic: Remove duplicate object file from Makefile
     net: ethernet: qlogic: qlcnic: Remove duplicate object file from Makefile
     qlogic: use pci_zalloc_consistent
@@ -1744,9 +2573,13 @@ Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Acked-By: Nilesh Javali <nilesh.javali@qlogic.com>
     Acked-By: Nilesh Javali <nilesh.javali@qlogic.com>
     Acked-By: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
+    Cc: Ariel Elior <ariel.elior@qlogic.com>
     Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
     Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
     Acked-by: Anil Gurumurthy <anil.gurumurthy@qlogic.com>
+    Cc: Ariel Elior <ariel.elior@qlogic.com>
+    Cc: Ariel Elior <ariel.elior@qlogic.com>
+    Cc: Ariel Elior <ariel.elior@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
@@ -2005,6 +2838,7 @@ Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Acked-by: Dmitry Kravkov <Dmitry.Kravkov@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
@@ -2028,6 +2862,13 @@ Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
     Signed-off-by: Manish Chopra <manish.chopra@qlogic.com>
+    Cc: Quinn Tran <quinn.tran@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+Author: Quinn Tran <quinn.tran@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Quinn Tran <quinn.tran@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
 Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
@@ -2108,6 +2949,9 @@ Author: Quinn Tran <quinn.tran@qlogic.com>
     In file included from drivers/net/ethernet/qlogic/qlcnic/qlcnic.h:36:0,
                      from drivers/net/ethernet/qlogic/qlcnic/qlcnic_hw.c:8:
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.h:585:1: error: unknown type name 'irqreturn_t'
+Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Cc: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
@@ -2138,12 +2982,30 @@ Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
 Author: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Yuval Mintz <Yuval.Mintz@qlogic.com>
     Signed-off-by: Ariel Elior <Ariel.Elior@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Chad Dupuis <chad.dupuis@qlogic.com>
     Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
@@ -2349,6 +3211,7 @@ Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Cc: Manish Chopra <manish.chopra@qlogic.com>
     Cc: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Acked-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
 Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
@@ -2920,6 +3783,15 @@ Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Cc: Manish Chopra <manish.chopra@qlogic.com>
     Cc: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Rajesh Borundia <rajesh.borundia@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
@@ -2940,6 +3812,9 @@ Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Himanshu Madhani <himanshu.madhani@qlogic.com>
     Signed-off-by: Himanshu Madhani <himanshu.madhani@qlogic.com>
 Author: Manish Chopra <manish.chopra@qlogic.com>
@@ -3026,6 +3901,8 @@ Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Cc: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Cc: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
@@ -3484,6 +4361,8 @@ Author: Manish Chopra <manish.chopra@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
+    Cc: Sony Chacko <sony.chacko@qlogic.com>
+    Cc: Rajesh Borundia <rajesh.borundia@qlogic.com>
 Author: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
@@ -3501,6 +4380,10 @@ Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
 Author: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Signed-off-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
+    Cc: Sony Chacko <sony.chacko@qlogic.com>
+    Cc: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Cc: Sony Chacko <sony.chacko@qlogic.com>
+    Cc: Rajesh Borundia <rajesh.borundia@qlogic.com>
     * Updated implemenation of ndo_fdb_del in emulex and qlogic drivers.
     Acked-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
 Author: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
@@ -3616,6 +4499,20 @@ Author: Sritej Velaga <sritej.velaga@qlogic.com>
     Signed-off-by: Sritej Velaga <sritej.velaga@qlogic.com>
     Cc: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Rajesh Borundia <rajesh.borundia@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Armen Baloyan <armen.baloyan@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Armen Baloyan <armen.baloyan@qlogic.com>
+    Signed-off-by: Armen Baloyan <armen.baloyan@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Cc: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Cc: Ron Mercer <ron.mercer@qlogic.com>
     Cc: linux-driver@qlogic.com
@@ -3624,6 +4521,8 @@ Author: Sritej Velaga <sritej.velaga@qlogic.com>
 Author: Sony Chacko <sony.chacko@qlogic.com>
     Signed-off-by: Shahed Shaikh <shahed.shaikh@qlogic.com>
     Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
 Author: Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
     Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
 Author: Shahed Shaikh <shahed.shaikh@qlogic.com>
@@ -3801,6 +4700,9 @@ Author: Sony Chacko <sony.chacko@qlogic.com>
     Acked-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
     drivers: ethernet: qlogic: qlge_dbg.c: Fixed a coding style issue
     Acked-by: Jitendra Kalsaria <Jitendra.kalsaria@qlogic.com>
+    Cc: Chad Dupuis <chad.dupuis@qlogic.com>
+    Cc: Arun Easi <arun.easi@qlogic.com>
+    Cc: Saurav Kashyap <saurav.kashyap@qlogic.com>
     Acked-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Acked-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     qlogicpti: Fix build warning.
@@ -3820,7 +4722,14 @@ Author: Sony Chacko <sony.chacko@qlogic.com>
     Cc: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
     Cc: Ron Mercer <ron.mercer@qlogic.com>
     Acked-by: Jitendra Kalsaria <jitendra.kalsaria@qlogic.com>
+    Cc: Chad Dupuis <chad.dupuis@qlogic.com>
+    Cc: Arun Easi <arun.easi@qlogic.com>
     Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Acked-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+Author: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+    Acked-by: Sony Chacko <sony.chacko@qlogic.com>
     drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c: fix error return code
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
@@ -4032,6 +4941,9 @@ Author: Manish Rangankar <manish.rangankar@qlogic.com>
     Signed-off-by: Manish Rangankar <manish.rangankar@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     new warning in drivers/scsi/qlogicpti.c that isn't that easy to resolve,
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
@@ -4499,6 +5411,15 @@ Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Mike Hernandez <michael.hernandez@qlogic.com>
     Signed-off-by: Mike Hernandez <michael.hernandez@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
+Author: Ram Vepa <ram.vepa@qlogic.com>
+    Signed-off-by: Ramkrishna Vepa <ram.vepa@qlogic.com>
+    Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+Author: Ram Vepa <ram.vepa@qlogic.com>
+    Signed-off-by: Ramkrishna Vepa <ram.vepa@qlogic.com>
+    Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+Author: Ram Vepa <ram.vepa@qlogic.com>
+    Signed-off-by: Ramkrishna Vepa <ram.vepa@qlogic.com>
+    Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Manish Rangankar <manish.rangankar@qlogic.com>
@@ -4663,6 +5584,12 @@ Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Reviewed-by: Ram Vepa <ram.vepa@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
@@ -4705,6 +5632,7 @@ Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
 Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+    Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Manish Rangankar <manish.rangankar@qlogic.com>
@@ -4750,6 +5678,9 @@ Author: Nilesh Javali <nilesh.javali@qlogic.com>
 Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Reviewed-by: Ram Vepa <ram.vepa@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
     Acked-by: Chad Dupuis <chad.dupuis@qlogic.com>
 Author: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
     Signed-off-by: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
@@ -5027,6 +5958,27 @@ Author: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
 Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Saurav Kashyap <saurav.kashyap@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Arun Easi <arun.easi@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Cc: Ravi Anand <ravi.anand@qlogic.com>
     Cc: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
@@ -5111,6 +6063,10 @@ Author: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
 Author: Mitko Haralanov <mitko@qlogic.com>
     Signed-off-by: Mitko Haralanov <mitko@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
+    Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: amit salecha <amit.salecha@qlogic.com>
+    Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
 Author: Chad Dupuis <chad.dupuis@qlogic.com>
@@ -5175,6 +6131,9 @@ Author: amit salecha <amit.salecha@qlogic.com>
 Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Acked-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: amit salecha <amit.salecha@qlogic.com>
@@ -5251,6 +6210,8 @@ Author: Mitko Haralanov <mitko@qlogic.com>
 Author: Mitko Haralanov <mitko@qlogic.com>
     Signed-off-by: Mitko Haralanov <mitko@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
+    Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Acked-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
@@ -5308,6 +6269,12 @@ Author: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Acked-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
 Author: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
     Signed-off-by: Mike Marciniszyn <mike.marciniszyn@qlogic.com>
+Author: Mike Hernandez <michael.hernandez@qlogic.com>
+    Signed-off-by: Mike Hernandez <michael.hernandez@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Acked-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Cc: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Mitko Haralanov <mitko@qlogic.com>
@@ -5366,6 +6333,12 @@ Author: Sony Chacko <sony.chacko@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: amit salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: Mike Hernandez <michael.hernandez@qlogic.com>
+    Signed-off-by: Mike Hernandez <michael.hernandez@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
 Author: amit salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
@@ -5472,6 +6445,9 @@ Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Chad Dupuis <chad.dupuis@qlogic.com>
+    Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
 Author: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
     Signed-off-by: Madhuranath Iyengar <Madhu.Iyengar@qlogic.com>
 Author: Saurav Kashyap <saurav.kashyap@qlogic.com>
@@ -5503,6 +6479,7 @@ Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
 Author: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Signed-off-by: Rajesh Borundia <rajesh.borundia@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+    Acked-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
 Author: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
     Signed-off-by: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
 Author: Sony Chacko <sony.chacko@qlogic.com>
@@ -6041,6 +7018,8 @@ Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Rajesh K Borundia <rajesh.borundia@qlogic.com>
@@ -6190,6 +7169,12 @@ Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: Lalit Chandivade <lalit.chandivade@qlogic.com>
+    Signed-off-by: Lalit Chandivade <lalit.chandivade@qlogic.com>
+    Signed-off-by: Michael Hernandez <michael.hernandez@qlogic.com>
+    Signed-off-by: Ravi Anand <ravi.anand@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Ravi Anand <ravi.anand@qlogic.com>
     Signed-off-by: Ravi Anand <ravi.anand@qlogic.com>
 Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
@@ -6222,6 +7207,8 @@ Author: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
     Signed-off-by: Ravi Anand <ravi.anand@qlogic.com>
 Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
+Author: Harish Zunjarrao <harish.zunjarrao@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
@@ -6284,6 +7271,8 @@ Author: Dhananjay Phadke <dhananjay.phadke@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+    qlogicpti: Remove slash in QlogicPTI irq name
+    qlogicpti driver registers its irq with a name containing slash.
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
@@ -6321,6 +7310,8 @@ Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: Anirban Chakraborty <anirban.chakraborty@qlogic.com>
+    Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
       qlogicpti: Remove slash in QlogicPTI irq name
     qlogicpti: Remove slash in QlogicPTI irq name
     qlogicpti driver registers its irq with a name containing slash.
@@ -6396,6 +7387,16 @@ Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
 Author: Amit Kumar Salecha <amit.salecha@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
+Author: Ron Mercer <ron.mercer@qlogic.com>
+    Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Ron Mercer <ron.mercer@qlogic.com>
+    Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Ron Mercer <ron.mercer@qlogic.com>
+    Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Ron Mercer <ron.mercer@qlogic.com>
+    Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Ron Mercer <ron.mercer@qlogic.com>
+    Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
     Signed-off-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Giridhar Malavali <giridhar.malavali@qlogic.com>
@@ -6456,6 +7457,7 @@ Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+    Acked-by: Giridhar Malavali <giridhar.malavali@qlogic.com>
 Author: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Sucheta Chakraborty <sucheta.chakraborty@qlogic.com>
     Signed-off-by: Amit Kumar Salecha <amit.salecha@qlogic.com>
@@ -6744,6 +7746,10 @@ Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
@@ -7171,8 +8177,16 @@ Author: Ralph Campbell <ralph.campbell@qlogic.com>
     Signed-off-by: Ralph Campbell <ralph.campbell@qlogic.com>
 Author: Ralph Campbell <ralph.campbell@qlogic.com>
     Signed-off-by: Ralph Campbell <ralph.campbell@qlogic.com>
+Author: Lalit Chandivade <lalit.chandivade@qlogic.com>
+    Signed-off-by: Lalit Chandivade <lalit.chandivade@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Shyam Sundar <shyam.sundar@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Ron Mercer <ron.mercer@qlogic.com>
     Signed-off-by: Ron Mercer <ron.mercer@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
@@ -7195,6 +8209,8 @@ Author: Ron Mercer <ron.mercer@qlogic.com>
     Cc: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Acked-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Acked-by: David C Somayajulu <david.somayajulu@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Acked-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
@@ -7231,6 +8247,16 @@ Author: Ron Mercer <ron.mercer@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
     qlogicpti: Convert to pure OF driver.
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Seokmann Ju <seokmann.ju@qlogic.com>
+    Signed-off-by: Seokmann Ju <seokmann.ju@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Seokmann Ju <seokmann.ju@qlogic.com>
+    Signed-off-by: Seokmann Ju <seokmann.ju@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
@@ -7373,6 +8399,8 @@ Author: Dave Olson <dave.olson@qlogic.com>
 Author: Ralph Campbell <ralph.campbell@qlogic.com>
     Signed-off-by: Ralph Campbell <ralph.campbell@qlogic.com>
     Signed-off-by: Michael Albaugh <michael.albaugh@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
@@ -7995,6 +9023,7 @@ Author: Ralph Campbell <ralph.campbell@qlogic.com>
     Signed-off-by: Robert Walsh <robert.walsh@qlogic.com>
     Signed-off-by: Ralph Campbell <ralph.campbell@qlogic.com>
     Acked-by: Ravi Anand <ravi.anand@qlogic.com>
+    Fix qlogicpti DMA unmapping
     Signed-off-by: Robert Walsh <robert.walsh@qlogic.com>
     Signed-off-by: Ralph Campbell <ralph.campbell@qlogic.com>
     Signed-off-by: Ralph Campbell <ralph.campbell@qlogic.com>
@@ -8628,6 +9657,10 @@ Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
     Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
 Author: Andrew Vasquez <andrew.vasquez@qlogic.com>

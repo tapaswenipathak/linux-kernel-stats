@@ -17,6 +17,8 @@
       25447    5816       0   31263    7a1f drivers/scsi/wd719x.o
       drivers/scsi/wd719x.c: remove last declaration using DEFINE_PCI_DEVICE_TABLE
     drivers/scsi/wd719x.c: remove last declaration using DEFINE_PCI_DEVICE_TABLE
+    wd719x: add missing .module to wd719x_template
+    wd719x_template is missing the .module field, causing module refcount
       wd719x: add missing .module to wd719x_template
     wd719x: add missing .module to wd719x_template
     wd719x_template is missing the .module field, causing module refcount

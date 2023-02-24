@@ -1,3 +1,13 @@
+    (X) (A)                 mcpu:   port@0 { mcpu0_ep: endpoint { remote-endpoint = <&mcodec0_ep>; }; };
+    (X)                             port@0 { mcodec0_ep: endpoint { remote-endpoint = <&mcpu0_ep>; }; };
+    (Y)                             port@0 { mcodec1_ep: endpoint { remote-endpoint = <&codec1_ep>; }; };
+    (Y)                             port@1 { mcodec2_ep: endpoint { remote-endpoint = <&codec2_ep>; }; };
+                            port@0 { codec1_ep: endpoint { remote-endpoint = <&mcodec1_ep>; }; };
+                            port@1 { codec2_ep: endpoint { remote-endpoint = <&mcodec2_ep>; }; };
+    crypto: cavium/nitrox - Add mailbox message to get mcode info in VF
+    dmaengine: pl330: use the same attributes when freeing pl330->mcode_cpu
+    In function dmac_alloc_resources(), pl330->mcode_cpu is allocated using
+    Use the correct dma_free_attrs() function to free pl330->mcode_cpu.
     Merge tag 'tegra-for-4.2-ramcode' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into next/drivers
     * tag 'tegra-for-4.2-ramcode' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
     Merge branch 'for-4.2/ramcode' into for-4.2/clk

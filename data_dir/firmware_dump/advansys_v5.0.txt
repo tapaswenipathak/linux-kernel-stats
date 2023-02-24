@@ -1,3 +1,31 @@
+    scsi: advansys: Move the SCSI pointer to private command data
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Call scsi_done() directly
+    scsi: advansys: Fix kernel pointer leak
+    scsi: advansys: Prefer struct_size() over open-coded arithmetic
+    scsi: advansys: Use scsi_cmd_to_rq() instead of scsi_cmnd.request
+    scsi: advansys: Do not set message byte in SCSI status
+    advansys: remove ISA support
+    scsi: advansys: Fix spelling of 'is'
+    scsi: advansys: Kill driver-defined status byte accessors
+    scsi: advansys: Relocate or remove unused variables
+     drivers/scsi/advansys.c: In function ‘asc_prt_asc_board_eeprom’:
+     drivers/scsi/advansys.c:2879:15: warning: variable ‘asc_dvc_varp’ set but not used [-Wunused-but-set-variable]
+     drivers/scsi/advansys.c: In function ‘asc_prt_driver_conf’:
+     drivers/scsi/advansys.c:3174:6: warning: variable ‘chip_scsi_id’ set but not used [-Wunused-but-set-variable]
+     drivers/scsi/advansys.c: In function ‘AdvISR’:
+     drivers/scsi/advansys.c:6114:9: warning: variable ‘target_bit’ set but not used [-Wunused-but-set-variable]
+    scsi: advansys: docs: Eliminate duplicated word
+    scsi: docs: convert advansys.txt to ReST
+    scsi: advansys: Replace zero-length array with flexible-array member
+      scsi: advansys: use sg helper to iterate over scatterlist
+    scsi: advansys: use sg helper to iterate over scatterlist
     scsi: advansys: remove unused variable 'srb_tag' in adv_isr_callback
     drivers/scsi/advansys.c: In function 'adv_isr_callback':
     drivers/scsi/advansys.c:5952:6: warning:
@@ -6,6 +34,54 @@
     drivers/scsi/advansys.c:6451:20: warning: equality comparison with
     drivers/scsi/advansys.c:6451:20: note: remove extraneous parentheses
     drivers/scsi/advansys.c:6451:20: note: use '=' to turn this equality
+    scsi: advansys: fix uninitialized data access
+    drivers/scsi/advansys.c: In function 'AscMsgOutSDTR':
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+7)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+7)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    scsi: advansys: fix build warning for PCI=n
+    The advansys probe function tries to handle both ISA and PCI cases, each
+    drivers/scsi/advansys.c: In function  advansys_board_found :
+    drivers/scsi/advansys.c:11036:5: error:  ret  may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:10928:28: note:  ret  was declared here
+    drivers/scsi/advansys.c:11309:8: error:  share_irq  may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:10928:6: note:  share_irq  was declared here
+    scsi: advansys: fix uninitialized data access
+    drivers/scsi/advansys.c: In function 'AscMsgOutSDTR':
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+7)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+7)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    scsi: advansys: fix build warning for PCI=n
+    The advansys probe function tries to handle both ISA and PCI cases, each
+    drivers/scsi/advansys.c: In function  advansys_board_found :
+    drivers/scsi/advansys.c:11036:5: error:  ret  may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:10928:28: note:  ret  was declared here
+    drivers/scsi/advansys.c:11309:8: error:  share_irq  may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:10928:6: note:  share_irq  was declared here
+    scsi: advansys: fix uninitialized data access
+    drivers/scsi/advansys.c: In function 'AscMsgOutSDTR':
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+7)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+7)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    scsi: advansys: fix build warning for PCI=n
+    The advansys probe function tries to handle both ISA and PCI cases, each
+    drivers/scsi/advansys.c: In function  advansys_board_found :
+    drivers/scsi/advansys.c:11036:5: error:  ret  may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:10928:28: note:  ret  was declared here
+    drivers/scsi/advansys.c:11309:8: error:  share_irq  may be used uninitialized in this function [-Werror=maybe-uninitialized]
+    drivers/scsi/advansys.c:10928:6: note:  share_irq  was declared here
+    scsi: advansys: remove #warning message
+    The advansys driver was converted to the proper DMA API in linux-4.2, but
+    drivers/scsi/advansys.c:71:2: warning: #warning this driver is still not properly converted to the DMA API [-Wcpp]
+    scsi: advansys: remove #warning message
+    The advansys driver was converted to the proper DMA API in linux-4.2, but
+    drivers/scsi/advansys.c:71:2: warning: #warning this driver is still not properly converted to the DMA API [-Wcpp]
+    scsi: advansys: remove #warning message
+    The advansys driver was converted to the proper DMA API in linux-4.2, but
+    drivers/scsi/advansys.c:71:2: warning: #warning this driver is still not properly converted to the DMA API [-Wcpp]
     scsi: advansys: fix uninitialized data access
     drivers/scsi/advansys.c: In function 'AscMsgOutSDTR':
     drivers/scsi/advansys.c:3860:26: error: '*((void *)&sdtr_buf+5)' may be used uninitialized in this function [-Werror=maybe-uninitialized]
@@ -81,6 +157,10 @@
     [SCSI] advansys: use request_firmware
     [SCSI] advansys, arcmsr, ipr, nsp32, qla1280, stex: use pci_ioremap_bar()
     advansys fix on ISA-less configs
+    SCSI advansys: Fix bug in AdvLoadMicrocode
+    SCSI advansys: fix overrun_buf aligned bug
+    boundary. advansys defines struct asc_dvc_var:
+    advansys crashes. The hostdata is placed on a sizeof(unsigned long)
       [SCSI] advansys: Fix bug in AdvLoadMicrocode
     [SCSI] advansys: Fix bug in AdvLoadMicrocode
       [SCSI] advansys: fix overrun_buf aligned bug
@@ -186,6 +266,26 @@
     drivers/scsi/advansys.c:18219: error: array type has incomplete element type
     drivers/scsi/advansys.c:18221: error: 'PCI_ANY_ID' undeclared here (not in a function)
     make[2]: *** [drivers/scsi/advansys.o] Error 1
+    [SCSI] advansys pci tweaks.
+    Remove a lot of duplicate #defines from the advansys driver,
+    advansys section fixes
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7a22) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7a4e) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7a79) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7aa2) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet3550EEPConfig' (at offset 0x7abb) and 'AdvSet38C0800EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7ae0) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b0c) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b37) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b60) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C0800EEPConfig' (at offset 0x7b79) and 'AdvSet38C1600EEPConfig'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7b9e) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7bca) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7bf5) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7c1e) and 'AdvExeScsiQueue'
+    WARNING: drivers/scsi/advansys.o - Section mismatch: reference to .init.text: from .text between 'AdvSet38C1600EEPConfig' (at offset 0x7c37) and 'AdvExeScsiQueue'
+    [SCSI] advansys driver: limp along on x86
+    Let people enable the advansys driver on x86-32, even though it's broken
     [PATCH] NULL noise removal: advansys
     [PATCH] advansys __iomem annotations
     [SCSI] advansys pci tweaks.

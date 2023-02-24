@@ -1,3 +1,12 @@
+    scsi: wd719x: Return proper error code when dma_set_mask() fails
+    scsi: wd719x: Stop using the SCSI pointer
+    scsi: wd719x: Call scsi_done() directly
+    scsi: docs: convert wd719x.txt to ReST
+    scsi: wd719x: Fix resets and aborts
+    Host reset oopses because it calls wd719x_chip_init, which calls
+    SCBs under a spinlock. Finally call wd719x_chip_init unlocked.
+    error in wd719x_wait_done.
+    wd719x_direct_cmd for RESET/ABORT commands didn't work properly, causing
     scsi: wd719x: always use generic DMA API
     The wd719x driver currently uses a mix of the legacy PCI DMA and the
     scsi: wd719x: use per-command private data
@@ -8,6 +17,8 @@
       25447    5816       0   31263    7a1f drivers/scsi/wd719x.o
       drivers/scsi/wd719x.c: remove last declaration using DEFINE_PCI_DEVICE_TABLE
     drivers/scsi/wd719x.c: remove last declaration using DEFINE_PCI_DEVICE_TABLE
+    wd719x: add missing .module to wd719x_template
+    wd719x_template is missing the .module field, causing module refcount
       wd719x: add missing .module to wd719x_template
     wd719x: add missing .module to wd719x_template
     wd719x_template is missing the .module field, causing module refcount
