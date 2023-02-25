@@ -1,0 +1,29 @@
+    (X) (A)                 mcpu:   port@0 { mcpu0_ep: endpoint { remote-endpoint = <&mcodec0_ep>; }; };
+    (X)                             port@0 { mcodec0_ep: endpoint { remote-endpoint = <&mcpu0_ep>; }; };
+    (Y)                             port@0 { mcodec1_ep: endpoint { remote-endpoint = <&codec1_ep>; }; };
+    (Y)                             port@1 { mcodec2_ep: endpoint { remote-endpoint = <&codec2_ep>; }; };
+                            port@0 { codec1_ep: endpoint { remote-endpoint = <&mcodec1_ep>; }; };
+                            port@1 { codec2_ep: endpoint { remote-endpoint = <&mcodec2_ep>; }; };
+    crypto: cavium/nitrox - Add mailbox message to get mcode info in VF
+    dmaengine: pl330: use the same attributes when freeing pl330->mcode_cpu
+    In function dmac_alloc_resources(), pl330->mcode_cpu is allocated using
+    Use the correct dma_free_attrs() function to free pl330->mcode_cpu.
+    Merge tag 'tegra-for-4.2-ramcode' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into next/drivers
+    * tag 'tegra-for-4.2-ramcode' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+    Merge branch 'for-4.2/ramcode' into for-4.2/clk
+    Merge branch 'for-4.2/ramcode' into for-4.2/emc
+    (or romcode) has fiddled with MUSB before
+    in SPI boot mode, romcode uses SPI controller to fetch data from NOR
+Author: Mostyn Bramley-Moore <mbmcode@gmail.com>
+    Signed-off-by: Mostyn Bramley-Moore <mbmcode@gmail.com>
+Author: Mostyn Bramley-Moore <mbmcode@gmail.com>
+    Signed-off-by: Mostyn Bramley-Moore <mbmcode@gmail.com>
+    - maintain backward compatibility to deprecated DT bindings (sw, hw, hw-romcode)
+    The microcode bus address (pl330_dmac.mcode_bus) is currently a u32,
+    Change tegra_emc_ramcode_devnode() to get ram-code from child node instead of
+    Reported-by: Jose Gómez <adler@dreamcoder.org>
+    DMADISABLE bit (but the romcode/bootloader might not set it back to 1).
+    of whether it's been set to 1 in romcode or bootloader).
+    fixing a problem with the shift/mask of mcode.
+    omap3: nand: making ecc layout as compatible with romcode ecc
+    device) to support hw ecc in romcode layout. So as to have in sync with ecc
