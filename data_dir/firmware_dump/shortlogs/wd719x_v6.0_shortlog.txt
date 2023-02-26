@@ -1,0 +1,31 @@
+    scsi: wd719x: Return proper error code when dma_set_mask() fails
+    scsi: wd719x: Stop using the SCSI pointer
+    scsi: wd719x: Call scsi_done() directly
+    scsi: docs: convert wd719x.txt to ReST
+    scsi: wd719x: Fix resets and aborts
+    Host reset oopses because it calls wd719x_chip_init, which calls
+    SCBs under a spinlock. Finally call wd719x_chip_init unlocked.
+    error in wd719x_wait_done.
+    wd719x_direct_cmd for RESET/ABORT commands didn't work properly, causing
+    scsi: wd719x: always use generic DMA API
+    The wd719x driver currently uses a mix of the legacy PCI DMA and the
+    scsi: wd719x: use per-command private data
+    scsi: wd719x: there should be no active SCBs on removal
+    scsi: wd719x: Use module_pci_driver
+    scsi: wd719x: make card_types static const, shrinks object size
+      25625    5752       0   31377    7a91 drivers/scsi/wd719x.o
+      25447    5816       0   31263    7a1f drivers/scsi/wd719x.o
+      drivers/scsi/wd719x.c: remove last declaration using DEFINE_PCI_DEVICE_TABLE
+    drivers/scsi/wd719x.c: remove last declaration using DEFINE_PCI_DEVICE_TABLE
+      wd719x: add missing .module to wd719x_template
+    wd719x: add missing .module to wd719x_template
+    wd719x_template is missing the .module field, causing module refcount
+      NCR5380, fnic, 53c974, ses, wd719x, hpsa, megaraid_sas).
+      wd719x: remove dma_cache_sync call
+      wd719x: Add firmware documentation
+      wd719x: Introduce Western Digital WD7193/7197/7296 PCI SCSI card driver
+    wd719x: remove dma_cache_sync call
+    wd719x: Add firmware documentation
+    wd719x: Introduce Western Digital WD7193/7197/7296 PCI SCSI card driver
+    Introduce wd719x, a driver for Western Digital WD7193, WD7197 and WD7296 PCI
+    This will be used by wd719x driver.

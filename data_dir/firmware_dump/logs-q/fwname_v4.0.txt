@@ -1,0 +1,11 @@
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     brcmf_usb_get_fwname+0x114/0x1a0
+     drivers/gpu/drm/nouveau/nvkm/core/firmware.c:71: warning: Function parameter or member 'fwname' not described in 'nvkm_firmware_get'
+    brcmfmac: add extension to .get_fwname() callbacks
