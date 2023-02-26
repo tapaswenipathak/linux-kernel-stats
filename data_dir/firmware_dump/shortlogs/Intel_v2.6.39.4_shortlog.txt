@@ -1,0 +1,1935 @@
+    Some BIOSes will reset the Intel MISC_ENABLE MSR (specifically the
+    platform such as Intel CE4100.
+    The Intel manual changed the name of the CPUID bit to match the
+    instruction name. We should follow suit for sanity's sake. (See Intel SDM
+    According to Chapter 10 of Intel Software Developer Manual
+    Intel 3000 chipset, and write-combining is enabled, the controller
+      ptrace.  This is e.g. on Intel the "orig_eax" register; on Sparc the kernel
+    The ML7223 is companion chip for Intel Atom E6xx series.
+    The ML7223 is completely compatible for Intel EG20T PCH.
+      perf events, x86: Fix Intel Nehalem and Westmere last level cache event definitions
+    perf events, x86: Fix Intel Nehalem and Westmere last level cache event definitions
+    The Intel Nehalem offcore bits implemented in:
+      e994d7d23a0b: perf: Fix LLC-* events on Intel Nehalem/Westmere
+      watchdog: iTCO_wdt: TCO Watchdog patch for Intel Panther Point PCH
+    watchdog: iTCO_wdt: TCO Watchdog patch for Intel Panther Point PCH
+    This patch adds the TCO Watchdog DeviceIDs for the Intel Panther Point PCH.
+     Since this driver is only used with Intel x86 motherboard chipsets,
+      ahci: AHCI-mode SATA patch for Intel Panther Point DeviceIDs
+      ata_piix: IDE-mode SATA patch for Intel Panther Point DeviceIDs
+    ahci: AHCI-mode SATA patch for Intel Panther Point DeviceIDs
+    This patch adds the AHCI-mode SATA DeviceIDs for the Intel Panther Point PCH.
+    ata_piix: IDE-mode SATA patch for Intel Panther Point DeviceIDs
+    This patch adds the IDE-mode SATA DeviceIDs for the Intel Panther
+      perf, x86: Update/fix Intel Nehalem cache events
+    perf, x86: Update/fix Intel Nehalem cache events
+    Andi Kleen pointed out that the Intel offcore support patches were merged
+     | Some raw events -- like the Intel OFFCORE events -- support additional
+     | For example on a multi socket Intel Nehalem:
+      e994d7d23a0b: perf: Fix LLC-* events on Intel Nehalem/Westmere
+    Intel VT-d Protected Memory Regions (PMRs) are supposed to be disabled,
+    This fixes aggregation problems with Intel 5100 Windows STAs (and maybe
+    Since Intel no longer supports 3945, there is no chance to get proper
+    This is the basic thermal sensor driver for Intel MID platform using the
+      PCI / Intel IOMMU: Use syscore_ops instead of sysdev class and sysdev
+      perf, x86: Fix Intel fixed counters base initialization
+    of predefined events Intel releases for each CPU has some events which
+      pci_ids: Add Intel Tunnel Creek LPC Bridge device ID.
+    There are two different variations on how Intel hardware addresses the
+    There are two different variations on how Intel hardware addresses the
+    PCI / Intel IOMMU: Use syscore_ops instead of sysdev class and sysdev
+    The Intel IOMMU subsystem uses a sysdev class and a sysdev for
+    Intel Poulsbo SCH and Tunnel Creek provide almost the
+    pci_ids: Add Intel Tunnel Creek LPC Bridge device ID.
+      i2c-i801: SMBus patch for Intel DH89xxCC DeviceIDs
+    i2c-i801: SMBus patch for Intel DH89xxCC DeviceIDs
+    Add the SMBus Controller DeviceIDs for the Intel DH89xxCC PCH.
+    perf, x86: Fix Intel fixed counters base initialization
+      PCI/lpc: irq and pci_ids patch for Intel DH89xxCC DeviceIDs
+      gpio; Make Intel chipset gpio drivers depend on x86
+      watchdog: Intel SCU Watchdog Timer Driver for Moorestown and Medfield platforms.
+    gpio; Make Intel chipset gpio drivers depend on x86
+    A correction to Intel cpu model CPUID data (patch queued)
+    this MSR, a general description exists in Intel's developer's
+    be modified pending clarification from Intel.
+      ahci: AHCI mode SATA patch for Intel Patsburg SATA RAID controller
+    watchdog: Intel SCU Watchdog Timer Driver for Moorestown and Medfield platforms.
+    Intel Archiecture Software Developer's Manual section 7.1.3 specifies that a
+    Failure to do so can lead to unspecified behavior (Intel XMC erratas include
+    Hardware timestamping for Intel 82580 didn't work in either 2.6.36 or
+    2.6.37. Comparing it to Intel's igb-2.4.12 I found that the
+    ML7213 is companion chip of Intel Atom E6xx series for IVI(In-Vehicle Infotainment).
+    ML7213 is completely compatible for Intel EG20T PCH.
+    ahci: AHCI mode SATA patch for Intel Patsburg SATA RAID controller
+    This patch adds an updated SATA RAID DeviceID for the Intel Patsburg PCH.
+    although this looks to be only defined on Intel systems and has a
+    Add support to the ndo_fcoe_ddp_target() to allow the Intel 82599 device to
+    Successfully tested by me on a Dell and Intel whitebox which exhibited
+    perf: Fix LLC-* events on Intel Nehalem/Westmere
+    On Intel Nehalem and Westmere CPUs the generic perf LLC-* events count the
+    Intel Nehalem/Westmere have a special OFFCORE_RESPONSE event
+    - Adds support to the Intel perf_event core to schedule per
+    This patch updates PEBS event constraints for Intel Atom, Nehalem, Westmere.
+    In this 3rd version, we drop BR_INST_RETIRED.MISPRED from Intel Atom as it does
+    o both Intel Nehalem and Westmere. I misssed those in the earlier patches.
+    perf, x86: Add Intel SandyBridge CPU support
+    chip for the Atom E6xx series and compatible with the Intel EG20T
+    Intel 82580 to timestamp IPv6 packets.
+    igb: Update Intel copyright notice for driver source.
+    in the Intel internal documention according to Chris Wilson).
+    staging: gma500: Intel GMA500 staging driver
+    Intel 945-GME.
+    The current code does not follow Intel documentation: It misses some things
+    Intel WiFi devices 3945 and 4965 now have their own driver in the folder
+    Intel WiFi devices 3945 and 4965 now have their own driver in the folder
+    "mXT224" is used in the Intel mid firmware in SFI tables to identify the
+    [ tglx: A sane timer on an Intel chip - I can't believe it ]
+        PCI: SR-IOV quirk for Intel 82576 NIC
+        Please refer to Intel 82576 Gigabit Ethernet Controller Datasheet
+    The DMA latency issue is observed only in Intel pinetrail platforms
+    issue in Intel pinetrail platfroms in user space using any one of
+    This lower CPU usage from ~10% to ~2% on Intel Atom when running
+    PCI/lpc: irq and pci_ids patch for Intel DH89xxCC DeviceIDs
+    This patch adds the LPC Controller DeviceIDs for the Intel DH89xxCC PCH.
+    was not officially supported by Intel at the time when Pentium-III
+    when in AP-mode (kworker at ~50% on Intel Atom N270). By batching commands
+    ML7213 is companion chip of Intel Atom E6xx series for IVI(In-Vehicle Infotainment).
+    ML7213 is completely compatible for Intel EG20T PCH.
+    ML7213 is companion chip of Intel Atom E6xx series for IVI(In-Vehicle Infotainment).
+    ML7213 is completely compatible for Intel EG20T PCH.
+    Intel PCI_CLASS_DISPLAY devices (and functions) to work in multi-gpu
+      ahci: AHCI mode SATA patch for Intel DH89xxCC DeviceIDs
+    ahci: AHCI mode SATA patch for Intel DH89xxCC DeviceIDs
+    This patch adds the AHCI-mode SATA DeviceID for the Intel DH89xxCC PCH.
+    Under Dell Inspiron 1525, and Intel SandyBridge SDP's the
+    This patch enables support for Intel i340 Quad Port Fiber Adapter.
+    The ML7213 is companion chip for Intel Atom E6xx series.
+    The ML7213 is completely compatible for Intel EG20T PCH.
+    ASoC: Add dependency on INTEL_SCU_IPC for Intel MID drivers
+    The ML7213 is companion chip for Intel Atom E6xx series.
+    The ML7213 is completely compatible for Intel EG20T PCH.
+      x86/PCI: irq and pci_ids patch for Intel Patsburg
+    case for Intel and Nvidia HDMIs, where hdmi_pcm_open() is called.
+      i2c-eg20t: add driver for Intel EG20T
+      watchdog: iTCO_wdt: TCO Watchdog patch for Intel DH89xxCC PCH
+      watchdog: iTCO_wdt: TCO Watchdog patch for Intel NM10 DeviceIDs
+    ML7213 is a companion chip for Intel Atom E6xx series.  This driver can be
+    Intel_idle driver uses CLOCK_EVT_NOTIFY_BROADCAST_ENTER
+    watchdog: iTCO_wdt: TCO Watchdog patch for Intel DH89xxCC PCH
+    This patch adds the DeviceIDs for TCO Watchdog on the Intel DH89xxCC PCH.
+    watchdog: iTCO_wdt: TCO Watchdog patch for Intel NM10 DeviceIDs
+    This patch adds the Intel NM10 DeviceIDs for iTCO Watchdog.
+    I have tested it on a PQ7-M102XL (Intel Atom) board.
+    of Intel(R) Turbo Boost Technology.
+    On Intel Core i3/i5/i7 (Nehalem) and newer processors,
+      x86, cpu: Clear XD_DISABLED flag on Intel to regain NX
+    This improves the IGD/DIS picking using firstly if Intel, then
+    i2c-eg20t: add driver for Intel EG20T
+    I2C driver for Intel EG20T PCH
+    This driver supports only Intelligent Ethernet Adapters.
+    Documentation/networking: Update Intel Wired LAN docs
+    - Update the Intel Wired LAN documentation with the latest
+    on Intel Moorestown platform, at the same time it provides a general
+    Recent Intel new system have different order in MADT, aka will list all thread0
+    x86/PCI: irq and pci_ids patch for Intel Patsburg
+    This patch adds an additional LPC Controller DeviceID for the Intel
+    Wei Yonjun reported this caused a regression against Intel VGA hotplug
+    As has been pointed out by Daniel Halperin some devices (e.g. Intel IWL5100)
+    Atom processor and Intel 945GME gpu. The codepath for
+    which was observed in Intel Pinetrail platforms.
+    On platforms with Intel 7500 chipset, there were some reports of system
+    delayed by two HPET clock cycles on Intel chipsets which showed
+    Intel Wired LAN drivers: Use static const
+    MAINTAINERS: Update Intel Wired LAN info
+    Update with Intel Wired Ethernet public git trees.
+    Update Intel Wired LAN ixgbevf documentation.
+    Update Intel Wired LAN ixgbe documentation.
+    Update Intel Wired LAN igbvf documentation.
+    Update Intel Wired LAN igb documentation.
+    Update Intel Wired LAN e1000e documentation.
+    Update Intel Wired LAN e1000 documentation.
+    With this patch, pktgen on Intel SR1625 server with two E5530
+    ALSA: HDA: Remove unconnected PCM devices for Intel HDMI
+    - verified on Intel 32/64 bit, Intel Atom, ST-Ericsson U8500 (ARM)
+    CAN register of Intel PCH EG20T has 2 sets of interface register.
+      watchdog: iTCO_wdt: TCO Watchdog patch for Intel Patsburg PCH
+    watchdog: iTCO_wdt: TCO Watchdog patch for Intel Patsburg PCH
+    This patch adds an additional LPC Controller DeviceID for the Intel Patsburg PCH for TCO Watchdog.
+    Intel.  Thanks for all the fish.
+    UART driver of Intel EG20T(Topcliff) PCH
+    Intel EG20T PCH is the platform controller hub that is going to be used in
+    Intel's general embedded platform. All IO peripherals in
+    Intel EG20T PCH are actually devices sitting on AMBA bus.
+    Intel EG20T PCH has UART I/F. Using this I/F, it is able to access system
+       "Intel(R) Centrino(R) Wireless-N 100"
+       "Intel(R) Centrino(R) Wireless-N 130"
+       "Intel(R) Centrino(R) Wireless-N 1030"
+       "Intel(R) Centrino(R) Advanced-N 6230"
+       "Intel(R) Centrino(R) Advanced-N 6205"
+       "Intel(R) Centrino(R) Wireless-N 6150"
+    devices such as HDAudio or Intel SST. Disabling interrupts
+    (ATI Mobility Radeon X1600) in a Intel Core-2 Duo MacBookPro
+    and decryption driver that is used on the Intel mobile platform.
+    This patch adds support for the EHCI IP block present on the Intel
+    Intel's upcoming general embedded platform. All IO peripherals in
+    crypto: aesni-intel - RFC4106 AES-GCM Driver Using Intel New Instructions
+    be implemented in assembly code. The assembly code leverages Intel(R)
+    x86, cpu: Clear XD_DISABLED flag on Intel to regain NX
+    Intel CPUs have an additional MSR bit to indicate if the BIOS was
+    cannot be inappropriately controlled by the BIOS on Intel CPUs. If, under
+    Intel development code by Feng, Alek, myself into a single coherent patch
+    > >       gpu: Add Intel GMA500(Poulsbo) Stub Driver
+    Today's -tip fails to build due to upstream commit e26fd11 ("gpu: Add Intel
+            tristate "Intel GMA500 Stub Driver"
+              Choose this option if you have a system that has Intel 830M, 845G,
+    ath9k: Fix a DMA latency issue for Intel Pinetrail platforms.
+    Throughput was severely affected in Intel Pinetrail platforms
+    This is the convention used by Intel Wimax
+      i2c-i801: Add Intel Patsburg device ID
+    i2c-i801: Add Intel Patsburg device ID
+    Add support for the Intel Patsburg PCH SMBus Controller.
+      watchdog: iTCO_wdt: TCO Watchdog patch for Intel Patsburg DeviceIDs
+    iTCO_wdt: Intel TCO WatchDog Timer Driver v1.05
+    iTCO_wdt: Intel TCO WatchDog Timer Driver v1.05
+    watchdog: iTCO_wdt: TCO Watchdog patch for Intel Patsburg DeviceIDs
+    This patch adds the Intel Patsburg (PCH) DeviceIDs for iTCO Watchdog.
+      PCI: update Intel chipset names and defines
+      x86/PCI: irq and pci_ids patch for Intel Patsburg DeviceIDs
+      mmc: sdhci: Intel Medfield support
+    Intel's upcoming general embedded platform.  All IO peripherals in
+      gpu: Add Intel GMA500(Poulsbo) Stub Driver
+    hand, the Intel HPET specs (1.0a) says (3.2.5.1):
+    X86:    Intel P4 2-core
+    gpu: Add Intel GMA500(Poulsbo) Stub Driver
+    The only Wimedia LLC Protocol (WLP) hardware was an Intel i1480 chip
+    a product.  This hardware and firmware is no longer available as Intel
+    Intel's upcoming general embedded platform. All IO peripherals in
+    the dependency on Intel IOMMU, kvm_iommu_map_pages will be a nop anyway
+    (I'm currently trying to verify which steps actually matter outside Intel
+    mmc: sdhci: Intel Medfield support
+    Basic support for the Intel Medfield devices
+    USB OTG: Add common data structure for Intel MID Platform (Langwell/Penwell)
+    Intel Penwell/Langwell MID Platform OTG Transceiver drivers. After switched
+    usb: Add Intel Langwell USB OTG Transceiver Driver
+    on the Intel MID platforms. It folds up the original patch set which includes
+    Intel's upcoming general embedded platform. All IO peripherals in
+      ata: Intel IDE-R support
+    It is documented in Intel specification update 290745-025, currently
+    ata: Intel IDE-R support
+    Intel IDE-R devices are part of the Intel AMT management setup. They don't
+      x86, VT-d: Make Intel VT-d IOMMU use IOMMU_INIT_* macros.
+      x86, earlyprintk: Add hsu early console for Intel Medfield platform
+      x86, earlyprintk: Add earlyprintk for Intel Moorestown platform
+    apparently, on a number of Intel DP55-series motherboards:
+    Missed a few init functions on non-Intel platforms the first time :-(
+    V4L/DVB: gspca_cpia1: Disable illuminator controls if not an Intel Play QX3
+    The illuminator controls should only be available to the user for the Intel
+    V4L/DVB: gspca_cpia1: Add basic v4l2 illuminator controls for the Intel Play QX3
+    This patch adds basic V4L2 controls for the illuminators on the Intel
+    PCI: update Intel chipset names and defines
+    This patch updates the defines for Intel devices in
+    x86/PCI: irq and pci_ids patch for Intel Patsburg DeviceIDs
+    This patch adds the LPC Controller DeviceIDs for the Intel Patsburg PCH.
+    Intel to choose the nearest online node or first node.  Fake NUMA would be
+      MAINTAINERS: update Intel LAN Ethernet info
+    in Intel's upcoming general embedded platform. All IO peripherals in
+    x86, earlyprintk: Add hsu early console for Intel Medfield platform
+    Intel Medfield platform has a high speed UART device, which
+    also for Intel MID platforms like the mrst early console
+    x86, earlyprintk: Add earlyprintk for Intel Moorestown platform
+    Intel Moorestown platform has a spi-uart device(Maxim3110),
+    MAINTAINERS: update Intel LAN Ethernet info
+    Staging: sst: Intel SST audio driver
+    This is the Intel SST audio driver.
+      oprofile: Add Support for Intel CPU Family 6 / Model 29
+      KVM: Fix reboot on Intel hosts
+    KVM: Fix reboot on Intel hosts
+    particularly for large send. This is fixed in this patch for all Intel e1000,
+    This patch adds support for the Intel(r) DH89xxCC series. The new
+    device will be using Intel(r) i347-AT4 and Marvell(r) M88E1322 and
+      oprofile: Add Support for Intel CPU Family 6 / Model 22 (Intel Celeron 540)
+    oprofile: Add Support for Intel CPU Family 6 / Model 29
+    I tested oprofile on Intel(R) Xeon(R) CPU E7440 reporting itself as
+    The DP infoframe is tested OK on Intel SandyBridge/CougarPoint platform.
+    At least on Intel, adjusting the max CPUID level can expose new CPUID
+    implementation using Intel New Instructions) to leverage cryptd for
+      ALSA: hda_intel: ALSA HD Audio patch for Intel Patsburg DeviceIDs
+    oprofile: Add Support for Intel CPU Family 6 / Model 22 (Intel Celeron 540)
+    This patch adds CPU type detection for the Intel Celeron 540, which is
+    comments.  I have tested this patch on an Intel Celeron 540 machine
+    ALSA: hda - Reduce pci id list for Intel with class id
+    Most of Intel controllers work as generic HD-audio without quirks,
+    PCI_CLASS_MULTIMEDIA_HD_AUDIO for Intel so that the driver will work
+    added on an Intel ICH9 chipset. Venki added a workaround (commit
+    ALSA: hda_intel: ALSA HD Audio patch for Intel Patsburg DeviceIDs
+    This patch adds the Intel Patsburg (PCH) HD Audio Controller DeviceIDs.
+      ahci: AHCI and RAID mode SATA patch for Intel Patsburg DeviceIDs
+      ata_piix: IDE Mode SATA patch for Intel Patsburg DeviceIDs
+    ahci: AHCI and RAID mode SATA patch for Intel Patsburg DeviceIDs
+    This patch adds the Intel Patsburg (PCH) SATA AHCI and RAID Controller
+    ata_piix: IDE Mode SATA patch for Intel Patsburg DeviceIDs
+    This patch adds the Intel Patsburg (PCH) IDE mode SATA Controller DeviceIDs.
+    Tests with recent firmware on Intel X25-M 80GB and OCZ Vertex 60GB SSDs
+    is now disadvanteous: adds 25% overhead on Intel, adds 230% on OCZ (YMMV).
+    native Intel backlight controller.
+    It's part of the generic Intel driver infrastructure so rename it in
+    VGA compatible controller [0300]: Intel Corporation 82G33/G31 Express
+    slot). Tested with an Intel ixgbe 10GE card.
+    x86, VT-d: Make Intel VT-d IOMMU use IOMMU_INIT_* macros.
+    from Intel and AMD, VMware ran a few experiments to compare these
+    Intel and Nvidia HDMI codec drivers have own implementations of
+      perf, x86: Fix Intel-nhm PMU programming errata workaround
+    perf, x86: Fix Intel-nhm PMU programming errata workaround
+    Affects all Nehalem-class Intel PMUs.
+      Intel MID platform battery driver
+    USB: UHCI: add support for Intel's wakeup flags
+    vendor-specific wakeup settings found in Intel's ICHx hardware.  A
+    This device is used by some of the Intel MID platforms. It's not similar
+      mtd: m25p80: add support for the Intel/Numonyx {16,32,64}0S33B SPI flash chips
+    So I'm resubmitting with fixes for other Intel Device Drivers with
+      ALSA: hda - Add PC-beep whitelist for an Intel board
+    mtd: m25p80: add support for the Intel/Numonyx {16,32,64}0S33B SPI flash chips
+    present for select models of Intel cpus when people are
+    oprofile: add support for Intel processor model 30
+    Newer Intel processors identifying themselves as model 30 are not recognized by
+    model name      : Intel(R) Xeon(R) CPU           X3470  @ 2.93GHz
+    oprofile: available events for CPU type "Intel Architectural Perfmon"
+    See Intel 64 and IA-32 Architectures Software Developer's Manual
+    be used in Intel's upcoming general embedded platforms. This
+    Intel variants don't support it.
+    Power limit notification feature is published in Intel 64 and IA-32
+    It is implemented first on Intel Sandy Bridge platform.
+    ALSA: hda - Add PC-beep whitelist for an Intel board
+    An Intel board needs a white-list entry to enable PC-beep.
+    Intel SCU message formats depend upon the processor type. Replace the
+    Intel Core i3/5 platforms with integrated graphics support both CPU and
+    sil164 transmitters are used for DVI outputs on Intel/nvidia and ATI setups.
+    Enable Intel(R) Advanced Vector Extension(AVX) for guest.
+    On Intel, we call skip_emulated_instruction() even if we injected a #GP,
+    On Intel, we call skip_emulated_instruction() even if we injected a #GP,
+    On Intel, we call skip_emulated_instruction() even if we injected a #GP,
+    The two MSRs and features are new starting with Intel's Sandy Bridge processor.
+    Please check Intel 64 and IA-32 Architectures SDMV Vol 3A 14.5.6 Power Limit
+    Without this patch, Intel Moorestown platform graphics unit will be
+    of Intel(R) Moorestown platform and DMA controllers in Penwell of
+    Intel(R) Medfield platfrom
+    versions of the Intel SDM.
+      wimax/i2400m: Add PID & VID for Intel WiMAX 6250
+    those on the Intel Q35 chipset.
+    wimax/i2400m: Add PID & VID for Intel WiMAX 6250
+    It turns out that there is a bit in the _CST for Intel FFH C3
+    ref: Intel Processor Vendor-Specific ACPI Interface Specification
+    remapping.  Not all Intel IOMMUs have the hardware, and the
+    Intel Wireless WiFi Next Gen AGN support two major categories:
+     1. Intel Wireless WiFi 4965 AGN device
+     2. Intel Wireless-N/Advanced-N/Ultimate-N family
+    Intel has defined CPUID leaf 7 as the next set of feature flags (see
+    Some x86 platforms like Intel MID platforms don't have i8042 controllers,
+    This caused hibernate on Intel hardware to result in a lot of memory
+      perf_events: Fix Intel Westmere event constraints
+    Intel MID platform battery driver
+    functionality on Intel MID platforms. This provides the basic functions.
+    as documented in the Intel Architectures Software Developer's Manual.
+    perf_events: Fix Intel Westmere event constraints
+    Based on Intel Vol3b (March 2010), the event
+    update the event table for Intel Westmere accordingly.
+    Fixes to 'cpuid10_edx' to comply with Intel documentation.
+    According to the Intel Manual, Volume 2A, Table 3-12, the cpuid for
+    Staging: mid: Intel MID touch screen driver
+    showing up on Intel CPU because events would move around more
+      intel_idle: native hardware cpuidle driver for latest Intel processors
+    intel_idle: native hardware cpuidle driver for latest Intel processors
+    Intel Atom Processors, Intel Core i3/i5/i7 Processors
+    and associated Intel Xeon processors.
+    It does not support the Intel Core2 processor or earlier.
+    can: Add support for Janz VMOD-ICAN3 Intelligent CAN module
+    Intel Penwell chip has two 96 pins GPIO blocks, which are very similiar as
+    Intel Langwell chip GPIO block, except for pin number difference. This
+    While investigating Intel i5 Arrandale GPU lockups with -rc4, I
+    Intel processors.
+    The thermal sensors of Intel(R) CPUs can be detected by CPUID instruction,
+      x86/PCI: irq and pci_ids patch for additional Intel Cougar Point DeviceIDs
+      KVM: VMX: enable VMXON check with SMX enabled (Intel TXT)
+      IPC driver for Intel Mobile Internet Device (MID) platforms
+    Disabling PCI PME# isn't good enough, because some systems (Intel)
+    In addition, the patch improves the handling of the Intel Moorestown
+    [    8.328665] Intel ICH 0000:00:1f.5: PCI INT B -> GSI 17 (level, low) -> IRQ 17
+    [    8.328753] Intel ICH 0000:00:1f.5: setting latency timer to 64
+    KVM: VMX: enable VMXON check with SMX enabled (Intel TXT)
+      x86: Improve Intel microcode loader performance
+    fe:00.0 Host bridge: Intel Corporation QuickPath Architecture Generic
+    IPC driver for Intel Mobile Internet Device (MID) platforms
+    Intel x86 platforms.
+    KVM: x86 emulator: add decoding of X,Y parameters from Intel SDM
+    Add decoding of X,Y parameters from Intel SDM which are used by string
+    one of them. Intel analog of VMMCALL is already marked privileged.
+    When using iommu_domain_alloc with the Intel iommu, the domain address
+    Add id for Intel CougarPoint HDMI audio codec.
+    mtd/nand: Add Intel Moorestown/Denali NAND support
+    standard PS/2 device (bare or IntelliMouse protocol).
+    active (originally suggested by Gleb). Intel confirmed that this is
+    Intel Wireless WiMAX Connection 5150 and 5350 devices.
+    According to Intel Wimax i3200, i5x50 and i6x60 device specification documents,
+    According to Intel Wimax i3200, i5x50 and i6x50 specification
+    According to Intel Wimax i3200, i5x50 and i6x50 device specification
+    x86/PCI: irq and pci_ids patch for additional Intel Cougar Point DeviceIDs
+    This patch adds additional LPC Controller DeviceIDs for the Intel Cougar
+    staging: Intel Restricted Access Region Handler
+    The Intel Restricted Access Region Handler provides a buffer allocation
+    the D945GCLF2 and breaks snd-hda-intel/ snd-hda-codec-realtek on the Intel
+    00:1b.0 Audio device [0403]: Intel Corporation N10/ICH 7 Family High Definition Audio Controller [8086:27d8] (rev 01)
+    The public Intel Xeon 5500 volume 2 datasheet describes, on page 53,
+    where to find documentation on the Intel processors.
+    idle at high frequency. Specifically, older Intel and various
+    URLs for the Intel and AMD manuals where this is discussed in depth.
+    And modify the Intel PEBS code accordingly. The PEBS implementation
+    broken SPDIF output on Intel DG45FC motherboard (IDT 92HD73E1X5 codec).
+    [    8.328665] Intel ICH 0000:00:1f.5: PCI INT B -> GSI 17 (level, low) -> IRQ 17
+    [    8.328753] Intel ICH 0000:00:1f.5: setting latency timer to 64
+    Multiple Lenovo ThinkPad models with Intel Core i5/i7 CPUs can
+    For AMD's and Intel's P6 generic performance counters have pairwise
+    to match the header file (and verified with ath9k's usage) and updating Intel's
+    Description: When using Intel smartspeed, the patch displays a
+    - Intel 865 8086:2571
+    as usual. Let's do the same for standard PS/2 protocols (bare, Intellimouse
+    and Intellimouse Explorer) to provide better compatibility. Thsi should fix
+    Intel definitions have spilled into agp.h. Create a header file for
+    e1000e on 8 core Intel
+      [WATCHDOG] iTCO_wdt: TCO Watchdog patch for additional Intel Cougar Point DeviceIDs
+    According to Intel Software Devel Manual Volume 3B, the
+    [WATCHDOG] iTCO_wdt: TCO Watchdog patch for additional Intel Cougar Point DeviceIDs
+    This patch adds the Intel Cougar Point PCH LPC Controller DeviceIDs for iTCO Watchdog.
+    Download Intel&#174; Parallel Studio Eval
+    See why Intel Parallel Studio got high marks during beta.
+    Cc: Intel Linux Wireless <ilw@linux.intel.com>
+    ARCHITECTURAL PERFORMANCE MONITORING section in the Intel 64 and IA-32
+    > Again, on the Intel DP55KG board:
+    > Is this something Intel has to fix or is it a bug in the kernel?
+    "Intel I/O Controller Hub 9 (ICH9) Family Specification Update"
+    Cc: Intel Linux Wireless <ilw@linux.intel.com>
+    Intel X58 have asc7621a chip. So added X58 entry in Kconfig for asc7621.
+    Intel SSDs have a limit of 0xffff as queue_max_hw_sectors(q).  Such a
+    Implement the workaround for Intel Errata AAK100 and AAP53.
+    Affected machines: IntelliStation Z20/Z30.  Note that the i2c-i801 driver no
+    igb: add support for Intel I350 Gigabit Network Connection
+    Tested this with 10 Intel 82599 ports w. TYAN S7025 E5520 CPU's.
+    This patch adds support for S3 memory integrity protection within an Intel(R)
+      ALSA: hda - New Intel HDA controller
+    e1000e on 8 core Intel
+    ALSA: hda - New Intel HDA controller
+    x86: Improve Intel microcode loader performance
+    Intel generic_load_microcode() logic.
+    Implement simple suport Intel Last-Branch-Record, it supports all
+    The Intel LBR is a FIFO of From,To addresses describing the last few
+    This patch implements support for Intel Precise Event Based Sampling,
+    This data is written to the Intel Debug-Store, which can be programmed
+      gpio: add Intel SCH GPIO controller driver
+    gpio: add Intel SCH GPIO controller driver
+    mfd: Introduce lpc_sch for Intel SCH LPC bridge
+    Intel Poulsbo (SCH) chipset LPC bridge controller contains several
+    joint venture. These boards are now made by GE Intelligent platorms.
+      i2c-i801: Add Intel Cougar Point device IDs
+    i2c-i801: Add Intel Cougar Point device IDs
+    Add the Intel Cougar Point (PCH) SMBus controller device IDs.
+    ata_piix: IDE Mode SATA patch for Intel Cougar Point DeviceIDs
+    ahci: AHCI and RAID mode SATA patch for Intel Cougar Point DeviceIDs
+      ALSA: hda - enable snoop for Intel Cougar Point
+    Inject #UD if guest attempts to do so. This is in accordance to Intel
+    Move to/from Control Registers chapter of Intel SDM says.  "Reserved bits
+    Intel/ATI - Lenovo W500/T500 - use ATPX ACPI method
+    Intel/Nvidia - - use _DSM ACPI method
+    v11: fix bug in resuming Intel for 2nd time.
+    Tested on W500 (Intel/ATI) and T500 (Intel/ATI)
+    The timberdale FPGA is found on the Intel in-Vehicle Infotainment reference board
+    This patch add supports for the radio system on the Intel Russellville board.
+    driver. The drive works fine with this enabled on an Intel AHCI so
+    ALSA: hda - enable snoop for Intel Cougar Point
+    x86/PCI: irq and pci_ids patch for Intel Cougar Point DeviceIDs
+    This patch adds the Intel Cougar Point (PCH) LPC and SMBus Controller DeviceIDs.
+    Print official names for Pineview and Ironlake, which is Intel
+    GMA3150 and Intel HD graphics.
+    supporting Intelligent Power Sharing, a feature which allows for
+            Kernel driver in use: HDA Intel
+    ALSA: hda - Clean up Intel Mac unsol codes
+    IntelMac models with Realtek ALC885 codecs.
+    The Intel Architecture Optimization Reference Manual states that a short
+    HDA Intel -> hda_intel
+    Implement Intel Core Solo/Duo, aka.
+    Intel Architectural Performance Monitoring Version 1.
+      x86: Add quirk for Intel DG45FC board to avoid low memory corruption
+    x86: Add quirk for Intel DG45FC board to avoid low memory corruption
+    Intel DG45ID board due to low memory corruption. The Intel DG45FC
+    perf_events, x86: Implement Intel Westmere support
+    The new Intel documentation includes Westmere arch specific
+    Intel Fixed counter events and the BTS special event are also handled via
+      net: Fix IPv6 GSO type checks in Intel ethernet drivers
+      MAINTAINERS: Add Intel igbvf maintainer
+    net: Fix IPv6 GSO type checks in Intel ethernet drivers
+    The following patch fixes the check for IPv6 GSO packet in Intel
+    MAINTAINERS: Add Intel igbvf maintainer
+    Add igbvf to the list of supported Intel drivers and Alex to the list of
+    The Intel WiMax Wireless Link 6050 can show under more than one USB
+      [WATCHDOG] iTCO_wdt: Add Intel Cougar Point and PCH DeviceIDs
+    This has been tested to work on both Intel and AMD platforms.
+    [WATCHDOG] iTCO_wdt: Add Intel Cougar Point and PCH DeviceIDs
+    This patch adds the Intel Cougar Point and PCH DeviceIDs for iTCO Watchdog.
+    reserved vector in the Intel IA32 manuals).
+    others, just before we strat probing for Intellimouse Explorer.
+    ALSA: hda_intel: ALSA HD Audio patch for Intel Cougar Point DeviceIDs
+    This patch adds the Intel Cougar Point (PCH) HD Audio Controller DeviceIDs.
+    Intel platforms with <= 8 logical cpu's, logical flat mode works fine
+    Tested only with the Intel i915 driver on an Intel GM45 Express
+    Celsius. Since these CPUs are always coupled with Intel NM10 chipset in
+      x86/pci: Intel ioh bus num reg accessing fix
+    Tested only with the Intel i915 driver on an Intel GM45 Express
+    the sysfs attributes local_cpu* on Intel machines with no ACPI NUMA
+    x86/pci: Intel ioh bus num reg accessing fix
+      PCI: add Intel 82599 Virtual Function specific reset method
+      PCI: add Intel USB specific reset method
+      [WATCHDOG] iTCO_wdt: add PCI ID for the Intel EP80579 (Tolapai) SoC
+      in executing request_firmware() (on Intel CPUs at least) which doesn't
+    [WATCHDOG] iTCO_wdt: add PCI ID for the Intel EP80579 (Tolapai) SoC
+    add PCI ID for the Intel EP80579 (Tolapai) SoC
+      leds: LED driver for Intel NAS SS4200 series (v5)
+    PCI: add Intel 82599 Virtual Function specific reset method
+    PCI: add Intel USB specific reset method
+      Revert "Intel IOMMU: Avoid memory allocation failures in dma map api calls"
+    Intel reported a performance regression caused by the following commit:
+    resolving the issue.  Intel re-tested with this patch and saw a 0.6%
+    A GPIO driver for the Timberdale FPGA found on the Intel Atom board
+    leds: LED driver for Intel NAS SS4200 series (v5)
+    http://downloadcenter.intel.com/SearchResult.aspx?lang=eng&ProductFamily=Server+Products&ProductLine=Intel%C2%AE+Storage+Systems&ProductProduct=Intel%C2%AE+Entry+Storage+System+SS4200-E&OSVersion=OS+Independent
+    Currently, ARB_DISABLE is a NOP on all of the recent Intel platforms.
+    Note that "Intel Correct Machine Check Interrupts" already
+    Intel(R) PXA27x Processor Family Specification Update (Nov 2005)
+    However, Intel ICH9 chipsets (and some later chipsets) have issues when SW
+    the IST under an Intel chipset.  Make sure that when we fall behind the
+    be scheduled within the IST, since this doesn't trigger the Intel chipset
+    IbexPeak is the first Intel HDMI audio codec to support channel mapping.
+    the PCI devices since it is limited (to 64KB on Intel Architecture[1])
+    Pull more Intel changes in, especially one to init the GTT properly
+    Update copyright from Intel-NE, Inc. to Intel Corporation.  Use proper
+    even if it uses an Intel GPU.  The current driver default was reported
+    Quirk for the ALC662 found on the Intel D945GCLF2 (and possibly other)
+      [WATCHDOG] iTCO_wdt: Add support for Intel Ibex Peak
+      x86: Fix typo in Intel CPU cache size descriptor
+      x86: Add new Intel CPU cache size descriptors
+            With the iMac 24-inch 3.06GHz Intel Core 2 Duo
+            With the iMac 24-inch 2.66GHz Intel Core 2 Duo
+    Revert "Intel IOMMU: Avoid memory allocation failures in dma map api calls"
+    commit eb3fa7cb51 said Intel IOMMU
+        Intel IOMMU driver needs memory during DMA map calls to setup its
+    This merges the upstream Intel tree and fixes up numerous conflicts
+    Intel driver.
+    The Intel 82801 is sometimes used on systems with a BMC connected. The
+      x86: Remove CPU cache size output for non-Intel too
+    Have Intel and AMD IOMMUs request ACS, and Xen does as well during early
+    [WATCHDOG] iTCO_wdt: Add support for Intel Ibex Peak
+    Add the Intel Ibex Peak (PCH) Device IDs to iTCO_wdt.c.
+     30:1e.0 PCI bridge: Intel Corporation 82801 PCI Bridge (rev e1)
+     00:1e.0 PCI bridge: Intel Corporation 82801 PCI Bridge (rev e1)
+    Some of the Intel ICH Specs (ICH2 to ICH5) documents the io-apic
+        Intel/Marvell Dev Platforms, followed by 3rd party platforms, followed
+            Intel/Marvell   Lubbock
+            Intel/Marvell   Mainstone
+            Intel/Marvell   Zylonite
+            Intel/Marvell   Littleton
+            Intel/Marvell   TavorEVB
+            Intel/Marvell   SAAR
+            Intel Research  MOTE2
+            Intel research  Stargate2
+      kernel crash during kms graphic boot on Intel GM4500 platform
+    Update MAINTAINERS with the Intel supported iwmc3200wifi entry.
+    Intel, the PDC is not initialized on VIA CPU's.  The resulting behavior
+    This trivial patch ensures that init_intel_pdc() is called on Intel and
+    3. later call srat_detect_node for Intel/AMD, will use first_online
+    Example on a Intel(R) Core(TM)2 Duo CPU E6850 @ 3.00GHz:
+      [CPUFREQ] acpi-cpufreq: blacklist Intel 0f68: Fix HT detection and put in notification message
+    [ 1624.024524] iwlagn: Intel(R) Wireless WiFi Link AGN driver for Linux, 1.3.27kds
+    [ 1624.024527] iwlagn: Copyright(c) 2003-2009 Intel Corporation
+    [ 1624.024909] iwlagn 0000:01:00.0: Detected Intel Wireless WiFi Link 1000 Series BGN REV=0x6C
+    [ 1624.024524] iwlagn: Intel(R) Wireless WiFi Link AGN driver for Linux, 1.3.27kds
+    [ 1624.024527] iwlagn: Copyright(c) 2003-2009 Intel Corporation
+    [ 1624.024909] iwlagn 0000:01:00.0: Detected Intel Wireless WiFi Link 1000 Series BGN REV=0x6C
+    [CPUFREQ] acpi-cpufreq: blacklist Intel 0f68: Fix HT detection and put in notification message
+    occur on Intel NICs if the packet size falls below the threshold),
+    Intel VT-d, GART, and swiotlb already use
+    registered device acceping those events. It means that the HDA Intel
+    x86: Remove CPU cache size output for non-Intel too
+      Intel GenuineIntel
+      Intel GenuineIntel
+    x86: Fix typo in Intel CPU cache size descriptor
+    Cc: <stable@kernel.org> # .3x.x: 85160b9: x86: Add new Intel CPU cache size descriptors
+    x86: Add new Intel CPU cache size descriptors
+    The latest rev of Intel doc AP-485 details new cache descriptors
+    If HW IOMMU initialization fails (Intel VT-d often does this,
+    found in upcoming Intel CPU.
+    x86/PCI: read root resources from IOH on Intel
+    Some versions of the user space Intel WiMAX daemon need to have full
+    EOI(using IO-APIC EOI register) on Intel platforms and for
+    way of using it seems to be what the Intel drivers do
+    The Intel IbexPeak HDMI codec supports 2 converters and 3 pins,
+    The new Intel HDMI codec supports 2 independant HDMI/DisplayPort pipes.
+    orientation as Intel based 6730 (this is not true for any other related
+    x86: Add Intel FMA instructions to x86 opcode map
+    Add Intel FMA(FUSED-MULTIPLY-ADD) instructions to x86 opcode map
+    Add Intel AVX(Advanced Vector Extensions) instruction set
+    Intel will help maintaining the coretemp driver.
+      requests even on my laptop running the Intel X25-M SSD for which the
+    Add Intel AES opcodes to x86 opcode map. These opcodes are
+    iwmc3200top: Add Intel Wireless MultiCom 3200 top driver.
+    This patch adds Intel Wireless MultiCom 3200 top driver.
+    wimax/i6x50: add Intel WiFi/WiMAX Link 6050 Series support
+    Add support for the WiMAX device in the Intel WiFi/WiMAX Link 6050
+    In the Intel Wireless Multicomm 3200, the initialization is
+    during boot (say on an Intel system) and then rmmod'd:
+    official name used in Intel's documents.
+    perf_events: Add event constraints support for Intel processors
+    On some Intel processors, not all events can be measured in all
+    into account event constraints for Intel P6, Core and Nehalem
+    processors. There is no contraints on Intel Atom. There are
+    constraints on Intel Yonah (Core Duo) but they are not provided in
+    Intel fixed counters do not support all the filters possible with a
+    For example, on an Intel Ibex Peak (PCH) controller:
+    Note, this patch only adds CMPXCHG8B for the obvious Intel CPU's,
+    LRO'd packets, not the packets/bytes on the wire.  The Intel 82599 NIC has
+    Since the recent kernel can handle MSI properly on non-Intel platforms,
+    A driver for the Intel 3200 and 3210 memory controllers.  It has only had
+    Following patch adds support for mobile Penryn CPUs. Intel documents this
+    Fix Atom CPUs support. Intel documents TjMax at 90 degrees C but
+    gpio: add Intel Moorestown Platform Langwell chip gpio driver
+    The Langwell chip is the IO hub for Intel Moorestown platform which has a
+    USB: EHCI: Add Intel Moorestown EHCI controller HOSTPCx extensions and support phy low power mode
+    The Intel Moorestown EHCI controller supports non-standard HOSTPCx register
+    Intel EHCI HCDs should turn off the flag.
+    WPCD376I chipset (found on e.g. Intel DG45FC motherboards).
+    drivers/hwmon/coretemp.c: enable the Intel Atom
+    Enable the coretemp driver on an Intel Atom.
+    x86:    Intel Pentium D 3GHz with 8G RAM (no-brand machine)
+    Intel x86-64 processors didn't support NX, and even recent systems
+    On Intel platforms, we can use logical flat mode if there are <= 8
+    at least one more firmware type confirmed for Radeon 9xxx and Intel
+    buggy Intel video driver.
+    Intel has officially abandoned this project and does not want to
+    IWMC3200(Intel Wireless Multicomm 3200 WiFi driver).
+      intel_txt: Force IOMMU on for Intel TXT launch
+      x86, intel_txt: Intel TXT Sx shutdown support
+      x86, intel_txt: Intel TXT reboot/halt shutdown support
+      x86, intel_txt: Intel TXT boot support
+      x86: add specific support for Intel Atom architecture
+    The card includes Intel ce5039(Zarlink zl10039) tuner
+    and Intel ce6313 (Zarlink zl10313) demod.
+      Linux f7ea8425-d45b-490f-a738-d181d0df6963.host.elastichosts.com 2.6.30.4-elastic-lon-p #2 SMP PREEMPT Thu Aug 20 14:30:50 BST 2009 x86_64 Intel(R) Xeon(R) CPU E5420 @ 2.50GHz GenuineIntel GNU/Linux
+    It is observed that for some hardware, particularly Intel 82599, there is too
+    (returning 0), because the MSR number is the same as Intel's.
+    Intel specification.
+    an Intel host.
+    The performance counter MSRs are different for AMD and Intel CPUs and they
+    This fixes booting a 64bit Windows guest with an AMD CPUID on an Intel host.
+    Intel Westmere and onwards processors will support this feature.
+    determining mode numbers.  On new Intel platforms it's necessary to
+    'version': Intel(R) QuickData specfication revision
+    Up until this point the driver for Intel(R) QuickData Technology
+    Add LCD backlight support for the Intel GMA965 found in the MacBookAir
+    This also depends on the oscillator frequency. Intel seems to have
+    from Intel's base.
+     Audio device [0403]: Intel Corporation 82801H (ICH8 Family) HD Audio
+    There are several sources of unnecessary power consumption on Intel
+    The Intel Optimization Reference Guide says:
+            In Intel Atom microarchitecture, the address generation unit
+            For Intel Atom processors, use segments with base set to 0
+    identify its VLAN to allow such discovery. Intel is pursuing this issue
+    The initial entry in the blacklist function is the Intel 0f68 processor.  It's
+    Intel Linux wireless folks can be reached via this address.
+    Currently, the opcode maps are based on opcode maps in Intel(R) 64 and
+    [    8.650254] CPU31: Intel(R) Xeon(R) CPU           E5540  @ 2.53GHz stepping 04
+    Intelligence about IRQ muxing is missing, so for the moment this
+    x86: add specific support for Intel Atom architecture
+    optimized for Intel Atom CPUs. If GCC supports tuning options for
+    Intel Atom they will be used.
+      ALSA: hda: add model for Intel DG45ID/DG45FC boards
+    ALSA: hda: add model for Intel DG45ID/DG45FC boards
+    Now that we're using the scaling property in the Intel driver I noticed
+    With manageability (Intel AMT) enabled via BIOS, PHY wakeup does not get
+    ECNVRAM, and the Intel GPUs will get UCMS_STEP.
+    ALSA: hda: add HP automute support to Intel ALC889/ALC889A models
+    ALSA: hda: add 2-channel mode to Intel ALC889/ALC889A models
+    Intel X38 MCHBAR is a 64bits register, base from 0x48, so its higher base
+    (per paragraph 13.5.2.3 of the "Intel 64 and IA-32 Architectures
+      x86: Add quirk for Intel DG45ID board to avoid low memory corruption
+    reported to me internally at Intel.
+    ALSA: hda - Add better Intel IbexPeak platform support
+    intel_txt: Force IOMMU on for Intel TXT launch
+    the kernel must enable Intel Virtualization Technology for Directed I/O
+    (VT-d or Intel IOMMU) in order to replace this broad protection with the
+    x86, intel_txt: Intel TXT Sx shutdown support
+    Support for graceful handling of sleep states (S3/S4/S5) after an Intel(R) TXT launch.
+    x86, intel_txt: Intel TXT reboot/halt shutdown support
+    Support for graceful handling of kernel reboots after an Intel(R) TXT launch.
+    x86, intel_txt: Intel TXT boot support
+    This patch adds kernel configuration and boot support for Intel Trusted
+    Execution Technology (Intel TXT).
+    Intel's technology for safer computing, Intel Trusted Execution
+    Technology (Intel TXT), defines platform-level enhancements that
+    Intel TXT was formerly known by the code name LaGrande Technology (LT).
+    Intel TXT in Brief:
+    Intel TXT is part of the vPro(TM) brand and is also available some
+    This site also has a link to the Intel TXT MLE Developers Manual, which
+    x86: Add quirk for Intel DG45ID board to avoid low memory corruption
+    AMI BIOS with low memory corruption was found on Intel DG45ID
+    (somewhat optimistic) hope of future boards/BIOSes from Intel
+    Add device ID for Intel 82801JI SATA AHCI controller.
+    Revert "USB: Add Intel Langwell USB OTG Transceiver Drive"
+      ALSA: hda - Missing volume controls for Intel HDA (ALC269/EeePC)
+      ALSA: hda - Missing volume controls for Intel HDA (ALC269/EeePC)
+    The Intel x86 architecture right now only supports 32 machine check
+    ALSA: hda - Missing volume controls for Intel HDA (ALC269/EeePC)
+    I'm taking my sabbatical from Intel for July/August 2009.
+    reads to the P6 EVNTSEL MSRs. That fixed crashes on Intel machines.
+      drm/i915: Add missing dependency on Intel AGP support.
+    However, this is not the case for certain Intel processors, such as
+        Intel AES-NI instructions are not detected.
+      Intel-IOMMU, intr-remap: source-id checking
+      Intel-IOMMU, intr-remap: set the whole 128bits of irte when modify/free it
+    Intel-IOMMU, intr-remap: source-id checking
+    Intel-IOMMU, intr-remap: set the whole 128bits of irte when modify/free it
+      Fix !CONFIG_DMAR build failure introduced by Intel IOMMU Pass Through Support
+      Intel IOMMU Pass Through Support
+    drm/i915: Add missing dependency on Intel AGP support.
+    Users could accidentally enable AGP but not the Intel AGP support, and get
+      x86: nmi: Add Intel processor 0x6f4 to NMI perfctr1 workaround
+    missed a spot, which caused all Intel-PMU samples to have a
+    x86: nmi: Add Intel processor 0x6f4 to NMI perfctr1 workaround
+    Expand Intel NMI perfctr1 workaround to include a Core2 processor stepping
+    lock, especially on CPU's where the serialization is expensive (eg Intel
+    lock, especially on CPU's where the serialization is expensive (eg Intel
+    USB: Add Intel Langwell USB OTG Transceiver Drive
+    This driver is used for Intel Langwell* USB OTG controller in Intel
+    accomplished in modified EHCI driver and Intel Langwell USB OTG client
+    This patch is the first version Intel Langwell USB OTG Transceiver
+    USB: Add Intel Langwell USB Device Controller driver
+    Intel Langwell USB Device Controller is a High-Speed USB OTG device
+    controller in Intel Moorestown platform. It can work in OTG device mode
+    with Intel Langwell USB OTG transceiver driver as well as device-only
+    This patch is the first version Intel Langwell USB OTG device controller
+    issues.  Intel Langwell USB OTG transceiver driver and EHCI driver
+     - USB OTG protocol support with Intel Langwell USB OTG transceiver
+      On this hardware there is an Intel P30 flash, following patch
+    up in lower values on latest (Intel and AMD) hardware as these can switch
+      perf_counter/x86: Fix the model number of Intel Core2 processors
+      perf_counter, x86: Correct some event and umask values for Intel processors
+    addition to the check for the EST flag it also checked if the vendor is Intel.
+    through the crypto API -- so we're already using the Intel crc32c
+    combination which fails boot probing - MCP5x + Intel SSD and there are
+    perf_counter/x86: Fix the model number of Intel Core2 processors
+    Fix the model number of Intel Core2 processors according to the
+    documentation: Intel Processor Identification with the CPUID
+    Re-inject event instead. This is what Intel suggest. Also use correct
+    been made unusable. Clear it here to pass an Intel VMX
+    Intel TXT(Trusted Execution Technology) required VMX off for all cpu to work
+    perf_counter, x86: Correct some event and umask values for Intel processors
+    Correct some event and UMASK values according to Intel SDM,
+    ( Note: these are straight from the Intel manuals - not tested yet.)
+    on the Russellville board, a development board for Intel Atom CPU
+    makes it possible to support e.g. the Intel P30 48F4400 chips which
+    Newer Intel CPUs support a new class of machine checks called recoverable
+    mce_severity rule checking engine.  Following the Intel
+    only works on Intel systems, on AMD there are quite a lot of systems
+    On Intel platforms machine check exceptions are always broadcast to
+      asserting the machine check pin.  This follows Intel hardware
+    non Intel CPUs or also on very old Intel systems.
+    is a common problem on Intel Nehalem which has both SMT (two
+    This patch provides support for the next generation Intel desktop
+    fixed and submitted by Intel ...
+    standard Intel machine check architecture described in the IA32 SDM.
+    WinChip C3 and Intel P5.  I made those a separate CONFIG option
+    x86, mce: unify Intel thermal init
+    x86, mce: unify Intel thermal init, prepare
+    ARB_DISABLE is a NOP on all of the recent Intel platforms.
+    model name      : Intel(R) Xeon(R) CPU           E5405  @ 2.00GHz
+    lguest: fix on Intel when KVM loaded (unhandled trap 13)
+    IXP42x: Identify Intel IXP425 rev. A0 processors.
+    iwmc3200wifi: Add new Intel Wireless Multicomm 802.11 driver
+    This driver supports Intel's full MAC wireless multicomm 802.11 hardware.
+    Xiaohui Xin and some other folks at Intel have been looking into what's
+    There are a number of small form factor desktop systems with Intel mobile
+    'perfmon' is the CPU feature name that is Intel-only, while we do
+    Traditionally Intel based NIC drivers request I/O port even though it
+    Intel PCIE 10Gb driver (ixgbe) also requests I/O port but it doesn't
+    perf_counter: fix fixed-purpose counter support on v2 Intel-PERFMON
+    [ Impact: add quirk for three fixed-purpose counters on certain Intel CPUs ]
+    Fix !CONFIG_DMAR build failure introduced by Intel IOMMU Pass Through Support
+    counters. In difference to the Intel pmu, there is no single status
+    Intel is moved to Intel only functions. In the end, checks and calls
+    This function is Intel only and not necessary for AMD cpus.
+    This function is Intel only and not necessary for AMD cpus.
+    This separates the perfcounter interrupt handler for AMD and Intel
+    X86_FEATURE_ARCH_PERFMON is an Intel hardware feature that does not
+    work on AMD CPUs. The flag is now only used in Intel specific code
+    Intel IOMMU Pass Through Support
+    Copyright(c) 2009 Intel Corporation.
+    Intel 82576 chipset supports SCTP checksum offloading.  This
+    lock, especially on CPU's where the serialization is expensive (eg Intel
+    lock, especially on CPU's where the serialization is expensive (eg Intel
+    It was pointed out that the Intel wired ethernet drivers do not need to
+    Remove this unused Kconfig variable, which Intel apparently once
+      ALSA: Intel8x0: Add hp_only quirk for SSID 0x1028016a (Dell Inspiron 8600)
+      ALSA: Intel8x0: Remove conflicting quirk for SSID 0x103c0934
+      ALSA: Intel8x0: Add hp_only quirk for SSID 0x1028016a (Dell Inspiron 8600)
+      ALSA: Intel8x0: Remove conflicting quirk for SSID 0x103c0934
+    ALSA: Intel8x0: Add hp_only quirk for SSID 0x1028016a (Dell Inspiron 8600)
+    ALSA: Intel8x0: Remove conflicting quirk for SSID 0x103c0934
+    That change is causing only one Intel CPU's microcode to be updated e.g.
+    because Intel's request_microcode_user() involves a copy_from_user() from
+    Support the Intel 854 Chipset in fbdev.
+      Intel-IOMMU Alignment Issue in dma_pte_clear_range()
+    Impact: save/restore Intel-AVX state properly between tasks
+    Intel Advanced Vector Extensions (AVX) introduce 256-bit vector processing
+    Some drivers like Intel8x0 or Intel HDA are broken for some hardware variants.
+      PCI: SR-IOV quirk for Intel 82576 NIC
+      ALSA: hda - enable SPDIF output for Intel DX58SO board
+    Intel-IOMMU Alignment Issue in dma_pte_clear_range()
+      Intel IOMMU Suspend/Resume Support - Interrupt Remapping
+      Intel IOMMU Suspend/Resume Support - Queued Invalidation
+      Intel IOMMU Suspend/Resume Support - DMAR
+    PCI: SR-IOV quirk for Intel 82576 NIC
+    Please refer to Intel 82576 Gigabit Ethernet Controller Datasheet
+    are added for the Intel/Nvidia chipset models and passed by the DMI_MATCH
+    Impact: fix boot crash on Intel Perfmon Version 1 systems
+    Intel Perfmon v1 does not support the global MSRs, nor does
+    ALSA: hda - enable SPDIF output for Intel DX58SO board
+    The Intel Management Engine Interface (aka HECI: Host Embedded
+    host or Intel AMT firmware can initiate transactions.
+    The core hardware architecture of Intel Active Management Technology
+    (Intel AMT) is resident in firmware. The micro-controller within the
+    - Intel(R) Quiet System Technology (QST) is implemented as a firmware
+    health monitoring and fan speed control capabilities of Intel(R) QST
+    Most recent Intel desktop chipsets have one or more of the above ME
+    Driver for Intelligent Instruments PCI-20001C carrier board
+    Intel IOMMU Suspend/Resume Support - Interrupt Remapping
+    Intel IOMMU Suspend/Resume Support - Queued Invalidation
+    Intel IOMMU Suspend/Resume Support - DMAR
+    This patch implements the suspend and resume feature for Intel IOMMU
+    V4L/DVB (11216): Add driver for Intel CE6230 DVB-T USB2.0
+    Add driver for Intel CE6230 DVB-T USB 2.0 COFDM demodulator
+    V4L/DVB (11215): zl10353: add support for Intel CE6230 and Intel CE6231
+    Add chip IDs and configuration registers needed for Intel CE6230 and
+    Intel CE6231.
+    ACPI: Populate DIDL before registering ACPI video device on Intel
+    Intel graphics hardware that implements the ACPI IGD OpRegion spec
+    Tested both 32 and 32 PAE modes on Intel X58 and Q35 platforms.
+    warnings, the Intel IOMMU driver works fine in a 32-bit kernel.
+    Convert the Intel 6300ESB watchdog timer to a platform device driver.
+    control for Intel IOMMU, which can be used by other components of kernel to
+    (although it can be cleared in the descriptor itself). Since Intel
+    even on Intel.  Implement fake support for this MSR to avoid the
+    Tested on Intel only, but SVM /should/ work as well, but who knows...
+    Intel.
+     Output Intel HDA Function Id in /proc/asound/cardX/codec#X
+    This patch enables support for the new Intel 82552 adapter (new PHY paired
+    With this patch, we can get correct pci cfg size of new Intel CPUs/IOHs
+         PowerTOP version 1.9       (C) 2007 Intel Corporation
+    RS600s are an AMD IGP for Intel CPUs, that look like RS690s from
+    When we switch controllers the Intel Multi-Flex reports
+    This adds the Intel Multi-Flex device to scsi_dh_alua's
+    Build and boot tested on a 4 way Intel x86_64 workstation.
+    Build and boot tested on a 4 way Intel x86_64 workstation.
+    Build and boot tested on a 4 way Intel x86_64 workstation.
+    Build and boot tested on a 4 way Intel x86_64 workstation.
+    Build and boot tested on a 4 way Intel x86_64 workstation.
+      x86: work around Fedora-11 x86-32 kernel failures on Intel Atom CPUs
+    x86: work around Fedora-11 x86-32 kernel failures on Intel Atom CPUs
+    Work around Intel Atom erratum AAH41 (probabilistically) - it's triggering
+    for Intel and AMD processors to view / debug the state of each CPU.
+    Impact: fix lguest boot crash on modern Intel machines
+    This code is only applied to Intel Pentium and AMD K7 32-bit cpus.
+    Update copyright to the new legal entity, Intel-NE, Inc., an Intel
+    Upcoming server platforms from Intel based on the Nehalem performance
+    Resetting the counter width of the performance counters on Intel's
+       Intel Corporation Mobile 915GM/GMS/910GML
+    - IWL5000 now supports Intel Wireless Wifi 100, 6000, and 6050 series.
+    Intel CMCI (Corrected Machine Check Interrupt) is a new
+    Intel Nehalem CPUs available on some machine check banks.
+    The threshold handler on AMD (and soon on Intel) could be theoretically
+    interrupt handler. Since Intel needs a similar handler
+    be used by both the Intel or AMD MC code.
+    This is needed for the next patch which adds an Intel specific
+    ALSA: hda - add support for "Maxdata Favorit 100XS" (Intel HDA/ALC260)
+    Intel 8257x Ethernet boards have a feature called Serial Over Lan.
+    Testing based on dm-crypt on an Intel Core 2 E6400 (two cores) machine
+    The test result on an Intel Core2 E6400 (two cores) is as follow:
+    broken in half after latest changes for Intel 915 mode setting support.
+    this by make Intel frame buffers depend on CONFIG_INTEL_AGP.
+    Since Intel-based models have an inverted x axis, while AMD-based models
+    "HDA Intel at 0xf8400000 irq 21".
+    crypto: aes-ni - Add support to Intel AES-NI instructions for x86_64 platform
+    Intel AES-NI is a new set of Single Instruction Multiple Data (SIMD)
+    Intel processor, as of 2009. These instructions enable fast and secure
+    Intel AES-NI AES acceleration instructions touch XMM state, to use
+    The Intel AES-NI AES acceleration instructions need key_enc, key_dec
+      iommu: fix Intel IOMMU write-buffer flushing
+    Fix Intel IOMMU write-buffer flushing
+    iommu: fix Intel IOMMU write-buffer flushing
+      0000: 44 4d 41 52 98 00 00 00 01 6f 49 6e 74 65 6c 20  DMAR.....oIntel
+      ALSA: hda - add id for Intel IbexPeak integrated HDMI codec
+      x86: add clflush before monitor for Intel 7400 series
+    Intel reported a 10% regression (mysql+sysbench) on a 16-way machine
+    ALSA: hda - add id for Intel IbexPeak integrated HDMI codec
+    iwlwifi: add new HW_REV_TYPEs for Intel WiFi Link 100, 6000 and 6050 Series
+    x86: add clflush before monitor for Intel 7400 series
+    For Intel 7400 series CPUs, the recommendation is to use a clflush on the
+    [1] "MONITOR/MWAIT Recommendations for Intel Xeon Processor 7400 series"
+    license used for Intel ACPI CA code.
+      x86: add cache descriptors for Intel Core i7
+      PCI: irq and pci_ids patch for Intel Tigerpoint DeviceIDs
+    x86: add cache descriptors for Intel Core i7
+            CPU0: Intel(R) Xeon(R) CPU            5110  @ 1.60GHz stepping 06
+            CPU0: Intel(R) Xeon(R) CPU            5110  @ 1.60GHz stepping 06
+            CPU0: Intel(R) Xeon(R) CPU            5110  @ 1.60GHz stepping 06
+    iwlwifi: add recognition of Intel WiFi Link 100 Series
+    add configuration for new Intel WiFi Link 100 series as part of the
+    iwlwifi: add recognition of Intel WiFi Link 6000 and 6050 Series
+    add configuration for new Intel WiFi Link Series as part of the iwlagn
+    Move X86_ELAN (old, NCR hw platform built on Intel CPUs) from the
+    PCI: irq and pci_ids patch for Intel Tigerpoint DeviceIDs
+    This patch adds the Intel Tigerpoint LPC Controller DeviceIDs.
+    of some devices (most importantly, USB controllers and HDA Intel)
+      x86: unmask CPUID levels on Intel CPUs, fix
+      x86: unmask CPUID levels on Intel CPUs
+    x86: unmask CPUID levels on Intel CPUs, fix
+    Impact: fix boot hang on pre-model-15 Intel CPUs
+    ALSA: hda - Add model=ref for Intel board with STAC9221
+    x86: unmask CPUID levels on Intel CPUs
+    the Intel Network drivers.
+      ALSA: hda - add support for Intel DX58SO board
+    Intel "Smackover" x58 BIOS don't have HPET enabled in the BIOS, so allow
+    ALSA: hda - add support for Intel DX58SO board
+    The Intel DX58SO board works fine with model ALC883_3ST_6ch_INTEL.
+    a Intel chipset system.  The problem is that the system has a fancy Nvidia
+    This adds more LPC controller IO range decode quirks for the Intel ICH
+    with the WiMAX kernel API and to speak the Intel 2400m Wireless WiMAX
+    This is seen on an Intel host that tries to execute the VMMCALL
+    GUEST_PAT support is a new feature introduced by Intel Core i7 architecture.
+    It moves the Intel and radeon drivers to using the sarea from
+    such as the one utilising Intel's CRC32C instruction can be
+    Impact: extend performance counter support on x86 Intel CPUs
+    Modern Intel CPUs have 3 "fixed-function" performance counters, which
+      x86: fix resume (S2R) broken by Intel microcode module, on A110L
+    x86: fix resume (S2R) broken by Intel microcode module, on A110L
+    Subject         : resume (S2R) broken by Intel microcode module, on A110L
+    This caused the silent output on some Intel desktops due to missing
+    Intel CPUs.  None of the other iommu_init() functions makes noise when
+    ALSA: hda - Add Intel vendor id string
+    Added Intel codec vendor id string (0x8086).
+    Also fixed Intel-HDMI codec name strings, too.
+    Originally designed by Intel, now sold by Crossbow (www.xbow.com).
+    x86: support always running TSC on Intel CPUs
+    Add support for CPUID_0x80000007_Bit8 on Intel CPUs as well. This bit means
+    With Intel CPUs, we have 3 classes
+    We still have CONSTANT_TSC _set_ and NONSTOP_TSC _not_set_ on some older Intel
+    x86: support always running TSC on Intel CPUs, add cpufeature definition
+    always valid Intel Linux Wireless, which will be routed
+    Implement performance counters for x86 Intel CPUs.
+    which is available in Core2 and later Intel CPUs.
+    (September 2008) of Intel 64 and IA-32 Architectures Software Develper's Manual,
+      x86/oprofile: fix Intel cpu family 6 detection
+    x86/oprofile: fix Intel cpu family 6 detection
+    The Intel AP-485 says this is a "Intel Pentium M processor model D". Seems like
+    Referring to the Intel AP-485:
+    PXA935 has changed its implementor ID from Intel to Marvell, this
+    the messages consistant with other Intel driver link messages.
+    the messages consistant with other Intel driver link messages.
+    the messages consistant with other Intel driver link messages.
+    the messages consistant with other Intel driver link messages.
+    worked, both Thinkpads with Intel chipsets.  Checkin
+    This patch fixes the bug 0004240: ALC888 - Intel HDA - Headphone Controlling.
+    worked, both Thinkpads with Intel chipsets.  This reverts the default
+            Intel 82566MM (PCI ID 8086:1049)
+            Intel 82566DC (PCI ID 8086:104b)
+            Intel 82541GI (PCI ID 8086:1076)
+    Bugzilla #9868: On Intel motherboards with the ICH9 based I/O controllers
+    Intel datasheets [2] state that the timer registers are in an
+    - The ELD retrieval routines rely on the Intel HDA interface,
+    b99170288421c79f0c2efa8b33e26e65f4bb7fb8 (oprofile: Implement Intel
+    "tbench 8" is 4.4 % faster on a dual quad core (HP BL460c G1), Intel E5450 @3.00GHz
+    Revert "x86: blacklist DMAR on Intel G31/G33 chipsets"
+    ("PCI/iommu: blacklist DMAR on Intel G31/G33 chipsets"), where we do
+    voltage sensors.  This driver has been tested on an IntelliStation Z30.
+      non-cacheable and non-bufferable from the IntelR XScaleTM core.
+    Intel graphics card and an Integrated Graphics Device BIOS implementation
+       but also Intel Core7i has it.
+    ALSA: hda - Intel HDMI audio support
+    Add support for Intel G45 integrated HDMI audio codecs.
+    Intel is currently shipping support for adapters with a phy
+            HDA Intel 0000:00:1b.0: BAR 0: can't reserve mem region [0xfe9dc000-0xfe9dffff]
+    This is only an interim hack until Intel fixes the requeue issue.
+    I wrote a new module for Intel X38 chipset.  This chipset is very similar
+    to Intel 3200 chipset, but there are some different points, so I copyed
+    This is Intel's web page describing this chipset.
+      i2c-i801: Add support for Intel Ibex Peak
+      oprofile: Implement Intel architectural perfmon support
+      uwb: add Intel i1480 HWA to the UWB RC quirk table
+      Update NetEffect maintainer emails to Intel emails
+      [IA64] Add Variable Page Size and IA64 Support in Intel IOMMU
+    Current Intel errata for the GM965 says that using MSI may cause interrupts
+    support. Data from the Intel 64 Architecture x2APIC Specification,
+    ACPI: thinkpad-acpi: Remove firmware backlight delays for Intel ACPI IGD OpRegion
+    i2c-i801: Add support for Intel Ibex Peak
+    Adds the Intel Ibex Peak (PCH) SMBus Controller Device IDs.
+    The Intel 7300 Memory Controller supports dynamic throttling of memory which can
+    Refer to "Intel 7300 Memory Controller Hub (MCH)" datasheet
+    x86/PCI: irq and pci_ids patch for Intel Ibex Peak DeviceIDs
+    This patch updates the Intel Ibex Peak (PCH) LPC and SMBus Controller
+    The current Intel IOMMU code assumes that both host page size and Intel
+    It only affects the Intel G33 series and newer.
+    This adds support for the RS400 family of IGPs for Intel CPUs.
+    Add Intel ACPI IGD OpRegion support
+    work on some newer Intel-based graphics systems. Tested on Thinkpad T61
+    [IA64] Add Variable Page Size and IA64 Support in Intel IOMMU
+    The patch contains Intel IOMMU IA64 specific code. It defines new
+    For a generic kernel with CONFIG_DMAR=y, if Intel IOMMU is detected,
+    Update NetEffect maintainer emails to Intel emails
+    Intel acquired NetEffect, so update the nes driver maintainer contacts
+    3) According to the specification update for Intel 5000 MCHs, all the
+    Tested on Intel's L443GX with redhat's 2.6.18 with whole EDAC subsystem
+    agpgart: Detected an Intel 440GX Chipset.
+    newer Intel Apple hardware.  This has been fairly well tested; we've been
+    Add support for Intel's 945GME graphics chip to the intelfb driver.  I
+    This patch instead uses what both the latest Intel and AMD spec suggests.
+    oprofile: Implement Intel architectural perfmon support
+    Newer Intel CPUs (Core1+) have support for architectural
+    This patch implements support for that in oprofile's Intel
+    motherboard with an Intel 82810E Northbridge and 82801AA Southbridge.
+    Intel drivers.
+      crypto: crc32c - Use Intel CRC32 instruction
+    Instead of making init a two pass sequence, to satisfy the Intel's TLB
+      ata_piix: IDE Mode SATA patch for Intel Ibex Peak DeviceIDs
+    ata_piix: IDE Mode SATA patch for Intel Ibex Peak DeviceIDs
+    This patch updates the Intel Ibex Peak (PCH) IDE mode SATA Controller DeviceIDs.
+    Intel doesn't yet ship hardware to the public with this enabled, but when they
+    PXA26x (PXA261/262) is actually a PXA250 with stacked Intel(R)
+            with Intel C1E ]
+    On Intel CPUs it is rather common and a good hint that BIOSes which do provide
+    uwb: add Intel i1480 HWA to the UWB RC quirk table
+    The Intel i1480 HWA uses WHCI commands/events even though reporting itself as
+    Intel.
+    Add the driver for the WLP capability of the Intel i1480 device.
+    Add the driver for downloading the firmware to an Intel i1480 device.
+    by the Intel RC algorithms, so move it into those.
+      PCI/iommu: blacklist DMAR on Intel G31/G33 chipsets
+    Just FYI, many Windows/Intel platform users also seems to be struck
+    by this, and HGST has issued a note pointing to Intel ICH8/9 driver.
+    processor which doesn't support NX (ie, old Intel P4 -based64-bit
+    Current implementation just cover Intel VMX side.
+    PCI/iommu: blacklist DMAR on Intel G31/G33 chipsets
+    Some BIOSes (the Intel DG33BU, for example) wrongly claim to have DMAR
+      ahci: RAID mode SATA patch for Intel Ibex Peak DeviceIDs
+    ahci: RAID mode SATA patch for Intel Ibex Peak DeviceIDs
+    Add the Intel Ibex Peak (PCH) SATA RAID Controller DeviceIDs.
+    On all hardware (some Intel ICH4, PIIX4 and PIIX4E chipsets) affected by a
+    Unfortunately, several non-Intel x86 implementations, both hardware
+    x86: blacklist DMAR on Intel G31/G33 chipsets
+    Some BIOSes (the Intel DG33BU, for example) wrongly claim to have DMAR
+    On an Intel computer this will for instance happen when using a
+    the dump), Pentium class machines and AMD/Intel 64 bit boxen.
+    crypto: crc32c - Use Intel CRC32 instruction
+    From NHM processor onward, Intel processors can support hardware accelerated
+    x86: cpufeature: add Intel features from CPUID and AVX specs
+    Add all Intel CPUID features currently documented in the CPUID spec
+    Added Intel processor SSE4.2 feature flag.
+    INIT is blocked when Intel VT is enabled.  This leads to a partially reset
+      ata_piix: IDE Mode SATA patch for Intel Ibex Peak DeviceIDs
+      ahci: RAID mode SATA patch for Intel Ibex Peak DeviceIDs
+    ata_piix: IDE Mode SATA patch for Intel Ibex Peak DeviceIDs
+    This patch adds the Intel Ibex Peak (PCH) IDE mode SATA Controller DeviceIDs.
+    ahci: RAID mode SATA patch for Intel Ibex Peak DeviceIDs
+    This patch adds the Intel Ibex Peak (PCH) SATA RAID Controller DeviceIDs.
+      x86/PCI: irq and pci_ids patch for Intel Ibex Peak PCHs
+    Unfortunately, several non-Intel x86 implementations, both hardware
+    An example of size saving, on x86 with only Intel CPU support:
+    and/or cmpxchg64 natively. However, while defined in an Intel-specific
+    compilation when support for Intel CPUs is disabled.
+    contains code specific to Intel CPUs. However, movsl_mask is used in
+    the compilation when support for Intel CPUs is compiled out.
+    than 32 bits as immediates. Intel's add/sub documentation specifies they
+    actually improves performances on Intel Xeon, AMD64, Pentium M. It does not
+    x86/PCI: irq and pci_ids patch for Intel Ibex Peak PCHs
+    This patch adds the Intel Ibex Peak (PCH) LPC and SMBus Controller DeviceIDs.
+    applesmc: support for Intel iMac
+    >               Intel(R) Pentium(R) D CPU 2.80GHz stepping 04
+      ALSA: hda_intel: ALSA HD Audio patch for Intel Ibex Peak DeviceIDs
+    ALSA: hda_intel: ALSA HD Audio patch for Intel Ibex Peak DeviceIDs
+    This patch adds the Intel Ibex Peak (PCH) HD Audio Controller DeviceIDs.
+    On my Intel chipset (965GM), the GTT is entirely erased across
+    rewrite call to anything other than the Intel resume function.
+    the GATT.  This is needed on Intel (at least) as the entire GATT is
+    (see "[PATCH 2/4] [RFC][MTD] cfi_probe: remove Intel chip workaround"
+    x86: Intel microcode patch loader style corrections
+    on systems with more capable HPETs than at least Intel seems to ship.
+    for Intel processors.
+    to Intel's microcode patching solution.
+    x86: moved Intel microcode patch loader declarations to seperate header file
+    Intel specific microcode declarations have been moved to a seperate header file.
+    module parameter is passed, and an Intel Mac board is detected, the
+    core Intel Xeon system running an OLTP workload on DB2 v9.5
+      x3850 M2 server with 2 processors (quad-core Intel Xeon processors at
+    Preliminary support for the Intel 5100 MCH.  CE and UE errors are reported
+    8250: fix break handling for Intel 82571
+    Intel 82571 has a "Serial Over LAN" feature that doesn't properly
+    Microsoft Intellimouse I have works correctly.
+    support for Intel I/OAT DMA engine ver.3 (aka CB3 device).
+      KVM: VMX: Fake emulate Intel perfctr MSRs
+    KVM: VMX: Fake emulate Intel perfctr MSRs
+    Intel machines where this is a bit expensive.
+    and multicast filtering is disabled. This patch changes all Intel
+    ...while Len is on sabbatical from Intel
+    Intel and Centaur(?) only support "sysenter" from 32-bit compat usermode.
+    Although it wasn't actually using ihex records before, we use the Intel
+    EEPROMs on an Intel 82801 bus (basically twice as fast.)
+    i2c: Add Intel SCH SMBus support
+    New i2c bus driver for the Intel SCH chipsets (AF82US15W, AF82US15L,
+    The segment descriptor registers (what Intel calls "segment cache") is
+    00:1f.0 ISA bridge: Intel Corporation 6300ESB LPC Interface Controller (rev 02)
+    00:1f.0 ISA bridge [0601]: Intel Corporation 82801FB/FR (ICH6/ICH6R) LPC Interface Bridge [8086:2640] (rev 03)
+    Interrupt remapping (part of Intel Virtualization Tech for directed I/O)
+    Queued invalidation (part of Intel Virtualization Technology for
+    x64, x2apic/intr-remap: Intel vt-d, IOMMU code reorganization
+    code reorganization of the generic Intel vt-d parsing related routines and linux
+    iommu routines specific to Intel vt-d.
+    tpm: add Intel TPM TIS device HID
+    This patch adds Intel TPM TIS device HID:  ICO0102
+    Some drivers could do with using records like Intel HEX, but with each
+    of the Intel IXP4xx networking processor series.
+    This patch brings support for gpio/gpiolib framework to Intel IOP3xx
+    within the same kernel, depending on whether its an Intel or AMD
+    > kernel with the above config file started up fine on both the Intel and AMD
+      x86: fix Intel Mac booting with EFI
+    x86: fix Intel Mac booting with EFI
+    resume causes 32-bit Intel Mac machines to reboot very early when
+      drm/i915: add support for Intel series 4 chipsets.
+      [agp]: fixup chipset flush for new Intel G4x.
+    00:1f.0 ISA bridge: Intel Corporation 6300ESB LPC Interface Controller (rev 02)
+    drm/i915: add support for Intel series 4 chipsets.
+    [agp]: fixup chipset flush for new Intel G4x.
+      [AGP] intel_agp: Add support for Intel 4 series chipsets
+    [AGP] intel_agp: Add support for Intel 4 series chipsets
+    RS400 (Intel based IGP) ones.
+    00:1f.0 ISA bridge [0601]: Intel Corporation 82801FB/FR (ICH6/ICH6R) LPC Interface Bridge [8086:2640] (rev 03)
+    Add PJ Waskiewicz to the list of maintainers for Intel 10/100/1000/10GbE
+    the Silicon Image ATA card and Intel E1000 GIGE card.  Hangs were seen with
+    Use bdl_pos_adj=32 as default except for Intel hardwares confirmed
+    [4294014.568167] ACPI: DSDT override uses original SSDTs unless "acpi_no_auto_ssdt"<6>CPU0: Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz stepping 0d
+    SFF P667 with the Intel 815E chipset. Unhiding it reveals
+    One more machine with a hidden Intel SMBus. Unhiding it reveals a SMSC
+    6. Intel NOR StrataFlash X16 64Mbit PC28F640P30T85;
+    The hypercall instructions on Intel and AMD are different.  KVM allows the
+    guest to choose one or the other (the default is Intel), and if the guest
+    instruction.  This allows live migration between Intel and AMD machines.
+    00:1f.0 ISA bridge [0601]: Intel Corporation 82801FB/FR (ICH6/ICH6R) LPC Interface Bridge [8086:2640] (rev 03)
+    x86: Move the 64-bit Intel specific parts out of setup_64.c
+    Input: i8042 - add Intel D845PESV to nopnp list
+    introduces such an entry for Intel D845PESV -- this system doesn't
+    Add the Intel ICH9DO controller ID's for the iTCO_wdt kernel driver and bump
+    i5k_amb: support Intel 5400 chipset
+    Minor rework to support the Intel 5400 chipset.
+      New maintainer for Intel ethernet adapters
+    New maintainer for Intel ethernet adapters
+    to other Linux/Open Source work within Intel. Good luck to Jeff ;)
+    The latest rev of Intel doc AP-485 details a new cache
+      x86: sysfs cpu?/topology is empty in 2.6.25 (32-bit Intel system)
+      on the filesystem.  System is an Intel Core 2 Quad running a 64bit
+    x86: sysfs cpu?/topology is empty in 2.6.25 (32-bit Intel system)
+    [MAINTAINERS] New maintainer for Intel ethernet adapters
+    to other Linux/Open Source work within Intel. Good luck to Jeff ;)
+    I was unable to access a computer containing an Intel EtherExpress 16 network
+    the IPv6 address of the computer with the Intel EtherExpress 16 network card
+    Correcting these problems allows the computer with the Intel EtherExpress 16
+    p.s. There is some information on the Intel EtherExpress 16 at
+    Datasheet for the Intel 82586 ethernet controller used by the card
+    libata: Add Intel SCH PATA driver
+    This patch adds Intel SCH chipsets (AF82US15W, AF82US15L, AF82UL11L)
+    Open MPI, Intel MPI and other applications don't respect the iWARP
+      PCI: Add Intel SCH PCI IDs
+    edac: new support for Intel 3100 chipset
+    Add Intel 3100 chipset support to e752x EDAC driver.
+    fbdev: intelfb: add support for the Intel Integrated Graphics Controller 965G/965GM
+    have a notebook with an Intel Mobile GM965/GL960 Integrated Graphics
+    I also have an Intel Mobile GM945 and I compared the results, the programming
+    interface of the 9xx series from Intel is mostly the same, so I think the
+    it from 12.5 kbps to 50 kbps.  The Intel (i810) and Matrox framebuffer drivers
+    it from 12.5 kbps to 50 kbps.  The Intel (i810) and Matrox framebuffer drivers
+    the non-x86 architectures but I haven't tested those.  I've tested Intel,
+    Most Intel hosts have a stable tsc, and playing with the offset only
+    Looking at Intel Volume 3b, page 148, table 20-11 and noticed
+    Based on an original patch by Rajesh Shah from Intel.
+      [MTD] [NOR] Fix Intel CFI driver for collie flash
+    Tested this EEH patch with Intel 10G pci-express ixgbe adapter.
+    It is based on the original driver from Intel, but has been re-worked
+    [ALSA] HDA-Intel - Patch to support RV7xx HDMI Audio
+    ACPICA: update Intel copyright
+    PCI: Add Intel SCH PCI IDs
+    This patch adds Intel SCH chipsets (US15W, US15L, UL11L) PCI IDs, these
+    [MTD] [NOR] Fix Intel CFI driver for collie flash
+    implementation found in the Intel VT-d hardware.  It works by building a list
+    placed downstream of a particular Intel bridge.
+    This patch has been tested on Intel x86_64 platform with EFI 64/32
+    It is based on the original driver from Intel, but has been re-worked
+    taken from Intel PXA270 Developers Manual.
+              (Intel-defined) can be used for IPIs. The node identifier
+              fits within the Intel-defined portion of the APICID register.
+    Intel recommends to not use large pages for the first 1MB
+    Intel x86 processor
+    "good" Intel cpu?
+    This is on a Intel machine with 36bit physical address space. The PTE
+    Updates based on the "Intel® Itanium® Architecture Software Developer's Manual
+      model name      : Intel(R) Pentium(R) D CPU 3.00GHz
+    * Intel IXP422
+       Text specific to Intel hardware is now at the end.
+    Intel ethernet adapter: Update MAINTAINERS
+    Add to help text that the Intel I2C ICH (i801) driver is also needed
+    Intel Tiger platforms hang when calling SAL_GET_PHYSICAL_ID_INFO
+    - link for Intel Zappa BIOS is dead
+    Add the Intel ICH10 SMBus Controller DeviceID's and updates
+    running on a Intel 82575 Ethernet controller with a 1000BASE-SX PHY.  The
+    This patch enables snoop on Intel SCH chipset, eliminating static during
+      PCI: irq: patch for Intel ICH10 DeviceID's
+      PCI: pci_ids: patch for Intel ICH10 DeviceID's
+    PCI: irq: patch for Intel ICH10 DeviceID's
+    This patch adds the Intel ICH10 LPC Controller DeviceID's.
+    PCI: pci_ids: patch for Intel ICH10 DeviceID's
+    This patch adds the Intel ICH10 LPC and SMBus Controller DeviceID's.
+    Following patch will finally solve the detection of Intel Mobile CPUs which
+    some bit so we know if TjMax is 100C or 85C. Intel claims this works for mobiles
+    only, respect that and set for desktops the TjMax to 100C. Intel provided some
+    This patch has been tested on Intel x86_64 platform with EFI64/32
+            "Can you also add a comment which points at the Intel
+             The 'Intel E7320 Memory Controller Hub (MCH) Datasheet' at
+    00:00.0 Host bridge: Intel Corporation Mobile 945GM/PM/GMS/940GML and 945GT Express Memory Controller Hub (rev 03)
+    00:02.0 VGA compatible controller: Intel Corporation Mobile 945GM/GMS/940GML Express Integrated Graphics Controller (rev 03)
+    00:02.1 Display controller: Intel Corporation Mobile 945GM/GMS/940GML Express Integrated Graphics Controller (rev 03)
+    00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition Audio Controller (rev 02)
+    00:1c.0 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 1 (rev 02)
+    00:1c.1 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 2 (rev 02)
+    00:1c.2 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 3 (rev 02)
+    00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #1 (rev 02)
+    00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #2 (rev 02)
+    00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #3 (rev 02)
+    00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #4 (rev 02)
+    00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2 EHCI Controller (rev 02)
+    00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev e2)
+    00:1f.0 ISA bridge: Intel Corporation 82801GBM (ICH7-M) LPC Interface Bridge (rev 02)
+    00:1f.1 IDE interface: Intel Corporation 82801G (ICH7 Family) IDE Controller (rev 02)
+    00:1f.2 SATA controller: Intel Corporation 82801GBM/GHM (ICH7 Family) Serial ATA Storage Controller AHCI (rev 02)
+    00:1f.3 SMBus: Intel Corporation 82801G (ICH7 Family) SMBus Controller (rev 02)
+    05:00.0 Network controller: Intel Corporation PRO/Wireless 3945ABG Network Connection (rev 02)
+      [MTD] Unlocking all Intel flash that is locked on power up.
+      i915: Add chipset id for Intel Integrated Graphics Device
+    i915: Add chipset id for Intel Integrated Graphics Device
+    This one adds new pci ids for Intel intergrated graphics chipset, with gtt
+    families of Intel chips.
+    Certain Intel chipsets contains a global write buffer, and this can require
+    will add support to the Intel driver to use this interface.
+    After /dev/*/cpuid was introduced, Intel changed the semantics of the
+    This is needed for example for Intel 48F4400 512MBit chips, since they
+    [MTD] Unlocking all Intel flash that is locked on power up.
+    Patch for unlocking all Intel flash that has instant locking on power up.
+    The patch has been tested on Intel M18, P30 and J3D Strata Flash.
+             Intel parts with legacy unlocking will not be unlocked.
+    Intel menlow platform specific driver for thermal management extension.
+    Intel menlow driver needs to get the pointer of themal_zone_device
+    EHCI Glue driver for Intel IXP4XX EHCI USB controller
+      ata_piix: IDE mode SATA patch for Intel ICH10 DeviceID's
+      ahci: RAID mode SATA patch for Intel ICH10 DeviceID's
+    ata_piix: IDE mode SATA patch for Intel ICH10 DeviceID's
+    This patch adds the Intel ICH10 IDE mode SATA Controller DeviceID's.
+    ahci: RAID mode SATA patch for Intel ICH10 DeviceID's
+    This patch adds the Intel ICH10 SATA RAID Controllers DeviceID's.
+    I'm working on cleaning up Intel's FCoE stack, which generates new MAC
+      [ALSA] HDA-Intel - Add support for Intel SCH
+      [ALSA] hda_intel: ALSA HD Audio patch for Intel ICH10 DeviceID's
+    [ALSA] HDA-Intel - Add support for Intel SCH
+    This patch adds support for Intel's SCH mobile chipset.
+    [ALSA] hda_intel: ALSA HD Audio patch for Intel ICH10 DeviceID's
+    This patch adds the Intel ICH10 HD Audio Controller DeviceID's.
+    AC_KNBCAP_DELTA is incorrectly defined as (1<<8). According to the Intel
+    [ALSA] HDA-Intel - Add support for RV6xx HDMI audio
+    [ALSA] HDA-Intel - Add support for RV610/RV630 HDMI audio
+      KVM: Disable vapic support on Intel machines with FlexPriority
+    KVM: Disable vapic support on Intel machines with FlexPriority
+    mode on Intel so that the CPU will not bark at us.  This fixes some old
+    as a tss when emulating real mode on Intel.  This patch moves the allocation
+    Unfortunately, this trick only works on Intel hardware, as AMD lacks a
+    not available in 32-bit mode on Intel processors, so the SCE bit is
+    Intel i386/x86_64 CPUs.  After changing page attribute to be
+    Intel i386/x86_64 CPU.  Because on Intel i386/x86_64 CPU, only if the
+    the corresponding page is executable (refer to section 4.13.2 of Intel
+    x86: c_p_a() fix: reorder TLB / cache flushes to follow Intel recommendation
+    Intel recommends to first flush the TLBs and then the caches
+    The procedure is still not fully compliant to the Intel documentation
+    because Intel recommends a all CPU synchronization step between
+    However on all new Intel CPUs this is now meaningless anyways
+    non-Intel machines (AMD machines apparently don't need it and it's untested
+    on other non-Intel machines, so best keep it off).
+    Previously it was only run for Intel CPUs, but AMD Fam10h implements MWAIT too.
+    x86 setup: initialize LDTR and TR to make life easier to Intel VT
+    Intel VT doesn't like to engage when the protected-mode state isn't
+    I actually think this is true on Intel too for C2 states
+    to handle this like Intel on AMD too.
+    The Intel check simply checks for CONSTANT_TSC too without hardcoding
+    Intel vendor. This is equivalent on 64bit because all 64bit capable Intel
+    On Intel there is no CPU supplied CONSTANT_TSC bit currently,
+    CONSTANT_TSC bit set or on Intel CPUs which are new enough
+    It expands either to LFENCE (for Intel CPUs) or MFENCE (for
+    LFENCE is available on XMM2 or higher Intel CPUs - not XMM or higher...
+    x86: Implement support to synchronize RDTSC with LFENCE on Intel CPUs
+    According to Intel RDTSC can be always synchronized with LFENCE
+    Refer to Intel system programming guide Part 1 Section 7.8.5
+    implementation has been reviewed by Intel and AMD engineers.
+    The Intel documentation says "P6 family" and later processors all have it.
+    Citing Intel's Instruction set reference:
+    This instruction is not supported on Intel processors earlier than the
+    Intel486 processors.
+    This instruction encoding is not supported on Intel processors earlier
+    [    3.726156] Intel machine check architecture supported.
+    [    3.726165] Intel machine check reporting enabled on CPU#0.
+    [    3.726167] CPU0: Intel P4/Xeon Extended MCE MSRs (12) available
+    [    3.798946] Intel machine check architecture supported.
+    [    3.798952] Intel machine check reporting enabled on CPU#1.
+    [    3.798955] CPU1: Intel P4/Xeon Extended MCE MSRs (12) available
+    [    3.799161] CPU1: Intel(R) Pentium(R) 4 CPU 3.00GHz stepping 09
+    driver to the linux community. This product is the Intel(R) 82575
+      ACPI: Delete Intel Customer Reference Board (CRB) from OSI(Linux) DMI list
+    ACPI: Delete Intel Customer Reference Board (CRB) from OSI(Linux) DMI list
+    So when it is seen in the BIOS for an Intel Customer Reference Board,
+    The E7221 chipset is a 915 rebadged for the Intel server line.
+      [NET]: Fix interrupt semaphore corruption in Intel drivers.
+    [NET]: Fix interrupt semaphore corruption in Intel drivers.
+    Several of the Intel ethernet drivers keep an atomic counter used to
+    Unfortunately, this trips up the semaphore used here in the Intel
+      x86: add support for the latest Intel processors to Oprofile
+    x86: add support for the latest Intel processors to Oprofile
+    The latest Intel processors (the 45nm ones) have a model number of 23
+      [NET]: Fix TX timeout regression in Intel drivers.
+    [NET]: Fix TX timeout regression in Intel drivers.
+    breakout consistent in Intel ethernet drivers.")
+    controversial in that it can be incorrect in non-Dell non-Intel systems
+      [NET] Intel ethernet drivers: update MAINTAINERS
+      [NET]: Make ->poll() breakout consistent in Intel ethernet drivers.
+    [NET] Intel ethernet drivers: update MAINTAINERS
+    [NET]: Make ->poll() breakout consistent in Intel ethernet drivers.
+      [CASSINI]: Program parent Intel31154 bridge when necessary.
+    [CASSINI]: Program parent Intel31154 bridge when necessary.
+    based on discussions with Intel CPU architects and verified at
+      x86: intel_cacheinfo.c: cpu cache info entry for Intel Tolapai
+    x86: intel_cacheinfo.c: cpu cache info entry for Intel Tolapai
+    This patch adds a cpu cache info entry for the Intel Tolapai cpu.
+     Intel machine check architecture supported.
+     Intel machine check reporting enabled on CPU#1.
+    driver.  The EFI frame buffer driver in this patch is based on the Intel Mac
+     - Non-Intel(R) hardware also has DMA engines;
+    (this isn't called on Intel as the hardware does the decode for us)
+    [MTD] [NOR] Support Intel P3x flash support with CFI version 1.5
+    hermes: clarify Intel reference in Kconfig help
+    The Intel device supported by the hermes driver core is the IPW2011.  The
+    "Intel PRO/Wireless" wording suggests the later Centrino devices and may
+    Intel 5000 series chipsets.
+    Originally based on a patch by Kristen Carlson Accardi @ Intel.
+    This patch removes dead code spotted by the Intel C Compiler.
+    Convert CFI tables from Atmel cmdset_0001 chips to Intel format and set
+      [MTD] [NOR] Fix deadlock in Intel chip driver caused by get_chip recursion
+    [MTD] [NOR] Fix deadlock in Intel chip driver caused by get_chip recursion
+    Intel IOMMU: Iommu floppy workaround
+    Intel IOMMU: Iommu Gfx workaround
+    Intel IOMMU: DMAR fault handling support
+    MSI interrupt handler registrations and fault handling support for Intel-IOMMU
+    Intel IOMMU: Intel iommu cmdline option - forcedac
+    Intel IOMMU: Avoid memory allocation failures in dma map api calls
+    Intel IOMMU driver needs memory during DMA map calls to setup its internal
+    Intel IOMMU: Intel IOMMU driver
+    Intel IOMMU: IOVA allocation and management routines
+    Intel IOMMU: clflush_cache_range now takes size param
+    Intel IOMMU: PCI generic helper function
+    Intel IOMMU: DMAR detection and parsing logic
+    This patch supports the upcomming Intel IOMMU hardware a.k.a.  Intel(R)
+    For detailed info on the specification of "Intel(R) Virtualization Technology
+    Intel x86_64 CPUs.  After changing page attribute to be executable with
+    these functions, the page remains un-executable on Intel x86_64 CPU.
+    Because on Intel x86_64 CPU, only if the "NX" bits of all four level
+    section 4.13.2 of Intel 64 and IA-32 Architectures Software Developer's
+    and by 4-5% on an Intel dual-core system too:
+    Intel FB: more interlaced mode support
+    Intel FB: allow odd- and even-field-first in interlaced modes, and
+    Intel FB: force even line count in interlaced mode
+    Intel FB: the chip adds two halflines automatically in interlaced mode,
+    Intel FB: obvious changes and corrections
+    Intel FB: obvious changes and corrections
+    Intel FB: whitespace, bracket and other clean-ups
+    Intel FB: whitespace, bracket and other clean-ups
+    Intel FB: support for interlaced video modes
+    Intel framebuffer now supports interlaced video modes.
+    Add device ids for new revs of the Intel I/OAT DMA engine
+    [ALSA] Intel HD Audio: Use list_for_each_entry(_safe)
+    Intel HD Audio: Use list_for_each_entry(_safe) instead of
+    [ALSA] hda-codec - Fix PM on ALC885 Intel Macs
+    Fix power-management on ALC885 Intel Macs.
+    i2c-i801: Add support for the Intel Tolapai SMBus
+    Add the Intel Tolapai SMBus Controller DID.
+      [MTD] map driver for NOR flash on the Intel Vermilion Range chipset
+    According to Intel Software Developer's Manual, Vol. 3B, Appendix H.4.2,
+    Intel manual (and KVM definition) say the TPR is 4 bits wide.  Also fix
+    On this machine (Intel), writing to the CR4 bits 0x00000800 and
+    0x00001000 cause a GPF.  The Intel manual is a little unclear, but
+    According to latest memory ordering specification documents from Intel
+    ahci: RAID mode SATA patch for Intel Tolapai
+    There is another outstanding issue with ata_piix.c.  Intel has never
+    Here are Intel's datasheets for the affected chipsets: ICH5 Datasheet:
+       http://lkml.org/lkml/2007/7/6/292 (It was already tested by an Intel
+    This patch adds the mac80211 based wireless drivers for the Intel
+    PRO/Wireless 3945ABG/BG Network Connection and Intel Wireless WiFi
+    ixgbe: driver for Intel(R) 82598 PCI-Express 10GbE adapters (v4)
+    This patch adds support for the Intel 82598 PCI-Express 10GbE
+    The TKIP mixing code was added for the benefit of Intel's ipw3945
+    [MTD] map driver for NOR flash on the Intel Vermilion Range chipset
+    Subject: [PATCH] Intel FB pixel clock calculation fix
+    Intel framebuffer mis-calculated pixel clocks.
+      PCI: irq and pci_ids patch for Intel Tolapai
+    usb flash memories listed in the patch are being used in Intel's
+    PCI: irq and pci_ids patch for Intel Tolapai
+    This patch adds the Intel Tolapai LPC and SMBus Controller DID's.
+    Fix the NMI watchdog on Intel CoreDuo processor where the kernel would
+    using PERFEVTSEL0.  The other Intel processors supporting the
+      ata_piix: IDE mode SATA patch for Intel Tolapai
+    ata_piix: IDE mode SATA patch for Intel Tolapai
+    This patch adds the Intel Tolapai IDE mode SATA controller DID's.
+    chipsets, e.g. Intel E7520, when the driver is loaded.
+    orders of magnitude faster on 64-bit Intel hardware.
+    This fixes oopses and some guest failures on AMD machines (the Intel
+      that just shouldn't break at this late stage in the game.  My new Intel
+    2007 i686 Intel(R) Celeron(R) M processor 1.50GHz GenuineIntel
+    task to swap any special-purpose registers like the fpu or Intel's VT
+    structure by name in the setup code.  Additionally, "Intel SpeedStep
+    i386: Reserve the right performance counter for the Intel PerfMon NMI watchdog
+    The Intel PerfMon NMI watchdog reserves the first performance counter,
+    [ALSA] HDA-Intel - Add support for MSI K9AGM2-FIH motherboard
+    Volume).  This should fix another recording problem on Intel Macs.
+    [ALSA] hda-codec - Fix pin configs for Intel Macs
+    [ALSA] hda-codec - Add support of newer version of Intel iMac
+    Added the pin configs for newer version of Intel iMac.
+    the iq31244 board and can be found on Intel "Baxter Creek" ss4000e nas.
+    The appletouch geyser3 devices found in the Intel Macs (and possibly
+    Here's a driver for the Intel 3000 and 3010 memory controllers,
+    Thompson) for the Intel 5000X/V/P (Blackford/Greencreek) chipset to the in
+            - 2.9GHz Intel Core 2 CPU
+    KVM: Emulate hlt on real mode for Intel
+    The Intel(R) IOP series of i/o processors integrate an Xscale core with
+    Intel Xscale series of I/O processors, iop-adma, is provided in a later
+    It was tested on Intel ICH7 and Serverworks/Broadcom HT1000 EHCI
+    Some Intel features are spread around in different CPUID leafs like 0x5,
+    Display Intel Dynamic Acceleration feature in /proc/cpuinfo. This feature
+    Refer to Intel Software Developer's Manual for more details about the feature.
+    Intel E7520/7320/7525 detected.<6>Disabling irq balancing and affinity
+    I've quit Intel and gone into business as a Linux consultant.  Update
+    Intel Macs (and possibly other machines) provide a PNP entry for the RTC,
+    pci_ids: update patch for Intel ICH9M
+    This patch updates the Intel ICH9M LPC Controller DID's, due to a
+    Volume).  This should fix another recording problem on Intel Macs.
+    implement all the necessary MSRs of the standard Intel machine
+    Add handling of Intel-iMac-specific pinconfig of the sound card.
+    Intel-iMac now handled as a separated subsystem.
+    [ALSA] HDA-Intel: Fix headphone squeal on Conexant audio
+    This option is needed on the Apple Intel Laptops too.
+    vmlfb: framebuffer driver for Intel Vermilion Range
+    Add the Intel Vermilion Range framebuffer support.
+    1. Intelligent owner selection (like an idle core in a busy package).
+    Use stop_machine_run in the Intel RNG driver
+    Replace call_smp_function with stop_machine_run in the Intel RNG driver.
+    Intel-based Apple's computers are supported (MacBook Pro, MacBook, MacMini).
+    Intel Core CPUs.
+    fixed array to a pointer.  I assume the Intel compiler doesn't support
+    The Blackfin architecture was jointly developed by Intel and Analog Devices
+      [AGPGART] Intel-agp adjustments
+    Intel hosts only support syscall/sysret in long more (and only if efer.sce
+    Intel procesors, update the segment registers after the mode switch has taken
+    The data (struct) got set to NULL  for all, but Intel in different
+    Quoting from Intel's "MultiProcessor Specification" (Version 1.4), B-3:
+    Intel's documentation suggests the implementation of a time-out
+    Quoting from Intel's "MultiProcessor Specification" (Version 1.4), B-3:
+    Intel's documentation suggests the implementation of a time-out
+    across all processors." as written in the AMD and Intel manuals.
+    set, I expect that also the Intel-style MTRR bits are not updated.
+    AMD and Intel x86 CPU manuals state that it is the responsibility of
+    instead of PERFSEL0/PERFCTR0 on processors supporting Intel architectural
+    perfmon, such as Intel Core 2. Although all PMU events can work on
+              on processors supporting the Intel architectural perfmon (e.g. Core 2 Duo).
+    instead of PERFSEL0/PERFCTR0 on processors supporting Intel architectural
+    perfmon, such as Intel Core 2. Although all PMU events can work on
+              on processors supporting the Intel architectural perfmon (e.g. Core 2 Duo).
+       is to use logical flat mode on both AMD and Intel systems, and
+    build & booted on a couple of AMD and Intel SMP systems.
+    For Intel users running in combined mode, it is now wholly dependent on
+    PCI based SNI RM machines have their EISA bus behind an Intel PCI/EISA
+    [AGPGART] Intel-agp adjustments
+    Add Intel KIXRP435 Reference Platform based on IXP43x processor.
+    reported by Valerie Clement <valerie.clement@bull.net> and the Intel
+    We'll revert it until root cause is known.  Intel has a repeatable
+      myri10ge: more Intel chipsets providing aligned PCIe completions
+    myri10ge: more Intel chipsets providing aligned PCIe completions
+    Add the Intel 5000 southbridge (aka Intel 6310/6311/6321ESB) PCIe ports
+    and the Intel E30x0 chipsets to the whitelist of aligned PCIe completion.
+      [AGPGART] intel_agp: PCI id update for Intel 965GM
+    [AGPGART] intel_agp: PCI id update for Intel 965GM
+    Update PCI id info for Intel 965GM chipset.
+    ordering that causes systems based on Intel x86 CPUs using the microcode
+    Intel virtualization extensions do not support virtualizing real mode.  So
+    It was found that the Toshiba laptops with hidden Intel SMBus have SMM
+    According to Intel only specific Intel models (Banias/Dothan) are broken
+    EFI partitions are also used by Apple on their Intel-based machines and
+    Add checking for closed ROM window on Intel ESB2 Southbridge.
+      ahci: RAID mode SATA patch for Intel ICH9M
+    ahci: RAID mode SATA patch for Intel ICH9M
+    This patch adds the Intel ICH9M RAID controller DID for SATA support.
+    on hardware of Qtuantek QT1010 tuner, Zarlink ZL10353 (Intel CE 6353)
+      [MTD] [NOR] Intel: remove ugly PROGREGION macros
+      hwif->ide_dma_clear_irq for Intel ICHx controllers.
+    of Intel space. This looks a little weird, but I've been assured
+    For reference, the relevant Intel xAPIC spec is kept at
+    can not be used to boot the kernel on Intel platforms, making the boot time
+    We don't need to allocate pgds in PAE mode, (PDPs in Intel terminology) as
+    Eric Wollesen ported the Bluesmoke Memory Controller driver for the Intel
+    [MTD] [NOR] Intel: remove ugly PROGREGION macros
+    [MTD] Fix default timeouts for Intel NOR flash
+    HDA Intel: probe of 0000:00:14.2 failed with error -12
+    This patch adds limited support for Intel-based MacPro workstations.
+    fixes video1394 DMA on machines with DMA bounce buffers, especially Intel
+      PCI: Speed up the Intel SMBus unhiding quirk
+    PCI: Speed up the Intel SMBus unhiding quirk
+    Speed up the Intel SMBus PCI quirk by avoiding tests which can only
+    on the Intel P64H2.  It turns out however that pci_setup_bridge() in
+    Synchronize with version 0.46 of the Intel PIIX/ICH driver:
+    - SLC90E66 only supports MW DMA modes 1/2 and SW DMA mode 2 (just like Intel
+    According to the datasheet, Intel 82371MX (MPIIX) actually has only a
+    This patch is needed to allow the new Intel-based Macs to suspend to ram
+    The Intel driver also gets a new memory type for pages that can be bound cached to the intel GTT.
+    00:02.0 VGA compatible controller: Intel Corporation Mobile
+    Intel hosts, without long mode, and with nx support disabled in the bios
+    With that, "nmi_watchdog=2" stops working for me on Intel Core 2 CPU
+      [ALSA] hda_intel: ALSA HD Audio patch for Intel ICH9
+    [ALSA] hda_intel: ALSA HD Audio patch for Intel ICH9
+    This patch adds the Intel ICH9 HD Audio controller DID's for ALSA.
+    Intel cpu.
+    the Intel PIIX and SMsC SLC90E66 IDE drivers because:
+    I have a system with AMCC PowerPC 405EP and PHY Intel LXT971A.  Linux
+      [PATCH] ata_piix: IDE mode SATA patch for Intel ICH9
+    >         tristate "Intel PIIX/ICH SATA support"
+    >           support for select Intel PIIX/ICH PATA host controllers.
+    [PATCH] ata_piix: IDE mode SATA patch for Intel ICH9
+    This updated patch adds the Intel ICH9 IDE mode SATA controller DID's.
+    Enable PEC on recent Intel SMBus controllers (ICH6, ICH7, ICH8, ICH9
+    Add the Intel ICH9/ICH8/ESB2 SMBus Controller text to
+    The following patchset adds a driver for Intel's hardware virtualization
+    SMP hosts and UP guests are supported.  At the moment only Intel
+    - wait until AMD and Intel release processors with nested page tables
+    [PATCH] ide-cd: Handle strange interrupt on the Intel ESB2
+    Additional updates to conform with Rev 2.2 of Volume 2 of "Intel
+    Based on Rev 2.2 of Volume 2 of "Intel Itanium Architecture Software
+    Rev 2.2 of Volume 2 of "Intel Itanium Architecture Software Developer's
+    Rev 2.2 of Volume 2 of "Intel Itanium Architecture Software Developer's
+    This patch supports the two Intel customer reference platforms iq81340mc
+    David Binderman and his Intel C compiler rightly observe that
+    [PATCH] i386: i386 add Intel BTS cpufeature bit and detection (take 2)
+    detection code for Intel's Branch Trace Store (BTS) feature. This
+    feature can be found on Intel P4 and Core 2 processors among others.
+    [PATCH] x86-64: x86-64 add Intel BTS cpufeature bit and detection (take 2)
+    detection code for Intel's Branch Trace Store (BTS) feature. This
+    feature can be found on Intel P4 and Core 2 processors among others.
+    Add genapic_force. Used by the next Intel quirks patch.
+      region can also be uncacheable) and even further as per Intel's
+    Add an option to compile for Intel's Core 2
+    The Kconfig help is a mouthful due to the inventiveness of Intel's
+    [PATCH] i386: add Intel Core related PMU MSRs
+    - add Intel Precise-Event Based sampling (PEBS) related MSR
+    - add Intel Data Save (DS) Area related MSR
+    - add Intel Core microarchitecure performance counter MSRs
+    [PATCH] x86-64: x86-64 add Intel Core related PMU MSRs definitions
+    monitoring for the processors based on Intel Core microarchitecture.
+            - add Intel Precise-Event Based sampling (PEBS) related MSR
+            - add Intel Data Save (DS) Area related MSR
+            - add Intel Core microarchitecure performance counter MSRs
+    X86_FEATURE_DS to match Intel's documentation for the Debug Store save area on
+    Precise Event Based Sampling (PEBS) feature for Intel 64-bit processors.
+    to X86_FEATURE_DS to match Intel's documentation for the Debug Store
+      i2c-i801: SMBus patch for Intel ICH9
+      PCI: irq: irq and pci_ids patch for Intel ICH9
+    i2c-i801: SMBus patch for Intel ICH9
+    This updated patch adds the Intel ICH9 LPC and SMBus Controller DID's.  Thi=
+    PCI: irq: irq and pci_ids patch for Intel ICH9
+    This updated patch adds the Intel ICH9 LPC and SMBus Controller DID's.
+    I think some were with Intel ones.
+    Current Wireless USB host hardware (Intel i1480 for example) allows up
+      [PATCH] ahci: AHCI mode SATA patch for Intel ICH9
+    [PATCH] Fix Intel/Sharp command set erase suspend bug
+    [PATCH] ahci: AHCI mode SATA patch for Intel ICH9
+    This patch adds the Intel ICH9 AHCI controller DID's for SATA support.
+    cares about the aperture size is the Intel "stolen memory" calculation,
+       Intel APIC is an unbelievable piece of sh*t, and has the edge-detect logic
+      Revert "[PATCH] MMCONFIG and new Intel motherboards"
+    Revert "[PATCH] MMCONFIG and new Intel motherboards"
+    Several more Intel CPUs are now capable using the p4-clockmod cpufreq
+    [MTD] NOR: leave Intel chips in read-array mode on suspend
+    [MTD] MAPS: Support for BIOS flash chips on Intel ESB2 southbridge
+    Add MTD map driver for BIOS flash chips connected to the Intel ESB2
+    This patch breaks C-state discovery on my IBM IntelliStation Z30 because
+    -[0000:00]-+-00.0  Intel Corporation 5000P Chipset Memory Controller Hub
+    Refer to IA-32 Intel® Architecture Software Developer's Manual at
+    Add in the support for Intel Enhanced Speedstep - MSR based transitions.
+    below it is easier to add support for other address spaces like Intel
+     Intel CPUs are handled in speedstep-centrino driver. Even though most of the
+    Intel processors starting with the Core Duo support
+    Refer: Intel Architecture Software Developer's Manual
+    Refer: Intel Processor Vendor-Specific ACPI: Interface Specification
+    iIDMA (Intelligent Interleaved Direct Memory Access) allows for
+      [WATCHDOG] iTCO_wdt (Intel TCO Timer) driver
+      [WATCHDOG] iTCO_wdt (Intel TCO Timer) driver
+    [WATCHDOG] iTCO_wdt (Intel TCO Timer) driver
+    [WATCHDOG] iTCO_wdt (Intel TCO Timer) driver
+    These drivers are included in the Intel 82801 I/O Controller
+    Hub family (from ICH0 up to ICH7) and in the Intel 6300ESB
+      drm: Add support for Intel i965G chipsets.
+    [PATCH] fix Intel RNG detection
+    Previously, since determination whether there was an Intel random number
+      [ARM] 3856/1: Add clocksource for Intel IXP4xx platforms
+    [ARM] 3856/1: Add clocksource for Intel IXP4xx platforms
+    Intel's "Lubbock" reference hardware, so that on more sensible hardware it
+      [PATCH] i386/x86-64: New Intel feature flags
+    [PATCH] i386/x86-64: New Intel feature flags
+    As described in "Intel Processor idenfication and the CPUID instruction
+    [PATCH] MMCONFIG and new Intel motherboards
+    [PATCH] x86: i386/x86-64 Add nmi watchdog support for new Intel CPUs
+    Intel now has support for Architectural Performance Monitoring Counters
+    ( Refer to IA-32 Intel Architecture Software Developer's Manual
+    feature is present starting from Intel Core Duo and Intel Core Solo processors.
+    [ALSA] hda-codec - Add 5 stack audio support for Intel 965 systems
+    This patch restores the Intel HDA Sigmatel codec pin configuration on
+    Simple patch to enable Message Signalled Interrupts for the HDA Intel
+     Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) High Definition Audio Controller (rev 03)
+    [ALSA] hda-codec - Add support for new Intel boards with Stac9227 codec
+    This patch adds full 5.1 audio support for Intel boards
+    [ALSA] hda-codec - add missing device ids for Intel 945 boards
+    This patch adds missing device ids for Intel 945 motherboards.
+    [ALSA] hda-codec - Fix headphone output for some Intel 945 systems
+    This patch enables headphone output at initialization for Intel
+    This patch adds missing device ids for Intel 915 and D102GGC
+      [AGPGART] Intel 965 Express support.
+    drm: Add support for Intel i965G chipsets.
+    Those changes were needed for EFI-environment Intel macs, but broke some
+    newer Intel 965 boards, so for now it's better to revert to our old
+    Intel 965 boards, which will be applied once they get wider testing.
+    Add the CPU identification needed by oprofile for Intel (r) Core (tm) 2
+    [AGPGART] Intel 965 Express support.
+    * when the board is plugged to one of the new Intel PCIe chipsets that
+    Adds PCI Error recovery callbacks to the Intel 10-gigabit ethernet ixgb
+    [PATCH] x86: Disable MMCONFIG on Intel SDV using DMI blacklist
+    we blacklist the Intel SDV with the original BIOS bug that
+    added to detect a broken BIOS in a preproduction Intel SDV. However it also
+    Input: psmouse - fix Intellimouse 4.0 initialization
+    Reading the Intel VSC and AHCI it seems like writing 0x302 is incorrect.
+    [PATCH] x86_64: On Intel systems when CPU has C3 don't use TSC
+    On Intel systems generally the TSC stops in C3 or deeper,
+      [I/OAT]: Remove pci_module_init() from Intel I/OAT DMA engine
+    [I/OAT]: Remove pci_module_init() from Intel I/OAT DMA engine
+    Fix of performance and stability issues on Intel NOR chips. It fixes:
+    [PATCH] mbxfb: Add framebuffer driver for the Intel 2700G
+    Intel PCIE chipsets will cause a device reset to occur.  This will
+    in Intel 80331/80321 manuals.
+    Intel 945 board.
+    [PATCH] Add Computone IntelliPort Plus serial hotplug support
+    Add "Computone IntelliPort Plus serial" hotplug support
+    According to the Intel PXA27x Processor Family Specification
+      [ALSA] Add Intel D965 board support
+    [ALSA] Add Intel D965 board support
+    Added the support for Intel D965 boards with STAC9227 codec.
+    Hyok says Intel Xscale is not currently supported by uCLinux.
+      Input: psmouse - add support for Intellimouse 4.0
+      [PATCH] x86_64: i386/x86-64 Add nmi watchdog support for new Intel CPUs
+    [PATCH] x86_64: i386/x86-64 Add nmi watchdog support for new Intel CPUs
+    Intel now has support for Architectural Performance Monitoring Counters
+    ( Refer to IA-32 Intel Architecture Software Developer's Manual
+    feature is present starting from Intel Core Duo and Intel Core Solo processors.
+    information that gets printed for Intel and AMD processors for NUMA
+    Intel systems report the cache level data from CPUID 4 in sysfs.
+    [PATCH] imacfb: Add Intel-based Macintosh Framebuffer Support
+    This patch adds a new framebuffer driver for the Intel Based macs.  This
+    [PATCH] Add Intel HW RNG driver
+    Input: psmouse - add support for Intellimouse 4.0
+    Add support for the H-Wheel present on Microsoft Intellimouse 4.0
+      [PATCH] hwmon-vid: Add support for Intel Core and Conroe
+    [PATCH] hwmon-vid: Add support for Intel Core and Conroe
+    This patch adds support for two new VID codes, supporting Intel mobile Core
+    [PATCH] UHCI: Work around old Intel bug
+    Some old Intel UHCI controllers have a bug that has shown up in a few
+    keeping up with the latest in Intel power management.  I get a steady
+    Move various QLogic, Vitesse, and Intel storage controller PCI IDs to the
+    but bugs happen.  Apparently especially on the Apple Intel Macs.
+    [I/OAT]: Driver for the Intel(R) I/OAT DMA engine
+    Instead of trying to make PPC64 MSI fit in a Intel-centric MSI layer, a
+    According to Intel ICH spec, there are several rules that Base Address
+    to something human-readable, but Intel brandnames don't change
+    defined" and it must be set to zero on Intel XScale CPUs or the cache does
+    One known offender is the Intel Modem driver.
+      STMicro and Intel Sibley flashes with internal ECC.  Those flashes
+    [MTD] Merge STMicro NOR_ECC code with Intel Sibley code
+    In 2005, Intel Sibley flashes copied this strategy and Nico added support for
+    [PATCH] Add PCI ID for the Intel IDE Controller which is in the Intel Mac Minis shipped in first quarter 2006
+       because there are lots of Intel boxes which have a bogus hotplug area
+    Add support to oprofile for the Intel Core Solo and Core Duo processors.
+        on the Intel Tiger box.
+    Intel PXA27x developers manual section 5.4.1.1 lists a priority
+    being different from Intel before.
+    Fail to resume on Tecra M2 with ADM1032 and Intel 82801DBM
+    This adds Auke Kok to the list of maintainers for the Intel NICs.
+    [ALSA] hda-codec - Adds HDA support for Intel D945Pvs board with subdevice id 0x0707
+    chip on the Intel D945Pvs board with subdevice id 0x0707.
+    [PATCH] x86_64: fix sync before RDTSC on Intel cpus
+    Intel platforms..
+    Intel EM64T CPUs handle uncanonical return addresses differently
+    EFI on some machines, e.g., Intel Tiger, reports that the VGA framebuffer
+    This patch adds support for the Intel ixp23xx series of CPUs.  The
+    ADI Engineering Roadrunner, Intel IXDP2351, and IP Fabrics Double
+    faster than kmalloc.  On a Intel P4 system it speeds up a select of a
+      Kconfig help: MTD_JEDECPROBE already supports Intel
+    Kconfig help: MTD_JEDECPROBE already supports Intel
+    Intel chips are already supported.
+    >From Intel's IA-32 opcode map described in IA-32 Intel Architecture Software
+    My test system, an Intel S870BN4 'Tiger4', aka Dell PowerEdge 7250, with
+    and Intel showed it was a loss. That was probably because the store
+    [PATCH] i386/x86-64: List Intel LaGrange AKA SMX in /proc/cpuinfo
+    On vSMPowered boxes with Intel CPUs this is working correctly as
+    While AMD formally permits multi-byte execution breakpoints, Intel
+    code for both common AMD and Intel CPUs. Use this option
+    Add support for the Intel Pentium M series to the hwmon-vid driver.
+    Modules: HDA Intel driver
+    Modules: HDA Codec driver,HDA Intel driver
+    [ALSA] hda-codec - Add missing model entries for Intel 945 boards
+    Added the missing entries for Intel 945 boards.
+    Modules: Intel8x0 driver
+    Modules: Documentation,HDA Intel driver
+    Modules: Intel8x0 driver
+    driver supports the Intel 31244.
+    This patch adds support for Intel's IXDP28x5 platform. This
+    on all chipsets (NVidia, Intel, AMD, ATI) I tried it on.
+    Fixes a local DOS on Intel systems that lead to an endless
+    on Intel processors with cpuid level > 4, it causes intel_cacheinfo.c to
+    on newer Intel processors.  Moving topology.c to arch/i386/kernel fixes
+    Fix a kernel oops for Intel P30 flashes, where the wait queue head was not
+    [PATCH] Necessary evil to get sata_vsc to initialize with Intel iq3124h hba
+    avoids issues with the Intel icc compiler. Function call
+    [PATCH] i2c-i801: I2C patch for Intel ICH8
+    This patch adds the Intel ICH8 DID to the i2c-i801.c and Kconfig files for I2C
+    [PATCH] x86_64: Only switch to IPI broadcast timer on Intel when C3 is supported
+    [PATCH] piix: add Intel ICH8M device IDs
+    Modules: Documentation,Intel8x0 driver
+    Add SigmaTel HDA support for the Intel D975XBK motherboard.
+    [PATCH] PCI: irq and pci_ids: patch for Intel ICH8
+    This patch adds the Intel ICH8 DID's to the irq.c and pci_ids.h files.
+    [libata ahci] Isolate Intel-ism, add JMicron JMB360 support
+    Isolate some PCI config register bitbanging to Intel hardware, as it
+    [X86] Add new Intel cache descriptors.
+    Modules: Intel8x0 driver
+    [ALSA] hda-intel - patch for Intel ICH8
+    Modules: HDA Intel driver
+    This patch adds the Intel ICH8 HD Audio DID to the hda_intel.c audio driver.
+    Modules: Intel8x0 driver
+    [PATCH] EDAC: drivers for Intel i82860, i82875
+    [PATCH] EDAC: drivers for AMD 76x and Intel E750x, E752x
+    [PATCH] Intel ICH8 SATA: add PCI device IDs
+    [PATCH] ahci: AHCI mode SATA patch for Intel ICH8
+    This patch adds the Intel ICH8 DID's to the ahci.c file for AHCI mode
+    Tested on Intel and IBM x86-64 memory hot-add capable systems.
+    This patch adds support for the Intel IXDP2351 to the CS89x0 driver.
+    [PATCH] x86_64: On Intel CPUs don't do an additional CPU sync before RDTSC
+    RDTSC serialization using cpuid is not needed for Intel platforms.
+    [PATCH] x86_64: Don't try to synchronize the TSC over CPUs on Intel CPUs at boot.
+    interrupt (IRQ 0). This is needed because Intel CPUs stop the local
+    APIC timer in C3.  This is currently only enabled for Intel CPUs.
+    [PATCH] x86_64: Use X86_FEATURE_CONSTANT_TSC now to clean up Intel speedstep drivers
+    - Fixes compiling warning on kernel 2.6.15 with the Intel C compiler.
+    [PATCH] PCI Quirk: 1K I/O space granularity on Intel P64H2
+    granularity option on the Intel P64H2 PCI Bridge.  I had to change
+    coming up sends a xTPR message to the chipset.  Intel chipsets (at least)
+    Table was updated to treat future Intel x86 CPUs as VRD10.
+    [ARM] 3206/1: Modifications to the bus arbiter controller for the Intel PXA27x
+    for the Intel PXA27x Application Processor Family.  Up to 5%
+    only applies changes to the Intel Mainstone development platform.
+    This patch is not compatible with preproduction Intel PXA27x
+    This patch is based on the Intel Linux Preview Kit released to the
+    I skimmed Intel's ICH7 datasheet and that basically says the wakeup
+    This patch adds support for a new arm/ixp4xx machine - the Iomega NAS 100d network attached storage product.  The NAS100D is a consumer device containing a 266MHz Intel IXP420 processor, 16MB of flash, 64MB of RAM, a 160Gb internal IDE hard disk, and 802.11b/g wireless on an Atheros mini-PCI card.
+    worse especially on chips like the Intel P4.
+    Modules: AC97 Codec,ATIIXP driver,Intel8x0 driver
+    - Add support for several Intel mobos
+    Modules: HDA Intel driver
+    Modules: HDA Intel driver
+    Modules: Intel8x0 driver
+    Modules: HDA Intel driver
+    Fix PM support on HDA-Intel driver.
+    Modules: Intel8x0 driver,Intel8x0-modem driver
+    Fix PM support on Intel8x0 and modem drivers.
+    [ALSA] Remove xxx_t typedefs: PCI Intel8x0
+    Modules: Intel8x0 driver,Intel8x0-modem driver
+    Remove xxx_t typedefs from the PCI Intel8x0 and modem drivers.
+    [ALSA] Remove xxx_t typedefs: HDA-Intel
+    Modules: HDA Intel driver
+    Remove xxx_t typedefs from the HDA-Intel driver.
+    Modules: Intel8x0 driver,Intel8x0-modem driver
+    Modules: HDA Intel driver
+    such as IntelliMouse and Explorer, to make sure that the mouse will
+    [PATCH] add boot option to control Intel SATA/PATA combined mode
+    Recent models of Intel/Sharp and Spansion CFI flash now have significant
+    "autoselect" and Intel calls "read device identifier".  Currently these
+    [PATCH] x86_64: Log machine checks from boot on Intel systems
+    on some AMD systems. But give Intel EM64T systems a chance because they are
+    K8_NUMA.  CONFIG_K8_NUMA is not needed for Intel EM64T NUMA boxes.  It also
+    The current value was correct before the introduction of Intel EM64T support -
+    TODO: figure out optimized versions for Intel Netburst based EM64T
+    [PATCH] x86_64: x86_64/i386 fix Intel cache detection code assumption about threads sharing
+    Fix the Intel cache detection code assumption that number of threads
+    [PATCH] x86-64/i386: Intel HT, Multi core detection fixes
+    [PATCH] x86_64: Force correct address space size for MTRR on some 64bit Intel Xeons
+    the the Intel IXDP425 evaluation board. It uses the
+    The specific bits are shown in the Intel IA-64 Architecture Software
+    Change to the extended cfi table parsing for Intel NOR flash that uses
+    - Intel chip driver has a reboot notifier so no need to reset the chip here.
+    Intels Sibley flash needs JFFS2 write buffer functionality
+    {MTD] add support for Intel's "Sibley" flash
+    Modules: Intel8x0 driver
+    Modules: Intel8x0 driver
+    Modules: Intel8x0 driver
+    Modules: Intel8x0 driver
+    Modules: Intel8x0-modem driver,VIA82xx-modem driver,HDA Codec driver
+    Modules: Intel8x0 driver
+    Modules: Intel8x0 driver
+    Modules: HDA Intel driver
+    This patch is to make the Intel HDA code work for NVIDIA azalia controller.
+    Current users: cache entries for Intel CPU's and cpufreq subsystem.
+    Intel P4 running at 3001.171 Mhz, the truncation to 3001 Mhz leads to an
+    [PATCH] fec_8xx: Add support for Intel PHY LX971
+    The following patch add support for the Intel LX971 PHY.
+    (written at a time when Intel's PIIX3 was about the only motherboard with
+    Run tested on Intel SE440BX-2 mobo.
+    Intel chipset ports in development that are waiting on this to go
+    The common oprofile code assumes the name "PMU" (from Intel's
+    Intel Documentation.
+     Intel(R) PXA 255 Processor - Developers Manual - Jan 2004 - Page 12-33
+    HDA Intel driver
+    with EM64T (i.e. Intel x86_64). Also add an entry for myself so that
+        Intel Pro/Wireless 2011 and 2011B have the same numeric ID, so use
+    [PATCH] x86-64: Use physflat on Intel for < 8 CPUs with CPU hotplug
+    [PATCH] x86-64: Use SRAT data on Intel systems too.
+    Intel8x0 driver,Intel8x0-modem driver,Maestro3 driver,RME32 driver
+    HDA Intel driver,ICE1712 driver,ICE1724 driver,KORG1212 driver
+    ES1938 driver,ES1968 driver,FM801 driver,Intel8x0 driver
+    Intel8x0-modem driver,Maestro3 driver,SonicVibes driver,VIA82xx driver
+    HDA generic driver,HDA Intel driver,ICE1712 driver,ICE1724 driver
+    Documentation,Intel8x0 driver
+    HDA Intel driver
+    ENS1370/1+ driver,ES1938 driver,ES1968 driver,Intel8x0 driver
+    Intel8x0-modem driver,Maestro3 driver,RME32 driver,RME96 driver
+    HDA Codec driver,HDA Intel driver,HDA generic driver
+    HDA Intel driver
+    Intel8x0 driver
+    Intel 6300ESB chipset.
+    sets the WDT_LOCK bit of watchdog timer for Intel 6300ESB chipset. So, we
+    Add support for Intel assabet specific board support for
+    Intel 82855PM chipset.
+    Intel 82855PM chipset.
+    controllers on my Intel motherboard don't work.
+    [ARM] 2871/1: Fixes an issue with gettimeofday not working correctly on Intel IOP3xx processors
+    This prepares us for updating to the latest Intel driver code, plus
+        Communications and Intel PRO/Wireless 2011B.
+    [PATCH] orinoco: Remove entry for Intel PRO/Wireless 2011B.
+        Remove entry for Intel PRO/Wireless 2011B.
+    Intel CPU will be detected as unknown rather than 9.0
+    bigsmp as soon as it finds more than 8 logical CPUs, Intel processors and
+    Intel8x0 driver
+    Intel8x0 driver
+    HDA Intel driver
+    Intel8x0 driver,AC97 Codec
+    Intel8x0 driver
+    HDA Intel driver
+    HDA Intel driver
+    Intel's XSC3 core and noticed that alloc_init_supersection currently
+    Tested on Intel IXP2350 CPU with 36-bit static I/O mappings.
+    vendor_id       : GenuineIntel
+    model name      : Mobile Intel(R) Pentium(R) 4 CPU 3.33GHz
+    vendor_id       : GenuineIntel
+    model name      : Mobile Intel(R) Pentium(R) 4 CPU 3.33GHz
+    in many current Intel and AMD motherboards.
+            intelfb: Framebuffer driver for Intel(R) 830M/845G/852GM/855GM/865G/915G chi
+    [PATCH] ahci: AHCI mode SATA patch for Intel ICH7-M DH
+    has been set.  This patch only touches the path used for Intel chipsets
+    Intel 82855PM chipset.  Tested on Toshiba Tecra M2.
+    ENS1370/1+ driver,ES1968 driver,Intel8x0 driver,VIA82xx driver
+    HDA Intel driver
+    Intel8x0 driver,AC97 Codec
+    Platform Module (TPM 1.1b) [1] which is embedded on Intel- mainboards or in
+    writing value 0x40 to offset 0x80. Blame Philips and Intel for the
+    This patch implements the iomap API for Intel IXP4xx NPU systems.
+    [MTD] Add mapping driver for Intel PXA27x Mainstone board flash.
+    MDREFR register for Intel XScale PXA27x.
+    For example on x86_64, we always have NUMA configured in.  On Intel EM64T
+    Documentation,HDA Codec driver,HDA generic driver,HDA Intel driver
+    HDA Codec driver,HDA Intel driver
+    Intel8x0 driver
+    HDA Intel driver
+    Intel8x0 driver
+    ATIIXP-modem driver,Intel8x0-modem driver,VIA82xx-modem driver
+    kobject_register failed for Intel(R) 830M/845G/852GM/855GM/865G/915G
+    Boot tested on Altix, HP rx2600 and Intel Tiger
+    HDA Intel driver
+    Documentation,HDA Intel driver
+    They are (almost) compatible with Intel ICH6/7.
+    Documentation,HDA Intel driver
+    This patch changes the Intel HD Audio device driver to include
+    Documentation,HDA Intel driver
+    Intel8x0 driver,Intel8x0-modem driver,Maestro3 driver,RME32 driver
+    EMU10K1/EMU10K2 driver,HDA Intel driver,ICE1712 driver,ICE1724 driver
+    Intel8x0-modem driver
+    [MTD] CFI DEBUG_LOCK_BITS fixes for Intel NOR flash:
+    [MTD] Add reboot notifier to Intel NOR flash driver
+    [MTD] Avoid compile warnings for Intel CFI flash without OTP support.
+    Skip jiffy delay after each block lock/unlock for Intel CFI flash
+    [MTD] Support for protection register support on Intel FLASH chips
+    - Make core_id match what Intel uses
+      Make this the default on Intel systems.
+    It is unnecessary on modern Intel or AMD systems, and that is all we support
+    [PATCH] Intel 6300ESB TCO timer support
+    with the Intel assembler manual (there was some disagreement as to
+    [PATCH] intel8x0: fix for Intel AC'97 audio driver
+    This patch fixes a typo in the Intel AC'97 audio driver intel8x0.c for
+    Intel ESB2.
+    This patch just adds Intel's Hance Rapid south bridge IDs to ICH4 region quirk.
+    Testing credits go to Ken Chen from Intel.
+    [PATCH] hda_intel: Intel ESB2 support
+    This adds the Intel ESB2 HD Audio DID to the hda_intel.c audio driver.
+    [PATCH] irq and pci_ids for Intel ICH7DH & ICH7-M DH
+    This patch adds the Intel ICH7DH and ICH7-M DH DID's to the irq.c and
+    Intel(R) PXA27x Processor Family Specification Update.
+    this patch is besed on "Intel(R) Itanium(R) Processor Family Interrupt
+    Clean up the code greatly.  Now uses the infrastructure from the Intel dual
+    [PATCH] x86_64: add support for Intel dual-core detection and displaying
+    Appended patch adds the support for Intel dual-core detection and displaying
+    documented in IA-32 Intel Architecture Software Developer's Manual (vol 2a)
+    On Intel Noconas the TSC ticks with a constant frequency.  Don't scale the
+    This generalizes an earlier patch by Intel for this.
+    [PATCH] i2c-i801: I2C patch for Intel ESB2
+    This patch adds the Intel ESB2 DID's to the i2c-i801.c and Kconfig files for
+    [PATCH] ahci: AHCI mode SATA patch for Intel ESB2
+    This patch adds the Intel ESB2 DID's to the ahci.c file for AHCI mode SATA
+    [PATCH] ata_piix: IDE mode SATA patch for Intel ESB2
+    This patch adds the Intel ESB2 DID's to the ata_piix.c and quirks.c file for
+    [PATCH] intel8x0: AC'97 audio patch for Intel ESB2
+    This patch adds the Intel ESB2 DID's to the intel8x0.c file for AC'97 audio
+    [PATCH] piix: IDE PATA patch for Intel ESB2
+    This patch adds the Intel ESB2 DID's to the piix.c file for IDE PATA support.
+    [PATCH] irq and pci_ids: patch for Intel ESB2
+    This patch adds the Intel ESB2 DID's to the irq.c and pci_ids.h files.
