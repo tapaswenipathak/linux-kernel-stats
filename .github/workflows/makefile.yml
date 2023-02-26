@@ -1,0 +1,43 @@
+name: Makefile CI-CD 
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Clone Linux kernel source code
+      run: |
+        git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git /home/runner/linux-stable
+        cd /home/runner/linux-stable
+        
+    - name: Clone archive
+      run: |
+        git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive /home/runner/archive
+        cd /home/runner/archive
+        
+    - name: Clone history
+      run: |
+        git clone https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git /home/runner/history
+        cd /home/runner/history
+        
+    - name: Clone kbd
+      run: |
+        git clone https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git /home/runner/kbd
+        cd /home/runner/kbd
+        
+    - name: Clone erofs-utils
+      run: |
+        git clone https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git /home/runner/erofs-utils
+        cd /home/runner/erofs-utils
+
+    - name: Build the code
+      run: make
