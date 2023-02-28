@@ -1,0 +1,5 @@
+commit 4bb0468bf8345ca1a9dae47ff75ab422b56264cf
+Author: Benno Schulenberg <bensberg@telfort.nl>
+Date:   Fri May 20 16:36:40 2022 +0200
+
+    docs: use the correct name for the sticky Shift symbol (SShift)
