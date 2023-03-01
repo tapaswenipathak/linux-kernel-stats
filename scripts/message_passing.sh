@@ -31,6 +31,14 @@ declare -a search_terms=(
   "netlink_unicast"
 )
 
+declare -a search_t=(
+  "process" 
+  "device"
+  "unicode"
+  "kbdfile"
+  "kfont"
+)
+
 cd ~/archive
 
 echo "Searching for message passing in Linux version v1.0"
@@ -49,7 +57,7 @@ cd ~/kbd
 echo "Searching for message passing in Linux version v2.0"
 git checkout -fq "2.0.0" 
 
-for term in "${search_terms[@]}"; do
+for term in "${search_t[@]}"; do
     if [ ! -f "../mps_gitlogs/v2.0_$term.gitlog.txt" ]; then
       git log --all --grep="$term" > "../mps_gitlogs/v2.0_$term.gitlog.txt"
     fi
