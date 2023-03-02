@@ -1,0 +1,417 @@
+commit e2778b587aa9fb80b1ce6bf12ff05ab1f7520dde
+Author: Linus Torvalds <torvalds@cc.helsinki.fi>
+Date:   Fri Feb 4 22:31:37 1994 +0000
+
+    Linux 0.99.15 released: Codefreeze for 1.0
+    
+    People who look into my directory on ftp.funet.fi will already have
+    noticed that the latest version of linux (0.99.15) is available, and I
+    assume it will be available on most other linux sites soon.  As
+    explained in a previous announcement, 0.99.15 is "it", in that this will
+    be the base for 1.0 after about a month of testing.  No further patches
+    are accepted until the 1.0 release, unless they obviously fix a serious
+    bug.
+    
+    **** NOTE 1 ****
+    
+      For this code-freeze to be effective yet still potential bugs be
+      found, testing is needed, along with good reports of errors and
+      problems.  Thus, nobody should think "hey, the *real* release will be
+      out in a month, let's wait for that", but instead think: "hey, I'd
+      better test this one, so that the *real* release won't result in any
+      ugly surprises for me".
+    
+      In short: test it out, preferably even more than you usually do.  Run
+      "crashme" for the whole month if you have the CPU-power to spare,
+      and/or just misuse your machine as badly as you can.  And if there are
+      problems, report them to me (and the better the report, the more
+      likely I am to be able to do something about it).
+    
+    **** NOTE 2 ****
+    
+      Bumping the linux version number to 1.0 doesn't mean anything more
+      than that: it's only a version number change.  More explicitly, it
+      does *NOT* mean that linux will become commercial (the copyright will
+      remain as-is), nor does it mean that development stops here, and that
+      1.0 will be anything special in that respect.
+    
+      I'm also afraid that just changing the version number will not make
+      potential bugs magically disappear: this has been amply proven by
+      various software houses over the years.  This code-freeze is there in
+      order to avoid most of the problems that people sometimes associate
+      with "X.0 releases", and I hope that it will mean that we have a
+      reasonably stable release that we can call 1.0 and one that I won't
+      have to be ashamed of.
+    
+    Ok, enough said, I hope.  The pl15 release is hopefully good, but I'll
+    continue to make ALPHA patches against it along the whole month as
+    problems crop up.  The networking code has been much maligned, and is
+    not perfect by far yet, but it's getting its act together thanks to
+    various developers and testers.  And as wiser men than I have said (or
+    if they haven't, they should have):
+    
+            "There is life after 1.0"
+    
+    Any rumors that the world is coming to an end just because I'm about to
+    release a 1.0-version are greatly exaggerated.  I think.
+    
+                            Linus
+    ----------
+    Things that remained the same between 0.99.14 and 0.99.15:
+    
+     - I again forgot to update the README before uploading the release.  In
+       pl14, I talked about pl13, while the all new and improved README has
+       now caught up with pl14.  Remind me to buy a new brain one of these
+       days.
+    
+    Changes between versions 0.99.14 and 0.99.15:
+    
+     - improved Pentium detection.  Some of you may have had linux report
+       your 4086DX2 as a pentium machine, but the new kernel will tell you
+       the sad truth.  Whee.
+     - Network driver updates by Donald Becker.  New drivers added, old ones
+       updated.
+     - FPU emulation updates by Bill Metzenthen.  Various minor errors and
+       misfeatures fixed (mostly error handling).
+     - Support for the SoubdBlaster Pro CD-ROM driver added by Eberhard
+       Moenkeberg.
+     - extended support for keyboard re-definition, along with font
+       re-programming (Eugene Crosser, Andries Brouwer et al).
+     - tty handling fixes: true canonical mode with most features supported
+       by Julian Cowley.  This may make your canonical mode behave funnily
+       if you happen to use old and broken programs that happened to work
+       with the old and broken behaviour (this includes at least some
+       'getty' programs).
+     - serial driver changes and tty fixes by Theodore Ts'o.
+     - SCSI fixes by Drew Eckhardt, Eric Youngdale, Rik Faith, Kai Mdkisara
+       et al.
+     - Updated sound card driver to version 2.4 (Hannu Savolainen)
+     - COFF binary loading support (but you will still need the experimental
+       iBCS2 patches to run non-linux i386 COFF binaries) by Al Longyear.
+     - Upgraded ext2fs filesystem routines (0.4a -> 0.4b), with new
+       features.  Read the fs/ext2/CHANGES file for details.  Remy Card and
+       Stephen Tweedie.  Get a new fsck that knows about the new features.
+     - pipe behaviour fixed in the presense of multiple writers (now
+       actually conforms to POSIX specs about atomic writes).  Much of the
+       code by Florian Coosmann.
+     - minix filesystem extended to support the clean flag: get a new fsck
+       that knows about it.
+     - System V filesystem (support for Xenix, Coherent and SysV
+       filesystems) by Doug Evans, Paul Monday, Pascal Haible and Bruno
+       Haible.
+     - loadable modules (various authors, don't remember original author of
+       the "modules" code).
+     - Lots of networking fixes by various people: Alan Cox, Charles
+       Hedrick, me and various other people.  Non-byte-aligned networks
+       work, and the networking code should be much stabler in general.
+    
+     + various bugfixes and enhacements here and there (mcd driver update by
+       Jon Tombs, atixlmouse fix by Chris Colohan, /dev/full by XXX etc etc)
+    
+    All in all, the patches come out to 1.5MB uncompressed (about 400kB
+    gzip-9'd), so there is little or no idea to make patches to plain pl14
+    available.  Incremental patches and ALPHA-releases can be found on
+    ftp.funet.fi: pub/OS/Linux/PEOPLE/Linus/ALPHA-pl14.
+
+commit 75bb5836a8a8c0ee44ffd60a51f357b9568f1381
+Author: Linus Torvalds <torvalds@cc.helsinki.fi>
+Date:   Mon Nov 29 14:21:10 1993 +0200
+
+    Linux 0.99 patchlevel 14
+    
+    Linux 0.99 patchlevel 14 is available on nic.funet.fi in the usual place
+    (pub/OS/Linux/PEOPLE/Linus).  There are no diffs relative to pl13, as
+    too much has changed (the directory structure changed and the sound
+    driver was added).  Diffs relative to the last ALPHA version (13t) are
+    in the "pl13-ALPHA's" subdirectory along with the actual ALPHA versions.
+    
+    The changes to pl13t are rather minor: most of them are just more printf
+    format fixes to make gcc-2.5.x happy (Chip Salzenberg).  Only one very
+    minor bugfix which made pl13t not notice the WP bit on a 486.
+    
+    It would seem to be a good idea to use gcc-2.5.x to compile the kernel,
+    as that seems to fix at least one known bug in earlier gcc versions.  I
+    hope that pl14 will be even more stable than pl13 has turned out to be,
+    and especially the networking code seems to have become much more
+    dependable.  Thanks Alan & co.
+    
+    Changes to the last official release (p13) are too numerous to mention
+    (or even to remember), but they include NTP support, updated SCSI and
+    networking drivers, >16MB swap area handling, added sound support,
+    read-only HPFS filesystem, memory management cleanups (especially
+    cleaned up mmap() some more).  Also, pl14 contains updated ext2fs code,
+    along with minor fixes (especially concerning the time values) in other
+    filesystems, and fixed unnamed/named pipe select() semantics.
+    
+    The reorganizations include moving all device drivers to a subdirectory
+    of their own (linux/drivers), centralizing the major number handling
+    (<linux/major.h> etc...  Possibly cleaner and/or easier to keep track of
+    different drivers.  Finally, the first 4kB of physical memory is no
+    longer cleared on bootup: tytso reports that this feature now enables
+    some portables to use the power-saving features under linux.  This could
+    also be useful for the DOS emulator to check where the interrupt
+    pointers pointed at startup.
+    
+                            Linus
+
+commit 8331b82c1ac6ebe96db75d5853b4329b1502d5d3
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Tue Sep 17 17:29:55 1991 +0000
+
+    linux release 0.01
+    
+                    1. Short intro
+    
+    This is a free minix-like kernel for i386(+) based AT-machines.  Full
+    source is included, and this source has been used to produce a running
+    kernel on two different machines.  Currently there are no kernel
+    binaries for public viewing, as they have to be recompiled for different
+    machines.  You need to compile it with gcc (I use 1.40, don't know if
+    1.37.1 will handle all __asm__-directives), after having changed the
+    relevant configuration file(s).
+    
+    As the version number (0.01) suggests this is not a mature product.
+    Currently only a subset of AT-hardware is supported (hard-disk, screen,
+    keyboard and serial lines), and some of the system calls are not yet
+    fully implemented (notably mount/umount aren't even implemented).  See
+    comments or readme's in the code.
+    
+    This version is also meant mostly for reading - ie if you are interested
+    in how the system looks like currently.  It will compile and produce a
+    working kernel, and though I will help in any way I can to get it
+    working on your machine (mail me), it isn't really supported.  Changes
+    are frequent, and the first "production" version will probably differ
+    wildly from this pre-alpha-release.
+    
+    Hardware needed for running linux:
+            - 386 AT
+            - VGA/EGA screen
+            - AT-type harddisk controller (IDE is fine)
+            - Finnish keyboard (oh, you can use a US keyboard, but not
+              without some practise :-)
+    
+    The Finnish keyboard is hard-wired, and as I don't have a US one I
+    cannot change it without major problems. See kernel/keyboard.s for
+    details. If anybody is willing to make an even partial port, I'd be
+    grateful. Shouldn't be too hard, as it's tabledriven (it's assembler
+    though, so ...)
+    
+    Although linux is a complete kernel, and uses no code from minix or
+    other sources, almost none of the support routines have yet been coded.
+    Thus you currently need minix to bootstrap the system. It might be
+    possible to use the free minix demo-disk to make a filesystem and run
+    linux without having minix, but I don't know...
+    
+                    2. Copyrights etc
+    
+    This kernel is (C) 1991 Linus Torvalds, but all or part of it may be
+    redistributed provided you do the following:
+    
+            - Full source must be available (and free), if not with the
+              distribution then at least on asking for it.
+    
+            - Copyright notices must be intact. (In fact, if you distribute
+              only parts of it you may have to add copyrights, as there aren't
+              (C)'s in all files.) Small partial excerpts may be copied
+              without bothering with copyrights.
+    
+            - You may not distibute this for a fee, not even "handling"
+              costs.
+    
+    Mail me at "torvalds@kruuna.helsinki.fi" if you have any questions.
+    
+    Sadly, a kernel by itself gets you nowhere. To get a working system you
+    need a shell, compilers, a library etc. These are separate parts and may
+    be under a stricter (or even looser) copyright. Most of the tools used
+    with linux are GNU software and are under the GNU copyleft. These tools
+    aren't in the distribution - ask me (or GNU) for more info.
+    
+                    3. Short technical overview of the kernel.
+    
+    The linux kernel has been made under minix, and it was my original idea
+    to make it binary compatible with minix. That was dropped, as the
+    differences got bigger, but the system still resembles minix a great
+    deal. Some of the key points are:
+    
+            - Efficient use of the possibilities offered by the 386 chip.
+              Minix was written on a 8088, and later ported to other
+              machines - linux takes full advantage of the 386 (which is
+              nice if you /have/ a 386, but makes porting very difficult)
+    
+            - No message passing, this is a more traditional approach to
+              unix. System calls are just that - calls. This might or might
+              not be faster, but it does mean we can dispense with some of
+              the problems with messages (message queues etc). Of course, we
+              also miss the nice features :-p.
+    
+            - Multithreaded FS - a direct consequence of not using messages.
+              This makes the filesystem a bit (a lot) more complicated, but
+              much nicer. Coupled with a better scheduler, this means that
+              you can actually run several processes concurrently without
+              the performance hit induced by minix.
+    
+            - Minimal task switching. This too is a consequence of not using
+              messages. We task switch only when we really want to switch
+              tasks - unlike minix which task-switches whatever you do. This
+              means we can more easily implement 387 support (indeed this is
+              already mostly implemented)
+    
+            - Interrupts aren't hidden. Some people (among them Tanenbaum)
+              think interrupts are ugly and should be hidden. Not so IMHO.
+              Due to practical reasons interrupts must be mainly handled by
+              machine code, which is a pity, but they are a part of the code
+              like everything else. Especially device drivers are mostly
+              interrupt routines - see kernel/hd.c etc.
+    
+            - There is no distinction between kernel/fs/mm, and they are all
+              linked into the same heap of code. This has it's good sides as
+              well as bad. The code isn't as modular as the minix code, but
+              on the other hand some things are simpler. The different parts
+              of the kernel are under different sub-directories in the
+              source tree, but when running everything happens in the same
+              data/code space.
+    
+    The guiding line when implementing linux was: get it working fast. I
+    wanted the kernel simple, yet powerful enough to run most unix software.
+    The file system I couldn't do much about - it needed to be minix
+    compatible for practical reasons, and the minix filesystem was simple
+    enough as it was. The kernel and mm could be simplified, though:
+    
+            - Just one data structure for tasks. "Real" unices have task
+              information in several places, I wanted everything in one
+              place.
+    
+            - A very simple memory management algorithm, using both the
+              paging and segmentation capabilities of the i386. Currently
+              MM is just two files - memory.c and page.s, just a couple of
+              hundreds of lines of code.
+    
+    These decisions seem to have worked out well - bugs were easy to spot,
+    and things work.
+    
+                    4. The "kernel proper"
+    
+    All the routines handling tasks are in the subdirectory "kernel". These
+    include things like 'fork' and 'exit' as well as scheduling and minor
+    system calls like 'getpid' etc. Here are also the handlers for most
+    exceptions and traps (not page faults, they are in mm), and all
+    low-level device drivers (get_hd_block, tty_write etc). Currently all
+    faults lead to a exit with error code 11 (Segmentation fault), and the
+    system seems to be relatively stable ("crashme" hasn't - yet).
+    
+                    5. Memory management
+    
+    This is the simplest of all parts, and should need only little changes.
+    It contains entry-points for some things that the rest of the kernel
+    needs, but mostly copes on it's own, handling page faults as they
+    happen. Indeed, the rest of the kernel usually doesn't actively allocate
+    pages, and just writes into user space, letting mm handle any possible
+    'page-not-present' errors.
+    
+    Memory is dealt with in two completely different ways - by paging and
+    segmentation.  First the 386 VM-space (4GB) is divided into a number of
+    segments (currently 64 segments of 64Mb each), the first of which is the
+    kernel memory segment, with the complete physical memory identity-mapped
+    into it.  All kernel functions live within this area.
+    
+    Tasks are then given one segment each, to use as they wish. The paging
+    mechanism sees to filling the segment with the appropriate pages,
+    keeping track of any duplicate copies (created at a 'fork'), and making
+    copies on any write. The rest of the system doesn't need to know about
+    all this.
+    
+                    6. The file system
+    
+    As already mentioned, the linux FS is the same as in minix. This makes
+    crosscompiling from minix easy, and means you can mount a linux
+    partition from minix (or the other way around as soon as I implement
+    mount :-). This is only on the logical level though - the actual
+    routines are very different.
+    
+            NOTE! Minix-1.6.16 seems to have a new FS, with minor
+            modifications to the 1.5.10 I've been using. Linux
+            won't understand the new system.
+    
+    The main difference is in the fact that minix has a single-threaded
+    file-system and linux hasn't. Implementing a single-threaded FS is much
+    easier as you don't need to worry about other processes allocating
+    buffer blocks etc while you do something else. It also means that you
+    lose some of the multiprocessing so important to unix.
+    
+    There are a number of problems (deadlocks/raceconditions) that the linux
+    kernel needed to address due to multi-threading.  One way to inhibit
+    race-conditions is to lock everything you need, but as this can lead to
+    unnecessary blocking I decided never to lock any data structures (unless
+    actually reading or writing to a physical device).  This has the nice
+    property that dead-locks cannot happen.
+    
+    Sadly it has the not so nice property that race-conditions can happen
+    almost everywhere.  These are handled by double-checking allocations etc
+    (see fs/buffer.c and fs/inode.c).  Not letting the kernel schedule a
+    task while it is in supervisor mode (standard unix practise), means that
+    all kernel/fs/mm actions are atomic (not counting interrupts, and we are
+    careful when writing those) if you don't call 'sleep', so that is one of
+    the things we can count on.
+    
+                    7. Apologies :-)
+    
+    This isn't yet the "mother of all operating systems", and anyone who
+    hoped for that will have to wait for the first real release (1.0), and
+    even then you might not want to change from minix.  This is a source
+    release for those that are interested in seeing what linux looks like,
+    and it's not really supported yet.  Anyone with questions or suggestions
+    (even bug-reports if you decide to get it working on your system) is
+    encouraged to mail me.
+    
+                    8. Getting it working
+    
+    Most hardware dependancies will have to be compiled into the system, and
+    there a number of defines in the file "include/linux/config.h" that you
+    have to change to get a personalized kernel.  Also you must uncomment
+    the right "equ" in the file boot/boot.s, telling the bootup-routine what
+    kind of device your A-floppy is.  After that a simple "make" should make
+    the file "Image", which you can copy to a floppy (cp Image /dev/PS0 is
+    what I use with a 1.44Mb floppy).  That's it.
+    
+    Without any programs to run, though, the kernel cannot do anything. You
+    should find binaries for 'update' and 'bash' at the same place you found
+    this, which will have to be put into the '/bin' directory on the
+    specified root-device (specified in config.h). Bash must be found under
+    the name '/bin/sh', as that's what the kernel currently executes. Happy
+    hacking.
+    
+                    Linus Torvalds          "torvalds@kruuna.helsinki.fi"
+                    Petersgatan 2 A 2
+                    00140 Helsingfors 14
+                    FINLAND
+    
+    -----
+    
+    From: torvalds@klaava.Helsinki.FI (Linus Benedict Torvalds)
+    Newsgroups: comp.os.minix
+    Subject: What would you like to see most in minix?
+    Summary: small poll for my new operating system
+    Keywords: 386, preferences
+    Message-ID: <1991Aug25.205708.9541@klaava.Helsinki.FI>
+    Date: 25 Aug 91 20:57:08 GMT
+    Organization: University of Helsinki
+    
+    Hello everybody out there using minix -
+    
+    I'm doing a (free) operating system (just a hobby, won't be big and
+    professional like gnu) for 386(486) AT clones.  This has been brewing
+    since april, and is starting to get ready.  I'd like any feedback on
+    things people like/dislike in minix, as my OS resembles it somewhat
+    (same physical layout of the file-system (due to practical reasons)
+    among other things).
+    
+    I've currently ported bash(1.08) and gcc(1.40), and things seem to work.
+    This implies that I'll get something practical within a few months, and
+    I'd like to know what features most people would want.  Any suggestions
+    are welcome, but I won't promise I'll implement them :-)
+    
+                    Linus (torvalds@kruuna.helsinki.fi)
+    
+    PS.  Yes - it's free of any minix code, and it has a multi-threaded fs.
+    It is NOT protable (uses 386 task switching etc), and it probably never
+    will support anything other than AT-harddisks, as that's all I have :-(.

@@ -1,0 +1,188 @@
+commit ae982073095a44f004d7ffb9f271077abef9dbcf
+Merge: f1a3c0b933e7 e625ccec1fa6
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Sep 1 19:45:46 2015 -0700
+
+    Merge tag 'pm+acpi-4.3-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull power management and ACPI updates from Rafael Wysocki:
+     "From the number of commits perspective, the biggest items are ACPICA
+      and cpufreq changes with the latter taking the lead (over 50 commits).
+    
+      On the cpufreq front, there are many cleanups and minor fixes in the
+      core and governors, driver updates etc.  We also have a new cpufreq
+      driver for Mediatek MT8173 chips.
+    
+      ACPICA mostly updates its debug infrastructure and adds a number of
+      fixes and cleanups for a good measure.
+    
+      The Operating Performance Points (OPP) framework is updated with new
+      DT bindings and support for them among other things.
+    
+      We have a few updates of the generic power domains framework and a
+      reorganization of the ACPI device enumeration code and bus type
+      operations.
+    
+      And a lot of fixes and cleanups all over.
+    
+      Included is one branch from the MFD tree as it contains some
+      PM-related driver core and ACPI PM changes a few other commits are
+      based on.
+    
+      Specifics:
+    
+       - ACPICA update to upstream revision 20150818 including method
+         tracing extensions to allow more in-depth AML debugging in the
+         kernel and a number of assorted fixes and cleanups (Bob Moore, Lv
+         Zheng, Markus Elfring).
+    
+       - ACPI sysfs code updates and a documentation update related to AML
+         method tracing (Lv Zheng).
+    
+       - ACPI EC driver fix related to serialized evaluations of _Qxx
+         methods and ACPI tools updates allowing the EC userspace tool to be
+         built from the kernel source (Lv Zheng).
+    
+       - ACPI processor driver updates preparing it for future introduction
+         of CPPC support and ACPI PCC mailbox driver updates (Ashwin
+         Chaugule).
+    
+       - ACPI interrupts enumeration fix for a regression related to the
+         handling of IRQ attribute conflicts between MADT and the ACPI
+         namespace (Jiang Liu).
+    
+       - Fixes related to ACPI device PM (Mika Westerberg, Srinidhi
+         Kasagar).
+    
+       - ACPI device registration code reorganization to separate the
+         sysfs-related code and bus type operations from the rest (Rafael J
+         Wysocki).
+    
+       - Assorted cleanups in the ACPI core (Jarkko Nikula, Mathias Krause,
+         Andy Shevchenko, Rafael J Wysocki, Nicolas Iooss).
+    
+       - ACPI cpufreq driver and ia64 cpufreq driver fixes and cleanups (Pan
+         Xinhui, Rafael J Wysocki).
+    
+       - cpufreq core cleanups on top of the previous changes allowing it to
+         preseve its sysfs directories over system suspend/resume (Viresh
+         Kumar, Rafael J Wysocki, Sebastian Andrzej Siewior).
+    
+       - cpufreq fixes and cleanups related to governors (Viresh Kumar).
+    
+       - cpufreq updates (core and the cpufreq-dt driver) related to the
+         turbo/boost mode support (Viresh Kumar, Bartlomiej Zolnierkiewicz).
+    
+       - New DT bindings for Operating Performance Points (OPP), support for
+         them in the OPP framework and in the cpufreq-dt driver plus related
+         OPP framework fixes and cleanups (Viresh Kumar).
+    
+       - cpufreq powernv driver updates (Shilpasri G Bhat).
+    
+       - New cpufreq driver for Mediatek MT8173 (Pi-Cheng Chen).
+    
+       - Assorted cpufreq driver (speedstep-lib, sfi, integrator) cleanups
+         and fixes (Abhilash Jindal, Andrzej Hajda, Cristian Ardelean).
+    
+       - intel_pstate driver updates including Skylake-S support, support
+         for enabling HW P-states per CPU and an additional vendor bypass
+         list entry (Kristen Carlson Accardi, Chen Yu, Ethan Zhao).
+    
+       - cpuidle core fixes related to the handling of coupled idle states
+         (Xunlei Pang).
+    
+       - intel_idle driver updates including Skylake Client support and
+         support for freeze-mode-specific idle states (Len Brown).
+    
+       - Driver core updates related to power management (Andy Shevchenko,
+         Rafael J Wysocki).
+    
+       - Generic power domains framework fixes and cleanups (Jon Hunter,
+         Geert Uytterhoeven, Rajendra Nayak, Ulf Hansson).
+    
+       - Device PM QoS framework update to allow the latency tolerance
+         setting to be exposed to user space via sysfs (Mika Westerberg).
+    
+       - devfreq support for PPMUv2 in Exynos5433 and a fix for an incorrect
+         exynos-ppmu DT binding (Chanwoo Choi, Javier Martinez Canillas).
+    
+       - System sleep support updates (Alan Stern, Len Brown, SungEun Kim).
+    
+       - rockchip-io AVS support updates (Heiko Stuebner).
+    
+       - PM core clocks support fixup (Colin Ian King).
+    
+       - Power capping RAPL driver update including support for Skylake H/S
+         and Broadwell-H (Radivoje Jovanovic, Seiichi Ikarashi).
+    
+       - Generic device properties framework fixes related to the handling
+         of static (driver-provided) property sets (Andy Shevchenko).
+    
+       - turbostat and cpupower updates (Len Brown, Shilpasri G Bhat,
+         Shreyas B Prabhu)"
+    
+    * tag 'pm+acpi-4.3-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm: (180 commits)
+      cpufreq: speedstep-lib: Use monotonic clock
+      cpufreq: powernv: Increase the verbosity of OCC console messages
+      cpufreq: sfi: use kmemdup rather than duplicating its implementation
+      cpufreq: drop !cpufreq_driver check from cpufreq_parse_governor()
+      cpufreq: rename cpufreq_real_policy as cpufreq_user_policy
+      cpufreq: remove redundant 'policy' field from user_policy
+      cpufreq: remove redundant 'governor' field from user_policy
+      cpufreq: update user_policy.* on success
+      cpufreq: use memcpy() to copy policy
+      cpufreq: remove redundant CPUFREQ_INCOMPATIBLE notifier event
+      cpufreq: mediatek: Add MT8173 cpufreq driver
+      dt-bindings: mediatek: Add MT8173 CPU DVFS clock bindings
+      PM / Domains: Fix typo in description of genpd_dev_pm_detach()
+      PM / Domains: Remove unusable governor dummies
+      PM / Domains: Make pm_genpd_init() available to modules
+      PM / domains: Align column headers and data in pm_genpd_summary output
+      powercap / RAPL: disable the 2nd power limit properly
+      tools: cpupower: Fix error when running cpupower monitor
+      PM / OPP: Drop unlikely before IS_ERR(_OR_NULL)
+      PM / OPP: Fix static checker warning (broken 64bit big endian systems)
+      ...
+
+commit 002acf1fc16cf60e60345bd68e03734628505b83
+Merge: b52b342d31fe 8e7030097e9f
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Dec 5 18:26:40 2013 -0800
+
+    Merge tag 'pm-3.13-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull power management fixes from Rafael Wysocki:
+    
+     - cpufreq regression fix from Bjørn Mork restoring the pre-3.12
+       behavior of the framework during system suspend/hibernation to avoid
+       garbage sysfs files from being left behind in case of a suspend error
+    
+     - PNP regression fix to restore the correct states of devices after
+       resume from hibernation broken in 3.12.  From Dmitry Torokhov.
+    
+     - cpuidle fix to prevent cpuidle device unregistration from crashing
+       due to a NULL pointer dereference if cpuidle has been disabled from
+       the kernel command line.  From Konrad Rzeszutek Wilk.
+    
+     - intel_idle fix for the C6 state definition on Intel Avoton/Rangeley
+       processors from Arne Bockholdt.
+    
+     - Power capping framework fix to make the energy_uj sysfs attribute
+       work in accordance with the documentation.  From Srinivas Pandruvada.
+    
+     - epoll fix to make it ignore the EPOLLWAKEUP flag if the kernel has
+       been compiled with CONFIG_PM_SLEEP unset (in which case that flag
+       should not have any effect).  From Amit Pundir.
+    
+     - cpufreq fix to prevent governor sysfs files from being lost over
+       system suspend/resume in some (arguably unusual) situations.  From
+       Viresh Kumar.
+    
+    * tag 'pm-3.13-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm:
+      PowerCap: Fix mode for energy counter
+      PNP: fix restoring devices after hibernation
+      cpuidle: Check for dev before deregistering it.
+      epoll: drop EPOLLWAKEUP if PM_SLEEP is disabled
+      cpufreq: fix garbage kobjects on errors during suspend/resume
+      cpufreq: suspend governors on system suspend/hibernate
+      intel_idle: Fixed C6 state on Avoton/Rangeley processors
