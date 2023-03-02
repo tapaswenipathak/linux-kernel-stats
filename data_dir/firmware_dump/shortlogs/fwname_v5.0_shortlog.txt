@@ -1,0 +1,1 @@
+    brcmfmac: add extension to .get_fwname() callbacks
