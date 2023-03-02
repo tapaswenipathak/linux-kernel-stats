@@ -1,0 +1,297 @@
+commit fda022143f6f00fc4c3c296175b5e315c7c12710
+Author: Marek Szyprowski <m.szyprowski@samsung.com>
+Date:   Thu May 14 12:08:12 2020 +0200
+
+    drm/exynos: mixer: Fix enabling of the runtime power management
+    
+    Runtime power management is essential for the Exynos Mixer driver
+    operation. It should be enabled before adding its DRM component, because
+    in some cases (when deferred probe takes place due to the IOMMU
+    availability) the DRM driver might be initialized directly from the
+    Mixer's component_add() call, what results in starting the driver
+    operation without enabling the runtime power management.
+    
+    Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+    Signed-off-by: Inki Dae <inki.dae@samsung.com>
+
+commit 67b18dfb8cfc6d6c2f45ba8c546088f5c14f5bd5
+Author: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Date:   Wed Oct 16 23:12:24 2019 +0800
+
+    HID: i2c-hid: Remove runtime power management
+    
+    Runtime power management in i2c-hid brings lots of issues, such as:
+    - When transitioning from display manager to desktop session, i2c-hid
+    was closed and opened, so the device was set to SLEEP and ON in a short
+    period. Vendors confirmed that their devices can't handle fast ON/SLEEP
+    command because Windows doesn't have this behavior.
+    
+    - When rebooting, i2c-hid was closed, and the driver core put the device
+    back to full power before shutdown. This behavior also triggers a quick
+    SLEEP and ON commands that some devices can't handle, renders an
+    unusable touchpad after reboot.
+    
+    - Most importantly, my power meter reports little to none energy saving
+    when i2c-hid is runtime suspended.
+    
+    So let's remove runtime power management since there is no actual
+    benefit.
+    
+    Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Acked-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+
+commit c6cbcdea7ab94120b676a4865e9782ed3c06dc80
+Merge: e894075934a4 db23d88756ab
+Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date:   Thu Dec 13 13:37:24 2018 +0100
+
+    Merge tag 'iio-for-4.21b' of git://git.kernel.org/pub/scm/linux/kernel/git/jic23/iio into staging-next
+    
+    Jonathan writes:
+    
+    Second set of IIO new device support, features and cleanups for the 4.21 cycle.
+    
+    Staging graduation
+    * ad2s90
+      - Driver for this resolver to digital chip.
+    
+    New drivers and device support.
+    * ad5686
+      - Add support for ad5310r DAC and associated fix in value read back.
+    * exynos-adc
+      - Support for S5PV210 which is slightly different from other parts.
+    * mcp41010
+      - Driver supporting MCP41010, MCP41050, MCP41100, MCP42010, MCP42050 and
+      MCP42100 microchip potentiometers.
+    
+    New ACPI ids.
+    * ak8975
+      - AKM9911 ACPI HID.
+    * kxcjk-1013
+      - KXJ2109 ACPI HID.
+      - KIOX010A ACPI HID.
+    
+    New features
+    * ad5933
+      - Explicit DT binding.
+    * ad2s90
+      - Explicit DT binding including dropping spi setup that is done via dt
+        in favour of verifying the settings form DT.
+    * adt7316
+      - Explicit DT binding and support for gpio, irq_flags etc.
+    * stm32-adc
+      - Runtime power management.
+    
+    Minor fixes and cleanups
+    * core
+      - Protect against missing info structure.
+    * ad2s90
+      - SPDX
+      - Add documentation fo the mutex.
+    * ad7280a
+      - Check allocation failure.
+      - Fix an accidental replacement of an error return.
+    * adt7316
+      - Switch some variables to be local and rename for consistency with other
+        drivers.
+      - Revert a false handling of 0 as an error introduced earlier this cycle.
+    * bmi160
+      - Use devm functions throughout probe() to avoid need for remove().
+    * hid-sensor-hub
+      - White space cleanup.
+    * hts221
+      - MAINTAINERS entry.
+    * lis302
+      - Use generic name in the DT binding doc.
+    * Messon-saradc
+      - Check for allocation error.
+      - Fix some presented clock names that break clk debugfs.
+    * qcom-spmi-adc
+      - A fix for initialization of the prescale property. Came late in the
+        cycle, so merge window is probably the best route for this.
+    * st_lsm6dsx
+      - Allow for variable read length to support wider range of slave devices.
+    
+    * tag 'iio-for-4.21b' of git://git.kernel.org/pub/scm/linux/kernel/git/jic23/iio: (37 commits)
+      iio: adc: qcom-spmi-adc5: Initialize prescale properly
+      dt-bindings: iio: adc: exynos-adc: Add S5PV210 variant
+      iio: adc: Allow selection of Exynos ADC on S5PV210
+      iio: adc: exynos-adc: Add S5PV210 variant
+      iio: bmi160: use all devm functions in probe
+      iio: dac: ad5686: fix bit shift read register
+      iio:dac:ad5686: Add AD5310R support
+      Revert "Staging: iio: adt7316: Add an extra check for 'ret' equals to 0"
+      dt-bindings: iio: accel: use a generic node name for lis302
+      iio: core: check 'info' value before registering the device
+      staging: iio: adc: ad7280a: fix overwrite of the returned value
+      staging: iio: adc: ad7280a: check for devm_kasprint() failure
+      iio: humidity: hts221: add entry in MAINTAINERS file
+      iio: magnetometer: ak8975: Add the "AKM9911" ACPI HID
+      staging:iio:ad2s90: Move out of staging
+      staging:iio:ad2s90: Add comment to device state mutex
+      staging:iio:ad2s90: Replace license text w/ SPDX identifier
+      dt-bindings:iio:resolver: Add docs for ad2s90
+      staging:iio:ad2s90: Add max frequency check at probe
+      staging:iio:ad2s90: Remove spi setup that should be done via dt
+      ...
+
+commit f9300eaaac1ca300083ad41937923a90cc3a2394
+Merge: 7f2dc5c4bcbf faddf2f5d278
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Nov 14 13:41:48 2013 +0900
+
+    Merge tag 'pm+acpi-3.13-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull ACPI and power management updates from Rafael J Wysocki:
+    
+     - New power capping framework and the the Intel Running Average Power
+       Limit (RAPL) driver using it from Srinivas Pandruvada and Jacob Pan.
+    
+     - Addition of the in-kernel switching feature to the arm_big_little
+       cpufreq driver from Viresh Kumar and Nicolas Pitre.
+    
+     - cpufreq support for iMac G5 from Aaro Koskinen.
+    
+     - Baytrail processors support for intel_pstate from Dirk Brandewie.
+    
+     - cpufreq support for Midway/ECX-2000 from Mark Langsdorf.
+    
+     - ARM vexpress/TC2 cpufreq support from Sudeep KarkadaNagesha.
+    
+     - ACPI power management support for the I2C and SPI bus types from Mika
+       Westerberg and Lv Zheng.
+    
+     - cpufreq core fixes and cleanups from Viresh Kumar, Srivatsa S Bhat,
+       Stratos Karafotis, Xiaoguang Chen, Lan Tianyu.
+    
+     - cpufreq drivers updates (mostly fixes and cleanups) from Viresh
+       Kumar, Aaro Koskinen, Jungseok Lee, Sudeep KarkadaNagesha, Lukasz
+       Majewski, Manish Badarkhe, Hans-Christian Egtvedt, Evgeny Kapaev.
+    
+     - intel_pstate updates from Dirk Brandewie and Adrian Huang.
+    
+     - ACPICA update to version 20130927 includig fixes and cleanups and
+       some reduction of divergences between the ACPICA code in the kernel
+       and ACPICA upstream in order to improve the automatic ACPICA patch
+       generation process.  From Bob Moore, Lv Zheng, Tomasz Nowicki, Naresh
+       Bhat, Bjorn Helgaas, David E Box.
+    
+     - ACPI IPMI driver fixes and cleanups from Lv Zheng.
+    
+     - ACPI hotplug fixes and cleanups from Bjorn Helgaas, Toshi Kani, Zhang
+       Yanfei, Rafael J Wysocki.
+    
+     - Conversion of the ACPI AC driver to the platform bus type and
+       multiple driver fixes and cleanups related to ACPI from Zhang Rui.
+    
+     - ACPI processor driver fixes and cleanups from Hanjun Guo, Jiang Liu,
+       Bartlomiej Zolnierkiewicz, Mathieu Rhéaume, Rafael J Wysocki.
+    
+     - Fixes and cleanups and new blacklist entries related to the ACPI
+       video support from Aaron Lu, Felipe Contreras, Lennart Poettering,
+       Kirill Tkhai.
+    
+     - cpuidle core cleanups from Viresh Kumar and Lorenzo Pieralisi.
+    
+     - cpuidle drivers fixes and cleanups from Daniel Lezcano, Jingoo Han,
+       Bartlomiej Zolnierkiewicz, Prarit Bhargava.
+    
+     - devfreq updates from Sachin Kamat, Dan Carpenter, Manish Badarkhe.
+    
+     - Operation Performance Points (OPP) core updates from Nishanth Menon.
+    
+     - Runtime power management core fix from Rafael J Wysocki and update
+       from Ulf Hansson.
+    
+     - Hibernation fixes from Aaron Lu and Rafael J Wysocki.
+    
+     - Device suspend/resume lockup detection mechanism from Benoit Goby.
+    
+     - Removal of unused proc directories created for various ACPI drivers
+       from Lan Tianyu.
+    
+     - ACPI LPSS driver fix and new device IDs for the ACPI platform scan
+       handler from Heikki Krogerus and Jarkko Nikula.
+    
+     - New ACPI _OSI blacklist entry for Toshiba NB100 from Levente Kurusa.
+    
+     - Assorted fixes and cleanups related to ACPI from Andy Shevchenko, Al
+       Stone, Bartlomiej Zolnierkiewicz, Colin Ian King, Dan Carpenter,
+       Felipe Contreras, Jianguo Wu, Lan Tianyu, Yinghai Lu, Mathias Krause,
+       Liu Chuansheng.
+    
+     - Assorted PM fixes and cleanups from Andy Shevchenko, Thierry Reding,
+       Jean-Christophe Plagniol-Villard.
+    
+    * tag 'pm+acpi-3.13-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm: (386 commits)
+      cpufreq: conservative: fix requested_freq reduction issue
+      ACPI / hotplug: Consolidate deferred execution of ACPI hotplug routines
+      PM / runtime: Use pm_runtime_put_sync() in __device_release_driver()
+      ACPI / event: remove unneeded NULL pointer check
+      Revert "ACPI / video: Ignore BIOS initial backlight value for HP 250 G1"
+      ACPI / video: Quirk initial backlight level 0
+      ACPI / video: Fix initial level validity test
+      intel_pstate: skip the driver if ACPI has power mgmt option
+      PM / hibernate: Avoid overflow in hibernate_preallocate_memory()
+      ACPI / hotplug: Do not execute "insert in progress" _OST
+      ACPI / hotplug: Carry out PCI root eject directly
+      ACPI / hotplug: Merge device hot-removal routines
+      ACPI / hotplug: Make acpi_bus_hot_remove_device() internal
+      ACPI / hotplug: Simplify device ejection routines
+      ACPI / hotplug: Fix handle_root_bridge_removal()
+      ACPI / hotplug: Refuse to hot-remove all objects with disabled hotplug
+      ACPI / scan: Start matching drivers after trying scan handlers
+      ACPI: Remove acpi_pci_slot_init() headers from internal.h
+      ACPI / blacklist: fix name of ThinkPad Edge E530
+      PowerCap: Fix build error with option -Werror=format-security
+      ...
+    
+    Conflicts:
+            arch/arm/mach-omap2/opp.c
+            drivers/Kconfig
+            drivers/spi/spi.c
+
+commit dc781d0e10fca29123ddde45429d777725c0fde5
+Author: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date:   Sun Jan 27 12:07:32 2013 +0800
+
+    mfd: arizona: Disable interrupts during resume
+    
+    Runtime power management does not function during system suspend but the
+    Arizona devices need to use runtime power management to power up the device
+    in order to handle interrupts. Try to avoid interrupts firing during
+    resume by disabling the primary IRQ before interrupts are reenabled on
+    resume and only reenabling it again during main resume.
+    
+    The goal is to avoid issues in the situation where an interrupt is asserted
+    during resume (eg, due to it being the wake source) and the interrupt
+    handling gets scheduled prior to the device being able to handle runtime
+    PM.
+    
+    Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+    Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+
+commit 2e85c4ddd3f32d3e1da51f4129473399e505ffa3
+Author: Kalhan Trisal <kalhan.trisal@intel.com>
+Date:   Tue Oct 26 14:22:40 2010 -0700
+
+    drivers/misc/isl29020.c: ambient light sensor
+    
+    The LS driver will read the latest Lux measurement based upon the light
+    brightness and will report the LUX output through sysfs interface.
+    
+    This hardware isn't quite the same as the ISL29003 so has a different
+    driver.
+    
+    [akpm@linux-foundation.org: put PM code under #ifdef CONFIG_PM]
+    Signed-off-by: Kalhan Trisal <kalhan.trisal@intel.com>
+    [Runtime power management support added]
+    Signed-off-by: Arjan van de Ven <arjan@linux.intel.com>
+    [Fixes to runtime PM]
+    Signed-off-by: Liu Hong <hong.liu@intel.com>
+    [Cleanups and added checks for I2C errors, reworked the API to match the
+     saner one agreed for other sensors]
+    Signed-off-by: Alan Cox <alan@linux.intel.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>

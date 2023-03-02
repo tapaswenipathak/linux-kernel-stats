@@ -1,0 +1,4028 @@
+commit 2e798814e01827871938ff172d2b2ccf1e74b355
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8 upstream.
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    [sudip: adjust context]
+    Signed-off-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit c3fa6d1937a8d0828131a04ae2cd2c30d0668693
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8 upstream.
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    [sudip: change in old path]
+    Signed-off-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f0ddc5184b0127038d05008e2a69f89d1e13f980
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8 upstream.
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    [sudip: change in old path]
+    Signed-off-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 33c73a4d7e7b19313a6b417152f5365016926418
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8 upstream.
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ba9efbbf6745750d34c1e87c9539ce9db645ca0a
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8 upstream.
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e098933866f9e1dd3ef4eebbe2e3d504f970f599
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8 upstream.
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3abea10e6a8f0e7804ed4c124bea2d15aca977c8
+Author: Chuansheng Liu <chuansheng.liu@intel.com>
+Date:   Wed Feb 23 08:20:24 2022 +0800
+
+    thermal: int340x: fix memory leak in int3400_notify()
+    
+    It is easy to hit the below memory leaks in my TigerLake platform:
+    
+    unreferenced object 0xffff927c8b91dbc0 (size 32):
+      comm "kworker/0:2", pid 112, jiffies 4294893323 (age 83.604s)
+      hex dump (first 32 bytes):
+        4e 41 4d 45 3d 49 4e 54 33 34 30 30 20 54 68 65  NAME=INT3400 The
+        72 6d 61 6c 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b a5  rmal.kkkkkkkkkk.
+      backtrace:
+        [<ffffffff9c502c3e>] __kmalloc_track_caller+0x2fe/0x4a0
+        [<ffffffff9c7b7c15>] kvasprintf+0x65/0xd0
+        [<ffffffff9c7b7d6e>] kasprintf+0x4e/0x70
+        [<ffffffffc04cb662>] int3400_notify+0x82/0x120 [int3400_thermal]
+        [<ffffffff9c8b7358>] acpi_ev_notify_dispatch+0x54/0x71
+        [<ffffffff9c88f1a7>] acpi_os_execute_deferred+0x17/0x30
+        [<ffffffff9c2c2c0a>] process_one_work+0x21a/0x3f0
+        [<ffffffff9c2c2e2a>] worker_thread+0x4a/0x3b0
+        [<ffffffff9c2cb4dd>] kthread+0xfd/0x130
+        [<ffffffff9c201c1f>] ret_from_fork+0x1f/0x30
+    
+    Fix it by calling kfree() accordingly.
+    
+    Fixes: 38e44da59130 ("thermal: int3400_thermal: process "thermal table changed" event")
+    Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+    Cc: 4.14+ <stable@vger.kernel.org> # 4.14+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit befc8b9a5ef1814de24373f81ed40bf1414aa6e0
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Apr 7 20:11:16 2020 +0200
+
+    i2c: designware: platdrv: Remove DPM_FLAG_SMART_SUSPEND flag on BYT and CHT
+    
+    commit d79294d0de12ddd1420110813626d691f440b86f upstream.
+    
+    We already set DPM_FLAG_SMART_PREPARE, so we completely skip all
+    callbacks (other then prepare) where possible, quoting from
+    dw_i2c_plat_prepare():
+    
+            /*
+             * If the ACPI companion device object is present for this device, it
+             * may be accessed during suspend and resume of other devices via I2C
+             * operation regions, so tell the PM core and middle layers to avoid
+             * skipping system suspend/resume callbacks for it in that case.
+             */
+            return !has_acpi_companion(dev);
+    
+    Also setting the DPM_FLAG_SMART_SUSPEND will cause acpi_subsys_suspend()
+    to leave the controller runtime-suspended even if dw_i2c_plat_prepare()
+    returned 0.
+    
+    Leaving the controller runtime-suspended normally, when the I2C controller
+    is suspended during the suspend_late phase, is not an issue because
+    the pm_runtime_get_sync() done by i2c_dw_xfer() will (runtime-)resume it.
+    
+    But for dw I2C controllers on Bay- and Cherry-Trail devices acpi_lpss.c
+    leaves the controller alive until the suspend_noirq phase, because it may
+    be used by the _PS3 ACPI methods of PCI devices and PCI devices are left
+    powered on until the suspend_noirq phase.
+    
+    Between the suspend_late and resume_early phases runtime-pm is disabled.
+    So for any ACPI I2C OPRegion accesses done after the suspend_late phase,
+    the pm_runtime_get_sync() done by i2c_dw_xfer() is a no-op and the
+    controller is left runtime-suspended.
+    
+    i2c_dw_xfer() has a check to catch this condition (rather then waiting
+    for the I2C transfer to timeout because the controller is suspended).
+    acpi_subsys_suspend() leaving the controller runtime-suspended in
+    combination with an ACPI I2C OPRegion access done after the suspend_late
+    phase triggers this check, leading to the following error being logged
+    on a Bay Trail based Lenovo Thinkpad 8 tablet:
+    
+    [   93.275882] i2c_designware 80860F41:00: Transfer while suspended
+    [   93.275993] WARNING: CPU: 0 PID: 412 at drivers/i2c/busses/i2c-designware-master.c:429 i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276252] Workqueue: kacpi_notify acpi_os_execute_deferred
+    [   93.276267] RIP: 0010:i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276340] Call Trace:
+    [   93.276366]  __i2c_transfer+0x121/0x520
+    [   93.276379]  i2c_transfer+0x4c/0x100
+    [   93.276392]  i2c_acpi_space_handler+0x219/0x510
+    [   93.276408]  ? up+0x40/0x60
+    [   93.276419]  ? i2c_acpi_notify+0x130/0x130
+    [   93.276433]  acpi_ev_address_space_dispatch+0x1e1/0x252
+    ...
+    
+    So since on BYT and CHT platforms we want ACPI I2c OPRegion accesses
+    to work until the suspend_noirq phase, we need the controller to be
+    runtime-resumed during the suspend phase if it is runtime-suspended
+    suspended at that time. This means that we must not set the
+    DPM_FLAG_SMART_SUSPEND on these platforms.
+    
+    On BYT and CHT we already have a special ACCESS_NO_IRQ_SUSPEND flag
+    to make sure the controller stays functional until the suspend_noirq
+    phase. This commit makes the driver not set the DPM_FLAG_SMART_SUSPEND
+    flag when that flag is set.
+    
+    Cc: stable@vger.kernel.org
+    Fixes: b30f2f65568f ("i2c: designware: Set IRQF_NO_SUSPEND flag for all BYT and CHT controllers")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e477a38a605224761749695605dd78497719c838
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Apr 7 20:11:16 2020 +0200
+
+    i2c: designware: platdrv: Remove DPM_FLAG_SMART_SUSPEND flag on BYT and CHT
+    
+    commit d79294d0de12ddd1420110813626d691f440b86f upstream.
+    
+    We already set DPM_FLAG_SMART_PREPARE, so we completely skip all
+    callbacks (other then prepare) where possible, quoting from
+    dw_i2c_plat_prepare():
+    
+            /*
+             * If the ACPI companion device object is present for this device, it
+             * may be accessed during suspend and resume of other devices via I2C
+             * operation regions, so tell the PM core and middle layers to avoid
+             * skipping system suspend/resume callbacks for it in that case.
+             */
+            return !has_acpi_companion(dev);
+    
+    Also setting the DPM_FLAG_SMART_SUSPEND will cause acpi_subsys_suspend()
+    to leave the controller runtime-suspended even if dw_i2c_plat_prepare()
+    returned 0.
+    
+    Leaving the controller runtime-suspended normally, when the I2C controller
+    is suspended during the suspend_late phase, is not an issue because
+    the pm_runtime_get_sync() done by i2c_dw_xfer() will (runtime-)resume it.
+    
+    But for dw I2C controllers on Bay- and Cherry-Trail devices acpi_lpss.c
+    leaves the controller alive until the suspend_noirq phase, because it may
+    be used by the _PS3 ACPI methods of PCI devices and PCI devices are left
+    powered on until the suspend_noirq phase.
+    
+    Between the suspend_late and resume_early phases runtime-pm is disabled.
+    So for any ACPI I2C OPRegion accesses done after the suspend_late phase,
+    the pm_runtime_get_sync() done by i2c_dw_xfer() is a no-op and the
+    controller is left runtime-suspended.
+    
+    i2c_dw_xfer() has a check to catch this condition (rather then waiting
+    for the I2C transfer to timeout because the controller is suspended).
+    acpi_subsys_suspend() leaving the controller runtime-suspended in
+    combination with an ACPI I2C OPRegion access done after the suspend_late
+    phase triggers this check, leading to the following error being logged
+    on a Bay Trail based Lenovo Thinkpad 8 tablet:
+    
+    [   93.275882] i2c_designware 80860F41:00: Transfer while suspended
+    [   93.275993] WARNING: CPU: 0 PID: 412 at drivers/i2c/busses/i2c-designware-master.c:429 i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276252] Workqueue: kacpi_notify acpi_os_execute_deferred
+    [   93.276267] RIP: 0010:i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276340] Call Trace:
+    [   93.276366]  __i2c_transfer+0x121/0x520
+    [   93.276379]  i2c_transfer+0x4c/0x100
+    [   93.276392]  i2c_acpi_space_handler+0x219/0x510
+    [   93.276408]  ? up+0x40/0x60
+    [   93.276419]  ? i2c_acpi_notify+0x130/0x130
+    [   93.276433]  acpi_ev_address_space_dispatch+0x1e1/0x252
+    ...
+    
+    So since on BYT and CHT platforms we want ACPI I2c OPRegion accesses
+    to work until the suspend_noirq phase, we need the controller to be
+    runtime-resumed during the suspend phase if it is runtime-suspended
+    suspended at that time. This means that we must not set the
+    DPM_FLAG_SMART_SUSPEND on these platforms.
+    
+    On BYT and CHT we already have a special ACCESS_NO_IRQ_SUSPEND flag
+    to make sure the controller stays functional until the suspend_noirq
+    phase. This commit makes the driver not set the DPM_FLAG_SMART_SUSPEND
+    flag when that flag is set.
+    
+    Cc: stable@vger.kernel.org
+    Fixes: b30f2f65568f ("i2c: designware: Set IRQF_NO_SUSPEND flag for all BYT and CHT controllers")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 653b425309524e6c21a9252d7ae07da0f11068d5
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Apr 7 20:11:16 2020 +0200
+
+    i2c: designware: platdrv: Remove DPM_FLAG_SMART_SUSPEND flag on BYT and CHT
+    
+    commit d79294d0de12ddd1420110813626d691f440b86f upstream.
+    
+    We already set DPM_FLAG_SMART_PREPARE, so we completely skip all
+    callbacks (other then prepare) where possible, quoting from
+    dw_i2c_plat_prepare():
+    
+            /*
+             * If the ACPI companion device object is present for this device, it
+             * may be accessed during suspend and resume of other devices via I2C
+             * operation regions, so tell the PM core and middle layers to avoid
+             * skipping system suspend/resume callbacks for it in that case.
+             */
+            return !has_acpi_companion(dev);
+    
+    Also setting the DPM_FLAG_SMART_SUSPEND will cause acpi_subsys_suspend()
+    to leave the controller runtime-suspended even if dw_i2c_plat_prepare()
+    returned 0.
+    
+    Leaving the controller runtime-suspended normally, when the I2C controller
+    is suspended during the suspend_late phase, is not an issue because
+    the pm_runtime_get_sync() done by i2c_dw_xfer() will (runtime-)resume it.
+    
+    But for dw I2C controllers on Bay- and Cherry-Trail devices acpi_lpss.c
+    leaves the controller alive until the suspend_noirq phase, because it may
+    be used by the _PS3 ACPI methods of PCI devices and PCI devices are left
+    powered on until the suspend_noirq phase.
+    
+    Between the suspend_late and resume_early phases runtime-pm is disabled.
+    So for any ACPI I2C OPRegion accesses done after the suspend_late phase,
+    the pm_runtime_get_sync() done by i2c_dw_xfer() is a no-op and the
+    controller is left runtime-suspended.
+    
+    i2c_dw_xfer() has a check to catch this condition (rather then waiting
+    for the I2C transfer to timeout because the controller is suspended).
+    acpi_subsys_suspend() leaving the controller runtime-suspended in
+    combination with an ACPI I2C OPRegion access done after the suspend_late
+    phase triggers this check, leading to the following error being logged
+    on a Bay Trail based Lenovo Thinkpad 8 tablet:
+    
+    [   93.275882] i2c_designware 80860F41:00: Transfer while suspended
+    [   93.275993] WARNING: CPU: 0 PID: 412 at drivers/i2c/busses/i2c-designware-master.c:429 i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276252] Workqueue: kacpi_notify acpi_os_execute_deferred
+    [   93.276267] RIP: 0010:i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276340] Call Trace:
+    [   93.276366]  __i2c_transfer+0x121/0x520
+    [   93.276379]  i2c_transfer+0x4c/0x100
+    [   93.276392]  i2c_acpi_space_handler+0x219/0x510
+    [   93.276408]  ? up+0x40/0x60
+    [   93.276419]  ? i2c_acpi_notify+0x130/0x130
+    [   93.276433]  acpi_ev_address_space_dispatch+0x1e1/0x252
+    ...
+    
+    So since on BYT and CHT platforms we want ACPI I2c OPRegion accesses
+    to work until the suspend_noirq phase, we need the controller to be
+    runtime-resumed during the suspend phase if it is runtime-suspended
+    suspended at that time. This means that we must not set the
+    DPM_FLAG_SMART_SUSPEND on these platforms.
+    
+    On BYT and CHT we already have a special ACCESS_NO_IRQ_SUSPEND flag
+    to make sure the controller stays functional until the suspend_noirq
+    phase. This commit makes the driver not set the DPM_FLAG_SMART_SUSPEND
+    flag when that flag is set.
+    
+    Cc: stable@vger.kernel.org
+    Fixes: b30f2f65568f ("i2c: designware: Set IRQF_NO_SUSPEND flag for all BYT and CHT controllers")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit d79294d0de12ddd1420110813626d691f440b86f
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Apr 7 20:11:16 2020 +0200
+
+    i2c: designware: platdrv: Remove DPM_FLAG_SMART_SUSPEND flag on BYT and CHT
+    
+    We already set DPM_FLAG_SMART_PREPARE, so we completely skip all
+    callbacks (other then prepare) where possible, quoting from
+    dw_i2c_plat_prepare():
+    
+            /*
+             * If the ACPI companion device object is present for this device, it
+             * may be accessed during suspend and resume of other devices via I2C
+             * operation regions, so tell the PM core and middle layers to avoid
+             * skipping system suspend/resume callbacks for it in that case.
+             */
+            return !has_acpi_companion(dev);
+    
+    Also setting the DPM_FLAG_SMART_SUSPEND will cause acpi_subsys_suspend()
+    to leave the controller runtime-suspended even if dw_i2c_plat_prepare()
+    returned 0.
+    
+    Leaving the controller runtime-suspended normally, when the I2C controller
+    is suspended during the suspend_late phase, is not an issue because
+    the pm_runtime_get_sync() done by i2c_dw_xfer() will (runtime-)resume it.
+    
+    But for dw I2C controllers on Bay- and Cherry-Trail devices acpi_lpss.c
+    leaves the controller alive until the suspend_noirq phase, because it may
+    be used by the _PS3 ACPI methods of PCI devices and PCI devices are left
+    powered on until the suspend_noirq phase.
+    
+    Between the suspend_late and resume_early phases runtime-pm is disabled.
+    So for any ACPI I2C OPRegion accesses done after the suspend_late phase,
+    the pm_runtime_get_sync() done by i2c_dw_xfer() is a no-op and the
+    controller is left runtime-suspended.
+    
+    i2c_dw_xfer() has a check to catch this condition (rather then waiting
+    for the I2C transfer to timeout because the controller is suspended).
+    acpi_subsys_suspend() leaving the controller runtime-suspended in
+    combination with an ACPI I2C OPRegion access done after the suspend_late
+    phase triggers this check, leading to the following error being logged
+    on a Bay Trail based Lenovo Thinkpad 8 tablet:
+    
+    [   93.275882] i2c_designware 80860F41:00: Transfer while suspended
+    [   93.275993] WARNING: CPU: 0 PID: 412 at drivers/i2c/busses/i2c-designware-master.c:429 i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276252] Workqueue: kacpi_notify acpi_os_execute_deferred
+    [   93.276267] RIP: 0010:i2c_dw_xfer+0x239/0x280
+    ...
+    [   93.276340] Call Trace:
+    [   93.276366]  __i2c_transfer+0x121/0x520
+    [   93.276379]  i2c_transfer+0x4c/0x100
+    [   93.276392]  i2c_acpi_space_handler+0x219/0x510
+    [   93.276408]  ? up+0x40/0x60
+    [   93.276419]  ? i2c_acpi_notify+0x130/0x130
+    [   93.276433]  acpi_ev_address_space_dispatch+0x1e1/0x252
+    ...
+    
+    So since on BYT and CHT platforms we want ACPI I2c OPRegion accesses
+    to work until the suspend_noirq phase, we need the controller to be
+    runtime-resumed during the suspend phase if it is runtime-suspended
+    suspended at that time. This means that we must not set the
+    DPM_FLAG_SMART_SUSPEND on these platforms.
+    
+    On BYT and CHT we already have a special ACCESS_NO_IRQ_SUSPEND flag
+    to make sure the controller stays functional until the suspend_noirq
+    phase. This commit makes the driver not set the DPM_FLAG_SMART_SUSPEND
+    flag when that flag is set.
+    
+    Cc: stable@vger.kernel.org
+    Fixes: b30f2f65568f ("i2c: designware: Set IRQF_NO_SUSPEND flag for all BYT and CHT controllers")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+
+commit 84d064535079cca6b4c1040e6cbcc1332a3cbde2
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed Feb 19 14:36:14 2020 -0800
+
+    hwmon: (acpi_power_meter) Fix lockdep splat
+    
+    commit badcd4546d52ae4318f2bcfda0e47a1394b60e38 upstream.
+    
+    Damien Le Moal reports a lockdep splat with the acpi_power_meter,
+    observed with Linux v5.5 and later.
+    
+    ======================================================
+    WARNING: possible circular locking dependency detected
+    5.6.0-rc2+ #629 Not tainted
+    ------------------------------------------------------
+    python/1397 is trying to acquire lock:
+    ffff888619080070 (&resource->lock){+.+.}, at: show_power+0x3c/0xa0 [acpi_power_meter]
+    
+                   but task is already holding lock:
+    ffff88881643f188 (kn->count#119){++++}, at: kernfs_seq_start+0x6a/0x160
+    
+                   which lock already depends on the new lock.
+    
+                   the existing dependency chain (in reverse order) is:
+    
+                   -> #1 (kn->count#119){++++}:
+           __kernfs_remove+0x626/0x7e0
+           kernfs_remove_by_name_ns+0x41/0x80
+           remove_attrs+0xcb/0x3c0 [acpi_power_meter]
+           acpi_power_meter_notify+0x1f7/0x310 [acpi_power_meter]
+           acpi_ev_notify_dispatch+0x198/0x1f3
+           acpi_os_execute_deferred+0x4d/0x70
+           process_one_work+0x7c8/0x1340
+           worker_thread+0x94/0xc70
+           kthread+0x2ed/0x3f0
+           ret_from_fork+0x24/0x30
+    
+                   -> #0 (&resource->lock){+.+.}:
+           __lock_acquire+0x20be/0x49b0
+           lock_acquire+0x127/0x340
+           __mutex_lock+0x15b/0x1350
+           show_power+0x3c/0xa0 [acpi_power_meter]
+           dev_attr_show+0x3f/0x80
+           sysfs_kf_seq_show+0x216/0x410
+           seq_read+0x407/0xf90
+           vfs_read+0x152/0x2c0
+           ksys_read+0xf3/0x1d0
+           do_syscall_64+0x95/0x1010
+           entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+                   other info that might help us debug this:
+    
+     Possible unsafe locking scenario:
+    
+           CPU0                    CPU1
+           ----                    ----
+      lock(kn->count#119);
+                                   lock(&resource->lock);
+                                   lock(kn->count#119);
+      lock(&resource->lock);
+    
+                    *** DEADLOCK ***
+    4 locks held by python/1397:
+     #0: ffff8890242d64e0 (&f->f_pos_lock){+.+.}, at: __fdget_pos+0x9b/0xb0
+     #1: ffff889040be74e0 (&p->lock){+.+.}, at: seq_read+0x6b/0xf90
+     #2: ffff8890448eb880 (&of->mutex){+.+.}, at: kernfs_seq_start+0x47/0x160
+     #3: ffff88881643f188 (kn->count#119){++++}, at: kernfs_seq_start+0x6a/0x160
+    
+                   stack backtrace:
+    CPU: 10 PID: 1397 Comm: python Not tainted 5.6.0-rc2+ #629
+    Hardware name: Supermicro Super Server/X11DPL-i, BIOS 3.1 05/21/2019
+    Call Trace:
+     dump_stack+0x97/0xe0
+     check_noncircular+0x32e/0x3e0
+     ? print_circular_bug.isra.0+0x1e0/0x1e0
+     ? unwind_next_frame+0xb9a/0x1890
+     ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+     ? graph_lock+0x79/0x170
+     ? __lockdep_reset_lock+0x3c0/0x3c0
+     ? mark_lock+0xbc/0x1150
+     __lock_acquire+0x20be/0x49b0
+     ? mark_held_locks+0xe0/0xe0
+     ? stack_trace_save+0x91/0xc0
+     lock_acquire+0x127/0x340
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     ? device_remove_bin_file+0x10/0x10
+     ? device_remove_bin_file+0x10/0x10
+     __mutex_lock+0x15b/0x1350
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     ? mutex_lock_io_nested+0x11f0/0x11f0
+     ? lock_downgrade+0x6a0/0x6a0
+     ? kernfs_seq_start+0x47/0x160
+     ? lock_acquire+0x127/0x340
+     ? kernfs_seq_start+0x6a/0x160
+     ? device_remove_bin_file+0x10/0x10
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     show_power+0x3c/0xa0 [acpi_power_meter]
+     dev_attr_show+0x3f/0x80
+     ? memset+0x20/0x40
+     sysfs_kf_seq_show+0x216/0x410
+     seq_read+0x407/0xf90
+     ? security_file_permission+0x16f/0x2c0
+     vfs_read+0x152/0x2c0
+    
+    Problem is that reading an attribute takes the kernfs lock in the kernfs
+    code, then resource->lock in the driver. During an ACPI notification, the
+    opposite happens: The resource lock is taken first, followed by the kernfs
+    lock when sysfs attributes are removed and re-created. Presumably this is
+    now seen due to some locking related changes in kernfs after v5.4, but it
+    was likely always a problem.
+    
+    Fix the problem by not blindly acquiring the lock in the notification
+    function. It is only needed to protect the various update functions.
+    However, those update functions are called anyway when sysfs attributes
+    are read. This means that we can just stop calling those functions from
+    the notifier, and the resource lock in the notifier function is no longer
+    needed.
+    
+    That leaves two situations:
+    
+    First, METER_NOTIFY_CONFIG removes and re-allocates capability strings.
+    While it did so under the resource lock, _displaying_ those strings was not
+    protected, creating a race condition. To solve this problem, selectively
+    protect both removal/creation and reporting of capability attributes with
+    the resource lock.
+    
+    Second, removing and re-creating the attribute files is no longer protected
+    by the resource lock. That doesn't matter since access to each individual
+    attribute is protected by the kernfs lock. Userspace may get messed up if
+    attributes disappear and reappear under its nose, but that is not different
+    than today, and there is nothing we can do about it without major driver
+    restructuring.
+    
+    Last but not least, when removing the driver, remove attribute functions
+    first, then release capability strings. This avoids yet another race
+    condition.
+    
+    Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
+    Cc: Damien Le Moal <Damien.LeMoal@wdc.com>
+    Cc: stable@vger.kernel.org # v5.5+
+    Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit badcd4546d52ae4318f2bcfda0e47a1394b60e38
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed Feb 19 14:36:14 2020 -0800
+
+    hwmon: (acpi_power_meter) Fix lockdep splat
+    
+    Damien Le Moal reports a lockdep splat with the acpi_power_meter,
+    observed with Linux v5.5 and later.
+    
+    ======================================================
+    WARNING: possible circular locking dependency detected
+    5.6.0-rc2+ #629 Not tainted
+    ------------------------------------------------------
+    python/1397 is trying to acquire lock:
+    ffff888619080070 (&resource->lock){+.+.}, at: show_power+0x3c/0xa0 [acpi_power_meter]
+    
+                   but task is already holding lock:
+    ffff88881643f188 (kn->count#119){++++}, at: kernfs_seq_start+0x6a/0x160
+    
+                   which lock already depends on the new lock.
+    
+                   the existing dependency chain (in reverse order) is:
+    
+                   -> #1 (kn->count#119){++++}:
+           __kernfs_remove+0x626/0x7e0
+           kernfs_remove_by_name_ns+0x41/0x80
+           remove_attrs+0xcb/0x3c0 [acpi_power_meter]
+           acpi_power_meter_notify+0x1f7/0x310 [acpi_power_meter]
+           acpi_ev_notify_dispatch+0x198/0x1f3
+           acpi_os_execute_deferred+0x4d/0x70
+           process_one_work+0x7c8/0x1340
+           worker_thread+0x94/0xc70
+           kthread+0x2ed/0x3f0
+           ret_from_fork+0x24/0x30
+    
+                   -> #0 (&resource->lock){+.+.}:
+           __lock_acquire+0x20be/0x49b0
+           lock_acquire+0x127/0x340
+           __mutex_lock+0x15b/0x1350
+           show_power+0x3c/0xa0 [acpi_power_meter]
+           dev_attr_show+0x3f/0x80
+           sysfs_kf_seq_show+0x216/0x410
+           seq_read+0x407/0xf90
+           vfs_read+0x152/0x2c0
+           ksys_read+0xf3/0x1d0
+           do_syscall_64+0x95/0x1010
+           entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+                   other info that might help us debug this:
+    
+     Possible unsafe locking scenario:
+    
+           CPU0                    CPU1
+           ----                    ----
+      lock(kn->count#119);
+                                   lock(&resource->lock);
+                                   lock(kn->count#119);
+      lock(&resource->lock);
+    
+                    *** DEADLOCK ***
+    4 locks held by python/1397:
+     #0: ffff8890242d64e0 (&f->f_pos_lock){+.+.}, at: __fdget_pos+0x9b/0xb0
+     #1: ffff889040be74e0 (&p->lock){+.+.}, at: seq_read+0x6b/0xf90
+     #2: ffff8890448eb880 (&of->mutex){+.+.}, at: kernfs_seq_start+0x47/0x160
+     #3: ffff88881643f188 (kn->count#119){++++}, at: kernfs_seq_start+0x6a/0x160
+    
+                   stack backtrace:
+    CPU: 10 PID: 1397 Comm: python Not tainted 5.6.0-rc2+ #629
+    Hardware name: Supermicro Super Server/X11DPL-i, BIOS 3.1 05/21/2019
+    Call Trace:
+     dump_stack+0x97/0xe0
+     check_noncircular+0x32e/0x3e0
+     ? print_circular_bug.isra.0+0x1e0/0x1e0
+     ? unwind_next_frame+0xb9a/0x1890
+     ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+     ? graph_lock+0x79/0x170
+     ? __lockdep_reset_lock+0x3c0/0x3c0
+     ? mark_lock+0xbc/0x1150
+     __lock_acquire+0x20be/0x49b0
+     ? mark_held_locks+0xe0/0xe0
+     ? stack_trace_save+0x91/0xc0
+     lock_acquire+0x127/0x340
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     ? device_remove_bin_file+0x10/0x10
+     ? device_remove_bin_file+0x10/0x10
+     __mutex_lock+0x15b/0x1350
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     ? mutex_lock_io_nested+0x11f0/0x11f0
+     ? lock_downgrade+0x6a0/0x6a0
+     ? kernfs_seq_start+0x47/0x160
+     ? lock_acquire+0x127/0x340
+     ? kernfs_seq_start+0x6a/0x160
+     ? device_remove_bin_file+0x10/0x10
+     ? show_power+0x3c/0xa0 [acpi_power_meter]
+     show_power+0x3c/0xa0 [acpi_power_meter]
+     dev_attr_show+0x3f/0x80
+     ? memset+0x20/0x40
+     sysfs_kf_seq_show+0x216/0x410
+     seq_read+0x407/0xf90
+     ? security_file_permission+0x16f/0x2c0
+     vfs_read+0x152/0x2c0
+    
+    Problem is that reading an attribute takes the kernfs lock in the kernfs
+    code, then resource->lock in the driver. During an ACPI notification, the
+    opposite happens: The resource lock is taken first, followed by the kernfs
+    lock when sysfs attributes are removed and re-created. Presumably this is
+    now seen due to some locking related changes in kernfs after v5.4, but it
+    was likely always a problem.
+    
+    Fix the problem by not blindly acquiring the lock in the notification
+    function. It is only needed to protect the various update functions.
+    However, those update functions are called anyway when sysfs attributes
+    are read. This means that we can just stop calling those functions from
+    the notifier, and the resource lock in the notifier function is no longer
+    needed.
+    
+    That leaves two situations:
+    
+    First, METER_NOTIFY_CONFIG removes and re-allocates capability strings.
+    While it did so under the resource lock, _displaying_ those strings was not
+    protected, creating a race condition. To solve this problem, selectively
+    protect both removal/creation and reporting of capability attributes with
+    the resource lock.
+    
+    Second, removing and re-creating the attribute files is no longer protected
+    by the resource lock. That doesn't matter since access to each individual
+    attribute is protected by the kernfs lock. Userspace may get messed up if
+    attributes disappear and reappear under its nose, but that is not different
+    than today, and there is nothing we can do about it without major driver
+    restructuring.
+    
+    Last but not least, when removing the driver, remove attribute functions
+    first, then release capability strings. This avoids yet another race
+    condition.
+    
+    Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
+    Cc: Damien Le Moal <Damien.LeMoal@wdc.com>
+    Cc: stable@vger.kernel.org # v5.5+
+    Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit 9a18bac19cdc52d082c362b694d37a1b7ddd4d81
+Author: Chen Yu <yu.c.chen@intel.com>
+Date:   Mon Jan 29 10:26:46 2018 +0800
+
+    ACPI: processor_perflib: Do not send _PPC change notification if not ready
+    
+    [ Upstream commit ba1edb9a5125a617d612f98eead14b9b84e75c3a ]
+    
+    The following warning was triggered after resumed from S3 -
+    if all the nonboot CPUs were put offline before suspend:
+    
+    [ 1840.329515] unchecked MSR access error: RDMSR from 0x771 at rIP: 0xffffffff86061e3a (native_read_msr+0xa/0x30)
+    [ 1840.329516] Call Trace:
+    [ 1840.329521]  __rdmsr_on_cpu+0x33/0x50
+    [ 1840.329525]  generic_exec_single+0x81/0xb0
+    [ 1840.329527]  smp_call_function_single+0xd2/0x100
+    [ 1840.329530]  ? acpi_ds_result_pop+0xdd/0xf2
+    [ 1840.329532]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329534]  rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329536]  ? cpumask_next+0x1b/0x20
+    [ 1840.329538]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329541]  intel_pstate_update_perf_limits+0xf3/0x220
+    [ 1840.329544]  ? notifier_call_chain+0x4a/0x70
+    [ 1840.329546]  intel_pstate_set_policy+0x4e/0x150
+    [ 1840.329548]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329550]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329552]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329556]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329558]  acpi_processor_notify+0x80/0x100
+    [ 1840.329561]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329563]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329565]  process_one_work+0x193/0x3c0
+    [ 1840.329567]  worker_thread+0x35/0x3b0
+    [ 1840.329569]  kthread+0x125/0x140
+    [ 1840.329571]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329572]  ? kthread_park+0x60/0x60
+    [ 1840.329575]  ? do_syscall_64+0x67/0x180
+    [ 1840.329577]  ret_from_fork+0x25/0x30
+    [ 1840.329585] unchecked MSR access error: WRMSR to 0x774 (tried to write 0x0000000000000000) at rIP: 0xffffffff86061f78 (native_write_msr+0x8/0x30)
+    [ 1840.329586] Call Trace:
+    [ 1840.329587]  __wrmsr_on_cpu+0x37/0x40
+    [ 1840.329589]  generic_exec_single+0x81/0xb0
+    [ 1840.329592]  smp_call_function_single+0xd2/0x100
+    [ 1840.329594]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329595]  ? cpumask_next+0x1b/0x20
+    [ 1840.329597]  wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329598]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329599]  ? wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329602]  intel_pstate_hwp_set+0xd3/0x150
+    [ 1840.329604]  intel_pstate_set_policy+0x119/0x150
+    [ 1840.329606]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329607]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329610]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329613]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329615]  acpi_processor_notify+0x80/0x100
+    [ 1840.329617]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329619]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329620]  process_one_work+0x193/0x3c0
+    [ 1840.329622]  worker_thread+0x35/0x3b0
+    [ 1840.329624]  kthread+0x125/0x140
+    [ 1840.329625]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329626]  ? kthread_park+0x60/0x60
+    [ 1840.329628]  ? do_syscall_64+0x67/0x180
+    [ 1840.329631]  ret_from_fork+0x25/0x30
+    
+    This is because if there's only one online CPU, the MSR_PM_ENABLE
+    (package wide)can not be enabled after resumed, due to
+    intel_pstate_hwp_enable() will only be invoked on AP's online
+    process after resumed - if there's no AP online, the HWP remains
+    disabled after resumed (BIOS has disabled it in S3). Then if
+    there comes a _PPC change notification which touches HWP register
+    during this stage, the warning is triggered.
+    
+    Since we don't call acpi_processor_register_performance() when
+    HWP is enabled, the pr->performance will be NULL. When this is
+    NULL we don't need to do _PPC change notification.
+    
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Suggested-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Yu Chen <yu.c.chen@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0194705a7be9daa82095f0580190566c5af187c3
+Author: Chen Yu <yu.c.chen@intel.com>
+Date:   Mon Jan 29 10:26:46 2018 +0800
+
+    ACPI: processor_perflib: Do not send _PPC change notification if not ready
+    
+    [ Upstream commit ba1edb9a5125a617d612f98eead14b9b84e75c3a ]
+    
+    The following warning was triggered after resumed from S3 -
+    if all the nonboot CPUs were put offline before suspend:
+    
+    [ 1840.329515] unchecked MSR access error: RDMSR from 0x771 at rIP: 0xffffffff86061e3a (native_read_msr+0xa/0x30)
+    [ 1840.329516] Call Trace:
+    [ 1840.329521]  __rdmsr_on_cpu+0x33/0x50
+    [ 1840.329525]  generic_exec_single+0x81/0xb0
+    [ 1840.329527]  smp_call_function_single+0xd2/0x100
+    [ 1840.329530]  ? acpi_ds_result_pop+0xdd/0xf2
+    [ 1840.329532]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329534]  rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329536]  ? cpumask_next+0x1b/0x20
+    [ 1840.329538]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329541]  intel_pstate_update_perf_limits+0xf3/0x220
+    [ 1840.329544]  ? notifier_call_chain+0x4a/0x70
+    [ 1840.329546]  intel_pstate_set_policy+0x4e/0x150
+    [ 1840.329548]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329550]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329552]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329556]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329558]  acpi_processor_notify+0x80/0x100
+    [ 1840.329561]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329563]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329565]  process_one_work+0x193/0x3c0
+    [ 1840.329567]  worker_thread+0x35/0x3b0
+    [ 1840.329569]  kthread+0x125/0x140
+    [ 1840.329571]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329572]  ? kthread_park+0x60/0x60
+    [ 1840.329575]  ? do_syscall_64+0x67/0x180
+    [ 1840.329577]  ret_from_fork+0x25/0x30
+    [ 1840.329585] unchecked MSR access error: WRMSR to 0x774 (tried to write 0x0000000000000000) at rIP: 0xffffffff86061f78 (native_write_msr+0x8/0x30)
+    [ 1840.329586] Call Trace:
+    [ 1840.329587]  __wrmsr_on_cpu+0x37/0x40
+    [ 1840.329589]  generic_exec_single+0x81/0xb0
+    [ 1840.329592]  smp_call_function_single+0xd2/0x100
+    [ 1840.329594]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329595]  ? cpumask_next+0x1b/0x20
+    [ 1840.329597]  wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329598]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329599]  ? wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329602]  intel_pstate_hwp_set+0xd3/0x150
+    [ 1840.329604]  intel_pstate_set_policy+0x119/0x150
+    [ 1840.329606]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329607]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329610]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329613]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329615]  acpi_processor_notify+0x80/0x100
+    [ 1840.329617]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329619]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329620]  process_one_work+0x193/0x3c0
+    [ 1840.329622]  worker_thread+0x35/0x3b0
+    [ 1840.329624]  kthread+0x125/0x140
+    [ 1840.329625]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329626]  ? kthread_park+0x60/0x60
+    [ 1840.329628]  ? do_syscall_64+0x67/0x180
+    [ 1840.329631]  ret_from_fork+0x25/0x30
+    
+    This is because if there's only one online CPU, the MSR_PM_ENABLE
+    (package wide)can not be enabled after resumed, due to
+    intel_pstate_hwp_enable() will only be invoked on AP's online
+    process after resumed - if there's no AP online, the HWP remains
+    disabled after resumed (BIOS has disabled it in S3). Then if
+    there comes a _PPC change notification which touches HWP register
+    during this stage, the warning is triggered.
+    
+    Since we don't call acpi_processor_register_performance() when
+    HWP is enabled, the pr->performance will be NULL. When this is
+    NULL we don't need to do _PPC change notification.
+    
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Suggested-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Yu Chen <yu.c.chen@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4c53640915f20c4372239348d89d4338b55da2f4
+Author: Chen Yu <yu.c.chen@intel.com>
+Date:   Mon Jan 29 10:26:46 2018 +0800
+
+    ACPI: processor_perflib: Do not send _PPC change notification if not ready
+    
+    [ Upstream commit ba1edb9a5125a617d612f98eead14b9b84e75c3a ]
+    
+    The following warning was triggered after resumed from S3 -
+    if all the nonboot CPUs were put offline before suspend:
+    
+    [ 1840.329515] unchecked MSR access error: RDMSR from 0x771 at rIP: 0xffffffff86061e3a (native_read_msr+0xa/0x30)
+    [ 1840.329516] Call Trace:
+    [ 1840.329521]  __rdmsr_on_cpu+0x33/0x50
+    [ 1840.329525]  generic_exec_single+0x81/0xb0
+    [ 1840.329527]  smp_call_function_single+0xd2/0x100
+    [ 1840.329530]  ? acpi_ds_result_pop+0xdd/0xf2
+    [ 1840.329532]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329534]  rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329536]  ? cpumask_next+0x1b/0x20
+    [ 1840.329538]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329541]  intel_pstate_update_perf_limits+0xf3/0x220
+    [ 1840.329544]  ? notifier_call_chain+0x4a/0x70
+    [ 1840.329546]  intel_pstate_set_policy+0x4e/0x150
+    [ 1840.329548]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329550]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329552]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329556]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329558]  acpi_processor_notify+0x80/0x100
+    [ 1840.329561]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329563]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329565]  process_one_work+0x193/0x3c0
+    [ 1840.329567]  worker_thread+0x35/0x3b0
+    [ 1840.329569]  kthread+0x125/0x140
+    [ 1840.329571]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329572]  ? kthread_park+0x60/0x60
+    [ 1840.329575]  ? do_syscall_64+0x67/0x180
+    [ 1840.329577]  ret_from_fork+0x25/0x30
+    [ 1840.329585] unchecked MSR access error: WRMSR to 0x774 (tried to write 0x0000000000000000) at rIP: 0xffffffff86061f78 (native_write_msr+0x8/0x30)
+    [ 1840.329586] Call Trace:
+    [ 1840.329587]  __wrmsr_on_cpu+0x37/0x40
+    [ 1840.329589]  generic_exec_single+0x81/0xb0
+    [ 1840.329592]  smp_call_function_single+0xd2/0x100
+    [ 1840.329594]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329595]  ? cpumask_next+0x1b/0x20
+    [ 1840.329597]  wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329598]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329599]  ? wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329602]  intel_pstate_hwp_set+0xd3/0x150
+    [ 1840.329604]  intel_pstate_set_policy+0x119/0x150
+    [ 1840.329606]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329607]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329610]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329613]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329615]  acpi_processor_notify+0x80/0x100
+    [ 1840.329617]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329619]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329620]  process_one_work+0x193/0x3c0
+    [ 1840.329622]  worker_thread+0x35/0x3b0
+    [ 1840.329624]  kthread+0x125/0x140
+    [ 1840.329625]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329626]  ? kthread_park+0x60/0x60
+    [ 1840.329628]  ? do_syscall_64+0x67/0x180
+    [ 1840.329631]  ret_from_fork+0x25/0x30
+    
+    This is because if there's only one online CPU, the MSR_PM_ENABLE
+    (package wide)can not be enabled after resumed, due to
+    intel_pstate_hwp_enable() will only be invoked on AP's online
+    process after resumed - if there's no AP online, the HWP remains
+    disabled after resumed (BIOS has disabled it in S3). Then if
+    there comes a _PPC change notification which touches HWP register
+    during this stage, the warning is triggered.
+    
+    Since we don't call acpi_processor_register_performance() when
+    HWP is enabled, the pr->performance will be NULL. When this is
+    NULL we don't need to do _PPC change notification.
+    
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Suggested-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Yu Chen <yu.c.chen@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 51939996acde4bce855f70a32544aaf44f8e3f0a
+Author: Chen Yu <yu.c.chen@intel.com>
+Date:   Mon Jan 29 10:26:46 2018 +0800
+
+    ACPI: processor_perflib: Do not send _PPC change notification if not ready
+    
+    
+    [ Upstream commit ba1edb9a5125a617d612f98eead14b9b84e75c3a ]
+    
+    The following warning was triggered after resumed from S3 -
+    if all the nonboot CPUs were put offline before suspend:
+    
+    [ 1840.329515] unchecked MSR access error: RDMSR from 0x771 at rIP: 0xffffffff86061e3a (native_read_msr+0xa/0x30)
+    [ 1840.329516] Call Trace:
+    [ 1840.329521]  __rdmsr_on_cpu+0x33/0x50
+    [ 1840.329525]  generic_exec_single+0x81/0xb0
+    [ 1840.329527]  smp_call_function_single+0xd2/0x100
+    [ 1840.329530]  ? acpi_ds_result_pop+0xdd/0xf2
+    [ 1840.329532]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329534]  rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329536]  ? cpumask_next+0x1b/0x20
+    [ 1840.329538]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329541]  intel_pstate_update_perf_limits+0xf3/0x220
+    [ 1840.329544]  ? notifier_call_chain+0x4a/0x70
+    [ 1840.329546]  intel_pstate_set_policy+0x4e/0x150
+    [ 1840.329548]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329550]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329552]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329556]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329558]  acpi_processor_notify+0x80/0x100
+    [ 1840.329561]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329563]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329565]  process_one_work+0x193/0x3c0
+    [ 1840.329567]  worker_thread+0x35/0x3b0
+    [ 1840.329569]  kthread+0x125/0x140
+    [ 1840.329571]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329572]  ? kthread_park+0x60/0x60
+    [ 1840.329575]  ? do_syscall_64+0x67/0x180
+    [ 1840.329577]  ret_from_fork+0x25/0x30
+    [ 1840.329585] unchecked MSR access error: WRMSR to 0x774 (tried to write 0x0000000000000000) at rIP: 0xffffffff86061f78 (native_write_msr+0x8/0x30)
+    [ 1840.329586] Call Trace:
+    [ 1840.329587]  __wrmsr_on_cpu+0x37/0x40
+    [ 1840.329589]  generic_exec_single+0x81/0xb0
+    [ 1840.329592]  smp_call_function_single+0xd2/0x100
+    [ 1840.329594]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329595]  ? cpumask_next+0x1b/0x20
+    [ 1840.329597]  wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329598]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329599]  ? wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329602]  intel_pstate_hwp_set+0xd3/0x150
+    [ 1840.329604]  intel_pstate_set_policy+0x119/0x150
+    [ 1840.329606]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329607]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329610]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329613]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329615]  acpi_processor_notify+0x80/0x100
+    [ 1840.329617]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329619]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329620]  process_one_work+0x193/0x3c0
+    [ 1840.329622]  worker_thread+0x35/0x3b0
+    [ 1840.329624]  kthread+0x125/0x140
+    [ 1840.329625]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329626]  ? kthread_park+0x60/0x60
+    [ 1840.329628]  ? do_syscall_64+0x67/0x180
+    [ 1840.329631]  ret_from_fork+0x25/0x30
+    
+    This is because if there's only one online CPU, the MSR_PM_ENABLE
+    (package wide)can not be enabled after resumed, due to
+    intel_pstate_hwp_enable() will only be invoked on AP's online
+    process after resumed - if there's no AP online, the HWP remains
+    disabled after resumed (BIOS has disabled it in S3). Then if
+    there comes a _PPC change notification which touches HWP register
+    during this stage, the warning is triggered.
+    
+    Since we don't call acpi_processor_register_performance() when
+    HWP is enabled, the pr->performance will be NULL. When this is
+    NULL we don't need to do _PPC change notification.
+    
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Suggested-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Yu Chen <yu.c.chen@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ba1edb9a5125a617d612f98eead14b9b84e75c3a
+Author: Chen Yu <yu.c.chen@intel.com>
+Date:   Mon Jan 29 10:26:46 2018 +0800
+
+    ACPI: processor_perflib: Do not send _PPC change notification if not ready
+    
+    The following warning was triggered after resumed from S3 -
+    if all the nonboot CPUs were put offline before suspend:
+    
+    [ 1840.329515] unchecked MSR access error: RDMSR from 0x771 at rIP: 0xffffffff86061e3a (native_read_msr+0xa/0x30)
+    [ 1840.329516] Call Trace:
+    [ 1840.329521]  __rdmsr_on_cpu+0x33/0x50
+    [ 1840.329525]  generic_exec_single+0x81/0xb0
+    [ 1840.329527]  smp_call_function_single+0xd2/0x100
+    [ 1840.329530]  ? acpi_ds_result_pop+0xdd/0xf2
+    [ 1840.329532]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329534]  rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329536]  ? cpumask_next+0x1b/0x20
+    [ 1840.329538]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329541]  intel_pstate_update_perf_limits+0xf3/0x220
+    [ 1840.329544]  ? notifier_call_chain+0x4a/0x70
+    [ 1840.329546]  intel_pstate_set_policy+0x4e/0x150
+    [ 1840.329548]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329550]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329552]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329556]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329558]  acpi_processor_notify+0x80/0x100
+    [ 1840.329561]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329563]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329565]  process_one_work+0x193/0x3c0
+    [ 1840.329567]  worker_thread+0x35/0x3b0
+    [ 1840.329569]  kthread+0x125/0x140
+    [ 1840.329571]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329572]  ? kthread_park+0x60/0x60
+    [ 1840.329575]  ? do_syscall_64+0x67/0x180
+    [ 1840.329577]  ret_from_fork+0x25/0x30
+    [ 1840.329585] unchecked MSR access error: WRMSR to 0x774 (tried to write 0x0000000000000000) at rIP: 0xffffffff86061f78 (native_write_msr+0x8/0x30)
+    [ 1840.329586] Call Trace:
+    [ 1840.329587]  __wrmsr_on_cpu+0x37/0x40
+    [ 1840.329589]  generic_exec_single+0x81/0xb0
+    [ 1840.329592]  smp_call_function_single+0xd2/0x100
+    [ 1840.329594]  ? acpi_ds_create_operand+0x215/0x23c
+    [ 1840.329595]  ? cpumask_next+0x1b/0x20
+    [ 1840.329597]  wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329598]  ? rdmsrl_on_cpu+0x57/0x80
+    [ 1840.329599]  ? wrmsrl_on_cpu+0x57/0x70
+    [ 1840.329602]  intel_pstate_hwp_set+0xd3/0x150
+    [ 1840.329604]  intel_pstate_set_policy+0x119/0x150
+    [ 1840.329606]  cpufreq_set_policy+0xcd/0x2f0
+    [ 1840.329607]  cpufreq_update_policy+0xb2/0x130
+    [ 1840.329610]  ? cpufreq_update_policy+0x130/0x130
+    [ 1840.329613]  acpi_processor_ppc_has_changed+0x65/0x80
+    [ 1840.329615]  acpi_processor_notify+0x80/0x100
+    [ 1840.329617]  acpi_ev_notify_dispatch+0x44/0x5c
+    [ 1840.329619]  acpi_os_execute_deferred+0x14/0x20
+    [ 1840.329620]  process_one_work+0x193/0x3c0
+    [ 1840.329622]  worker_thread+0x35/0x3b0
+    [ 1840.329624]  kthread+0x125/0x140
+    [ 1840.329625]  ? process_one_work+0x3c0/0x3c0
+    [ 1840.329626]  ? kthread_park+0x60/0x60
+    [ 1840.329628]  ? do_syscall_64+0x67/0x180
+    [ 1840.329631]  ret_from_fork+0x25/0x30
+    
+    This is because if there's only one online CPU, the MSR_PM_ENABLE
+    (package wide)can not be enabled after resumed, due to
+    intel_pstate_hwp_enable() will only be invoked on AP's online
+    process after resumed - if there's no AP online, the HWP remains
+    disabled after resumed (BIOS has disabled it in S3). Then if
+    there comes a _PPC change notification which touches HWP register
+    during this stage, the warning is triggered.
+    
+    Since we don't call acpi_processor_register_performance() when
+    HWP is enabled, the pr->performance will be NULL. When this is
+    NULL we don't need to do _PPC change notification.
+    
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Suggested-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Yu Chen <yu.c.chen@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit ef2b11c0a31df460cfda8bdc1a79806f9f95a3c5
+Author: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Date:   Tue Nov 7 23:08:10 2017 +0200
+
+    ACPI / PM: Fix acpi_pm_notifier_lock vs flush_workqueue() deadlock
+    
+    commit ff1656790b3a4caca94505c52fd0250f981ea187 upstream.
+    
+    acpi_remove_pm_notifier() ends up calling flush_workqueue() while
+    holding acpi_pm_notifier_lock, and that same lock is taken by
+    by the work via acpi_pm_notify_handler(). This can deadlock.
+    
+    To fix the problem let's split the single lock into two: one to
+    protect the dev->wakeup between the work vs. add/remove, and
+    another one to handle notifier installation vs. removal.
+    
+    After commit a1d14934ea4b "workqueue/lockdep: 'Fix' flush_work()
+    annotation" I was able to kill the machine (Intel Braswell)
+    very easily with 'powertop --auto-tune', runtime suspending i915,
+    and trying to wake it up via the USB keyboard. The cases when
+    it didn't die are presumably explained by lockdep getting disabled
+    by something else (cpu hotplug locking issues usually).
+    
+    Fortunately I still got a lockdep report over netconsole
+    (trickling in very slowly), even though the machine was
+    otherwise practically dead:
+    
+    [  112.179806] ======================================================
+    [  114.670858] WARNING: possible circular locking dependency detected
+    [  117.155663] 4.13.0-rc6-bsw-bisect-00169-ga1d14934ea4b #119 Not tainted
+    [  119.658101] ------------------------------------------------------
+    [  121.310242] xhci_hcd 0000:00:14.0: xHCI host not responding to stop endpoint command.
+    [  121.313294] xhci_hcd 0000:00:14.0: xHCI host controller not responding, assume dead
+    [  121.313346] xhci_hcd 0000:00:14.0: HC died; cleaning up
+    [  121.313485] usb 1-6: USB disconnect, device number 3
+    [  121.313501] usb 1-6.2: USB disconnect, device number 4
+    [  134.747383] kworker/0:2/47 is trying to acquire lock:
+    [  137.220790]  (acpi_pm_notifier_lock){+.+.}, at: [<ffffffff813cafdf>] acpi_pm_notify_handler+0x2f/0x80
+    [  139.721524]
+    [  139.721524] but task is already holding lock:
+    [  144.672922]  ((&dpc->work)){+.+.}, at: [<ffffffff8109ce90>] process_one_work+0x160/0x720
+    [  147.184450]
+    [  147.184450] which lock already depends on the new lock.
+    [  147.184450]
+    [  154.604711]
+    [  154.604711] the existing dependency chain (in reverse order) is:
+    [  159.447888]
+    [  159.447888] -> #2 ((&dpc->work)){+.+.}:
+    [  164.183486]        __lock_acquire+0x1255/0x13f0
+    [  166.504313]        lock_acquire+0xb5/0x210
+    [  168.778973]        process_one_work+0x1b9/0x720
+    [  171.030316]        worker_thread+0x4c/0x440
+    [  173.257184]        kthread+0x154/0x190
+    [  175.456143]        ret_from_fork+0x27/0x40
+    [  177.624348]
+    [  177.624348] -> #1 ("kacpi_notify"){+.+.}:
+    [  181.850351]        __lock_acquire+0x1255/0x13f0
+    [  183.941695]        lock_acquire+0xb5/0x210
+    [  186.046115]        flush_workqueue+0xdd/0x510
+    [  190.408153]        acpi_os_wait_events_complete+0x31/0x40
+    [  192.625303]        acpi_remove_notify_handler+0x133/0x188
+    [  194.820829]        acpi_remove_pm_notifier+0x56/0x90
+    [  196.989068]        acpi_dev_pm_detach+0x5f/0xa0
+    [  199.145866]        dev_pm_domain_detach+0x27/0x30
+    [  201.285614]        i2c_device_probe+0x100/0x210
+    [  203.411118]        driver_probe_device+0x23e/0x310
+    [  205.522425]        __driver_attach+0xa3/0xb0
+    [  207.634268]        bus_for_each_dev+0x69/0xa0
+    [  209.714797]        driver_attach+0x1e/0x20
+    [  211.778258]        bus_add_driver+0x1bc/0x230
+    [  213.837162]        driver_register+0x60/0xe0
+    [  215.868162]        i2c_register_driver+0x42/0x70
+    [  217.869551]        0xffffffffa0172017
+    [  219.863009]        do_one_initcall+0x45/0x170
+    [  221.843863]        do_init_module+0x5f/0x204
+    [  223.817915]        load_module+0x225b/0x29b0
+    [  225.757234]        SyS_finit_module+0xc6/0xd0
+    [  227.661851]        do_syscall_64+0x5c/0x120
+    [  229.536819]        return_from_SYSCALL_64+0x0/0x7a
+    [  231.392444]
+    [  231.392444] -> #0 (acpi_pm_notifier_lock){+.+.}:
+    [  235.124914]        check_prev_add+0x44e/0x8a0
+    [  237.024795]        __lock_acquire+0x1255/0x13f0
+    [  238.937351]        lock_acquire+0xb5/0x210
+    [  240.840799]        __mutex_lock+0x75/0x940
+    [  242.709517]        mutex_lock_nested+0x1c/0x20
+    [  244.551478]        acpi_pm_notify_handler+0x2f/0x80
+    [  246.382052]        acpi_ev_notify_dispatch+0x44/0x5c
+    [  248.194412]        acpi_os_execute_deferred+0x14/0x30
+    [  250.003925]        process_one_work+0x1ec/0x720
+    [  251.803191]        worker_thread+0x4c/0x440
+    [  253.605307]        kthread+0x154/0x190
+    [  255.387498]        ret_from_fork+0x27/0x40
+    [  257.153175]
+    [  257.153175] other info that might help us debug this:
+    [  257.153175]
+    [  262.324392] Chain exists of:
+    [  262.324392]   acpi_pm_notifier_lock --> "kacpi_notify" --> (&dpc->work)
+    [  262.324392]
+    [  267.391997]  Possible unsafe locking scenario:
+    [  267.391997]
+    [  270.758262]        CPU0                    CPU1
+    [  272.431713]        ----                    ----
+    [  274.060756]   lock((&dpc->work));
+    [  275.646532]                                lock("kacpi_notify");
+    [  277.260772]                                lock((&dpc->work));
+    [  278.839146]   lock(acpi_pm_notifier_lock);
+    [  280.391902]
+    [  280.391902]  *** DEADLOCK ***
+    [  280.391902]
+    [  284.986385] 2 locks held by kworker/0:2/47:
+    [  286.524895]  #0:  ("kacpi_notify"){+.+.}, at: [<ffffffff8109ce90>] process_one_work+0x160/0x720
+    [  288.112927]  #1:  ((&dpc->work)){+.+.}, at: [<ffffffff8109ce90>] process_one_work+0x160/0x720
+    [  289.727725]
+    
+    Fixes: c072530f391e (ACPI / PM: Revork the handling of ACPI device wakeup notifications)
+    Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ff1656790b3a4caca94505c52fd0250f981ea187
+Author: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Date:   Tue Nov 7 23:08:10 2017 +0200
+
+    ACPI / PM: Fix acpi_pm_notifier_lock vs flush_workqueue() deadlock
+    
+    acpi_remove_pm_notifier() ends up calling flush_workqueue() while
+    holding acpi_pm_notifier_lock, and that same lock is taken by
+    by the work via acpi_pm_notify_handler(). This can deadlock.
+    
+    To fix the problem let's split the single lock into two: one to
+    protect the dev->wakeup between the work vs. add/remove, and
+    another one to handle notifier installation vs. removal.
+    
+    After commit a1d14934ea4b "workqueue/lockdep: 'Fix' flush_work()
+    annotation" I was able to kill the machine (Intel Braswell)
+    very easily with 'powertop --auto-tune', runtime suspending i915,
+    and trying to wake it up via the USB keyboard. The cases when
+    it didn't die are presumably explained by lockdep getting disabled
+    by something else (cpu hotplug locking issues usually).
+    
+    Fortunately I still got a lockdep report over netconsole
+    (trickling in very slowly), even though the machine was
+    otherwise practically dead:
+    
+    [  112.179806] ======================================================
+    [  114.670858] WARNING: possible circular locking dependency detected
+    [  117.155663] 4.13.0-rc6-bsw-bisect-00169-ga1d14934ea4b #119 Not tainted
+    [  119.658101] ------------------------------------------------------
+    [  121.310242] xhci_hcd 0000:00:14.0: xHCI host not responding to stop endpoint command.
+    [  121.313294] xhci_hcd 0000:00:14.0: xHCI host controller not responding, assume dead
+    [  121.313346] xhci_hcd 0000:00:14.0: HC died; cleaning up
+    [  121.313485] usb 1-6: USB disconnect, device number 3
+    [  121.313501] usb 1-6.2: USB disconnect, device number 4
+    [  134.747383] kworker/0:2/47 is trying to acquire lock:
+    [  137.220790]  (acpi_pm_notifier_lock){+.+.}, at: [<ffffffff813cafdf>] acpi_pm_notify_handler+0x2f/0x80
+    [  139.721524]
+    [  139.721524] but task is already holding lock:
+    [  144.672922]  ((&dpc->work)){+.+.}, at: [<ffffffff8109ce90>] process_one_work+0x160/0x720
+    [  147.184450]
+    [  147.184450] which lock already depends on the new lock.
+    [  147.184450]
+    [  154.604711]
+    [  154.604711] the existing dependency chain (in reverse order) is:
+    [  159.447888]
+    [  159.447888] -> #2 ((&dpc->work)){+.+.}:
+    [  164.183486]        __lock_acquire+0x1255/0x13f0
+    [  166.504313]        lock_acquire+0xb5/0x210
+    [  168.778973]        process_one_work+0x1b9/0x720
+    [  171.030316]        worker_thread+0x4c/0x440
+    [  173.257184]        kthread+0x154/0x190
+    [  175.456143]        ret_from_fork+0x27/0x40
+    [  177.624348]
+    [  177.624348] -> #1 ("kacpi_notify"){+.+.}:
+    [  181.850351]        __lock_acquire+0x1255/0x13f0
+    [  183.941695]        lock_acquire+0xb5/0x210
+    [  186.046115]        flush_workqueue+0xdd/0x510
+    [  190.408153]        acpi_os_wait_events_complete+0x31/0x40
+    [  192.625303]        acpi_remove_notify_handler+0x133/0x188
+    [  194.820829]        acpi_remove_pm_notifier+0x56/0x90
+    [  196.989068]        acpi_dev_pm_detach+0x5f/0xa0
+    [  199.145866]        dev_pm_domain_detach+0x27/0x30
+    [  201.285614]        i2c_device_probe+0x100/0x210
+    [  203.411118]        driver_probe_device+0x23e/0x310
+    [  205.522425]        __driver_attach+0xa3/0xb0
+    [  207.634268]        bus_for_each_dev+0x69/0xa0
+    [  209.714797]        driver_attach+0x1e/0x20
+    [  211.778258]        bus_add_driver+0x1bc/0x230
+    [  213.837162]        driver_register+0x60/0xe0
+    [  215.868162]        i2c_register_driver+0x42/0x70
+    [  217.869551]        0xffffffffa0172017
+    [  219.863009]        do_one_initcall+0x45/0x170
+    [  221.843863]        do_init_module+0x5f/0x204
+    [  223.817915]        load_module+0x225b/0x29b0
+    [  225.757234]        SyS_finit_module+0xc6/0xd0
+    [  227.661851]        do_syscall_64+0x5c/0x120
+    [  229.536819]        return_from_SYSCALL_64+0x0/0x7a
+    [  231.392444]
+    [  231.392444] -> #0 (acpi_pm_notifier_lock){+.+.}:
+    [  235.124914]        check_prev_add+0x44e/0x8a0
+    [  237.024795]        __lock_acquire+0x1255/0x13f0
+    [  238.937351]        lock_acquire+0xb5/0x210
+    [  240.840799]        __mutex_lock+0x75/0x940
+    [  242.709517]        mutex_lock_nested+0x1c/0x20
+    [  244.551478]        acpi_pm_notify_handler+0x2f/0x80
+    [  246.382052]        acpi_ev_notify_dispatch+0x44/0x5c
+    [  248.194412]        acpi_os_execute_deferred+0x14/0x30
+    [  250.003925]        process_one_work+0x1ec/0x720
+    [  251.803191]        worker_thread+0x4c/0x440
+    [  253.605307]        kthread+0x154/0x190
+    [  255.387498]        ret_from_fork+0x27/0x40
+    [  257.153175]
+    [  257.153175] other info that might help us debug this:
+    [  257.153175]
+    [  262.324392] Chain exists of:
+    [  262.324392]   acpi_pm_notifier_lock --> "kacpi_notify" --> (&dpc->work)
+    [  262.324392]
+    [  267.391997]  Possible unsafe locking scenario:
+    [  267.391997]
+    [  270.758262]        CPU0                    CPU1
+    [  272.431713]        ----                    ----
+    [  274.060756]   lock((&dpc->work));
+    [  275.646532]                                lock("kacpi_notify");
+    [  277.260772]                                lock((&dpc->work));
+    [  278.839146]   lock(acpi_pm_notifier_lock);
+    [  280.391902]
+    [  280.391902]  *** DEADLOCK ***
+    [  280.391902]
+    [  284.986385] 2 locks held by kworker/0:2/47:
+    [  286.524895]  #0:  ("kacpi_notify"){+.+.}, at: [<ffffffff8109ce90>] process_one_work+0x160/0x720
+    [  288.112927]  #1:  ((&dpc->work)){+.+.}, at: [<ffffffff8109ce90>] process_one_work+0x160/0x720
+    [  289.727725]
+    
+    Fixes: c072530f391e (ACPI / PM: Revork the handling of ACPI device wakeup notifications)
+    Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
+    Cc: 3.17+ <stable@vger.kernel.org> # 3.17+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 42bf7b46a5de03c8e2dd28a1f105bc28b6485243
+Author: Bjørn Mork <bjorn@mork.no>
+Date:   Wed Mar 30 11:08:33 2016 +0200
+
+    drm/i915: fix deadlock on lid open
+    
+    commit e2c8b8701e2d moved modeset locking inside resume/suspend
+    functions, but missed a code path only executed on lid close/open
+    on older hardware. The result was a deadlock when closing and
+    opening the lid without suspending on such hardware:
+    
+     =============================================
+     [ INFO: possible recursive locking detected ]
+     4.6.0-rc1 #385 Not tainted
+     ---------------------------------------------
+     kworker/0:3/88 is trying to acquire lock:
+      (&dev->mode_config.mutex){+.+.+.}, at: [<ffffffffa063e6a4>] intel_display_resume+0x4a/0x12f [i915]
+    
+     but task is already holding lock:
+      (&dev->mode_config.mutex){+.+.+.}, at: [<ffffffffa02d0d4f>] drm_modeset_lock_all+0x3e/0xa6 [drm]
+    
+     other info that might help us debug this:
+      Possible unsafe locking scenario:
+    
+            CPU0
+            ----
+       lock(&dev->mode_config.mutex);
+       lock(&dev->mode_config.mutex);
+    
+      *** DEADLOCK ***
+    
+      May be due to missing lock nesting notation
+    
+     7 locks held by kworker/0:3/88:
+      #0:  ("kacpi_notify"){++++.+}, at: [<ffffffff81068dfc>] process_one_work+0x14a/0x50b
+      #1:  ((&dpc->work)#2){+.+.+.}, at: [<ffffffff81068dfc>] process_one_work+0x14a/0x50b
+      #2:  ((acpi_lid_notifier).rwsem){++++.+}, at: [<ffffffff8106f874>] __blocking_notifier_call_chain+0x34/0x65
+      #3:  (&dev_priv->modeset_restore_lock){+.+.+.}, at: [<ffffffffa0664cf6>] intel_lid_notify+0x3c/0xd9 [i915]
+      #4:  (&dev->mode_config.mutex){+.+.+.}, at: [<ffffffffa02d0d4f>] drm_modeset_lock_all+0x3e/0xa6 [drm]
+      #5:  (crtc_ww_class_acquire){+.+.+.}, at: [<ffffffffa02d0d59>] drm_modeset_lock_all+0x48/0xa6 [drm]
+      #6:  (crtc_ww_class_mutex){+.+.+.}, at: [<ffffffffa02d0b2a>] modeset_lock+0x13c/0x1cd [drm]
+    
+     stack backtrace:
+     CPU: 0 PID: 88 Comm: kworker/0:3 Not tainted 4.6.0-rc1 #385
+     Hardware name: LENOVO 2776LEG/2776LEG, BIOS 6EET55WW (3.15 ) 12/19/2011
+     Workqueue: kacpi_notify acpi_os_execute_deferred
+      0000000000000000 ffff88022fd5f990 ffffffff8124af06 ffffffff825b39c0
+      ffffffff825b39c0 ffff88022fd5fa60 ffffffff8108f547 ffff88022fd5fa70
+      000000008108e817 ffff880230236cc0 0000000000000000 ffffffff825b39c0
+     Call Trace:
+      [<ffffffff8124af06>] dump_stack+0x67/0x90
+      [<ffffffff8108f547>] __lock_acquire+0xdb5/0xf71
+      [<ffffffff8108bd2c>] ? look_up_lock_class+0xbe/0x10a
+      [<ffffffff8108fae2>] lock_acquire+0x137/0x1cb
+      [<ffffffff8108fae2>] ? lock_acquire+0x137/0x1cb
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffff8148202f>] mutex_lock_nested+0x7e/0x3a4
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa02d0b2a>] ? modeset_lock+0x13c/0x1cd [drm]
+      [<ffffffffa063e6a4>] intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa02d0b2a>] ? modeset_lock+0x13c/0x1cd [drm]
+      [<ffffffffa02d0b2a>] ? modeset_lock+0x13c/0x1cd [drm]
+      [<ffffffffa02d0bf7>] ? drm_modeset_lock+0x17/0x24 [drm]
+      [<ffffffffa02d0c8b>] ? drm_modeset_lock_all_ctx+0x87/0xa1 [drm]
+      [<ffffffffa0664d6a>] intel_lid_notify+0xb0/0xd9 [i915]
+      [<ffffffff8106f4c6>] notifier_call_chain+0x4a/0x6c
+      [<ffffffff8106f88d>] __blocking_notifier_call_chain+0x4d/0x65
+      [<ffffffff8106f8b9>] blocking_notifier_call_chain+0x14/0x16
+      [<ffffffffa0011215>] acpi_lid_send_state+0x83/0xad [button]
+      [<ffffffffa00112a6>] acpi_button_notify+0x41/0x132 [button]
+      [<ffffffff812b07df>] acpi_device_notify+0x19/0x1b
+      [<ffffffff812c8570>] acpi_ev_notify_dispatch+0x49/0x64
+      [<ffffffff812ab9fb>] acpi_os_execute_deferred+0x14/0x20
+      [<ffffffff81068f17>] process_one_work+0x265/0x50b
+      [<ffffffff810696f5>] worker_thread+0x1fc/0x2dd
+      [<ffffffff810694f9>] ? rescuer_thread+0x309/0x309
+      [<ffffffff810694f9>] ? rescuer_thread+0x309/0x309
+      [<ffffffff8106e2d6>] kthread+0xe0/0xe8
+      [<ffffffff8107bc47>] ? local_clock+0x19/0x22
+      [<ffffffff81484f42>] ret_from_fork+0x22/0x40
+      [<ffffffff8106e1f6>] ? kthread_create_on_node+0x1b5/0x1b5
+    
+    Fixes: e2c8b8701e2d ("drm/i915: Use atomic helpers for suspend, v2.")
+    Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+    Signed-off-by: Bjørn Mork <bjorn@mork.no>
+    Signed-off-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+    Link: http://patchwork.freedesktop.org/patch/msgid/1459328913-13719-1-git-send-email-bjorn@mork.no
+    (cherry picked from commit 9f54d4bd5808b5c892a44c539c126b71d299f341)
+    Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+
+commit 9f54d4bd5808b5c892a44c539c126b71d299f341
+Author: Bjørn Mork <bjorn@mork.no>
+Date:   Wed Mar 30 11:08:33 2016 +0200
+
+    drm/i915: fix deadlock on lid open
+    
+    commit e2c8b8701e2d moved modeset locking inside resume/suspend
+    functions, but missed a code path only executed on lid close/open
+    on older hardware. The result was a deadlock when closing and
+    opening the lid without suspending on such hardware:
+    
+     =============================================
+     [ INFO: possible recursive locking detected ]
+     4.6.0-rc1 #385 Not tainted
+     ---------------------------------------------
+     kworker/0:3/88 is trying to acquire lock:
+      (&dev->mode_config.mutex){+.+.+.}, at: [<ffffffffa063e6a4>] intel_display_resume+0x4a/0x12f [i915]
+    
+     but task is already holding lock:
+      (&dev->mode_config.mutex){+.+.+.}, at: [<ffffffffa02d0d4f>] drm_modeset_lock_all+0x3e/0xa6 [drm]
+    
+     other info that might help us debug this:
+      Possible unsafe locking scenario:
+    
+            CPU0
+            ----
+       lock(&dev->mode_config.mutex);
+       lock(&dev->mode_config.mutex);
+    
+      *** DEADLOCK ***
+    
+      May be due to missing lock nesting notation
+    
+     7 locks held by kworker/0:3/88:
+      #0:  ("kacpi_notify"){++++.+}, at: [<ffffffff81068dfc>] process_one_work+0x14a/0x50b
+      #1:  ((&dpc->work)#2){+.+.+.}, at: [<ffffffff81068dfc>] process_one_work+0x14a/0x50b
+      #2:  ((acpi_lid_notifier).rwsem){++++.+}, at: [<ffffffff8106f874>] __blocking_notifier_call_chain+0x34/0x65
+      #3:  (&dev_priv->modeset_restore_lock){+.+.+.}, at: [<ffffffffa0664cf6>] intel_lid_notify+0x3c/0xd9 [i915]
+      #4:  (&dev->mode_config.mutex){+.+.+.}, at: [<ffffffffa02d0d4f>] drm_modeset_lock_all+0x3e/0xa6 [drm]
+      #5:  (crtc_ww_class_acquire){+.+.+.}, at: [<ffffffffa02d0d59>] drm_modeset_lock_all+0x48/0xa6 [drm]
+      #6:  (crtc_ww_class_mutex){+.+.+.}, at: [<ffffffffa02d0b2a>] modeset_lock+0x13c/0x1cd [drm]
+    
+     stack backtrace:
+     CPU: 0 PID: 88 Comm: kworker/0:3 Not tainted 4.6.0-rc1 #385
+     Hardware name: LENOVO 2776LEG/2776LEG, BIOS 6EET55WW (3.15 ) 12/19/2011
+     Workqueue: kacpi_notify acpi_os_execute_deferred
+      0000000000000000 ffff88022fd5f990 ffffffff8124af06 ffffffff825b39c0
+      ffffffff825b39c0 ffff88022fd5fa60 ffffffff8108f547 ffff88022fd5fa70
+      000000008108e817 ffff880230236cc0 0000000000000000 ffffffff825b39c0
+     Call Trace:
+      [<ffffffff8124af06>] dump_stack+0x67/0x90
+      [<ffffffff8108f547>] __lock_acquire+0xdb5/0xf71
+      [<ffffffff8108bd2c>] ? look_up_lock_class+0xbe/0x10a
+      [<ffffffff8108fae2>] lock_acquire+0x137/0x1cb
+      [<ffffffff8108fae2>] ? lock_acquire+0x137/0x1cb
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffff8148202f>] mutex_lock_nested+0x7e/0x3a4
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa02d0b2a>] ? modeset_lock+0x13c/0x1cd [drm]
+      [<ffffffffa063e6a4>] intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa063e6a4>] ? intel_display_resume+0x4a/0x12f [i915]
+      [<ffffffffa02d0b2a>] ? modeset_lock+0x13c/0x1cd [drm]
+      [<ffffffffa02d0b2a>] ? modeset_lock+0x13c/0x1cd [drm]
+      [<ffffffffa02d0bf7>] ? drm_modeset_lock+0x17/0x24 [drm]
+      [<ffffffffa02d0c8b>] ? drm_modeset_lock_all_ctx+0x87/0xa1 [drm]
+      [<ffffffffa0664d6a>] intel_lid_notify+0xb0/0xd9 [i915]
+      [<ffffffff8106f4c6>] notifier_call_chain+0x4a/0x6c
+      [<ffffffff8106f88d>] __blocking_notifier_call_chain+0x4d/0x65
+      [<ffffffff8106f8b9>] blocking_notifier_call_chain+0x14/0x16
+      [<ffffffffa0011215>] acpi_lid_send_state+0x83/0xad [button]
+      [<ffffffffa00112a6>] acpi_button_notify+0x41/0x132 [button]
+      [<ffffffff812b07df>] acpi_device_notify+0x19/0x1b
+      [<ffffffff812c8570>] acpi_ev_notify_dispatch+0x49/0x64
+      [<ffffffff812ab9fb>] acpi_os_execute_deferred+0x14/0x20
+      [<ffffffff81068f17>] process_one_work+0x265/0x50b
+      [<ffffffff810696f5>] worker_thread+0x1fc/0x2dd
+      [<ffffffff810694f9>] ? rescuer_thread+0x309/0x309
+      [<ffffffff810694f9>] ? rescuer_thread+0x309/0x309
+      [<ffffffff8106e2d6>] kthread+0xe0/0xe8
+      [<ffffffff8107bc47>] ? local_clock+0x19/0x22
+      [<ffffffff81484f42>] ret_from_fork+0x22/0x40
+      [<ffffffff8106e1f6>] ? kthread_create_on_node+0x1b5/0x1b5
+    
+    Fixes: e2c8b8701e2d ("drm/i915: Use atomic helpers for suspend, v2.")
+    Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+    Signed-off-by: Bjørn Mork <bjorn@mork.no>
+    Signed-off-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+    Link: http://patchwork.freedesktop.org/patch/msgid/1459328913-13719-1-git-send-email-bjorn@mork.no
+
+commit 5f2f951264d00b7abbba4ce95ead10d5ff25c0da
+Author: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+Date:   Fri Aug 22 13:27:34 2014 -0700
+
+    x86/mm/hotplug: Modify PGD entry when removing memory
+    
+    commit 9661d5bcd058fe15b4138a00d96bd36516134543 upstream.
+    
+    When hot-adding/removing memory, sync_global_pgds() is called
+    for synchronizing PGD to PGD entries of all processes MM.  But
+    when hot-removing memory, sync_global_pgds() does not work
+    correctly.
+    
+    At first, sync_global_pgds() checks whether target PGD is none
+    or not.  And if PGD is none, the PGD is skipped.  But when
+    hot-removing memory, PGD may be none since PGD may be cleared by
+    free_pud_table().  So when sync_global_pgds() is called after
+    hot-removing memory, sync_global_pgds() should not skip PGD even
+    if the PGD is none.  And sync_global_pgds() must clear PGD
+    entries of all processes MM.
+    
+    Currently sync_global_pgds() does not clear PGD entries of all
+    processes MM when hot-removing memory.  So when hot adding
+    memory which is same memory range as removed memory after
+    hot-removing memory, following call traces are shown:
+    
+     kernel BUG at arch/x86/mm/init_64.c:206!
+     ...
+     [<ffffffff815e0c80>] kernel_physical_mapping_init+0x1b2/0x1d2
+     [<ffffffff815ced94>] init_memory_mapping+0x1d4/0x380
+     [<ffffffff8104aebd>] arch_add_memory+0x3d/0xd0
+     [<ffffffff815d03d9>] add_memory+0xb9/0x1b0
+     [<ffffffff81352415>] acpi_memory_device_add+0x1af/0x28e
+     [<ffffffff81325dc4>] acpi_bus_device_attach+0x8c/0xf0
+     [<ffffffff813413b9>] acpi_ns_walk_namespace+0xc8/0x17f
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff813418ed>] acpi_walk_namespace+0x95/0xc5
+     [<ffffffff81326b4c>] acpi_bus_scan+0x9a/0xc2
+     [<ffffffff81326bff>] acpi_scan_bus_device_check+0x8b/0x12e
+     [<ffffffff81326cb5>] acpi_scan_device_check+0x13/0x15
+     [<ffffffff81320122>] acpi_os_execute_deferred+0x25/0x32
+     [<ffffffff8107e02b>] process_one_work+0x17b/0x460
+     [<ffffffff8107edfb>] worker_thread+0x11b/0x400
+     [<ffffffff8107ece0>] ? rescuer_thread+0x400/0x400
+     [<ffffffff81085aef>] kthread+0xcf/0xe0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+     [<ffffffff815fc76c>] ret_from_fork+0x7c/0xb0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+    
+    This patch clears PGD entries of all processes MM when
+    sync_global_pgds() is called after hot-removing memory
+    
+    Signed-off-by: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Acked-by: Toshi Kani <toshi.kani@hp.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Tang Chen <tangchen@cn.fujitsu.com>
+    Cc: Gu Zheng <guz.fnst@cn.fujitsu.com>
+    Cc: Zhang Yanfei <zhangyanfei@cn.fujitsu.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Cc: Vlastimil Babka <vbabka@suse.com>
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit 3434ce3d38e41b0c46c932b1b06913cb42197f9c
+Author: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+Date:   Fri Aug 22 13:27:31 2014 -0700
+
+    x86/mm/hotplug: Pass sync_global_pgds() a correct argument in remove_pagetable()
+    
+    commit 5255e0a79fcc0ff47b387af92bd9ef5729b1b859 upstream.
+    
+    When hot-adding memory after hot-removing memory, following call
+    traces are shown:
+    
+      kernel BUG at arch/x86/mm/init_64.c:206!
+      ...
+     [<ffffffff815e0c80>] kernel_physical_mapping_init+0x1b2/0x1d2
+     [<ffffffff815ced94>] init_memory_mapping+0x1d4/0x380
+     [<ffffffff8104aebd>] arch_add_memory+0x3d/0xd0
+     [<ffffffff815d03d9>] add_memory+0xb9/0x1b0
+     [<ffffffff81352415>] acpi_memory_device_add+0x1af/0x28e
+     [<ffffffff81325dc4>] acpi_bus_device_attach+0x8c/0xf0
+     [<ffffffff813413b9>] acpi_ns_walk_namespace+0xc8/0x17f
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff813418ed>] acpi_walk_namespace+0x95/0xc5
+     [<ffffffff81326b4c>] acpi_bus_scan+0x9a/0xc2
+     [<ffffffff81326bff>] acpi_scan_bus_device_check+0x8b/0x12e
+     [<ffffffff81326cb5>] acpi_scan_device_check+0x13/0x15
+     [<ffffffff81320122>] acpi_os_execute_deferred+0x25/0x32
+     [<ffffffff8107e02b>] process_one_work+0x17b/0x460
+     [<ffffffff8107edfb>] worker_thread+0x11b/0x400
+     [<ffffffff8107ece0>] ? rescuer_thread+0x400/0x400
+     [<ffffffff81085aef>] kthread+0xcf/0xe0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+     [<ffffffff815fc76c>] ret_from_fork+0x7c/0xb0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+    
+    The patch-set fixes the issue.
+    
+    This patch (of 2):
+    
+    remove_pagetable() gets start argument and passes the argument
+    to sync_global_pgds().  In this case, the argument must not be
+    modified.  If the argument is modified and passed to
+    sync_global_pgds(), sync_global_pgds() does not correctly
+    synchronize PGD to PGD entries of all processes MM since
+    synchronized range of memory [start, end] is wrong.
+    
+    Unfortunately the start argument is modified in
+    remove_pagetable().  So this patch fixes the issue.
+    
+    Signed-off-by: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Acked-by: Toshi Kani <toshi.kani@hp.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Tang Chen <tangchen@cn.fujitsu.com>
+    Cc: Gu Zheng <guz.fnst@cn.fujitsu.com>
+    Cc: Zhang Yanfei <zhangyanfei@cn.fujitsu.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Cc: Vlastimil Babka <vbabka@suse.com>
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit f988f24ee7931d3487b36cc0c29164296bf2191e
+Author: Lv Zheng <lv.zheng@intel.com>
+Date:   Mon Oct 19 10:25:50 2015 +0800
+
+    ACPICA: Debugger: Add thread ID support so that single step mode can only apply to the debugger thread
+    
+    When the debugger is running in the kernel mode, acpi_db_single_step() may
+    also be invoked by the kernel runtime code path but the single stepping
+    command prompt may be erronously logged as the kernel logs and runtime code
+    path cannot proceed.
+    
+    This patch fixes this issue by adding acpi_gbl_db_thread_id for the debugger
+    thread and preventing acpi_db_single_step() to be invoked from other threads.
+    
+    It is not suitable to add acpi_thread_id parameter for acpi_os_execute() as
+    the function may be implemented as work queue on some hosts. So it is
+    better to let the hosts invoke acpi_set_debugger_thread_id(). Currently
+    acpiexec is not configured as DEBUGGER_MULTI_THREADED, but we can do this.
+    When we do this, it is better to invoke acpi_set_debugger_thread_id() in
+    acpi_os_execute() when the execution type is OSL_DEBUGGER_MAIN_THREAD. The
+    support should look like:
+      create_thread(&tid);
+      if (type == OSL_DEBUGGER_MAIN_THREAD)
+          acpi_set_debugger_thread_id(tid);
+      resume_thread(tid);
+    Similarly, semop() may be used for pthread implementation. But this patch
+    simply skips debugger thread ID check for application instead of
+    introducing such complications as there is no need to skip
+    acpi_db_single_step() for an application debugger - acpiexec.
+    
+    Note that the debugger thread ID can also be used by acpi_os_printf() to
+    filter out debugger output. Lv Zheng.
+    
+    Signed-off-by: Lv Zheng <lv.zheng@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 1edf5ca166be9dadbcb4c3fab3e8400ac73a0a5e
+Author: Ethan Zhao <ethan.zhao@oracle.com>
+Date:   Thu Dec 18 15:28:19 2014 +0900
+
+    cpufreq: fix a NULL pointer dereference in __cpufreq_governor()
+    
+    commit cb57720bf79688d64854a0a43565aa52303c1f3f upstream.
+    
+    If ACPI _PPC changed notification happens before governor was initiated
+    while kernel is booting, a NULL pointer dereference will be triggered:
+    
+    BUG: unable to handle kernel NULL pointer dereference at 0000000000000030
+     IP: [<ffffffff81470453>] __cpufreq_governor+0x23/0x1e0
+     PGD 0
+     Oops: 0000 [#1] SMP
+     ... ...
+     RIP: 0010:[<ffffffff81470453>]  [<ffffffff81470453>]
+     __cpufreq_governor+0x23/0x1e0
+     RSP: 0018:ffff881fcfbcfbb8  EFLAGS: 00010286
+     RAX: 0000000000000000 RBX: ffff881fd11b3980 RCX: ffff88407fc20000
+     RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff881fd11b3980
+     RBP: ffff881fcfbcfbd8 R08: 0000000000000000 R09: 000000000000000f
+     R10: ffffffff818068d0 R11: 0000000000000043 R12: 0000000000000004
+     R13: 0000000000000000 R14: ffffffff8196cae0 R15: 0000000000000000
+     FS:  0000000000000000(0000) GS:ffff881fffc00000(0000) knlGS:0000000000000000
+     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+     CR2: 0000000000000030 CR3: 00000000018ae000 CR4: 00000000000407f0
+     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+     DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+     Process kworker/0:3 (pid: 750, threadinfo ffff881fcfbce000, task
+     ffff881fcf556400)
+     Stack:
+      ffff881fffc17d00 ffff881fcfbcfc18 ffff881fd11b3980 0000000000000000
+      ffff881fcfbcfc08 ffffffff81470d08 ffff881fd11b3980 0000000000000007
+      ffff881fcfbcfc18 ffff881fffc17d00 ffff881fcfbcfd28 ffffffff81472e9a
+     Call Trace:
+      [<ffffffff81470d08>] __cpufreq_set_policy+0x1b8/0x2e0
+      [<ffffffff81472e9a>] cpufreq_update_policy+0xca/0x150
+      [<ffffffff81472f20>] ? cpufreq_update_policy+0x150/0x150
+      [<ffffffff81324a96>] acpi_processor_ppc_has_changed+0x71/0x7b
+      [<ffffffff81320bcd>] acpi_processor_notify+0x55/0x115
+      [<ffffffff812f9c29>] acpi_device_notify+0x19/0x1b
+      [<ffffffff813084ca>] acpi_ev_notify_dispatch+0x41/0x5f
+      [<ffffffff812f64a4>] acpi_os_execute_deferred+0x27/0x34
+    
+    The root cause is a race conditon -- cpufreq core and acpi-cpufreq driver
+    were initiated, but cpufreq_governor wasn't and _PPC changed notification
+    happened, __cpufreq_governor() was called within acpi_os_execute_deferred
+    kernel thread context.
+    
+    To fix this panic issue, add pointer checking code in __cpufreq_governor()
+    before pointer policy->governor is to be dereferenced.
+    
+    Signed-off-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit e4c218429fb3752cabf96724d60cbeba85e35eb2
+Author: Ethan Zhao <ethan.zhao@oracle.com>
+Date:   Thu Dec 18 15:28:19 2014 +0900
+
+    cpufreq: fix a NULL pointer dereference in __cpufreq_governor()
+    
+    commit cb57720bf79688d64854a0a43565aa52303c1f3f upstream.
+    
+    If ACPI _PPC changed notification happens before governor was initiated
+    while kernel is booting, a NULL pointer dereference will be triggered:
+    
+    BUG: unable to handle kernel NULL pointer dereference at 0000000000000030
+     IP: [<ffffffff81470453>] __cpufreq_governor+0x23/0x1e0
+     PGD 0
+     Oops: 0000 [#1] SMP
+     ... ...
+     RIP: 0010:[<ffffffff81470453>]  [<ffffffff81470453>]
+     __cpufreq_governor+0x23/0x1e0
+     RSP: 0018:ffff881fcfbcfbb8  EFLAGS: 00010286
+     RAX: 0000000000000000 RBX: ffff881fd11b3980 RCX: ffff88407fc20000
+     RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff881fd11b3980
+     RBP: ffff881fcfbcfbd8 R08: 0000000000000000 R09: 000000000000000f
+     R10: ffffffff818068d0 R11: 0000000000000043 R12: 0000000000000004
+     R13: 0000000000000000 R14: ffffffff8196cae0 R15: 0000000000000000
+     FS:  0000000000000000(0000) GS:ffff881fffc00000(0000) knlGS:0000000000000000
+     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+     CR2: 0000000000000030 CR3: 00000000018ae000 CR4: 00000000000407f0
+     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+     DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+     Process kworker/0:3 (pid: 750, threadinfo ffff881fcfbce000, task
+     ffff881fcf556400)
+     Stack:
+      ffff881fffc17d00 ffff881fcfbcfc18 ffff881fd11b3980 0000000000000000
+      ffff881fcfbcfc08 ffffffff81470d08 ffff881fd11b3980 0000000000000007
+      ffff881fcfbcfc18 ffff881fffc17d00 ffff881fcfbcfd28 ffffffff81472e9a
+     Call Trace:
+      [<ffffffff81470d08>] __cpufreq_set_policy+0x1b8/0x2e0
+      [<ffffffff81472e9a>] cpufreq_update_policy+0xca/0x150
+      [<ffffffff81472f20>] ? cpufreq_update_policy+0x150/0x150
+      [<ffffffff81324a96>] acpi_processor_ppc_has_changed+0x71/0x7b
+      [<ffffffff81320bcd>] acpi_processor_notify+0x55/0x115
+      [<ffffffff812f9c29>] acpi_device_notify+0x19/0x1b
+      [<ffffffff813084ca>] acpi_ev_notify_dispatch+0x41/0x5f
+      [<ffffffff812f64a4>] acpi_os_execute_deferred+0x27/0x34
+    
+    The root cause is a race conditon -- cpufreq core and acpi-cpufreq driver
+    were initiated, but cpufreq_governor wasn't and _PPC changed notification
+    happened, __cpufreq_governor() was called within acpi_os_execute_deferred
+    kernel thread context.
+    
+    To fix this panic issue, add pointer checking code in __cpufreq_governor()
+    before pointer policy->governor is to be dereferenced.
+    
+    Signed-off-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit d82d54af7b14092dc5934a8ce09170789c9ddb57
+Author: Ethan Zhao <ethan.zhao@oracle.com>
+Date:   Thu Mar 12 13:04:16 2015 +0900
+
+    kobject: WARN as tip when call kobject_get() to a kobject not initialized
+    
+    call kobject_get() to kojbect that is not initalized or released will only
+    leave following like call trace to us:
+    
+    -----------[ cut here ]------------
+    [   54.545816] WARNING: CPU: 0 PID: 213 at include/linux/kref.h:47
+    kobject_get+0x41/0x50()
+    [   54.642595] Modules linked in: i2c_i801(+) mfd_core shpchp(+)
+    acpi_cpufreq(+) edac_core ioatdma(+) xfs libcrc32c ast syscopyarea ixgbe
+    sysfillrect sysimgblt sr_mod sd_mod drm_kms_helper igb mdio cdrom e1000e ahci
+    dca ttm libahci uas drm i2c_algo_bit ptp megaraid_sas libata usb_storage
+    i2c_core pps_core dm_mirror dm_region_hash dm_log dm_mod
+    [   55.007264] CPU: 0 PID: 213 Comm: kworker/0:2 Not tainted
+    3.18.5
+    [   55.099970] Hardware name: Oracle Corporation SUN FIRE X4170 M2 SERVER
+       /ASSY,MOTHERBOARD,X4170, BIOS 08120104 05/08/2012
+    [   55.239736] Workqueue: kacpi_notify acpi_os_execute_deferred
+    [   55.308598]  0000000000000000 00000000bd730b61 ffff88046742baf8
+    ffffffff816b7edb
+    [   55.398305]  0000000000000000 0000000000000000 ffff88046742bb38
+    ffffffff81078ae1
+    [   55.488040]  ffff88046742bbd8 ffff8806706b3000 0000000000000292
+    0000000000000000
+    [   55.577776] Call Trace:
+    [   55.608228]  [<ffffffff816b7edb>] dump_stack+0x46/0x58
+    [   55.670895]  [<ffffffff81078ae1>] warn_slowpath_common+0x81/0xa0
+    [   55.743952]  [<ffffffff81078bfa>] warn_slowpath_null+0x1a/0x20
+    [   55.814929]  [<ffffffff8130d0d1>] kobject_get+0x41/0x50
+    [   55.878654]  [<ffffffff8153e955>] cpufreq_cpu_get+0x75/0xc0
+    [   55.946528]  [<ffffffff8153f37e>] cpufreq_update_policy+0x2e/0x1f0
+    
+    The above issue was casued by a race condition, if there is a WARN in
+    kobject_get() of the kobject is not initialized, that would save us much
+    time to debug it.
+    
+    Signed-off-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 6174cdc7baca9aba7d22891391c9ab085c19ecc8
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Sat Jan 31 06:02:44 2015 +0530
+
+    cpufreq: Set cpufreq_cpu_data to NULL before putting kobject
+    
+    commit 6ffae8c06fab058d6c3f8ecb7f921327721034e7 upstream.
+    
+    In __cpufreq_remove_dev_finish(), per-cpu 'cpufreq_cpu_data' needs
+    to be cleared before calling kobject_put(&policy->kobj) and under
+    cpufreq_driver_lock. Otherwise, if someone else calls cpufreq_cpu_get()
+    in parallel with it, they can obtain a non-NULL policy from that after
+    kobject_put(&policy->kobj) was executed.
+    
+    Consider this case:
+    
+    Thread A                                Thread B
+    cpufreq_cpu_get()
+      acquire cpufreq_driver_lock
+      read-per-cpu cpufreq_cpu_data
+                                            kobject_put(&policy->kobj);
+      kobject_get(&policy->kobj);
+                                            ...
+                                            per_cpu(&cpufreq_cpu_data, cpu) = NULL
+    
+    And this will result in a warning like this one:
+    
+     ------------[ cut here ]------------
+     WARNING: CPU: 0 PID: 4 at include/linux/kref.h:47
+     kobject_get+0x41/0x50()
+     Modules linked in: acpi_cpufreq(+) nfsd auth_rpcgss nfs_acl
+     lockd grace sunrpc xfs libcrc32c sd_mod ixgbe igb mdio ahci hwmon
+     ...
+     Call Trace:
+      [<ffffffff81661b14>] dump_stack+0x46/0x58
+      [<ffffffff81072b61>] warn_slowpath_common+0x81/0xa0
+      [<ffffffff81072c7a>] warn_slowpath_null+0x1a/0x20
+      [<ffffffff812e16d1>] kobject_get+0x41/0x50
+      [<ffffffff815262a5>] cpufreq_cpu_get+0x75/0xc0
+      [<ffffffff81527c3e>] cpufreq_update_policy+0x2e/0x1f0
+      [<ffffffff810b8cb2>] ? up+0x32/0x50
+      [<ffffffff81381aa9>] ? acpi_ns_get_node+0xcb/0xf2
+      [<ffffffff81381efd>] ? acpi_evaluate_object+0x22c/0x252
+      [<ffffffff813824f6>] ? acpi_get_handle+0x95/0xc0
+      [<ffffffff81360967>] ? acpi_has_method+0x25/0x40
+      [<ffffffff81391e08>] acpi_processor_ppc_has_changed+0x77/0x82
+      [<ffffffff81089566>] ? move_linked_works+0x66/0x90
+      [<ffffffff8138e8ed>] acpi_processor_notify+0x58/0xe7
+      [<ffffffff8137410c>] acpi_ev_notify_dispatch+0x44/0x5c
+      [<ffffffff8135f293>] acpi_os_execute_deferred+0x15/0x22
+      [<ffffffff8108c910>] process_one_work+0x160/0x410
+      [<ffffffff8108d05b>] worker_thread+0x11b/0x520
+      [<ffffffff8108cf40>] ? rescuer_thread+0x380/0x380
+      [<ffffffff81092421>] kthread+0xe1/0x100
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+      [<ffffffff81669ebc>] ret_from_fork+0x7c/0xb0
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+     ---[ end trace 89e66eb9795efdf7 ]---
+    
+    The actual code flow is as follows:
+    
+     Thread A: Workqueue: kacpi_notify
+    
+     acpi_processor_notify()
+       acpi_processor_ppc_has_changed()
+             cpufreq_update_policy()
+               cpufreq_cpu_get()
+                 kobject_get()
+    
+     Thread B: xenbus_thread()
+    
+     xenbus_thread()
+       msg->u.watch.handle->callback()
+         handle_vcpu_hotplug_event()
+           vcpu_hotplug()
+             cpu_down()
+               __cpu_notify(CPU_POST_DEAD..)
+                 cpufreq_cpu_callback()
+                   __cpufreq_remove_dev_finish()
+                     cpufreq_policy_put_kobj()
+                       kobject_put()
+    
+    cpufreq_cpu_get() gets the policy from per-cpu variable cpufreq_cpu_data
+    under cpufreq_driver_lock, and once it gets a valid policy it expects it
+    to not be freed until cpufreq_cpu_put() is called.
+    
+    But the race happens when another thread puts the kobject first and updates
+    cpufreq_cpu_data before or later. And so the first thread gets a valid policy
+    structure and before it does kobject_get() on it, the second one has already
+    done kobject_put().
+    
+    Fix this by setting cpufreq_cpu_data to NULL before putting the kobject and that
+    too under locks.
+    
+    Reported-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Reported-by: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 125c662fd50eefd9bd5400772639366f1f42b614
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Sat Jan 31 06:02:44 2015 +0530
+
+    cpufreq: Set cpufreq_cpu_data to NULL before putting kobject
+    
+    commit 6ffae8c06fab058d6c3f8ecb7f921327721034e7 upstream.
+    
+    In __cpufreq_remove_dev_finish(), per-cpu 'cpufreq_cpu_data' needs
+    to be cleared before calling kobject_put(&policy->kobj) and under
+    cpufreq_driver_lock. Otherwise, if someone else calls cpufreq_cpu_get()
+    in parallel with it, they can obtain a non-NULL policy from that after
+    kobject_put(&policy->kobj) was executed.
+    
+    Consider this case:
+    
+    Thread A                                Thread B
+    cpufreq_cpu_get()
+      acquire cpufreq_driver_lock
+      read-per-cpu cpufreq_cpu_data
+                                            kobject_put(&policy->kobj);
+      kobject_get(&policy->kobj);
+                                            ...
+                                            per_cpu(&cpufreq_cpu_data, cpu) = NULL
+    
+    And this will result in a warning like this one:
+    
+     ------------[ cut here ]------------
+     WARNING: CPU: 0 PID: 4 at include/linux/kref.h:47
+     kobject_get+0x41/0x50()
+     Modules linked in: acpi_cpufreq(+) nfsd auth_rpcgss nfs_acl
+     lockd grace sunrpc xfs libcrc32c sd_mod ixgbe igb mdio ahci hwmon
+     ...
+     Call Trace:
+      [<ffffffff81661b14>] dump_stack+0x46/0x58
+      [<ffffffff81072b61>] warn_slowpath_common+0x81/0xa0
+      [<ffffffff81072c7a>] warn_slowpath_null+0x1a/0x20
+      [<ffffffff812e16d1>] kobject_get+0x41/0x50
+      [<ffffffff815262a5>] cpufreq_cpu_get+0x75/0xc0
+      [<ffffffff81527c3e>] cpufreq_update_policy+0x2e/0x1f0
+      [<ffffffff810b8cb2>] ? up+0x32/0x50
+      [<ffffffff81381aa9>] ? acpi_ns_get_node+0xcb/0xf2
+      [<ffffffff81381efd>] ? acpi_evaluate_object+0x22c/0x252
+      [<ffffffff813824f6>] ? acpi_get_handle+0x95/0xc0
+      [<ffffffff81360967>] ? acpi_has_method+0x25/0x40
+      [<ffffffff81391e08>] acpi_processor_ppc_has_changed+0x77/0x82
+      [<ffffffff81089566>] ? move_linked_works+0x66/0x90
+      [<ffffffff8138e8ed>] acpi_processor_notify+0x58/0xe7
+      [<ffffffff8137410c>] acpi_ev_notify_dispatch+0x44/0x5c
+      [<ffffffff8135f293>] acpi_os_execute_deferred+0x15/0x22
+      [<ffffffff8108c910>] process_one_work+0x160/0x410
+      [<ffffffff8108d05b>] worker_thread+0x11b/0x520
+      [<ffffffff8108cf40>] ? rescuer_thread+0x380/0x380
+      [<ffffffff81092421>] kthread+0xe1/0x100
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+      [<ffffffff81669ebc>] ret_from_fork+0x7c/0xb0
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+     ---[ end trace 89e66eb9795efdf7 ]---
+    
+    The actual code flow is as follows:
+    
+     Thread A: Workqueue: kacpi_notify
+    
+     acpi_processor_notify()
+       acpi_processor_ppc_has_changed()
+             cpufreq_update_policy()
+               cpufreq_cpu_get()
+                 kobject_get()
+    
+     Thread B: xenbus_thread()
+    
+     xenbus_thread()
+       msg->u.watch.handle->callback()
+         handle_vcpu_hotplug_event()
+           vcpu_hotplug()
+             cpu_down()
+               __cpu_notify(CPU_POST_DEAD..)
+                 cpufreq_cpu_callback()
+                   __cpufreq_remove_dev_finish()
+                     cpufreq_policy_put_kobj()
+                       kobject_put()
+    
+    cpufreq_cpu_get() gets the policy from per-cpu variable cpufreq_cpu_data
+    under cpufreq_driver_lock, and once it gets a valid policy it expects it
+    to not be freed until cpufreq_cpu_put() is called.
+    
+    But the race happens when another thread puts the kobject first and updates
+    cpufreq_cpu_data before or later. And so the first thread gets a valid policy
+    structure and before it does kobject_get() on it, the second one has already
+    done kobject_put().
+    
+    Fix this by setting cpufreq_cpu_data to NULL before putting the kobject and that
+    too under locks.
+    
+    Reported-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Reported-by: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 42cd4f25af84038552f7d28db87e4b8cdff5a420
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Sat Jan 31 06:02:44 2015 +0530
+
+    cpufreq: Set cpufreq_cpu_data to NULL before putting kobject
+    
+    commit 6ffae8c06fab058d6c3f8ecb7f921327721034e7 upstream.
+    
+    In __cpufreq_remove_dev_finish(), per-cpu 'cpufreq_cpu_data' needs
+    to be cleared before calling kobject_put(&policy->kobj) and under
+    cpufreq_driver_lock. Otherwise, if someone else calls cpufreq_cpu_get()
+    in parallel with it, they can obtain a non-NULL policy from that after
+    kobject_put(&policy->kobj) was executed.
+    
+    Consider this case:
+    
+    Thread A                                Thread B
+    cpufreq_cpu_get()
+      acquire cpufreq_driver_lock
+      read-per-cpu cpufreq_cpu_data
+                                            kobject_put(&policy->kobj);
+      kobject_get(&policy->kobj);
+                                            ...
+                                            per_cpu(&cpufreq_cpu_data, cpu) = NULL
+    
+    And this will result in a warning like this one:
+    
+     ------------[ cut here ]------------
+     WARNING: CPU: 0 PID: 4 at include/linux/kref.h:47
+     kobject_get+0x41/0x50()
+     Modules linked in: acpi_cpufreq(+) nfsd auth_rpcgss nfs_acl
+     lockd grace sunrpc xfs libcrc32c sd_mod ixgbe igb mdio ahci hwmon
+     ...
+     Call Trace:
+      [<ffffffff81661b14>] dump_stack+0x46/0x58
+      [<ffffffff81072b61>] warn_slowpath_common+0x81/0xa0
+      [<ffffffff81072c7a>] warn_slowpath_null+0x1a/0x20
+      [<ffffffff812e16d1>] kobject_get+0x41/0x50
+      [<ffffffff815262a5>] cpufreq_cpu_get+0x75/0xc0
+      [<ffffffff81527c3e>] cpufreq_update_policy+0x2e/0x1f0
+      [<ffffffff810b8cb2>] ? up+0x32/0x50
+      [<ffffffff81381aa9>] ? acpi_ns_get_node+0xcb/0xf2
+      [<ffffffff81381efd>] ? acpi_evaluate_object+0x22c/0x252
+      [<ffffffff813824f6>] ? acpi_get_handle+0x95/0xc0
+      [<ffffffff81360967>] ? acpi_has_method+0x25/0x40
+      [<ffffffff81391e08>] acpi_processor_ppc_has_changed+0x77/0x82
+      [<ffffffff81089566>] ? move_linked_works+0x66/0x90
+      [<ffffffff8138e8ed>] acpi_processor_notify+0x58/0xe7
+      [<ffffffff8137410c>] acpi_ev_notify_dispatch+0x44/0x5c
+      [<ffffffff8135f293>] acpi_os_execute_deferred+0x15/0x22
+      [<ffffffff8108c910>] process_one_work+0x160/0x410
+      [<ffffffff8108d05b>] worker_thread+0x11b/0x520
+      [<ffffffff8108cf40>] ? rescuer_thread+0x380/0x380
+      [<ffffffff81092421>] kthread+0xe1/0x100
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+      [<ffffffff81669ebc>] ret_from_fork+0x7c/0xb0
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+     ---[ end trace 89e66eb9795efdf7 ]---
+    
+    The actual code flow is as follows:
+    
+     Thread A: Workqueue: kacpi_notify
+    
+     acpi_processor_notify()
+       acpi_processor_ppc_has_changed()
+             cpufreq_update_policy()
+               cpufreq_cpu_get()
+                 kobject_get()
+    
+     Thread B: xenbus_thread()
+    
+     xenbus_thread()
+       msg->u.watch.handle->callback()
+         handle_vcpu_hotplug_event()
+           vcpu_hotplug()
+             cpu_down()
+               __cpu_notify(CPU_POST_DEAD..)
+                 cpufreq_cpu_callback()
+                   __cpufreq_remove_dev_finish()
+                     cpufreq_policy_put_kobj()
+                       kobject_put()
+    
+    cpufreq_cpu_get() gets the policy from per-cpu variable cpufreq_cpu_data
+    under cpufreq_driver_lock, and once it gets a valid policy it expects it
+    to not be freed until cpufreq_cpu_put() is called.
+    
+    But the race happens when another thread puts the kobject first and updates
+    cpufreq_cpu_data before or later. And so the first thread gets a valid policy
+    structure and before it does kobject_get() on it, the second one has already
+    done kobject_put().
+    
+    Fix this by setting cpufreq_cpu_data to NULL before putting the kobject and that
+    too under locks.
+    
+    Reported-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Reported-by: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a71f2f60909654f882c02cec1e37109e8e157b91
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Sat Jan 31 06:02:44 2015 +0530
+
+    cpufreq: Set cpufreq_cpu_data to NULL before putting kobject
+    
+    commit 6ffae8c06fab058d6c3f8ecb7f921327721034e7 upstream.
+    
+    In __cpufreq_remove_dev_finish(), per-cpu 'cpufreq_cpu_data' needs
+    to be cleared before calling kobject_put(&policy->kobj) and under
+    cpufreq_driver_lock. Otherwise, if someone else calls cpufreq_cpu_get()
+    in parallel with it, they can obtain a non-NULL policy from that after
+    kobject_put(&policy->kobj) was executed.
+    
+    Consider this case:
+    
+    Thread A                                Thread B
+    cpufreq_cpu_get()
+      acquire cpufreq_driver_lock
+      read-per-cpu cpufreq_cpu_data
+                                            kobject_put(&policy->kobj);
+      kobject_get(&policy->kobj);
+                                            ...
+                                            per_cpu(&cpufreq_cpu_data, cpu) = NULL
+    
+    And this will result in a warning like this one:
+    
+     ------------[ cut here ]------------
+     WARNING: CPU: 0 PID: 4 at include/linux/kref.h:47
+     kobject_get+0x41/0x50()
+     Modules linked in: acpi_cpufreq(+) nfsd auth_rpcgss nfs_acl
+     lockd grace sunrpc xfs libcrc32c sd_mod ixgbe igb mdio ahci hwmon
+     ...
+     Call Trace:
+      [<ffffffff81661b14>] dump_stack+0x46/0x58
+      [<ffffffff81072b61>] warn_slowpath_common+0x81/0xa0
+      [<ffffffff81072c7a>] warn_slowpath_null+0x1a/0x20
+      [<ffffffff812e16d1>] kobject_get+0x41/0x50
+      [<ffffffff815262a5>] cpufreq_cpu_get+0x75/0xc0
+      [<ffffffff81527c3e>] cpufreq_update_policy+0x2e/0x1f0
+      [<ffffffff810b8cb2>] ? up+0x32/0x50
+      [<ffffffff81381aa9>] ? acpi_ns_get_node+0xcb/0xf2
+      [<ffffffff81381efd>] ? acpi_evaluate_object+0x22c/0x252
+      [<ffffffff813824f6>] ? acpi_get_handle+0x95/0xc0
+      [<ffffffff81360967>] ? acpi_has_method+0x25/0x40
+      [<ffffffff81391e08>] acpi_processor_ppc_has_changed+0x77/0x82
+      [<ffffffff81089566>] ? move_linked_works+0x66/0x90
+      [<ffffffff8138e8ed>] acpi_processor_notify+0x58/0xe7
+      [<ffffffff8137410c>] acpi_ev_notify_dispatch+0x44/0x5c
+      [<ffffffff8135f293>] acpi_os_execute_deferred+0x15/0x22
+      [<ffffffff8108c910>] process_one_work+0x160/0x410
+      [<ffffffff8108d05b>] worker_thread+0x11b/0x520
+      [<ffffffff8108cf40>] ? rescuer_thread+0x380/0x380
+      [<ffffffff81092421>] kthread+0xe1/0x100
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+      [<ffffffff81669ebc>] ret_from_fork+0x7c/0xb0
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+     ---[ end trace 89e66eb9795efdf7 ]---
+    
+    The actual code flow is as follows:
+    
+     Thread A: Workqueue: kacpi_notify
+    
+     acpi_processor_notify()
+       acpi_processor_ppc_has_changed()
+             cpufreq_update_policy()
+               cpufreq_cpu_get()
+                 kobject_get()
+    
+     Thread B: xenbus_thread()
+    
+     xenbus_thread()
+       msg->u.watch.handle->callback()
+         handle_vcpu_hotplug_event()
+           vcpu_hotplug()
+             cpu_down()
+               __cpu_notify(CPU_POST_DEAD..)
+                 cpufreq_cpu_callback()
+                   __cpufreq_remove_dev_finish()
+                     cpufreq_policy_put_kobj()
+                       kobject_put()
+    
+    cpufreq_cpu_get() gets the policy from per-cpu variable cpufreq_cpu_data
+    under cpufreq_driver_lock, and once it gets a valid policy it expects it
+    to not be freed until cpufreq_cpu_put() is called.
+    
+    But the race happens when another thread puts the kobject first and updates
+    cpufreq_cpu_data before or later. And so the first thread gets a valid policy
+    structure and before it does kobject_get() on it, the second one has already
+    done kobject_put().
+    
+    Fix this by setting cpufreq_cpu_data to NULL before putting the kobject and that
+    too under locks.
+    
+    Reported-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Reported-by: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit 6ffae8c06fab058d6c3f8ecb7f921327721034e7
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Sat Jan 31 06:02:44 2015 +0530
+
+    cpufreq: Set cpufreq_cpu_data to NULL before putting kobject
+    
+    In __cpufreq_remove_dev_finish(), per-cpu 'cpufreq_cpu_data' needs
+    to be cleared before calling kobject_put(&policy->kobj) and under
+    cpufreq_driver_lock. Otherwise, if someone else calls cpufreq_cpu_get()
+    in parallel with it, they can obtain a non-NULL policy from that after
+    kobject_put(&policy->kobj) was executed.
+    
+    Consider this case:
+    
+    Thread A                                Thread B
+    cpufreq_cpu_get()
+      acquire cpufreq_driver_lock
+      read-per-cpu cpufreq_cpu_data
+                                            kobject_put(&policy->kobj);
+      kobject_get(&policy->kobj);
+                                            ...
+                                            per_cpu(&cpufreq_cpu_data, cpu) = NULL
+    
+    And this will result in a warning like this one:
+    
+     ------------[ cut here ]------------
+     WARNING: CPU: 0 PID: 4 at include/linux/kref.h:47
+     kobject_get+0x41/0x50()
+     Modules linked in: acpi_cpufreq(+) nfsd auth_rpcgss nfs_acl
+     lockd grace sunrpc xfs libcrc32c sd_mod ixgbe igb mdio ahci hwmon
+     ...
+     Call Trace:
+      [<ffffffff81661b14>] dump_stack+0x46/0x58
+      [<ffffffff81072b61>] warn_slowpath_common+0x81/0xa0
+      [<ffffffff81072c7a>] warn_slowpath_null+0x1a/0x20
+      [<ffffffff812e16d1>] kobject_get+0x41/0x50
+      [<ffffffff815262a5>] cpufreq_cpu_get+0x75/0xc0
+      [<ffffffff81527c3e>] cpufreq_update_policy+0x2e/0x1f0
+      [<ffffffff810b8cb2>] ? up+0x32/0x50
+      [<ffffffff81381aa9>] ? acpi_ns_get_node+0xcb/0xf2
+      [<ffffffff81381efd>] ? acpi_evaluate_object+0x22c/0x252
+      [<ffffffff813824f6>] ? acpi_get_handle+0x95/0xc0
+      [<ffffffff81360967>] ? acpi_has_method+0x25/0x40
+      [<ffffffff81391e08>] acpi_processor_ppc_has_changed+0x77/0x82
+      [<ffffffff81089566>] ? move_linked_works+0x66/0x90
+      [<ffffffff8138e8ed>] acpi_processor_notify+0x58/0xe7
+      [<ffffffff8137410c>] acpi_ev_notify_dispatch+0x44/0x5c
+      [<ffffffff8135f293>] acpi_os_execute_deferred+0x15/0x22
+      [<ffffffff8108c910>] process_one_work+0x160/0x410
+      [<ffffffff8108d05b>] worker_thread+0x11b/0x520
+      [<ffffffff8108cf40>] ? rescuer_thread+0x380/0x380
+      [<ffffffff81092421>] kthread+0xe1/0x100
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+      [<ffffffff81669ebc>] ret_from_fork+0x7c/0xb0
+      [<ffffffff81092340>] ? kthread_create_on_node+0x1b0/0x1b0
+     ---[ end trace 89e66eb9795efdf7 ]---
+    
+    The actual code flow is as follows:
+    
+     Thread A: Workqueue: kacpi_notify
+    
+     acpi_processor_notify()
+       acpi_processor_ppc_has_changed()
+             cpufreq_update_policy()
+               cpufreq_cpu_get()
+                 kobject_get()
+    
+     Thread B: xenbus_thread()
+    
+     xenbus_thread()
+       msg->u.watch.handle->callback()
+         handle_vcpu_hotplug_event()
+           vcpu_hotplug()
+             cpu_down()
+               __cpu_notify(CPU_POST_DEAD..)
+                 cpufreq_cpu_callback()
+                   __cpufreq_remove_dev_finish()
+                     cpufreq_policy_put_kobj()
+                       kobject_put()
+    
+    cpufreq_cpu_get() gets the policy from per-cpu variable cpufreq_cpu_data
+    under cpufreq_driver_lock, and once it gets a valid policy it expects it
+    to not be freed until cpufreq_cpu_put() is called.
+    
+    But the race happens when another thread puts the kobject first and updates
+    cpufreq_cpu_data before or later. And so the first thread gets a valid policy
+    structure and before it does kobject_get() on it, the second one has already
+    done kobject_put().
+    
+    Fix this by setting cpufreq_cpu_data to NULL before putting the kobject and that
+    too under locks.
+    
+    Reported-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Reported-by: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Cc: 3.12+ <stable@vger.kernel.org> # 3.12+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 74443bbed72ab22ee005ecb6ecdc657a8018e1db
+Author: Lv Zheng <lv.zheng@intel.com>
+Date:   Wed Jan 14 19:28:47 2015 +0800
+
+    ACPI / EC: Fix issues related to the SCI_EVT handling
+    
+    This patch fixes 2 issues related to the draining behavior. But it doesn't
+    implement the draining support, it only cleans up code so that further
+    draining support is possible.
+    
+    The draining behavior is expected by some platforms (for example, Samsung)
+    where SCI_EVT is set only once for a set of events and might be cleared for
+    the very first QR_EC command issued after SCI_EVT is set. EC firmware on
+    such platforms will return 0x00 to indicate "no outstanding event". Thus
+    after seeing an SCI_EVT indication, EC driver need to fetch events until
+    0x00 returned (see acpi_ec_clear()).
+    
+    Issue 1 - acpi_ec_submit_query():
+    It's reported on Samsung laptops that SCI_EVT isn't checked when the
+    transactions are advanced in ec_poll(), which leads to SCI_EVT triggering
+    source lost:
+     If no EC GPE IRQs are arrived after that, EC driver cannot detect this
+     event and handle it.
+    See comment 244/247 for kernel bugzilla 44161.
+    This patch fixes this issue by moving SCI_EVT checks into
+    advance_transaction(). So that SCI_EVT is checked each time we are going to
+    handle the EC firmware indications. And this check will happen for both IRQ
+    context and task context.
+    Since after doing that, SCI_EVT is also checked after completing a
+    transaction, ec_check_sci() and ec_check_sci_sync() can be removed.
+    
+    Issue 2 - acpi_ec_complete_query():
+    We expect to clear EC_FLAGS_QUERY_PENDING to allow queuing another draining
+    QR_EC after writing a QR_EC command and before reading the event. After
+    reading the event, SCI_EVT might be cleared by the firmware, thus it may
+    not be possible to queue such a draining QR_EC at that time.
+    But putting the EC_FLAGS_QUERY_PENDING clearing code after
+    start_transaction() is wrong as there are chances that after
+    start_transaction(), QR_EC can fail to be sent. If this happens,
+    EC_FLAG_QUERY_PENDING will be cleared earlier. As a consequence, the
+    draining QR_EC will also be queued earlier than expected.
+    This patch also moves this code into advance_transaction() where QR_EC is
+    just sent (ACPI_EC_COMMAND_POLL flagged) to fix this issue.
+    
+    Notes:
+    1. After introducing the 2 SCI_EVT related handlings into
+       advance_transaction(), a next QR_EC can be queued right after writing
+       the current QR_EC command and before reading the event. But this still
+       hasn't implemented the draining behavior as the draining support
+       requires:
+         If a previous returned event value isn't 0x00, a draining QR_EC need
+         to be issued even when SCI_EVT isn't set.
+    2. In this patch, acpi_os_execute() is also converted into a seperate work
+       item to avoid invoking kmalloc() in the atomic context. We can do this
+       because of the previous global lock fix.
+    3. Originally, EC_FLAGS_EVENT_PENDING is also used to avoid queuing up
+       multiple work items (created by acpi_os_execute()), this can be covered
+       by only using a single work item. But this patch still keeps this flag
+       as there are different usages in the driver initialization steps relying
+       on this flag.
+    
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=44161
+    Reported-by: Kieran Clancy <clancy.kieran@gmail.com>
+    Signed-off-by: Lv Zheng <lv.zheng@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit c2cf5769fae1ce208ea00fa85298d1d19969300a
+Author: Lv Zheng <lv.zheng@intel.com>
+Date:   Wed Jan 14 19:28:33 2015 +0800
+
+    ACPI / EC: Fix returning values in acpi_ec_sync_query()
+    
+    The returning value of acpi_os_execute() is erroneously handled as errno.
+    This patch corrects it by returning EBUSY to indicate the work queue item
+    creation failure.
+    
+    Signed-off-by: Lv Zheng <lv.zheng@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit cb57720bf79688d64854a0a43565aa52303c1f3f
+Author: Ethan Zhao <ethan.zhao@oracle.com>
+Date:   Thu Dec 18 15:28:19 2014 +0900
+
+    cpufreq: fix a NULL pointer dereference in __cpufreq_governor()
+    
+    If ACPI _PPC changed notification happens before governor was initiated
+    while kernel is booting, a NULL pointer dereference will be triggered:
+    
+    BUG: unable to handle kernel NULL pointer dereference at 0000000000000030
+     IP: [<ffffffff81470453>] __cpufreq_governor+0x23/0x1e0
+     PGD 0
+     Oops: 0000 [#1] SMP
+     ... ...
+     RIP: 0010:[<ffffffff81470453>]  [<ffffffff81470453>]
+     __cpufreq_governor+0x23/0x1e0
+     RSP: 0018:ffff881fcfbcfbb8  EFLAGS: 00010286
+     RAX: 0000000000000000 RBX: ffff881fd11b3980 RCX: ffff88407fc20000
+     RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff881fd11b3980
+     RBP: ffff881fcfbcfbd8 R08: 0000000000000000 R09: 000000000000000f
+     R10: ffffffff818068d0 R11: 0000000000000043 R12: 0000000000000004
+     R13: 0000000000000000 R14: ffffffff8196cae0 R15: 0000000000000000
+     FS:  0000000000000000(0000) GS:ffff881fffc00000(0000) knlGS:0000000000000000
+     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+     CR2: 0000000000000030 CR3: 00000000018ae000 CR4: 00000000000407f0
+     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+     DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+     Process kworker/0:3 (pid: 750, threadinfo ffff881fcfbce000, task
+     ffff881fcf556400)
+     Stack:
+      ffff881fffc17d00 ffff881fcfbcfc18 ffff881fd11b3980 0000000000000000
+      ffff881fcfbcfc08 ffffffff81470d08 ffff881fd11b3980 0000000000000007
+      ffff881fcfbcfc18 ffff881fffc17d00 ffff881fcfbcfd28 ffffffff81472e9a
+     Call Trace:
+      [<ffffffff81470d08>] __cpufreq_set_policy+0x1b8/0x2e0
+      [<ffffffff81472e9a>] cpufreq_update_policy+0xca/0x150
+      [<ffffffff81472f20>] ? cpufreq_update_policy+0x150/0x150
+      [<ffffffff81324a96>] acpi_processor_ppc_has_changed+0x71/0x7b
+      [<ffffffff81320bcd>] acpi_processor_notify+0x55/0x115
+      [<ffffffff812f9c29>] acpi_device_notify+0x19/0x1b
+      [<ffffffff813084ca>] acpi_ev_notify_dispatch+0x41/0x5f
+      [<ffffffff812f64a4>] acpi_os_execute_deferred+0x27/0x34
+    
+    The root cause is a race conditon -- cpufreq core and acpi-cpufreq driver
+    were initiated, but cpufreq_governor wasn't and _PPC changed notification
+    happened, __cpufreq_governor() was called within acpi_os_execute_deferred
+    kernel thread context.
+    
+    To fix this panic issue, add pointer checking code in __cpufreq_governor()
+    before pointer policy->governor is to be dereferenced.
+    
+    Signed-off-by: Ethan Zhao <ethan.zhao@oracle.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit a51b4d7710d1a3593c3bdc4592fdecbbb8df4f16
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075 upstream.
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Zefan Li <lizefan@huawei.com>
+
+commit 5df1eb90953a86127ca130d90724819383f896da
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075 upstream.
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit d1c062033bc96b74941a06ffa1922e50c24f1680
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075 upstream.
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4df052078015216d52dd1357d82c131059ebfb18
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075 upstream.
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4f6a1e6210f5aeed2832d69103fc6511c0ca7c2d
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075 upstream.
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4cdd9a72256c461874df095fde4a6b96bd7f426d
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075 upstream.
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit 9661d5bcd058fe15b4138a00d96bd36516134543
+Author: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+Date:   Fri Aug 22 13:27:34 2014 -0700
+
+    x86/mm/hotplug: Modify PGD entry when removing memory
+    
+    When hot-adding/removing memory, sync_global_pgds() is called
+    for synchronizing PGD to PGD entries of all processes MM.  But
+    when hot-removing memory, sync_global_pgds() does not work
+    correctly.
+    
+    At first, sync_global_pgds() checks whether target PGD is none
+    or not.  And if PGD is none, the PGD is skipped.  But when
+    hot-removing memory, PGD may be none since PGD may be cleared by
+    free_pud_table().  So when sync_global_pgds() is called after
+    hot-removing memory, sync_global_pgds() should not skip PGD even
+    if the PGD is none.  And sync_global_pgds() must clear PGD
+    entries of all processes MM.
+    
+    Currently sync_global_pgds() does not clear PGD entries of all
+    processes MM when hot-removing memory.  So when hot adding
+    memory which is same memory range as removed memory after
+    hot-removing memory, following call traces are shown:
+    
+     kernel BUG at arch/x86/mm/init_64.c:206!
+     ...
+     [<ffffffff815e0c80>] kernel_physical_mapping_init+0x1b2/0x1d2
+     [<ffffffff815ced94>] init_memory_mapping+0x1d4/0x380
+     [<ffffffff8104aebd>] arch_add_memory+0x3d/0xd0
+     [<ffffffff815d03d9>] add_memory+0xb9/0x1b0
+     [<ffffffff81352415>] acpi_memory_device_add+0x1af/0x28e
+     [<ffffffff81325dc4>] acpi_bus_device_attach+0x8c/0xf0
+     [<ffffffff813413b9>] acpi_ns_walk_namespace+0xc8/0x17f
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff813418ed>] acpi_walk_namespace+0x95/0xc5
+     [<ffffffff81326b4c>] acpi_bus_scan+0x9a/0xc2
+     [<ffffffff81326bff>] acpi_scan_bus_device_check+0x8b/0x12e
+     [<ffffffff81326cb5>] acpi_scan_device_check+0x13/0x15
+     [<ffffffff81320122>] acpi_os_execute_deferred+0x25/0x32
+     [<ffffffff8107e02b>] process_one_work+0x17b/0x460
+     [<ffffffff8107edfb>] worker_thread+0x11b/0x400
+     [<ffffffff8107ece0>] ? rescuer_thread+0x400/0x400
+     [<ffffffff81085aef>] kthread+0xcf/0xe0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+     [<ffffffff815fc76c>] ret_from_fork+0x7c/0xb0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+    
+    This patch clears PGD entries of all processes MM when
+    sync_global_pgds() is called after hot-removing memory
+    
+    Signed-off-by: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Acked-by: Toshi Kani <toshi.kani@hp.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Tang Chen <tangchen@cn.fujitsu.com>
+    Cc: Gu Zheng <guz.fnst@cn.fujitsu.com>
+    Cc: Zhang Yanfei <zhangyanfei@cn.fujitsu.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 5255e0a79fcc0ff47b387af92bd9ef5729b1b859
+Author: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+Date:   Fri Aug 22 13:27:31 2014 -0700
+
+    x86/mm/hotplug: Pass sync_global_pgds() a correct argument in remove_pagetable()
+    
+    When hot-adding memory after hot-removing memory, following call
+    traces are shown:
+    
+      kernel BUG at arch/x86/mm/init_64.c:206!
+      ...
+     [<ffffffff815e0c80>] kernel_physical_mapping_init+0x1b2/0x1d2
+     [<ffffffff815ced94>] init_memory_mapping+0x1d4/0x380
+     [<ffffffff8104aebd>] arch_add_memory+0x3d/0xd0
+     [<ffffffff815d03d9>] add_memory+0xb9/0x1b0
+     [<ffffffff81352415>] acpi_memory_device_add+0x1af/0x28e
+     [<ffffffff81325dc4>] acpi_bus_device_attach+0x8c/0xf0
+     [<ffffffff813413b9>] acpi_ns_walk_namespace+0xc8/0x17f
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff81325d38>] ? acpi_bus_type_and_status+0xb7/0xb7
+     [<ffffffff813418ed>] acpi_walk_namespace+0x95/0xc5
+     [<ffffffff81326b4c>] acpi_bus_scan+0x9a/0xc2
+     [<ffffffff81326bff>] acpi_scan_bus_device_check+0x8b/0x12e
+     [<ffffffff81326cb5>] acpi_scan_device_check+0x13/0x15
+     [<ffffffff81320122>] acpi_os_execute_deferred+0x25/0x32
+     [<ffffffff8107e02b>] process_one_work+0x17b/0x460
+     [<ffffffff8107edfb>] worker_thread+0x11b/0x400
+     [<ffffffff8107ece0>] ? rescuer_thread+0x400/0x400
+     [<ffffffff81085aef>] kthread+0xcf/0xe0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+     [<ffffffff815fc76c>] ret_from_fork+0x7c/0xb0
+     [<ffffffff81085a20>] ? kthread_create_on_node+0x140/0x140
+    
+    The patch-set fixes the issue.
+    
+    This patch (of 2):
+    
+    remove_pagetable() gets start argument and passes the argument
+    to sync_global_pgds().  In this case, the argument must not be
+    modified.  If the argument is modified and passed to
+    sync_global_pgds(), sync_global_pgds() does not correctly
+    synchronize PGD to PGD entries of all processes MM since
+    synchronized range of memory [start, end] is wrong.
+    
+    Unfortunately the start argument is modified in
+    remove_pagetable().  So this patch fixes the issue.
+    
+    Signed-off-by: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Acked-by: Toshi Kani <toshi.kani@hp.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Tang Chen <tangchen@cn.fujitsu.com>
+    Cc: Gu Zheng <guz.fnst@cn.fujitsu.com>
+    Cc: Zhang Yanfei <zhangyanfei@cn.fujitsu.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 6726655dfdd2dc60c035c690d9f10cb69d7ea075
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Wed Sep 3 15:04:28 2014 +0200
+
+    ACPI / cpuidle: fix deadlock between cpuidle_lock and cpu_hotplug.lock
+    
+    There is a following AB-BA dependency between cpu_hotplug.lock and
+    cpuidle_lock:
+    
+    1) cpu_hotplug.lock -> cpuidle_lock
+    enable_nonboot_cpus()
+     _cpu_up()
+      cpu_hotplug_begin()
+       LOCK(cpu_hotplug.lock)
+     cpu_notify()
+      ...
+      acpi_processor_hotplug()
+       cpuidle_pause_and_lock()
+        LOCK(cpuidle_lock)
+    
+    2) cpuidle_lock -> cpu_hotplug.lock
+    acpi_os_execute_deferred() workqueue
+     ...
+     acpi_processor_cst_has_changed()
+      cpuidle_pause_and_lock()
+       LOCK(cpuidle_lock)
+      get_online_cpus()
+       LOCK(cpu_hotplug.lock)
+    
+    Fix this by reversing the order acpi_processor_cst_has_changed() does
+    thigs -- let it first execute the protection against CPU hotplug by
+    calling get_online_cpus() and obtain the cpuidle lock only after that (and
+    perform the symmentric change when allowing CPUs hotplug again and
+    dropping cpuidle lock).
+    
+    Spotted by lockdep.
+    
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Cc: All applicable <stable@vger.kernel.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 7b98118aaa5d75644c48f41fc5d0cc181e478383
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Nov 7 01:45:40 2013 +0100
+
+    ACPI / hotplug: Consolidate deferred execution of ACPI hotplug routines
+    
+    There are two different interfaces for queuing up work items on the
+    ACPI hotplug workqueue, alloc_acpi_hp_work() used by PCI and PCI host
+    bridge hotplug code and acpi_os_hotplug_execute() used by the common
+    ACPI hotplug code and docking stations.  They both are somewhat
+    cumbersome to use and work slightly differently.
+    
+    The users of alloc_acpi_hp_work() have to submit a work function that
+    will extract the necessary data items from a struct acpi_hp_work
+    object allocated by alloc_acpi_hp_work() and then will free that
+    object, while it would be more straightforward to simply use a work
+    function with one more argument and let the interface take care of
+    the execution details.
+    
+    The users of acpi_os_hotplug_execute() also have to deal with the
+    fact that it takes only one argument in addition to the work function
+    pointer, although acpi_os_execute_deferred() actually takes care of
+    the allocation and freeing of memory, so it would have been able to
+    pass more arguments to the work function if it hadn't been
+    constrained by the connection with acpi_os_execute().
+    
+    Moreover, while alloc_acpi_hp_work() makes GFP_KERNEL memory
+    allocations, which is correct, because hotplug work items are
+    always queued up from process context, acpi_os_hotplug_execute()
+    uses GFP_ATOMIC, as that is needed by acpi_os_execute().  Also,
+    acpi_os_execute_deferred() queued up by it waits for the ACPI event
+    workqueues to flush before executing the work function, whereas
+    alloc_acpi_hp_work() can't do anything similar.  That leads to
+    somewhat arbitrary differences in behavior between various ACPI
+    hotplug code paths and has to be straightened up.
+    
+    For this reason, replace both alloc_acpi_hp_work() and
+    acpi_os_hotplug_execute() with a single interface,
+    acpi_hotplug_execute(), combining their behavior and being more
+    friendly to its users than any of the two.
+    
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Tested-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+
+commit 798282a8718347b04a2f0a4bae7d775c48c6bcb9
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Tue Sep 10 02:54:50 2013 +0200
+
+    Revert "cpufreq: make sure frequency transitions are serialized"
+    
+    Commit 7c30ed5 (cpufreq: make sure frequency transitions are
+    serialized) attempted to serialize frequency transitions by
+    adding checks to the CPUFREQ_PRECHANGE and CPUFREQ_POSTCHANGE
+    notifications.  However, it assumed that the notifications will
+    always originate from the driver's .target() callback, but they
+    also can be triggered by cpufreq_out_of_sync() and that leads to
+    warnings like this on some systems:
+    
+     WARNING: CPU: 0 PID: 14543 at drivers/cpufreq/cpufreq.c:317
+     __cpufreq_notify_transition+0x238/0x260()
+     In middle of another frequency transition
+    
+    accompanied by a call trace similar to this one:
+    
+     [<ffffffff81720daa>] dump_stack+0x46/0x58
+     [<ffffffff8106534c>] warn_slowpath_common+0x8c/0xc0
+     [<ffffffff815b8560>] ? acpi_cpufreq_target+0x320/0x320
+     [<ffffffff81065436>] warn_slowpath_fmt+0x46/0x50
+     [<ffffffff815b1ec8>] __cpufreq_notify_transition+0x238/0x260
+     [<ffffffff815b33be>] cpufreq_notify_transition+0x3e/0x70
+     [<ffffffff815b345d>] cpufreq_out_of_sync+0x6d/0xb0
+     [<ffffffff815b370c>] cpufreq_update_policy+0x10c/0x160
+     [<ffffffff815b3760>] ? cpufreq_update_policy+0x160/0x160
+     [<ffffffff81413813>] cpufreq_set_cur_state+0x8c/0xb5
+     [<ffffffff814138df>] processor_set_cur_state+0xa3/0xcf
+     [<ffffffff8158e13c>] thermal_cdev_update+0x9c/0xb0
+     [<ffffffff8159046a>] step_wise_throttle+0x5a/0x90
+     [<ffffffff8158e21f>] handle_thermal_trip+0x4f/0x140
+     [<ffffffff8158e377>] thermal_zone_device_update+0x57/0xa0
+     [<ffffffff81415b36>] acpi_thermal_check+0x2e/0x30
+     [<ffffffff81415ca0>] acpi_thermal_notify+0x40/0xdc
+     [<ffffffff813e7dbd>] acpi_device_notify+0x19/0x1b
+     [<ffffffff813f8241>] acpi_ev_notify_dispatch+0x41/0x5c
+     [<ffffffff813e3fbe>] acpi_os_execute_deferred+0x25/0x32
+     [<ffffffff81081060>] process_one_work+0x170/0x4a0
+     [<ffffffff81082121>] worker_thread+0x121/0x390
+     [<ffffffff81082000>] ? manage_workers.isra.20+0x170/0x170
+     [<ffffffff81088fe0>] kthread+0xc0/0xd0
+     [<ffffffff81088f20>] ? flush_kthread_worker+0xb0/0xb0
+     [<ffffffff8173582c>] ret_from_fork+0x7c/0xb0
+     [<ffffffff81088f20>] ? flush_kthread_worker+0xb0/0xb0
+    
+    For this reason, revert commit 7c30ed5 along with the fix 266c13d
+    (cpufreq: Fix serialization of frequency transitions) on top of it
+    and we will revisit the serialization problem later.
+    
+    Reported-by: Alessandro Bono <alessandro.bono@gmail.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit ebff7d8f270d045338d9f4796014f4db429a17f9
+Author: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+Date:   Mon Apr 29 15:08:56 2013 -0700
+
+    mem hotunplug: fix kfree() of bootmem memory
+    
+    When hot removing memory presented at boot time, following messages are shown:
+    
+      kernel BUG at mm/slub.c:3409!
+      invalid opcode: 0000 [#1] SMP
+      Modules linked in: ebtable_nat ebtables xt_CHECKSUM iptable_mangle bridge stp llc ipmi_devintf ipmi_msghandler sunrpc ipt_REJECT nf_conntrack_ipv4 nf_defrag_ipv4 iptable_filter ip_tables ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 xt_state nf_conntrack ip6table_filter ip6_tables binfmt_misc vfat fat dm_mirror dm_region_hash dm_log dm_mod vhost_net macvtap macvlan tun uinput iTCO_wdt iTCO_vendor_support coretemp kvm_intel kvm crc32c_intel ghash_clmulni_intel microcode pcspkr sg i2c_i801 lpc_ich mfd_core igb i2c_algo_bit i2c_core e1000e ptp pps_core tpm_infineon ioatdma dca sr_mod cdrom sd_mod crc_t10dif usb_storage megaraid_sas lpfc scsi_transport_fc scsi_tgt scsi_mod
+      CPU 0
+      Pid: 5091, comm: kworker/0:2 Tainted: G        W    3.9.0-rc6+ #15
+      RIP: kfree+0x232/0x240
+      Process kworker/0:2 (pid: 5091, threadinfo ffff88084678c000, task ffff88083928ca80)
+      Call Trace:
+        __release_region+0xd4/0xe0
+        __remove_pages+0x52/0x110
+        arch_remove_memory+0x89/0xd0
+        remove_memory+0xc4/0x100
+        acpi_memory_device_remove+0x6d/0xb1
+        acpi_device_remove+0x89/0xab
+        __device_release_driver+0x7c/0xf0
+        device_release_driver+0x2f/0x50
+        acpi_bus_device_detach+0x6c/0x70
+        acpi_ns_walk_namespace+0x11a/0x250
+        acpi_walk_namespace+0xee/0x137
+        acpi_bus_trim+0x33/0x7a
+        acpi_bus_hot_remove_device+0xc4/0x1a1
+        acpi_os_execute_deferred+0x27/0x34
+        process_one_work+0x1f7/0x590
+        worker_thread+0x11a/0x370
+        kthread+0xee/0x100
+        ret_from_fork+0x7c/0xb0
+      RIP  [<ffffffff811c41d2>] kfree+0x232/0x240
+       RSP <ffff88084678d968>
+    
+    The reason why the messages are shown is to release a resource
+    structure, allocated by bootmem, by kfree().  So when we release a
+    resource structure, we should check whether it is allocated by bootmem
+    or not.
+    
+    But even if we know a resource structure is allocated by bootmem, we
+    cannot release it since SLxB cannot treat it.  So for reusing a resource
+    structure, this patch remembers it by using bootmem_resource as follows:
+    
+    When releasing a resource structure by free_resource(), free_resource()
+    checks whether the resource structure is allocated by bootmem or not.
+    If it is allocated by bootmem, free_resource() adds it to
+    bootmem_resource.  If it is not allocated by bootmem, free_resource()
+    release it by kfree().
+    
+    And when getting a new resource structure by get_resource(),
+    get_resource() checks whether bootmem_resource has released resource
+    structures or not.  If there is a released resource structure,
+    get_resource() returns it.  If there is not a releaed resource
+    structure, get_resource() returns new resource structure allocated by
+    kzalloc().
+    
+    [akpm@linux-foundation.org: s/get_resource/alloc_resource/]
+    Signed-off-by: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Reviewed-by: Toshi Kani <toshi.kani@hp.com>
+    Cc: Johannes Weiner <hannes@cmpxchg.org>
+    Cc: Ram Pai <linuxram@us.ibm.com>
+    Cc: David Rientjes <rientjes@google.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 247fd50b5953d2b07832a07bd1d1c3b8e221fe9e
+Author: Peter Hurley <peter@hurleysoftware.com>
+Date:   Wed Mar 27 06:59:58 2013 -0400
+
+    firewire: ohci: Fix double free_irq()
+    
+    A pci device can be removed while in its suspended state.
+    Because the ohci driver freed the irq to suspend, free_irq() is
+    called twice; once from pci_remove() and again from pci_suspend(),
+    which issues the warning below [1].
+    
+    Rather than allocate the irq in the .enable() path, move the
+    allocation to .probe(). Consequently, the irq is not reallocated
+    upon pci_resume() and thus is not freed upon pci_suspend().
+    
+    [1] Warning reported by Mark Einon <mark.einon@gmail.com> when
+    suspending an MSI MS-1727 GT740 laptop on Ubuntu 3.5.0-22-generic
+    
+    WARNING: at ./kernel/irq/manage.c:1198 __free_irq+0xa3/0x1e0()
+    Hardware name: MS-1727
+    Trying to free already-free IRQ 16
+    Modules linked in: ip6table_filter ip6_tables ebtable_nat ebtables <...snip...>
+    Pid: 4, comm: kworker/0:0 Tainted: P           O 3.5.0-22-generic #34-Ubuntu
+    Call Trace:
+     [<ffffffff81051c1f>] warn_slowpath_common+0x7f/0xc0
+     [<ffffffff81051d16>] warn_slowpath_fmt+0x46/0x50
+     [<ffffffff8103fa39>] ? default_spin_lock_flags+0x9/0x10
+     [<ffffffff810df6b3>] __free_irq+0xa3/0x1e0
+     [<ffffffff810df844>] free_irq+0x54/0xc0
+     [<ffffffffa005a27e>] pci_remove+0x6e/0x210 [firewire_ohci]
+     [<ffffffff8135ae7f>] pci_device_remove+0x3f/0x110
+     [<ffffffff8141fdbc>] __device_release_driver+0x7c/0xe0
+     [<ffffffff8141fe4c>] device_release_driver+0x2c/0x40
+     [<ffffffff8141f5f1>] bus_remove_device+0xe1/0x120
+     [<ffffffff8141cd1a>] device_del+0x12a/0x1c0
+     [<ffffffff8141cdc6>] device_unregister+0x16/0x30
+     [<ffffffff81354784>] pci_stop_bus_device+0x94/0xa0
+     [<ffffffffa0091c67>] acpiphp_disable_slot+0xb7/0x1a0 [acpiphp]
+     [<ffffffffa0090716>] ? get_slot_status+0x46/0xc0 [acpiphp]
+     [<ffffffffa0091d7d>] acpiphp_check_bridge.isra.15+0x2d/0xf0 [acpiphp]
+     [<ffffffffa0092442>] _handle_hotplug_event_bridge+0x372/0x4d0 [acpiphp]
+     [<ffffffff81390f8c>] ? acpi_os_execute_deferred+0x2f/0x34
+     [<ffffffff8116e22d>] ? kfree+0xed/0x110
+     [<ffffffff8107086a>] process_one_work+0x12a/0x420
+     [<ffffffffa00920d0>] ? _handle_hotplug_event_func+0x1d0/0x1d0 [acpiphp]
+     [<ffffffff8107141e>] worker_thread+0x12e/0x2f0
+     [<ffffffff810712f0>] ? manage_workers.isra.26+0x200/0x200
+     [<ffffffff81075f13>] kthread+0x93/0xa0
+     [<ffffffff8168d024>] kernel_thread_helper+0x4/0x10
+     [<ffffffff81075e80>] ? kthread_freezable_should_stop+0x70/0x70
+     [<ffffffff8168d020>] ? gs_change+0x13/0x13
+    
+    Reported-by: Mark Einon <mark.einon@gmail.com>
+    Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+    Signed-off-by: Stefan Richter <stefanr@s5r6.in-berlin.de>
+
+commit 8a356ce38e134b3b09b439e88dc770f8f5567648
+Author: Wen Congyang <wency@cn.fujitsu.com>
+Date:   Fri Feb 22 16:33:21 2013 -0800
+
+    memory-hotplug: consider compound pages when free memmap
+    
+    usemap could also be allocated as compound pages.  Should also consider
+    compound pages when freeing memmap.
+    
+    If we don't fix it, there could be problems when we free vmemmap
+    pagetables which are stored in compound pages.  The old pagetables will
+    not be freed properly, and when we add the memory again, no new
+    pagetable will be created.  And the old pagetable entry is used, than
+    the kernel will panic.
+    
+    The call trace is like the following:
+    
+      BUG: unable to handle kernel paging request at ffffea0040000000
+      IP: [<ffffffff816a483f>] sparse_add_one_section+0xef/0x166
+      PGD 7ff7d4067 PUD 78e035067 PMD 78e11d067 PTE 0
+      Oops: 0002 [#1] SMP
+      Modules linked in: ip6table_filter ip6_tables ebtable_nat ebtables nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack ipt_REJECT xt_CHECKSUM iptable_mangle iptable_filter ip_tables bridge stp llc sunrpc binfmt_misc dm_mirror dm_region_hash dm_log dm_mod vhost_net macvtap macvlan tun uinput iTCO_wdt iTCO_vendor_support coretemp kvm_intel kvm crc32c_intel microcode pcspkr sg lpc_ich mfd_core i2c_i801 i2c_core i7core_edac edac_core ioatdma e1000e igb dca ptp pps_core sd_mod crc_t10dif megaraid_sas mptsas mptscsih mptbase scsi_transport_sas scsi_mod
+      CPU 0
+      Pid: 4, comm: kworker/0:0 Tainted: G        W 3.8.0-rc3-phy-hot-remove+ #3 FUJITSU-SV PRIMEQUEST 1800E/SB
+      RIP: 0010:[<ffffffff816a483f>]  [<ffffffff816a483f>] sparse_add_one_section+0xef/0x166
+      RSP: 0018:ffff8807bdcb35d8  EFLAGS: 00010006
+      RAX: 0000000000000000 RBX: 0000000000000200 RCX: 0000000000200000
+      RDX: ffff88078df01148 RSI: 0000000000000282 RDI: ffffea0040000000
+      RBP: ffff8807bdcb3618 R08: 4cf05005b019467a R09: 0cd98fa09631467a
+      R10: 0000000000000000 R11: 0000000000030e20 R12: 0000000000008000
+      R13: ffffea0040000000 R14: ffff88078df66248 R15: ffff88078ea13b10
+      FS:  0000000000000000(0000) GS:ffff8807c1a00000(0000) knlGS:0000000000000000
+      CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+      CR2: ffffea0040000000 CR3: 0000000001c0c000 CR4: 00000000000007f0
+      DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+      DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+      Process kworker/0:0 (pid: 4, threadinfo ffff8807bdcb2000, task ffff8807bde18000)
+      Call Trace:
+        __add_pages+0x85/0x120
+        arch_add_memory+0x71/0xf0
+        add_memory+0xd6/0x1f0
+        acpi_memory_device_add+0x170/0x20c
+        acpi_device_probe+0x50/0x18a
+        really_probe+0x6c/0x320
+        driver_probe_device+0x47/0xa0
+        __device_attach+0x53/0x60
+        bus_for_each_drv+0x6c/0xa0
+        device_attach+0xa8/0xc0
+        bus_probe_device+0xb0/0xe0
+        device_add+0x301/0x570
+        device_register+0x1e/0x30
+        acpi_device_register+0x1d8/0x27c
+        acpi_add_single_object+0x1df/0x2b9
+        acpi_bus_check_add+0x112/0x18f
+        acpi_ns_walk_namespace+0x105/0x255
+        acpi_walk_namespace+0xcf/0x118
+        acpi_bus_scan+0x5b/0x7c
+        acpi_bus_add+0x2a/0x2c
+        container_notify_cb+0x112/0x1a9
+        acpi_ev_notify_dispatch+0x46/0x61
+        acpi_os_execute_deferred+0x27/0x34
+        process_one_work+0x20e/0x5c0
+        worker_thread+0x12e/0x370
+        kthread+0xee/0x100
+        ret_from_fork+0x7c/0xb0
+      Code: 00 00 48 89 df 48 89 45 c8 e8 3e 71 b1 ff 48 89 c2 48 8b 75 c8 b8 ef ff ff ff f6 02 01 75 4b 49 63 cc 31 c0 4c 89 ef 48 c1 e1 06 <f3> aa 48 8b 02 48 83 c8 01 48 85 d2 48 89 02 74 29 a8 01 74 25
+      RIP  [<ffffffff816a483f>] sparse_add_one_section+0xef/0x166
+       RSP <ffff8807bdcb35d8>
+      CR2: ffffea0040000000
+      ---[ end trace e7f94e3a34c442d4 ]---
+      Kernel panic - not syncing: Fatal exception
+    
+    Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+    Signed-off-by: Tang Chen <tangchen@cn.fujitsu.com>
+    Cc: Jiang Liu <jiang.liu@huawei.com>
+    Cc: Jianguo Wu <wujianguo@huawei.com>
+    Cc: Kamezawa Hiroyuki <kamezawa.hiroyu@jp.fujitsu.com>
+    Cc: Lai Jiangshan <laijs@cn.fujitsu.com>
+    Cc: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit cd099682e4c786c3a866e462b37fcac6e3a44a68
+Author: Tang Chen <tangchen@cn.fujitsu.com>
+Date:   Fri Feb 22 16:33:02 2013 -0800
+
+    memory-hotplug: move pgdat_resize_lock into sparse_remove_one_section()
+    
+    In __remove_section(), we locked pgdat_resize_lock when calling
+    sparse_remove_one_section().  This lock will disable irq.  But we don't
+    need to lock the whole function.  If we do some work to free pagetables
+    in free_section_usemap(), we need to call flush_tlb_all(), which need
+    irq enabled.  Otherwise the WARN_ON_ONCE() in smp_call_function_many()
+    will be triggered.
+    
+    If we lock the whole sparse_remove_one_section(), then we come to this call trace:
+    
+      ------------[ cut here ]------------
+      WARNING: at kernel/smp.c:461 smp_call_function_many+0xbd/0x260()
+      Hardware name: PRIMEQUEST 1800E
+      ......
+      Call Trace:
+        smp_call_function_many+0xbd/0x260
+        smp_call_function+0x3b/0x50
+        on_each_cpu+0x3b/0xc0
+        flush_tlb_all+0x1c/0x20
+        remove_pagetable+0x14e/0x1d0
+        vmemmap_free+0x18/0x20
+        sparse_remove_one_section+0xf7/0x100
+        __remove_section+0xa2/0xb0
+        __remove_pages+0xa0/0xd0
+        arch_remove_memory+0x6b/0xc0
+        remove_memory+0xb8/0xf0
+        acpi_memory_device_remove+0x53/0x96
+        acpi_device_remove+0x90/0xb2
+        __device_release_driver+0x7c/0xf0
+        device_release_driver+0x2f/0x50
+        acpi_bus_remove+0x32/0x6d
+        acpi_bus_trim+0x91/0x102
+        acpi_bus_hot_remove_device+0x88/0x16b
+        acpi_os_execute_deferred+0x27/0x34
+        process_one_work+0x20e/0x5c0
+        worker_thread+0x12e/0x370
+        kthread+0xee/0x100
+        ret_from_fork+0x7c/0xb0
+      ---[ end trace 25e85300f542aa01 ]---
+    
+    Signed-off-by: Tang Chen <tangchen@cn.fujitsu.com>
+    Signed-off-by: Lai Jiangshan <laijs@cn.fujitsu.com>
+    Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+    Acked-by: KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujitsu.com>
+    Cc: KOSAKI Motohiro <kosaki.motohiro@jp.fujitsu.com>
+    Cc: Jiang Liu <jiang.liu@huawei.com>
+    Cc: Jianguo Wu <wujianguo@huawei.com>
+    Cc: Wu Jianguo <wujianguo@huawei.com>
+    Cc: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit b8efb17b3d687695b81485f606fc4e6c35a50f9a
+Author: Zhang Rui <rui.zhang@intel.com>
+Date:   Tue Feb 5 15:41:53 2013 +0800
+
+    i915: ignore lid open event when resuming
+    
+    i915 driver needs to do modeset when
+    1. system resumes from sleep
+    2. lid is opened
+    
+    In PM_SUSPEND_MEM state, all the GPEs are cleared when system resumes,
+    thus it is the i915_resume code does the modeset rather than intel_lid_notify().
+    
+    But in PM_SUSPEND_FREEZE state, this will be broken because
+    system is still responsive to the lid events.
+    1. When we close the lid in Freeze state, intel_lid_notify() sets modeset_on_lid.
+    2. When we reopen the lid, intel_lid_notify() will do a modeset,
+       before the system is resumed.
+    here is the error log,
+    
+    [92146.548074] WARNING: at drivers/gpu/drm/i915/intel_display.c:1028 intel_wait_for_pipe_off+0x184/0x190 [i915]()
+    [92146.548076] Hardware name: VGN-Z540N
+    [92146.548078] pipe_off wait timed out
+    [92146.548167] Modules linked in: hid_generic usbhid hid snd_hda_codec_realtek snd_hda_intel snd_hda_codec parport_pc snd_hwdep ppdev snd_pcm_oss i915 snd_mixer_oss snd_pcm arc4 iwldvm snd_seq_dummy mac80211 snd_seq_oss snd_seq_midi fbcon tileblit font bitblit softcursor drm_kms_helper snd_rawmidi snd_seq_midi_event coretemp drm snd_seq kvm btusb bluetooth snd_timer iwlwifi pcmcia tpm_infineon i2c_algo_bit joydev snd_seq_device intel_agp cfg80211 snd intel_gtt yenta_socket pcmcia_rsrc sony_laptop agpgart microcode psmouse tpm_tis serio_raw mxm_wmi soundcore snd_page_alloc tpm acpi_cpufreq lpc_ich pcmcia_core tpm_bios mperf processor lp parport firewire_ohci firewire_core crc_itu_t sdhci_pci sdhci thermal e1000e
+    [92146.548173] Pid: 4304, comm: kworker/0:0 Tainted: G        W    3.8.0-rc3-s0i3-v3-test+ #9
+    [92146.548175] Call Trace:
+    [92146.548189]  [<c10378e2>] warn_slowpath_common+0x72/0xa0
+    [92146.548227]  [<f86398b4>] ? intel_wait_for_pipe_off+0x184/0x190 [i915]
+    [92146.548263]  [<f86398b4>] ? intel_wait_for_pipe_off+0x184/0x190 [i915]
+    [92146.548270]  [<c10379b3>] warn_slowpath_fmt+0x33/0x40
+    [92146.548307]  [<f86398b4>] intel_wait_for_pipe_off+0x184/0x190 [i915]
+    [92146.548344]  [<f86399c2>] intel_disable_pipe+0x102/0x190 [i915]
+    [92146.548380]  [<f8639ea4>] ? intel_disable_plane+0x64/0x80 [i915]
+    [92146.548417]  [<f8639f7c>] i9xx_crtc_disable+0xbc/0x150 [i915]
+    [92146.548456]  [<f863ebee>] intel_crtc_update_dpms+0x5e/0x90 [i915]
+    [92146.548493]  [<f86437cf>] intel_modeset_setup_hw_state+0x42f/0x8f0 [i915]
+    [92146.548535]  [<f8645b0b>] intel_lid_notify+0x9b/0xc0 [i915]
+    [92146.548543]  [<c15610d3>] notifier_call_chain+0x43/0x60
+    [92146.548550]  [<c105d1e1>] __blocking_notifier_call_chain+0x41/0x80
+    [92146.548556]  [<c105d23f>] blocking_notifier_call_chain+0x1f/0x30
+    [92146.548563]  [<c131a684>] acpi_lid_send_state+0x78/0xa4
+    [92146.548569]  [<c131aa9e>] acpi_button_notify+0x3b/0xf1
+    [92146.548577]  [<c12df56a>] ? acpi_os_execute+0x17/0x19
+    [92146.548582]  [<c12e591a>] ? acpi_ec_sync_query+0xa5/0xbc
+    [92146.548589]  [<c12e2b82>] acpi_device_notify+0x16/0x18
+    [92146.548595]  [<c12f4904>] acpi_ev_notify_dispatch+0x38/0x4f
+    [92146.548600]  [<c12df0e8>] acpi_os_execute_deferred+0x20/0x2b
+    [92146.548607]  [<c1051208>] process_one_work+0x128/0x3f0
+    [92146.548613]  [<c1564f73>] ? common_interrupt+0x33/0x38
+    [92146.548618]  [<c104f8c0>] ? wake_up_worker+0x30/0x30
+    [92146.548624]  [<c12df0c8>] ? acpi_os_wait_events_complete+0x1e/0x1e
+    [92146.548629]  [<c10524f9>] worker_thread+0x119/0x3b0
+    [92146.548634]  [<c10523e0>] ? manage_workers+0x240/0x240
+    [92146.548640]  [<c1056e84>] kthread+0x94/0xa0
+    [92146.548647]  [<c1060000>] ? ftrace_raw_output_sched_stat_runtime+0x70/0xf0
+    [92146.548652]  [<c15649b7>] ret_from_kernel_thread+0x1b/0x28
+    [92146.548658]  [<c1056df0>] ? kthread_create_on_node+0xc0/0xc0
+    
+    three different modeset flags are introduced in this patch
+    MODESET_ON_LID_OPEN: do modeset on next lid open event
+    MODESET_DONE:  modeset already done
+    MODESET_SUSPENDED:  suspended, only do modeset when system is resumed
+    
+    In this way,
+    1. when lid is closed, MODESET_ON_LID_OPEN is set so that
+       we'll do modeset on next lid open event.
+    2. when lid is opened, MODESET_DONE is set
+       so that duplicate lid open events will be ignored.
+    3. when system suspends, MODESET_SUSPENDED is set.
+       In this case, we will not do modeset on any lid events.
+    
+    Plus, locking mechanism is also introduced to avoid racing.
+    
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+
+commit 712cd386fdc983d318fecf302a2a9cb8e9de90c9
+Author: Tang Chen <tangchen@cn.fujitsu.com>
+Date:   Tue Dec 11 16:01:07 2012 -0800
+
+    mm/memory_hotplug.c: update start_pfn in zone and pg_data when spanned_pages == 0.
+    
+    If we hot-remove memory only and leave the cpus alive, the corresponding
+    node will not be removed.  But the node_start_pfn and node_spanned_pages
+    in pg_data will be reset to 0.  In this case, when we hot-add the memory
+    back next time, the node_start_pfn will always be 0 because no pfn is less
+    than 0.  After that, if we hot-remove the memory again, it will cause
+    kernel panic in function find_biggest_section_pfn() when it tries to scan
+    all the pfns.
+    
+    The zone will also have the same problem.
+    
+    This patch sets start_pfn to the start_pfn of the section being added when
+    spanned_pages of the zone or pg_data is 0.
+    
+      ---How to reproduce---
+    
+    1. hot-add a container with some memory and cpus;
+    2. hot-remove the container's memory, and leave cpus there;
+    3. hot-add these memory again;
+    4. hot-remove them again;
+    
+    then, the kernel will panic.
+    
+      ---Call trace---
+    
+      BUG: unable to handle kernel paging request at 00000fff82a8cc38
+      IP: [<ffffffff811c0d55>] find_biggest_section_pfn+0xe5/0x180
+      ......
+      Call Trace:
+       [<ffffffff811c1124>] __remove_zone+0x184/0x1b0
+       [<ffffffff811c11dc>] __remove_section+0x8c/0xb0
+       [<ffffffff811c12e7>] __remove_pages+0xe7/0x120
+       [<ffffffff81654f7c>] arch_remove_memory+0x2c/0x80
+       [<ffffffff81655bb6>] remove_memory+0x56/0x90
+       [<ffffffff813da0c8>] acpi_memory_device_remove_memory+0x48/0x73
+       [<ffffffff813da55a>] acpi_memory_device_notify+0x153/0x274
+       [<ffffffff813b6786>] acpi_ev_notify_dispatch+0x41/0x5f
+       [<ffffffff813a3867>] acpi_os_execute_deferred+0x27/0x34
+       [<ffffffff81090589>] process_one_work+0x219/0x680
+       [<ffffffff810923be>] worker_thread+0x12e/0x320
+       [<ffffffff81098396>] kthread+0xc6/0xd0
+       [<ffffffff8167c7c4>] kernel_thread_helper+0x4/0x10
+      ......
+      ---[ end trace 96d845dbf33fee11 ]---
+    
+    Signed-off-by: Tang Chen <tangchen@cn.fujitsu.com>
+    Cc: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
+    Cc: Wen Congyang <wency@cn.fujitsu.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 85b97637bb40a9f486459dd254598759af9c3d50
+Author: Tang Chen <tangchen@cn.fujitsu.com>
+Date:   Mon Oct 29 11:01:50 2012 +0800
+
+    x86/mce: Do not change worker's running cpu in cmci_rediscover().
+    
+    cmci_rediscover() used set_cpus_allowed_ptr() to change the current process's
+    running cpu, and migrate itself to the dest cpu. But worker processes are not
+    allowed to be migrated. If current is a worker, the worker will be migrated to
+    another cpu, but the corresponding  worker_pool is still on the original cpu.
+    
+    In this case, the following BUG_ON in try_to_wake_up_local() will be triggered:
+    BUG_ON(rq != this_rq());
+    
+    This will cause the kernel panic. The call trace is like the following:
+    
+    [ 6155.451107] ------------[ cut here ]------------
+    [ 6155.452019] kernel BUG at kernel/sched/core.c:1654!
+    ......
+    [ 6155.452019] RIP: 0010:[<ffffffff810add15>]  [<ffffffff810add15>] try_to_wake_up_local+0x115/0x130
+    ......
+    [ 6155.452019] Call Trace:
+    [ 6155.452019]  [<ffffffff8166fc14>] __schedule+0x764/0x880
+    [ 6155.452019]  [<ffffffff81670059>] schedule+0x29/0x70
+    [ 6155.452019]  [<ffffffff8166de65>] schedule_timeout+0x235/0x2d0
+    [ 6155.452019]  [<ffffffff810db57d>] ? mark_held_locks+0x8d/0x140
+    [ 6155.452019]  [<ffffffff810dd463>] ? __lock_release+0x133/0x1a0
+    [ 6155.452019]  [<ffffffff81671c50>] ? _raw_spin_unlock_irq+0x30/0x50
+    [ 6155.452019]  [<ffffffff810db8f5>] ? trace_hardirqs_on_caller+0x105/0x190
+    [ 6155.452019]  [<ffffffff8166fefb>] wait_for_common+0x12b/0x180
+    [ 6155.452019]  [<ffffffff810b0b30>] ? try_to_wake_up+0x2f0/0x2f0
+    [ 6155.452019]  [<ffffffff8167002d>] wait_for_completion+0x1d/0x20
+    [ 6155.452019]  [<ffffffff8110008a>] stop_one_cpu+0x8a/0xc0
+    [ 6155.452019]  [<ffffffff810abd40>] ? __migrate_task+0x1a0/0x1a0
+    [ 6155.452019]  [<ffffffff810a6ab8>] ? complete+0x28/0x60
+    [ 6155.452019]  [<ffffffff810b0fd8>] set_cpus_allowed_ptr+0x128/0x130
+    [ 6155.452019]  [<ffffffff81036785>] cmci_rediscover+0xf5/0x140
+    [ 6155.452019]  [<ffffffff816643c0>] mce_cpu_callback+0x18d/0x19d
+    [ 6155.452019]  [<ffffffff81676187>] notifier_call_chain+0x67/0x150
+    [ 6155.452019]  [<ffffffff810a03de>] __raw_notifier_call_chain+0xe/0x10
+    [ 6155.452019]  [<ffffffff81070470>] __cpu_notify+0x20/0x40
+    [ 6155.452019]  [<ffffffff810704a5>] cpu_notify_nofail+0x15/0x30
+    [ 6155.452019]  [<ffffffff81655182>] _cpu_down+0x262/0x2e0
+    [ 6155.452019]  [<ffffffff81655236>] cpu_down+0x36/0x50
+    [ 6155.452019]  [<ffffffff813d3eaa>] acpi_processor_remove+0x50/0x11e
+    [ 6155.452019]  [<ffffffff813a6978>] acpi_device_remove+0x90/0xb2
+    [ 6155.452019]  [<ffffffff8143cbec>] __device_release_driver+0x7c/0xf0
+    [ 6155.452019]  [<ffffffff8143cd6f>] device_release_driver+0x2f/0x50
+    [ 6155.452019]  [<ffffffff813a7870>] acpi_bus_remove+0x32/0x6d
+    [ 6155.452019]  [<ffffffff813a7932>] acpi_bus_trim+0x87/0xee
+    [ 6155.452019]  [<ffffffff813a7a21>] acpi_bus_hot_remove_device+0x88/0x16b
+    [ 6155.452019]  [<ffffffff813a33ee>] acpi_os_execute_deferred+0x27/0x34
+    [ 6155.452019]  [<ffffffff81090589>] process_one_work+0x219/0x680
+    [ 6155.452019]  [<ffffffff81090528>] ? process_one_work+0x1b8/0x680
+    [ 6155.452019]  [<ffffffff813a33c7>] ? acpi_os_wait_events_complete+0x23/0x23
+    [ 6155.452019]  [<ffffffff810923be>] worker_thread+0x12e/0x320
+    [ 6155.452019]  [<ffffffff81092290>] ? manage_workers+0x110/0x110
+    [ 6155.452019]  [<ffffffff81098396>] kthread+0xc6/0xd0
+    [ 6155.452019]  [<ffffffff8167c4c4>] kernel_thread_helper+0x4/0x10
+    [ 6155.452019]  [<ffffffff81671f30>] ? retint_restore_args+0x13/0x13
+    [ 6155.452019]  [<ffffffff810982d0>] ? __init_kthread_worker+0x70/0x70
+    [ 6155.452019]  [<ffffffff8167c4c0>] ? gs_change+0x13/0x13
+    
+    This patch removes the set_cpus_allowed_ptr() call, and put the cmci rediscover
+    jobs onto all the other cpus using system_wq. This could bring some delay for
+    the jobs.
+    
+    Signed-off-by: Tang Chen <tangchen@cn.fujitsu.com>
+    Signed-off-by: Miao Xie <miaox@cn.fujitsu.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit 4ce3278c947daff9a39b99255b278626eef1d8ee
+Author: Chen Gong <gong.chen@linux.intel.com>
+Date:   Tue May 8 20:40:12 2012 -0300
+
+    edac: avoid mce decoding crash after edac driver unloaded
+    
+    commit e35fca4791fcdd43dc1fd769797df40c562ab491 upstream.
+    
+    Some edac drivers register themselves as mce decoders via
+    notifier_chain. But in current notifier_chain implementation logic,
+    it doesn't accept same notifier registered twice. If so, it will be
+    wrong when adding/removing the element from the list. For example,
+    on one SandyBridge platform, remove module sb_edac and then trigger
+    one error, it will hit oops because it has no mce decoder registered
+    but related notifier_chain still points to an invalid callback
+    function. Here is an example:
+    
+    Call Trace:
+     [<ffffffff8150ef6a>] atomic_notifier_call_chain+0x1a/0x20
+     [<ffffffff8102b936>] mce_log+0x46/0x180
+     [<ffffffff8102eaea>] apei_mce_report_mem_error+0x4a/0x60
+     [<ffffffff812e19d2>] ghes_do_proc+0x192/0x210
+     [<ffffffff812e2066>] ghes_proc+0x46/0x70
+     [<ffffffff812e20d8>] ghes_notify_sci+0x48/0x80
+     [<ffffffff8150ef05>] notifier_call_chain+0x55/0x80
+     [<ffffffff81076f1a>] __blocking_notifier_call_chain+0x5a/0x80
+     [<ffffffff812aea11>] ? acpi_os_wait_events_complete+0x23/0x23
+     [<ffffffff81076f56>] blocking_notifier_call_chain+0x16/0x20
+     [<ffffffff812ddc4d>] acpi_hed_notify+0x19/0x1b
+     [<ffffffff812b16bd>] acpi_device_notify+0x19/0x1b
+     [<ffffffff812beb38>] acpi_ev_notify_dispatch+0x67/0x7f
+     [<ffffffff812aea3a>] acpi_os_execute_deferred+0x29/0x36
+     [<ffffffff81069dc2>] process_one_work+0x132/0x450
+     [<ffffffff8106bbcb>] worker_thread+0x17b/0x3c0
+     [<ffffffff8106ba50>] ? manage_workers+0x120/0x120
+     [<ffffffff81070aee>] kthread+0x9e/0xb0
+     [<ffffffff81514724>] kernel_thread_helper+0x4/0x10
+     [<ffffffff81070a50>] ? kthread_freezable_should_stop+0x70/0x70
+     [<ffffffff81514720>] ? gs_change+0x13/0x13
+    Code: f3 49 89 d4 45 85 ed 4d 89 c6 48 8b 0f 74 48 48 85 c9 75 17 eb 41
+    0f 1f 80 00 00 00 00 41 83 ed 01 4c 89 f9 74 22 4d 85 ff 74 1d <4c> 8b
+    79 08 4c 89 e2 48 89 de 48 89 cf ff 11 4d 85 f6 74 04 41
+    RIP  [<ffffffff8150eef6>] notifier_call_chain+0x46/0x80
+     RSP <ffff88042868fb20>
+    CR2: ffffffffa01af838
+    ---[ end trace 0100930068e73e6f ]---
+    BUG: unable to handle kernel paging request at fffffffffffffff8
+    IP: [<ffffffff810705b0>] kthread_data+0x10/0x20
+    PGD 1a0d067 PUD 1a0e067 PMD 0
+    Oops: 0000 [#2] SMP
+    
+    Only i7core_edac and sb_edac have such issues because they have more
+    than one memory controller which means they have to register mce
+    decoder many times.
+    
+    Signed-off-by: Chen Gong <gong.chen@linux.intel.com>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+    [bwh: Backported to 3.2: drivers call atomic_notifier_chain_{,un}register()
+     directly]
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 40ca92aafc8135368625ba3c8825bcd54f3569a8
+Author: Chen Gong <gong.chen@linux.intel.com>
+Date:   Tue May 8 20:40:12 2012 -0300
+
+    edac: avoid mce decoding crash after edac driver unloaded
+    
+    commit e35fca4791fcdd43dc1fd769797df40c562ab491 upstream.
+    
+    Some edac drivers register themselves as mce decoders via
+    notifier_chain. But in current notifier_chain implementation logic,
+    it doesn't accept same notifier registered twice. If so, it will be
+    wrong when adding/removing the element from the list. For example,
+    on one SandyBridge platform, remove module sb_edac and then trigger
+    one error, it will hit oops because it has no mce decoder registered
+    but related notifier_chain still points to an invalid callback
+    function. Here is an example:
+    
+    Call Trace:
+     [<ffffffff8150ef6a>] atomic_notifier_call_chain+0x1a/0x20
+     [<ffffffff8102b936>] mce_log+0x46/0x180
+     [<ffffffff8102eaea>] apei_mce_report_mem_error+0x4a/0x60
+     [<ffffffff812e19d2>] ghes_do_proc+0x192/0x210
+     [<ffffffff812e2066>] ghes_proc+0x46/0x70
+     [<ffffffff812e20d8>] ghes_notify_sci+0x48/0x80
+     [<ffffffff8150ef05>] notifier_call_chain+0x55/0x80
+     [<ffffffff81076f1a>] __blocking_notifier_call_chain+0x5a/0x80
+     [<ffffffff812aea11>] ? acpi_os_wait_events_complete+0x23/0x23
+     [<ffffffff81076f56>] blocking_notifier_call_chain+0x16/0x20
+     [<ffffffff812ddc4d>] acpi_hed_notify+0x19/0x1b
+     [<ffffffff812b16bd>] acpi_device_notify+0x19/0x1b
+     [<ffffffff812beb38>] acpi_ev_notify_dispatch+0x67/0x7f
+     [<ffffffff812aea3a>] acpi_os_execute_deferred+0x29/0x36
+     [<ffffffff81069dc2>] process_one_work+0x132/0x450
+     [<ffffffff8106bbcb>] worker_thread+0x17b/0x3c0
+     [<ffffffff8106ba50>] ? manage_workers+0x120/0x120
+     [<ffffffff81070aee>] kthread+0x9e/0xb0
+     [<ffffffff81514724>] kernel_thread_helper+0x4/0x10
+     [<ffffffff81070a50>] ? kthread_freezable_should_stop+0x70/0x70
+     [<ffffffff81514720>] ? gs_change+0x13/0x13
+    Code: f3 49 89 d4 45 85 ed 4d 89 c6 48 8b 0f 74 48 48 85 c9 75 17 eb 41
+    0f 1f 80 00 00 00 00 41 83 ed 01 4c 89 f9 74 22 4d 85 ff 74 1d <4c> 8b
+    79 08 4c 89 e2 48 89 de 48 89 cf ff 11 4d 85 f6 74 04 41
+    RIP  [<ffffffff8150eef6>] notifier_call_chain+0x46/0x80
+     RSP <ffff88042868fb20>
+    CR2: ffffffffa01af838
+    ---[ end trace 0100930068e73e6f ]---
+    BUG: unable to handle kernel paging request at fffffffffffffff8
+    IP: [<ffffffff810705b0>] kthread_data+0x10/0x20
+    PGD 1a0d067 PUD 1a0e067 PMD 0
+    Oops: 0000 [#2] SMP
+    
+    Only i7core_edac and sb_edac have such issues because they have more
+    than one memory controller which means they have to register mce
+    decoder many times.
+    
+    Signed-off-by: Chen Gong <gong.chen@linux.intel.com>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e35fca4791fcdd43dc1fd769797df40c562ab491
+Author: Chen Gong <gong.chen@linux.intel.com>
+Date:   Tue May 8 20:40:12 2012 -0300
+
+    edac: avoid mce decoding crash after edac driver unloaded
+    
+    Some edac drivers register themselves as mce decoders via
+    notifier_chain. But in current notifier_chain implementation logic,
+    it doesn't accept same notifier registered twice. If so, it will be
+    wrong when adding/removing the element from the list. For example,
+    on one SandyBridge platform, remove module sb_edac and then trigger
+    one error, it will hit oops because it has no mce decoder registered
+    but related notifier_chain still points to an invalid callback
+    function. Here is an example:
+    
+    Call Trace:
+     [<ffffffff8150ef6a>] atomic_notifier_call_chain+0x1a/0x20
+     [<ffffffff8102b936>] mce_log+0x46/0x180
+     [<ffffffff8102eaea>] apei_mce_report_mem_error+0x4a/0x60
+     [<ffffffff812e19d2>] ghes_do_proc+0x192/0x210
+     [<ffffffff812e2066>] ghes_proc+0x46/0x70
+     [<ffffffff812e20d8>] ghes_notify_sci+0x48/0x80
+     [<ffffffff8150ef05>] notifier_call_chain+0x55/0x80
+     [<ffffffff81076f1a>] __blocking_notifier_call_chain+0x5a/0x80
+     [<ffffffff812aea11>] ? acpi_os_wait_events_complete+0x23/0x23
+     [<ffffffff81076f56>] blocking_notifier_call_chain+0x16/0x20
+     [<ffffffff812ddc4d>] acpi_hed_notify+0x19/0x1b
+     [<ffffffff812b16bd>] acpi_device_notify+0x19/0x1b
+     [<ffffffff812beb38>] acpi_ev_notify_dispatch+0x67/0x7f
+     [<ffffffff812aea3a>] acpi_os_execute_deferred+0x29/0x36
+     [<ffffffff81069dc2>] process_one_work+0x132/0x450
+     [<ffffffff8106bbcb>] worker_thread+0x17b/0x3c0
+     [<ffffffff8106ba50>] ? manage_workers+0x120/0x120
+     [<ffffffff81070aee>] kthread+0x9e/0xb0
+     [<ffffffff81514724>] kernel_thread_helper+0x4/0x10
+     [<ffffffff81070a50>] ? kthread_freezable_should_stop+0x70/0x70
+     [<ffffffff81514720>] ? gs_change+0x13/0x13
+    Code: f3 49 89 d4 45 85 ed 4d 89 c6 48 8b 0f 74 48 48 85 c9 75 17 eb 41
+    0f 1f 80 00 00 00 00 41 83 ed 01 4c 89 f9 74 22 4d 85 ff 74 1d <4c> 8b
+    79 08 4c 89 e2 48 89 de 48 89 cf ff 11 4d 85 f6 74 04 41
+    RIP  [<ffffffff8150eef6>] notifier_call_chain+0x46/0x80
+     RSP <ffff88042868fb20>
+    CR2: ffffffffa01af838
+    ---[ end trace 0100930068e73e6f ]---
+    BUG: unable to handle kernel paging request at fffffffffffffff8
+    IP: [<ffffffff810705b0>] kthread_data+0x10/0x20
+    PGD 1a0d067 PUD 1a0e067 PMD 0
+    Oops: 0000 [#2] SMP
+    
+    Only i7core_edac and sb_edac have such issues because they have more
+    than one memory controller which means they have to register mce
+    decoder many times.
+    
+    Cc: <stable@vger.kernel.org> # 3.2 and upper
+    Signed-off-by: Chen Gong <gong.chen@linux.intel.com>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+
+commit 9ac6185669d0d277c4082fa92ba8eb2e55534cbf
+Author: Bjorn Helgaas <bjorn.helgaas@hp.com>
+Date:   Mon Aug 31 22:32:10 2009 +0000
+
+    ACPI: simplify deferred execution path
+    
+    We had two functions, acpi_os_execute_deferred() and
+    acpi_os_execute_hp_deferred() that differed only in that the
+    latter did acpi_os_wait_events_complete(NULL) before executing
+    the deferred function.
+    
+    This patch consolidates those two functions and uses a flag in
+    the struct acpi_os_dpc to determine whether to do the wait.
+    
+    Signed-off-by: Bjorn Helgaas <bjorn.helgaas@hp.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 97a97aaf1d374238d5e02d7a39d41983b6877c49
+Author: Darren Salt <linux@youmustbejoking.demon.co.uk>
+Date:   Sat Feb 7 01:02:07 2009 -0500
+
+    eeepc-laptop: fix oops when changing backlight brightness during eeepc-laptop init
+    
+    commit 7695fb04aca62e2d8a7ca6ede50f6211e1d71e53 upstream.
+    
+    I got the following oops while changing the backlight brightness during
+    startup.  When it happens, it prevents use of the hotkeys, Fn-Fx, and the
+    lid button.
+    
+    It's a clear use-before-init, as I verified by testing with an
+    appropriately-placed "else printk".
+    
+    BUG: unable to handle kernel NULL pointer dereference at 00000000
+    *pde = 00000000
+    Oops: 0002 [#1] PREEMPT SMP
+    Pid: 160, comm: kacpi_notify Not tainted (2.6.28.1-eee901 #4) 901
+    EIP: 0060:[<c0264e68>]  [<c0264e68>] eeepc_hotk_notify+26/da
+    EFLAGS: 00010246 CPU: 1
+    Using defaults from ksymoops -t elf32-i386 -a i386
+    EAX: 00000009 EBX: 00000000 ECX: 00000009 EDX: f70dbf64
+    ESI: 00000029 EDI: f7335188 EBP: c02112c9 ESP: f70dbf80
+     DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+     f70731e0 f73acd50 c02164ac f7335180 f70aa040 c02112e6 f733518c c012b62f
+     f70aa044 f70aa040 c012bdba f70aa04c 00000000 c012be6e 00000000 f70bdf80
+     c012e198 f70dbfc4 f70dbfc4 f70aa040 c012bdba 00000000 c012e0c9 c012e091
+    Call Trace:
+     [<c02164ac>] ? acpi_ev_notify_dispatch+4c/55
+     [<c02112e6>] ? acpi_os_execute_deferred+1d/25
+     [<c012b62f>] ? run_workqueue+71/f1
+     [<c012bdba>] ? worker_thread+0/bf
+     [<c012be6e>] ? worker_thread+b4/bf
+     [<c012e198>] ? autoremove_wake_function+0/2b
+     [<c012bdba>] ? worker_thread+0/bf
+     [<c012e0c9>] ? kthread+38/5f
+     [<c012e091>] ? kthread+0/5f
+     [<c0103abf>] ? kernel_thread_helper+7/10
+    Code: 00 00 00 00 c3 83 3d 60 5c 50 c0 00 56 89 d6 53 0f 84 c4 00 00 00 8d 42
+    e0 83 f8 0f 77 0f 8b 1d 68 5c 50 c0 89 d8 e8 a9 fa ff ff <89> 03 8b 1d 60 5c
+    50 c0 89 f2 83 e2 7f 0f b7 4c 53 10 8d 41 01
+    
+    Signed-off-by: Darren Salt <linux@youmustbejoking.demon.co.uk>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 106d6a4bdb51dc18233e43a4baee041167db3973
+Author: Darren Salt <linux@youmustbejoking.demon.co.uk>
+Date:   Sat Feb 7 01:02:07 2009 -0500
+
+    eeepc-laptop: fix oops when changing backlight brightness during eeepc-laptop init
+    
+    commit 7695fb04aca62e2d8a7ca6ede50f6211e1d71e53 upstream.
+    
+    I got the following oops while changing the backlight brightness during
+    startup.  When it happens, it prevents use of the hotkeys, Fn-Fx, and the
+    lid button.
+    
+    It's a clear use-before-init, as I verified by testing with an
+    appropriately-placed "else printk".
+    
+    BUG: unable to handle kernel NULL pointer dereference at 00000000
+    *pde = 00000000
+    Oops: 0002 [#1] PREEMPT SMP
+    Pid: 160, comm: kacpi_notify Not tainted (2.6.28.1-eee901 #4) 901
+    EIP: 0060:[<c0264e68>]  [<c0264e68>] eeepc_hotk_notify+26/da
+    EFLAGS: 00010246 CPU: 1
+    Using defaults from ksymoops -t elf32-i386 -a i386
+    EAX: 00000009 EBX: 00000000 ECX: 00000009 EDX: f70dbf64
+    ESI: 00000029 EDI: f7335188 EBP: c02112c9 ESP: f70dbf80
+     DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+     f70731e0 f73acd50 c02164ac f7335180 f70aa040 c02112e6 f733518c c012b62f
+     f70aa044 f70aa040 c012bdba f70aa04c 00000000 c012be6e 00000000 f70bdf80
+     c012e198 f70dbfc4 f70dbfc4 f70aa040 c012bdba 00000000 c012e0c9 c012e091
+    Call Trace:
+     [<c02164ac>] ? acpi_ev_notify_dispatch+4c/55
+     [<c02112e6>] ? acpi_os_execute_deferred+1d/25
+     [<c012b62f>] ? run_workqueue+71/f1
+     [<c012bdba>] ? worker_thread+0/bf
+     [<c012be6e>] ? worker_thread+b4/bf
+     [<c012e198>] ? autoremove_wake_function+0/2b
+     [<c012bdba>] ? worker_thread+0/bf
+     [<c012e0c9>] ? kthread+38/5f
+     [<c012e091>] ? kthread+0/5f
+     [<c0103abf>] ? kernel_thread_helper+7/10
+    Code: 00 00 00 00 c3 83 3d 60 5c 50 c0 00 56 89 d6 53 0f 84 c4 00 00 00 8d 42
+    e0 83 f8 0f 77 0f 8b 1d 68 5c 50 c0 89 d8 e8 a9 fa ff ff <89> 03 8b 1d 60 5c
+    50 c0 89 f2 83 e2 7f 0f b7 4c 53 10 8d 41 01
+    
+    Signed-off-by: Darren Salt <linux@youmustbejoking.demon.co.uk>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 7695fb04aca62e2d8a7ca6ede50f6211e1d71e53
+Author: Darren Salt <linux@youmustbejoking.demon.co.uk>
+Date:   Sat Feb 7 01:02:07 2009 -0500
+
+    eeepc-laptop: fix oops when changing backlight brightness during eeepc-laptop init
+    
+    I got the following oops while changing the backlight brightness during
+    startup.  When it happens, it prevents use of the hotkeys, Fn-Fx, and the
+    lid button.
+    
+    It's a clear use-before-init, as I verified by testing with an
+    appropriately-placed "else printk".
+    
+    BUG: unable to handle kernel NULL pointer dereference at 00000000
+    *pde = 00000000
+    Oops: 0002 [#1] PREEMPT SMP
+    Pid: 160, comm: kacpi_notify Not tainted (2.6.28.1-eee901 #4) 901
+    EIP: 0060:[<c0264e68>]  [<c0264e68>] eeepc_hotk_notify+26/da
+    EFLAGS: 00010246 CPU: 1
+    Using defaults from ksymoops -t elf32-i386 -a i386
+    EAX: 00000009 EBX: 00000000 ECX: 00000009 EDX: f70dbf64
+    ESI: 00000029 EDI: f7335188 EBP: c02112c9 ESP: f70dbf80
+     DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+     f70731e0 f73acd50 c02164ac f7335180 f70aa040 c02112e6 f733518c c012b62f
+     f70aa044 f70aa040 c012bdba f70aa04c 00000000 c012be6e 00000000 f70bdf80
+     c012e198 f70dbfc4 f70dbfc4 f70aa040 c012bdba 00000000 c012e0c9 c012e091
+    Call Trace:
+     [<c02164ac>] ? acpi_ev_notify_dispatch+4c/55
+     [<c02112e6>] ? acpi_os_execute_deferred+1d/25
+     [<c012b62f>] ? run_workqueue+71/f1
+     [<c012bdba>] ? worker_thread+0/bf
+     [<c012be6e>] ? worker_thread+b4/bf
+     [<c012e198>] ? autoremove_wake_function+0/2b
+     [<c012bdba>] ? worker_thread+0/bf
+     [<c012e0c9>] ? kthread+38/5f
+     [<c012e091>] ? kthread+0/5f
+     [<c0103abf>] ? kernel_thread_helper+7/10
+    Code: 00 00 00 00 c3 83 3d 60 5c 50 c0 00 56 89 d6 53 0f 84 c4 00 00 00 8d 42
+    e0 83 f8 0f 77 0f 8b 1d 68 5c 50 c0 89 d8 e8 a9 fa ff ff <89> 03 8b 1d 60 5c
+    50 c0 89 f2 83 e2 7f 0f b7 4c 53 10 8d 41 01
+    
+    Signed-off-by: Darren Salt <linux@youmustbejoking.demon.co.uk>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit fcfc638c6b1345b6646523dbab0065b36a868ffc
+Author: Alexey Y. Starikovskiy <alexey.y.starikovskiy@intel.com>
+Date:   Tue Sep 26 04:18:16 2006 -0400
+
+    ACPI: Remove deferred execution from global lock acquire wakeup path
+    
+    On acquiring the ACPI global lock, if there were sleepers on the lock,
+    we used to use acpi_os_execute() to defer a thread which would signal
+    sleepers.  Now just signal the semaphore directly.
+    
+    http://bugzilla.kernel.org/show_bug.cgi?id=5534#c159
+    
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 72945b2b90a5554975b8f72673ab7139d232a121
+Author: Len Brown <len.brown@intel.com>
+Date:   Wed Jul 12 22:46:42 2006 -0400
+
+    [PATCH] Revert "ACPI: execute Notify() handlers on new thread"
+    
+    This effectively reverts commit b8d35192c55fb055792ff0641408eaaec7c88988
+    by reverts acpi_os_queue_for_execution() to what it was before that,
+    except it changes the name to acpi_os_execute() to match ACPICA
+    20060512.
+    
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    
+    [ The thread execution doesn't actually solve the bug it set out to
+      solve (see
+    
+            http://bugzilla.kernel.org/show_bug.cgi?id=5534
+    
+      for more details) because the new events can get caught behind the AML
+      semaphore or other serialization.  And when that happens, the notify
+      threads keep on piling up until the system dies. ]
+    
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+
+commit 958dd242b691f64ab4632b4903dbb1e16fee8269
+Author: Bob Moore <robert.moore@intel.com>
+Date:   Fri May 12 17:12:00 2006 -0400
+
+    ACPI: ACPICA 20060512
+    
+    Replaced the acpi_os_queue_for_execution() with a new
+    interface named acpi_os_execute(). The major difference is
+    that the new interface does not have a Priority parameter,
+    this appeared to be useless and has been replaced by
+    a Type parameter. The Type tells the OS what type of
+    execution is being requested, such as global lock handler,
+    notify handler, GPE handler, etc. This allows the host
+    to queue and execute the request as appropriate for the
+    request type, possibly using different work queues and
+    different priorities for the various request types. This
+    enables fixes for multithreading deadlock problems such as
+    http://bugzilla.kernel.org/show_bug.cgi?id=5534
+    (Alexey Starikovskiy and Bob Moore)
+    
+    Fixed a possible memory leak associated with the
+    support for the so-called "implicit return" ACPI
+    extension. Reported by FreeBSD  (Fiodor Suietov)
+    http://bugzilla.kernel.org/show_bug.cgi?id=6514
+    
+    Fixed a problem with the Load() operator where a table
+    load from an operation region could overwrite an internal
+    table buffer by up to 7 bytes and cause alignment faults
+    on IPF systems. (With assistance from Luming Yu)
+    
+    Signed-off-by: Bob Moore <robert.moore@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>

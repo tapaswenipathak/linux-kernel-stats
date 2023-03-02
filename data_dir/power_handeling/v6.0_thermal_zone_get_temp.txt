@@ -1,0 +1,2593 @@
+commit c547d7ee0455aef3d7a0e746ecf11180b9b08136
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Thu Nov 10 07:24:54 2022 -0800
+
+    thermal/core: Ensure that thermal device is registered in thermal_zone_get_temp
+    
+    [ Upstream commit 1c6b30060777352e7881383bab726046d8c3c610 ]
+    
+    Calls to thermal_zone_get_temp() are not protected against thermal zone
+    device removal. As result, it is possible that the thermal zone operations
+    callbacks are no longer valid when thermal_zone_get_temp() is called.
+    This may result in crashes such as
+    
+    BUG: unable to handle page fault for address: ffffffffc04ef420
+     #PF: supervisor read access in kernel mode
+     #PF: error_code(0x0000) - not-present page
+    PGD 5d60e067 P4D 5d60e067 PUD 5d610067 PMD 110197067 PTE 0
+    Oops: 0000 [#1] PREEMPT SMP NOPTI
+    CPU: 1 PID: 3209 Comm: cat Tainted: G        W         5.10.136-19389-g615abc6eb807 #1 02df41ac0b12f3a64f4b34245188d8875bb3bce1
+    Hardware name: Google Coral/Coral, BIOS Google_Coral.10068.92.0 11/27/2018
+    RIP: 0010:thermal_zone_get_temp+0x26/0x73
+    Code: 89 c3 eb d3 0f 1f 44 00 00 55 48 89 e5 41 57 41 56 53 48 85 ff 74 50 48 89 fb 48 81 ff 00 f0 ff ff 77 44 48 8b 83 98 03 00 00 <48> 83 78 10 00 74 36 49 89 f6 4c 8d bb d8 03 00 00 4c 89 ff e8 9f
+    RSP: 0018:ffffb3758138fd38 EFLAGS: 00010287
+    RAX: ffffffffc04ef410 RBX: ffff98f14d7fb000 RCX: 0000000000000000
+    RDX: ffff98f17cf90000 RSI: ffffb3758138fd64 RDI: ffff98f14d7fb000
+    RBP: ffffb3758138fd50 R08: 0000000000001000 R09: ffff98f17cf90000
+    R10: 0000000000000000 R11: ffffffff8dacad28 R12: 0000000000001000
+    R13: ffff98f1793a7d80 R14: ffff98f143231708 R15: ffff98f14d7fb018
+    FS:  00007ec166097800(0000) GS:ffff98f1bbd00000(0000) knlGS:0000000000000000
+    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    CR2: ffffffffc04ef420 CR3: 000000010ee9a000 CR4: 00000000003506e0
+    Call Trace:
+     temp_show+0x31/0x68
+     dev_attr_show+0x1d/0x4f
+     sysfs_kf_seq_show+0x92/0x107
+     seq_read_iter+0xf5/0x3f2
+     vfs_read+0x205/0x379
+     __x64_sys_read+0x7c/0xe2
+     do_syscall_64+0x43/0x55
+     entry_SYSCALL_64_after_hwframe+0x61/0xc6
+    
+    if a thermal device is removed while accesses to its device attributes
+    are ongoing.
+    
+    The problem is exposed by code in iwl_op_mode_mvm_start(), which registers
+    a thermal zone device only to unregister it shortly afterwards if an
+    unrelated failure is encountered while accessing the hardware.
+    
+    Check if the thermal zone device is registered after acquiring the
+    thermal zone device mutex to ensure this does not happen.
+    
+    The code was tested by triggering the failure in iwl_op_mode_mvm_start()
+    on purpose. Without this patch, the kernel crashes reliably. The crash
+    is no longer observed after applying this and the preceding patches.
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 691806e977a3a64895bd891878ed726cdbd282c0
+Merge: 456ed864fd90 75b15aa0d83e
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Dec 12 13:45:21 2022 -0800
+
+    Merge tag 'thermal-6.2-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull thermal control updates from Rafael Wysocki:
+     "These include thermal core fixes to protect thermal device operations
+      against thermal device removal, other thermal core fixes and updates
+      of Intel thermal control drivers.
+    
+      Specifics:
+    
+       - Fix race conditions related to thermal device operations that are
+         not protected against thermal device removal (Guenter Roeck)
+    
+       - Fix error code in __thermal_cooling_device_register() (Dan
+         Carpenter)
+    
+       - Validate new cooling device state (coming from user space) in
+         cur_state_store() and reuse the max_state value from cooling device
+         structure in the sysfs interface (Viresh Kumar)
+    
+       - Fix some possible name leaks in error paths in the thermal control
+         core code (Yang Yingliang)
+    
+       - Detect TCC lock bit set in the intel_tcc_cooling driver and make it
+         refuse to update the TCC offset in that case (Zhang Rui)
+    
+       - Add TCC cooling support for RaptorLake-S (Zhang Rui)
+    
+       - Prevent accidental clearing of HFI status by one of the other
+         drivers using the same status register (Srinivas Pandruvada)
+    
+       - Protect clearing of thermal status bits in Intel thermal control
+         drivers (Srinivas Pandruvada)
+    
+       - Allow the HFI thermal control driver to ACK an HFI event for the
+         previously observed timestamp (Srinivas Pandruvada)
+    
+       - Remove a pointless die_id check from the HFI thermal driver and
+         adjust the definition a data structure used by it (Ricardo Neri)"
+    
+    * tag 'thermal-6.2-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm:
+      thermal: intel: hfi: Remove a pointless die_id check
+      thermal: core: fix some possible name leaks in error paths
+      thermal: intel: hfi: ACK HFI for the same timestamp
+      thermal: intel: Protect clearing of thermal status bits
+      thermal: intel: Prevent accidental clearing of HFI status
+      thermal/core: Protect thermal device operations against thermal device removal
+      thermal/core: Remove thermal_zone_set_trips()
+      thermal/core: Protect sysfs accesses to thermal operations with thermal zone mutex
+      thermal/core: Protect hwmon accesses to thermal operations with thermal zone mutex
+      thermal/core: Introduce locked version of thermal_zone_device_update
+      thermal/core: Move parameter validation from __thermal_zone_get_temp to thermal_zone_get_temp
+      thermal/core: Ensure that thermal device is registered in thermal_zone_get_temp
+      thermal/core: Delete device under thermal device zone lock
+      thermal/core: Destroy thermal zone device mutex in release function
+      thermal: intel: intel_tcc_cooling: Add TCC cooling support for RaptorLake-S
+      thermal: intel: intel_tcc_cooling: Detect TCC lock bit
+      thermal: intel: hfi: Improve the type of hfi_features::nr_table_pages
+      thermal/core: fix error code in __thermal_cooling_device_register()
+      thermal: sysfs: Reuse cdev->max_state
+      thermal: Validate new state in cur_state_store()
+
+commit ed97d10a8b2c78d1664b01658c5f581e6791ff7d
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Thu Nov 10 07:24:55 2022 -0800
+
+    thermal/core: Move parameter validation from __thermal_zone_get_temp to thermal_zone_get_temp
+    
+    All callers of __thermal_zone_get_temp() already validated the
+    thermal zone parameters. Move validation to thermal_zone_get_temp()
+    where it is actually needed. Also add kernel documentation for
+    __thermal_zone_get_temp(), listing the requirement that the
+    function must be called with validated parameters and with thermal
+    device mutex held.
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 1c6b30060777352e7881383bab726046d8c3c610
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Thu Nov 10 07:24:54 2022 -0800
+
+    thermal/core: Ensure that thermal device is registered in thermal_zone_get_temp
+    
+    Calls to thermal_zone_get_temp() are not protected against thermal zone
+    device removal. As result, it is possible that the thermal zone operations
+    callbacks are no longer valid when thermal_zone_get_temp() is called.
+    This may result in crashes such as
+    
+    BUG: unable to handle page fault for address: ffffffffc04ef420
+     #PF: supervisor read access in kernel mode
+     #PF: error_code(0x0000) - not-present page
+    PGD 5d60e067 P4D 5d60e067 PUD 5d610067 PMD 110197067 PTE 0
+    Oops: 0000 [#1] PREEMPT SMP NOPTI
+    CPU: 1 PID: 3209 Comm: cat Tainted: G        W         5.10.136-19389-g615abc6eb807 #1 02df41ac0b12f3a64f4b34245188d8875bb3bce1
+    Hardware name: Google Coral/Coral, BIOS Google_Coral.10068.92.0 11/27/2018
+    RIP: 0010:thermal_zone_get_temp+0x26/0x73
+    Code: 89 c3 eb d3 0f 1f 44 00 00 55 48 89 e5 41 57 41 56 53 48 85 ff 74 50 48 89 fb 48 81 ff 00 f0 ff ff 77 44 48 8b 83 98 03 00 00 <48> 83 78 10 00 74 36 49 89 f6 4c 8d bb d8 03 00 00 4c 89 ff e8 9f
+    RSP: 0018:ffffb3758138fd38 EFLAGS: 00010287
+    RAX: ffffffffc04ef410 RBX: ffff98f14d7fb000 RCX: 0000000000000000
+    RDX: ffff98f17cf90000 RSI: ffffb3758138fd64 RDI: ffff98f14d7fb000
+    RBP: ffffb3758138fd50 R08: 0000000000001000 R09: ffff98f17cf90000
+    R10: 0000000000000000 R11: ffffffff8dacad28 R12: 0000000000001000
+    R13: ffff98f1793a7d80 R14: ffff98f143231708 R15: ffff98f14d7fb018
+    FS:  00007ec166097800(0000) GS:ffff98f1bbd00000(0000) knlGS:0000000000000000
+    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    CR2: ffffffffc04ef420 CR3: 000000010ee9a000 CR4: 00000000003506e0
+    Call Trace:
+     temp_show+0x31/0x68
+     dev_attr_show+0x1d/0x4f
+     sysfs_kf_seq_show+0x92/0x107
+     seq_read_iter+0xf5/0x3f2
+     vfs_read+0x205/0x379
+     __x64_sys_read+0x7c/0xe2
+     do_syscall_64+0x43/0x55
+     entry_SYSCALL_64_after_hwframe+0x61/0xc6
+    
+    if a thermal device is removed while accesses to its device attributes
+    are ongoing.
+    
+    The problem is exposed by code in iwl_op_mode_mvm_start(), which registers
+    a thermal zone device only to unregister it shortly afterwards if an
+    unrelated failure is encountered while accessing the hardware.
+    
+    Check if the thermal zone device is registered after acquiring the
+    thermal zone device mutex to ensure this does not happen.
+    
+    The code was tested by triggering the failure in iwl_op_mode_mvm_start()
+    on purpose. Without this patch, the kernel crashes reliably. The crash
+    is no longer observed after applying this and the preceding patches.
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit d35f29ed9d11ccc4f9b957871d14726f4451a4ad
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Thu Nov 10 07:24:52 2022 -0800
+
+    thermal/core: Destroy thermal zone device mutex in release function
+    
+    Accesses to thermal zones, and with it the thermal zone device mutex,
+    are still possible after the thermal zone device has been unregistered.
+    For example, thermal_zone_get_temp() can be called from temp_show()
+    in thermal_sysfs.c if the sysfs attribute was opened before the thermal
+    device was unregistered.
+    
+    Move the call to mutex_destroy from thermal_zone_device_unregister()
+    to thermal_release() to ensure that it is only destroyed after it is
+    guaranteed to be no longer accessed.
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 821c341fb0864df59320cb081178a29c20cb2a8d
+Author: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date:   Tue Jul 7 12:34:12 2020 +0200
+
+    Revert "thermal: mediatek: fix register index error"
+    
+    [ Upstream commit a8f62f183021be389561570ab5f8c701a5e70298 ]
+    
+    This reverts commit eb9aecd90d1a39601e91cd08b90d5fee51d321a6
+    
+    The above patch is supposed to fix a register index error on mt2701. It
+    is not clear if the problem solved is a hang or just an invalid value
+    returned, my guess is the second. The patch introduces, though, a new
+    hang on MT8173 device making them unusable. So, seems reasonable, revert
+    the patch because introduces a worst issue.
+    
+    The reason I send a revert instead of trying to fix the issue for MT8173
+    is because the information needed to fix the issue is in the datasheet
+    and is not public. So I am not really able to fix it.
+    
+    Fixes the following bug when CONFIG_MTK_THERMAL is set on MT8173
+    devices.
+    
+    [    2.222488] Unable to handle kernel paging request at virtual address ffff8000125f5001
+    [    2.230421] Mem abort info:
+    [    2.233207]   ESR = 0x96000021
+    [    2.236261]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    2.241571]   SET = 0, FnV = 0
+    [    2.244623]   EA = 0, S1PTW = 0
+    [    2.247762] Data abort info:
+    [    2.250640]   ISV = 0, ISS = 0x00000021
+    [    2.254473]   CM = 0, WnR = 0
+    [    2.257544] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041850000
+    [    2.264251] [ffff8000125f5001] pgd=000000013ffff003, pud=000000013fffe003, pmd=000000013fff9003, pte=006800001100b707
+    [    2.274867] Internal error: Oops: 96000021 [#1] PREEMPT SMP
+    [    2.280432] Modules linked in:
+    [    2.283483] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.7.0-rc6+ #162
+    [    2.289914] Hardware name: Google Elm (DT)
+    [    2.294003] pstate: 20000005 (nzCv daif -PAN -UAO)
+    [    2.298792] pc : mtk_read_temp+0xb8/0x1c8
+    [    2.302793] lr : mtk_read_temp+0x7c/0x1c8
+    [    2.306794] sp : ffff80001003b930
+    [    2.310100] x29: ffff80001003b930 x28: 0000000000000000
+    [    2.315404] x27: 0000000000000002 x26: ffff0000f9550b10
+    [    2.320709] x25: ffff0000f9550a80 x24: 0000000000000090
+    [    2.326014] x23: ffff80001003ba24 x22: 00000000610344c0
+    [    2.331318] x21: 0000000000002710 x20: 00000000000001f4
+    [    2.336622] x19: 0000000000030d40 x18: ffff800011742ec0
+    [    2.341926] x17: 0000000000000001 x16: 0000000000000001
+    [    2.347230] x15: ffffffffffffffff x14: ffffff0000000000
+    [    2.352535] x13: ffffffffffffffff x12: 0000000000000028
+    [    2.357839] x11: 0000000000000003 x10: ffff800011295ec8
+    [    2.363143] x9 : 000000000000291b x8 : 0000000000000002
+    [    2.368447] x7 : 00000000000000a8 x6 : 0000000000000004
+    [    2.373751] x5 : 0000000000000000 x4 : ffff800011295cb0
+    [    2.379055] x3 : 0000000000000002 x2 : ffff8000125f5001
+    [    2.384359] x1 : 0000000000000001 x0 : ffff0000f9550a80
+    [    2.389665] Call trace:
+    [    2.392105]  mtk_read_temp+0xb8/0x1c8
+    [    2.395760]  of_thermal_get_temp+0x2c/0x40
+    [    2.399849]  thermal_zone_get_temp+0x78/0x160
+    [    2.404198]  thermal_zone_device_update.part.0+0x3c/0x1f8
+    [    2.409589]  thermal_zone_device_update+0x34/0x48
+    [    2.414286]  of_thermal_set_mode+0x58/0x88
+    [    2.418375]  thermal_zone_of_sensor_register+0x1a8/0x1d8
+    [    2.423679]  devm_thermal_zone_of_sensor_register+0x64/0xb0
+    [    2.429242]  mtk_thermal_probe+0x690/0x7d0
+    [    2.433333]  platform_drv_probe+0x5c/0xb0
+    [    2.437335]  really_probe+0xe4/0x448
+    [    2.440901]  driver_probe_device+0xe8/0x140
+    [    2.445077]  device_driver_attach+0x7c/0x88
+    [    2.449252]  __driver_attach+0xac/0x178
+    [    2.453082]  bus_for_each_dev+0x78/0xc8
+    [    2.456909]  driver_attach+0x2c/0x38
+    [    2.460476]  bus_add_driver+0x14c/0x230
+    [    2.464304]  driver_register+0x6c/0x128
+    [    2.468131]  __platform_driver_register+0x50/0x60
+    [    2.472831]  mtk_thermal_driver_init+0x24/0x30
+    [    2.477268]  do_one_initcall+0x50/0x298
+    [    2.481098]  kernel_init_freeable+0x1ec/0x264
+    [    2.485450]  kernel_init+0x1c/0x110
+    [    2.488931]  ret_from_fork+0x10/0x1c
+    [    2.492502] Code: f9401081 f9400402 b8a67821 8b010042 (b9400042)
+    [    2.498599] ---[ end trace e43e3105ed27dc99 ]---
+    [    2.503367] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    [    2.511020] SMP: stopping secondary CPUs
+    [    2.514941] Kernel Offset: disabled
+    [    2.518421] CPU features: 0x090002,25006005
+    [    2.522595] Memory Limit: none
+    [    2.525644] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]--
+    
+    Cc: Michael Kao <michael.kao@mediatek.com>
+    Fixes: eb9aecd90d1a ("thermal: mediatek: fix register index error")
+    Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+    Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20200707103412.1010823-1-enric.balletbo@collabora.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a75a8aabb2f44d22a03585de221a31499e06b736
+Author: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date:   Tue Jul 7 12:34:12 2020 +0200
+
+    Revert "thermal: mediatek: fix register index error"
+    
+    [ Upstream commit a8f62f183021be389561570ab5f8c701a5e70298 ]
+    
+    This reverts commit eb9aecd90d1a39601e91cd08b90d5fee51d321a6
+    
+    The above patch is supposed to fix a register index error on mt2701. It
+    is not clear if the problem solved is a hang or just an invalid value
+    returned, my guess is the second. The patch introduces, though, a new
+    hang on MT8173 device making them unusable. So, seems reasonable, revert
+    the patch because introduces a worst issue.
+    
+    The reason I send a revert instead of trying to fix the issue for MT8173
+    is because the information needed to fix the issue is in the datasheet
+    and is not public. So I am not really able to fix it.
+    
+    Fixes the following bug when CONFIG_MTK_THERMAL is set on MT8173
+    devices.
+    
+    [    2.222488] Unable to handle kernel paging request at virtual address ffff8000125f5001
+    [    2.230421] Mem abort info:
+    [    2.233207]   ESR = 0x96000021
+    [    2.236261]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    2.241571]   SET = 0, FnV = 0
+    [    2.244623]   EA = 0, S1PTW = 0
+    [    2.247762] Data abort info:
+    [    2.250640]   ISV = 0, ISS = 0x00000021
+    [    2.254473]   CM = 0, WnR = 0
+    [    2.257544] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041850000
+    [    2.264251] [ffff8000125f5001] pgd=000000013ffff003, pud=000000013fffe003, pmd=000000013fff9003, pte=006800001100b707
+    [    2.274867] Internal error: Oops: 96000021 [#1] PREEMPT SMP
+    [    2.280432] Modules linked in:
+    [    2.283483] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.7.0-rc6+ #162
+    [    2.289914] Hardware name: Google Elm (DT)
+    [    2.294003] pstate: 20000005 (nzCv daif -PAN -UAO)
+    [    2.298792] pc : mtk_read_temp+0xb8/0x1c8
+    [    2.302793] lr : mtk_read_temp+0x7c/0x1c8
+    [    2.306794] sp : ffff80001003b930
+    [    2.310100] x29: ffff80001003b930 x28: 0000000000000000
+    [    2.315404] x27: 0000000000000002 x26: ffff0000f9550b10
+    [    2.320709] x25: ffff0000f9550a80 x24: 0000000000000090
+    [    2.326014] x23: ffff80001003ba24 x22: 00000000610344c0
+    [    2.331318] x21: 0000000000002710 x20: 00000000000001f4
+    [    2.336622] x19: 0000000000030d40 x18: ffff800011742ec0
+    [    2.341926] x17: 0000000000000001 x16: 0000000000000001
+    [    2.347230] x15: ffffffffffffffff x14: ffffff0000000000
+    [    2.352535] x13: ffffffffffffffff x12: 0000000000000028
+    [    2.357839] x11: 0000000000000003 x10: ffff800011295ec8
+    [    2.363143] x9 : 000000000000291b x8 : 0000000000000002
+    [    2.368447] x7 : 00000000000000a8 x6 : 0000000000000004
+    [    2.373751] x5 : 0000000000000000 x4 : ffff800011295cb0
+    [    2.379055] x3 : 0000000000000002 x2 : ffff8000125f5001
+    [    2.384359] x1 : 0000000000000001 x0 : ffff0000f9550a80
+    [    2.389665] Call trace:
+    [    2.392105]  mtk_read_temp+0xb8/0x1c8
+    [    2.395760]  of_thermal_get_temp+0x2c/0x40
+    [    2.399849]  thermal_zone_get_temp+0x78/0x160
+    [    2.404198]  thermal_zone_device_update.part.0+0x3c/0x1f8
+    [    2.409589]  thermal_zone_device_update+0x34/0x48
+    [    2.414286]  of_thermal_set_mode+0x58/0x88
+    [    2.418375]  thermal_zone_of_sensor_register+0x1a8/0x1d8
+    [    2.423679]  devm_thermal_zone_of_sensor_register+0x64/0xb0
+    [    2.429242]  mtk_thermal_probe+0x690/0x7d0
+    [    2.433333]  platform_drv_probe+0x5c/0xb0
+    [    2.437335]  really_probe+0xe4/0x448
+    [    2.440901]  driver_probe_device+0xe8/0x140
+    [    2.445077]  device_driver_attach+0x7c/0x88
+    [    2.449252]  __driver_attach+0xac/0x178
+    [    2.453082]  bus_for_each_dev+0x78/0xc8
+    [    2.456909]  driver_attach+0x2c/0x38
+    [    2.460476]  bus_add_driver+0x14c/0x230
+    [    2.464304]  driver_register+0x6c/0x128
+    [    2.468131]  __platform_driver_register+0x50/0x60
+    [    2.472831]  mtk_thermal_driver_init+0x24/0x30
+    [    2.477268]  do_one_initcall+0x50/0x298
+    [    2.481098]  kernel_init_freeable+0x1ec/0x264
+    [    2.485450]  kernel_init+0x1c/0x110
+    [    2.488931]  ret_from_fork+0x10/0x1c
+    [    2.492502] Code: f9401081 f9400402 b8a67821 8b010042 (b9400042)
+    [    2.498599] ---[ end trace e43e3105ed27dc99 ]---
+    [    2.503367] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    [    2.511020] SMP: stopping secondary CPUs
+    [    2.514941] Kernel Offset: disabled
+    [    2.518421] CPU features: 0x090002,25006005
+    [    2.522595] Memory Limit: none
+    [    2.525644] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]--
+    
+    Cc: Michael Kao <michael.kao@mediatek.com>
+    Fixes: eb9aecd90d1a ("thermal: mediatek: fix register index error")
+    Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+    Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20200707103412.1010823-1-enric.balletbo@collabora.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 2c2ac700c9d720abd60e39c6ac82d6b5cdb69368
+Author: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date:   Tue Jul 7 12:34:12 2020 +0200
+
+    Revert "thermal: mediatek: fix register index error"
+    
+    [ Upstream commit a8f62f183021be389561570ab5f8c701a5e70298 ]
+    
+    This reverts commit eb9aecd90d1a39601e91cd08b90d5fee51d321a6
+    
+    The above patch is supposed to fix a register index error on mt2701. It
+    is not clear if the problem solved is a hang or just an invalid value
+    returned, my guess is the second. The patch introduces, though, a new
+    hang on MT8173 device making them unusable. So, seems reasonable, revert
+    the patch because introduces a worst issue.
+    
+    The reason I send a revert instead of trying to fix the issue for MT8173
+    is because the information needed to fix the issue is in the datasheet
+    and is not public. So I am not really able to fix it.
+    
+    Fixes the following bug when CONFIG_MTK_THERMAL is set on MT8173
+    devices.
+    
+    [    2.222488] Unable to handle kernel paging request at virtual address ffff8000125f5001
+    [    2.230421] Mem abort info:
+    [    2.233207]   ESR = 0x96000021
+    [    2.236261]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    2.241571]   SET = 0, FnV = 0
+    [    2.244623]   EA = 0, S1PTW = 0
+    [    2.247762] Data abort info:
+    [    2.250640]   ISV = 0, ISS = 0x00000021
+    [    2.254473]   CM = 0, WnR = 0
+    [    2.257544] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041850000
+    [    2.264251] [ffff8000125f5001] pgd=000000013ffff003, pud=000000013fffe003, pmd=000000013fff9003, pte=006800001100b707
+    [    2.274867] Internal error: Oops: 96000021 [#1] PREEMPT SMP
+    [    2.280432] Modules linked in:
+    [    2.283483] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.7.0-rc6+ #162
+    [    2.289914] Hardware name: Google Elm (DT)
+    [    2.294003] pstate: 20000005 (nzCv daif -PAN -UAO)
+    [    2.298792] pc : mtk_read_temp+0xb8/0x1c8
+    [    2.302793] lr : mtk_read_temp+0x7c/0x1c8
+    [    2.306794] sp : ffff80001003b930
+    [    2.310100] x29: ffff80001003b930 x28: 0000000000000000
+    [    2.315404] x27: 0000000000000002 x26: ffff0000f9550b10
+    [    2.320709] x25: ffff0000f9550a80 x24: 0000000000000090
+    [    2.326014] x23: ffff80001003ba24 x22: 00000000610344c0
+    [    2.331318] x21: 0000000000002710 x20: 00000000000001f4
+    [    2.336622] x19: 0000000000030d40 x18: ffff800011742ec0
+    [    2.341926] x17: 0000000000000001 x16: 0000000000000001
+    [    2.347230] x15: ffffffffffffffff x14: ffffff0000000000
+    [    2.352535] x13: ffffffffffffffff x12: 0000000000000028
+    [    2.357839] x11: 0000000000000003 x10: ffff800011295ec8
+    [    2.363143] x9 : 000000000000291b x8 : 0000000000000002
+    [    2.368447] x7 : 00000000000000a8 x6 : 0000000000000004
+    [    2.373751] x5 : 0000000000000000 x4 : ffff800011295cb0
+    [    2.379055] x3 : 0000000000000002 x2 : ffff8000125f5001
+    [    2.384359] x1 : 0000000000000001 x0 : ffff0000f9550a80
+    [    2.389665] Call trace:
+    [    2.392105]  mtk_read_temp+0xb8/0x1c8
+    [    2.395760]  of_thermal_get_temp+0x2c/0x40
+    [    2.399849]  thermal_zone_get_temp+0x78/0x160
+    [    2.404198]  thermal_zone_device_update.part.0+0x3c/0x1f8
+    [    2.409589]  thermal_zone_device_update+0x34/0x48
+    [    2.414286]  of_thermal_set_mode+0x58/0x88
+    [    2.418375]  thermal_zone_of_sensor_register+0x1a8/0x1d8
+    [    2.423679]  devm_thermal_zone_of_sensor_register+0x64/0xb0
+    [    2.429242]  mtk_thermal_probe+0x690/0x7d0
+    [    2.433333]  platform_drv_probe+0x5c/0xb0
+    [    2.437335]  really_probe+0xe4/0x448
+    [    2.440901]  driver_probe_device+0xe8/0x140
+    [    2.445077]  device_driver_attach+0x7c/0x88
+    [    2.449252]  __driver_attach+0xac/0x178
+    [    2.453082]  bus_for_each_dev+0x78/0xc8
+    [    2.456909]  driver_attach+0x2c/0x38
+    [    2.460476]  bus_add_driver+0x14c/0x230
+    [    2.464304]  driver_register+0x6c/0x128
+    [    2.468131]  __platform_driver_register+0x50/0x60
+    [    2.472831]  mtk_thermal_driver_init+0x24/0x30
+    [    2.477268]  do_one_initcall+0x50/0x298
+    [    2.481098]  kernel_init_freeable+0x1ec/0x264
+    [    2.485450]  kernel_init+0x1c/0x110
+    [    2.488931]  ret_from_fork+0x10/0x1c
+    [    2.492502] Code: f9401081 f9400402 b8a67821 8b010042 (b9400042)
+    [    2.498599] ---[ end trace e43e3105ed27dc99 ]---
+    [    2.503367] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    [    2.511020] SMP: stopping secondary CPUs
+    [    2.514941] Kernel Offset: disabled
+    [    2.518421] CPU features: 0x090002,25006005
+    [    2.522595] Memory Limit: none
+    [    2.525644] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]--
+    
+    Cc: Michael Kao <michael.kao@mediatek.com>
+    Fixes: eb9aecd90d1a ("thermal: mediatek: fix register index error")
+    Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+    Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20200707103412.1010823-1-enric.balletbo@collabora.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c5b5101aeb7a65a9b67ba3f4f7437b951cf2bc59
+Author: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date:   Tue Jul 7 12:34:12 2020 +0200
+
+    Revert "thermal: mediatek: fix register index error"
+    
+    [ Upstream commit a8f62f183021be389561570ab5f8c701a5e70298 ]
+    
+    This reverts commit eb9aecd90d1a39601e91cd08b90d5fee51d321a6
+    
+    The above patch is supposed to fix a register index error on mt2701. It
+    is not clear if the problem solved is a hang or just an invalid value
+    returned, my guess is the second. The patch introduces, though, a new
+    hang on MT8173 device making them unusable. So, seems reasonable, revert
+    the patch because introduces a worst issue.
+    
+    The reason I send a revert instead of trying to fix the issue for MT8173
+    is because the information needed to fix the issue is in the datasheet
+    and is not public. So I am not really able to fix it.
+    
+    Fixes the following bug when CONFIG_MTK_THERMAL is set on MT8173
+    devices.
+    
+    [    2.222488] Unable to handle kernel paging request at virtual address ffff8000125f5001
+    [    2.230421] Mem abort info:
+    [    2.233207]   ESR = 0x96000021
+    [    2.236261]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    2.241571]   SET = 0, FnV = 0
+    [    2.244623]   EA = 0, S1PTW = 0
+    [    2.247762] Data abort info:
+    [    2.250640]   ISV = 0, ISS = 0x00000021
+    [    2.254473]   CM = 0, WnR = 0
+    [    2.257544] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041850000
+    [    2.264251] [ffff8000125f5001] pgd=000000013ffff003, pud=000000013fffe003, pmd=000000013fff9003, pte=006800001100b707
+    [    2.274867] Internal error: Oops: 96000021 [#1] PREEMPT SMP
+    [    2.280432] Modules linked in:
+    [    2.283483] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.7.0-rc6+ #162
+    [    2.289914] Hardware name: Google Elm (DT)
+    [    2.294003] pstate: 20000005 (nzCv daif -PAN -UAO)
+    [    2.298792] pc : mtk_read_temp+0xb8/0x1c8
+    [    2.302793] lr : mtk_read_temp+0x7c/0x1c8
+    [    2.306794] sp : ffff80001003b930
+    [    2.310100] x29: ffff80001003b930 x28: 0000000000000000
+    [    2.315404] x27: 0000000000000002 x26: ffff0000f9550b10
+    [    2.320709] x25: ffff0000f9550a80 x24: 0000000000000090
+    [    2.326014] x23: ffff80001003ba24 x22: 00000000610344c0
+    [    2.331318] x21: 0000000000002710 x20: 00000000000001f4
+    [    2.336622] x19: 0000000000030d40 x18: ffff800011742ec0
+    [    2.341926] x17: 0000000000000001 x16: 0000000000000001
+    [    2.347230] x15: ffffffffffffffff x14: ffffff0000000000
+    [    2.352535] x13: ffffffffffffffff x12: 0000000000000028
+    [    2.357839] x11: 0000000000000003 x10: ffff800011295ec8
+    [    2.363143] x9 : 000000000000291b x8 : 0000000000000002
+    [    2.368447] x7 : 00000000000000a8 x6 : 0000000000000004
+    [    2.373751] x5 : 0000000000000000 x4 : ffff800011295cb0
+    [    2.379055] x3 : 0000000000000002 x2 : ffff8000125f5001
+    [    2.384359] x1 : 0000000000000001 x0 : ffff0000f9550a80
+    [    2.389665] Call trace:
+    [    2.392105]  mtk_read_temp+0xb8/0x1c8
+    [    2.395760]  of_thermal_get_temp+0x2c/0x40
+    [    2.399849]  thermal_zone_get_temp+0x78/0x160
+    [    2.404198]  thermal_zone_device_update.part.0+0x3c/0x1f8
+    [    2.409589]  thermal_zone_device_update+0x34/0x48
+    [    2.414286]  of_thermal_set_mode+0x58/0x88
+    [    2.418375]  thermal_zone_of_sensor_register+0x1a8/0x1d8
+    [    2.423679]  devm_thermal_zone_of_sensor_register+0x64/0xb0
+    [    2.429242]  mtk_thermal_probe+0x690/0x7d0
+    [    2.433333]  platform_drv_probe+0x5c/0xb0
+    [    2.437335]  really_probe+0xe4/0x448
+    [    2.440901]  driver_probe_device+0xe8/0x140
+    [    2.445077]  device_driver_attach+0x7c/0x88
+    [    2.449252]  __driver_attach+0xac/0x178
+    [    2.453082]  bus_for_each_dev+0x78/0xc8
+    [    2.456909]  driver_attach+0x2c/0x38
+    [    2.460476]  bus_add_driver+0x14c/0x230
+    [    2.464304]  driver_register+0x6c/0x128
+    [    2.468131]  __platform_driver_register+0x50/0x60
+    [    2.472831]  mtk_thermal_driver_init+0x24/0x30
+    [    2.477268]  do_one_initcall+0x50/0x298
+    [    2.481098]  kernel_init_freeable+0x1ec/0x264
+    [    2.485450]  kernel_init+0x1c/0x110
+    [    2.488931]  ret_from_fork+0x10/0x1c
+    [    2.492502] Code: f9401081 f9400402 b8a67821 8b010042 (b9400042)
+    [    2.498599] ---[ end trace e43e3105ed27dc99 ]---
+    [    2.503367] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    [    2.511020] SMP: stopping secondary CPUs
+    [    2.514941] Kernel Offset: disabled
+    [    2.518421] CPU features: 0x090002,25006005
+    [    2.522595] Memory Limit: none
+    [    2.525644] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]--
+    
+    Cc: Michael Kao <michael.kao@mediatek.com>
+    Fixes: eb9aecd90d1a ("thermal: mediatek: fix register index error")
+    Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+    Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20200707103412.1010823-1-enric.balletbo@collabora.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 5e48553597df05065bde5d1ce19bf35911ee038b
+Author: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date:   Tue Jul 7 12:34:12 2020 +0200
+
+    Revert "thermal: mediatek: fix register index error"
+    
+    [ Upstream commit a8f62f183021be389561570ab5f8c701a5e70298 ]
+    
+    This reverts commit eb9aecd90d1a39601e91cd08b90d5fee51d321a6
+    
+    The above patch is supposed to fix a register index error on mt2701. It
+    is not clear if the problem solved is a hang or just an invalid value
+    returned, my guess is the second. The patch introduces, though, a new
+    hang on MT8173 device making them unusable. So, seems reasonable, revert
+    the patch because introduces a worst issue.
+    
+    The reason I send a revert instead of trying to fix the issue for MT8173
+    is because the information needed to fix the issue is in the datasheet
+    and is not public. So I am not really able to fix it.
+    
+    Fixes the following bug when CONFIG_MTK_THERMAL is set on MT8173
+    devices.
+    
+    [    2.222488] Unable to handle kernel paging request at virtual address ffff8000125f5001
+    [    2.230421] Mem abort info:
+    [    2.233207]   ESR = 0x96000021
+    [    2.236261]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    2.241571]   SET = 0, FnV = 0
+    [    2.244623]   EA = 0, S1PTW = 0
+    [    2.247762] Data abort info:
+    [    2.250640]   ISV = 0, ISS = 0x00000021
+    [    2.254473]   CM = 0, WnR = 0
+    [    2.257544] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041850000
+    [    2.264251] [ffff8000125f5001] pgd=000000013ffff003, pud=000000013fffe003, pmd=000000013fff9003, pte=006800001100b707
+    [    2.274867] Internal error: Oops: 96000021 [#1] PREEMPT SMP
+    [    2.280432] Modules linked in:
+    [    2.283483] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.7.0-rc6+ #162
+    [    2.289914] Hardware name: Google Elm (DT)
+    [    2.294003] pstate: 20000005 (nzCv daif -PAN -UAO)
+    [    2.298792] pc : mtk_read_temp+0xb8/0x1c8
+    [    2.302793] lr : mtk_read_temp+0x7c/0x1c8
+    [    2.306794] sp : ffff80001003b930
+    [    2.310100] x29: ffff80001003b930 x28: 0000000000000000
+    [    2.315404] x27: 0000000000000002 x26: ffff0000f9550b10
+    [    2.320709] x25: ffff0000f9550a80 x24: 0000000000000090
+    [    2.326014] x23: ffff80001003ba24 x22: 00000000610344c0
+    [    2.331318] x21: 0000000000002710 x20: 00000000000001f4
+    [    2.336622] x19: 0000000000030d40 x18: ffff800011742ec0
+    [    2.341926] x17: 0000000000000001 x16: 0000000000000001
+    [    2.347230] x15: ffffffffffffffff x14: ffffff0000000000
+    [    2.352535] x13: ffffffffffffffff x12: 0000000000000028
+    [    2.357839] x11: 0000000000000003 x10: ffff800011295ec8
+    [    2.363143] x9 : 000000000000291b x8 : 0000000000000002
+    [    2.368447] x7 : 00000000000000a8 x6 : 0000000000000004
+    [    2.373751] x5 : 0000000000000000 x4 : ffff800011295cb0
+    [    2.379055] x3 : 0000000000000002 x2 : ffff8000125f5001
+    [    2.384359] x1 : 0000000000000001 x0 : ffff0000f9550a80
+    [    2.389665] Call trace:
+    [    2.392105]  mtk_read_temp+0xb8/0x1c8
+    [    2.395760]  of_thermal_get_temp+0x2c/0x40
+    [    2.399849]  thermal_zone_get_temp+0x78/0x160
+    [    2.404198]  thermal_zone_device_update.part.0+0x3c/0x1f8
+    [    2.409589]  thermal_zone_device_update+0x34/0x48
+    [    2.414286]  of_thermal_set_mode+0x58/0x88
+    [    2.418375]  thermal_zone_of_sensor_register+0x1a8/0x1d8
+    [    2.423679]  devm_thermal_zone_of_sensor_register+0x64/0xb0
+    [    2.429242]  mtk_thermal_probe+0x690/0x7d0
+    [    2.433333]  platform_drv_probe+0x5c/0xb0
+    [    2.437335]  really_probe+0xe4/0x448
+    [    2.440901]  driver_probe_device+0xe8/0x140
+    [    2.445077]  device_driver_attach+0x7c/0x88
+    [    2.449252]  __driver_attach+0xac/0x178
+    [    2.453082]  bus_for_each_dev+0x78/0xc8
+    [    2.456909]  driver_attach+0x2c/0x38
+    [    2.460476]  bus_add_driver+0x14c/0x230
+    [    2.464304]  driver_register+0x6c/0x128
+    [    2.468131]  __platform_driver_register+0x50/0x60
+    [    2.472831]  mtk_thermal_driver_init+0x24/0x30
+    [    2.477268]  do_one_initcall+0x50/0x298
+    [    2.481098]  kernel_init_freeable+0x1ec/0x264
+    [    2.485450]  kernel_init+0x1c/0x110
+    [    2.488931]  ret_from_fork+0x10/0x1c
+    [    2.492502] Code: f9401081 f9400402 b8a67821 8b010042 (b9400042)
+    [    2.498599] ---[ end trace e43e3105ed27dc99 ]---
+    [    2.503367] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    [    2.511020] SMP: stopping secondary CPUs
+    [    2.514941] Kernel Offset: disabled
+    [    2.518421] CPU features: 0x090002,25006005
+    [    2.522595] Memory Limit: none
+    [    2.525644] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]--
+    
+    Cc: Michael Kao <michael.kao@mediatek.com>
+    Fixes: eb9aecd90d1a ("thermal: mediatek: fix register index error")
+    Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+    Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20200707103412.1010823-1-enric.balletbo@collabora.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a8f62f183021be389561570ab5f8c701a5e70298
+Author: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date:   Tue Jul 7 12:34:12 2020 +0200
+
+    Revert "thermal: mediatek: fix register index error"
+    
+    This reverts commit eb9aecd90d1a39601e91cd08b90d5fee51d321a6
+    
+    The above patch is supposed to fix a register index error on mt2701. It
+    is not clear if the problem solved is a hang or just an invalid value
+    returned, my guess is the second. The patch introduces, though, a new
+    hang on MT8173 device making them unusable. So, seems reasonable, revert
+    the patch because introduces a worst issue.
+    
+    The reason I send a revert instead of trying to fix the issue for MT8173
+    is because the information needed to fix the issue is in the datasheet
+    and is not public. So I am not really able to fix it.
+    
+    Fixes the following bug when CONFIG_MTK_THERMAL is set on MT8173
+    devices.
+    
+    [    2.222488] Unable to handle kernel paging request at virtual address ffff8000125f5001
+    [    2.230421] Mem abort info:
+    [    2.233207]   ESR = 0x96000021
+    [    2.236261]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    2.241571]   SET = 0, FnV = 0
+    [    2.244623]   EA = 0, S1PTW = 0
+    [    2.247762] Data abort info:
+    [    2.250640]   ISV = 0, ISS = 0x00000021
+    [    2.254473]   CM = 0, WnR = 0
+    [    2.257544] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041850000
+    [    2.264251] [ffff8000125f5001] pgd=000000013ffff003, pud=000000013fffe003, pmd=000000013fff9003, pte=006800001100b707
+    [    2.274867] Internal error: Oops: 96000021 [#1] PREEMPT SMP
+    [    2.280432] Modules linked in:
+    [    2.283483] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.7.0-rc6+ #162
+    [    2.289914] Hardware name: Google Elm (DT)
+    [    2.294003] pstate: 20000005 (nzCv daif -PAN -UAO)
+    [    2.298792] pc : mtk_read_temp+0xb8/0x1c8
+    [    2.302793] lr : mtk_read_temp+0x7c/0x1c8
+    [    2.306794] sp : ffff80001003b930
+    [    2.310100] x29: ffff80001003b930 x28: 0000000000000000
+    [    2.315404] x27: 0000000000000002 x26: ffff0000f9550b10
+    [    2.320709] x25: ffff0000f9550a80 x24: 0000000000000090
+    [    2.326014] x23: ffff80001003ba24 x22: 00000000610344c0
+    [    2.331318] x21: 0000000000002710 x20: 00000000000001f4
+    [    2.336622] x19: 0000000000030d40 x18: ffff800011742ec0
+    [    2.341926] x17: 0000000000000001 x16: 0000000000000001
+    [    2.347230] x15: ffffffffffffffff x14: ffffff0000000000
+    [    2.352535] x13: ffffffffffffffff x12: 0000000000000028
+    [    2.357839] x11: 0000000000000003 x10: ffff800011295ec8
+    [    2.363143] x9 : 000000000000291b x8 : 0000000000000002
+    [    2.368447] x7 : 00000000000000a8 x6 : 0000000000000004
+    [    2.373751] x5 : 0000000000000000 x4 : ffff800011295cb0
+    [    2.379055] x3 : 0000000000000002 x2 : ffff8000125f5001
+    [    2.384359] x1 : 0000000000000001 x0 : ffff0000f9550a80
+    [    2.389665] Call trace:
+    [    2.392105]  mtk_read_temp+0xb8/0x1c8
+    [    2.395760]  of_thermal_get_temp+0x2c/0x40
+    [    2.399849]  thermal_zone_get_temp+0x78/0x160
+    [    2.404198]  thermal_zone_device_update.part.0+0x3c/0x1f8
+    [    2.409589]  thermal_zone_device_update+0x34/0x48
+    [    2.414286]  of_thermal_set_mode+0x58/0x88
+    [    2.418375]  thermal_zone_of_sensor_register+0x1a8/0x1d8
+    [    2.423679]  devm_thermal_zone_of_sensor_register+0x64/0xb0
+    [    2.429242]  mtk_thermal_probe+0x690/0x7d0
+    [    2.433333]  platform_drv_probe+0x5c/0xb0
+    [    2.437335]  really_probe+0xe4/0x448
+    [    2.440901]  driver_probe_device+0xe8/0x140
+    [    2.445077]  device_driver_attach+0x7c/0x88
+    [    2.449252]  __driver_attach+0xac/0x178
+    [    2.453082]  bus_for_each_dev+0x78/0xc8
+    [    2.456909]  driver_attach+0x2c/0x38
+    [    2.460476]  bus_add_driver+0x14c/0x230
+    [    2.464304]  driver_register+0x6c/0x128
+    [    2.468131]  __platform_driver_register+0x50/0x60
+    [    2.472831]  mtk_thermal_driver_init+0x24/0x30
+    [    2.477268]  do_one_initcall+0x50/0x298
+    [    2.481098]  kernel_init_freeable+0x1ec/0x264
+    [    2.485450]  kernel_init+0x1c/0x110
+    [    2.488931]  ret_from_fork+0x10/0x1c
+    [    2.492502] Code: f9401081 f9400402 b8a67821 8b010042 (b9400042)
+    [    2.498599] ---[ end trace e43e3105ed27dc99 ]---
+    [    2.503367] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    [    2.511020] SMP: stopping secondary CPUs
+    [    2.514941] Kernel Offset: disabled
+    [    2.518421] CPU features: 0x090002,25006005
+    [    2.522595] Memory Limit: none
+    [    2.525644] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]--
+    
+    Cc: Michael Kao <michael.kao@mediatek.com>
+    Fixes: eb9aecd90d1a ("thermal: mediatek: fix register index error")
+    Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+    Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20200707103412.1010823-1-enric.balletbo@collabora.com
+
+commit a7577abb959e71c0978a366ef4239a9ddb235556
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0af17b8b93ebe8a5e0578d2e4f155954c4fe5904
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3be5da34757a684c239e7164c5bd783b6e9e724f
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fe46db764fb1a55caf2a87932414da7edb868ff1
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit df06454a0d51ba1905af12bdac26a12c1c5e3ca0
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 7d967912c06c9d3746e832d881b326e2ce57b208
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a0cab4f0326c0f31dd15dfe1c960cf4d11b964b1
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    commit 163b00cde7cf2206e248789d2780121ad5e6a70b upstream.
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Cc: Ido Schimmel <idosch@mellanox.com>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 163b00cde7cf2206e248789d2780121ad5e6a70b
+Author: Wei Wang <wvw@google.com>
+Date:   Tue Nov 12 12:42:23 2019 -0800
+
+    thermal: Fix deadlock in thermal thermal_zone_device_check
+    
+    1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone
+    device") changed cancel_delayed_work to cancel_delayed_work_sync to avoid
+    a use-after-free issue. However, cancel_delayed_work_sync could be called
+    insides the WQ causing deadlock.
+    
+    [54109.642398] c0   1162 kworker/u17:1   D    0 11030      2 0x00000000
+    [54109.642437] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.642447] c0   1162 Call trace:
+    [54109.642456] c0   1162  __switch_to+0x138/0x158
+    [54109.642467] c0   1162  __schedule+0xba4/0x1434
+    [54109.642480] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.642492] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.642511] c0   1162  flush_work+0x348/0x40c
+    [54109.642522] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.642544] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.642553] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.642563] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.642574] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.642583] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.642593] c0   1162  kthread+0x17c/0x1b0
+    [54109.642602] c0   1162  ret_from_fork+0x10/0x18
+    [54109.643051] c0   1162 kworker/u17:2   D    0 16245      2 0x00000000
+    [54109.643067] c0   1162 Workqueue: thermal_passive_wq thermal_zone_device_check
+    [54109.643077] c0   1162 Call trace:
+    [54109.643085] c0   1162  __switch_to+0x138/0x158
+    [54109.643095] c0   1162  __schedule+0xba4/0x1434
+    [54109.643104] c0   1162  schedule_timeout+0xa0/0xb28
+    [54109.643114] c0   1162  wait_for_common+0x138/0x2e8
+    [54109.643122] c0   1162  flush_work+0x348/0x40c
+    [54109.643131] c0   1162  __cancel_work_timer+0x180/0x218
+    [54109.643141] c0   1162  handle_thermal_trip+0x2c4/0x5a4
+    [54109.643150] c0   1162  thermal_zone_device_update+0x1b4/0x25c
+    [54109.643159] c0   1162  thermal_zone_device_check+0x18/0x24
+    [54109.643167] c0   1162  process_one_work+0x3cc/0x69c
+    [54109.643177] c0   1162  worker_thread+0x49c/0x7c0
+    [54109.643186] c0   1162  kthread+0x17c/0x1b0
+    [54109.643195] c0   1162  ret_from_fork+0x10/0x18
+    [54109.644500] c0   1162 cat             D    0  7766      1 0x00000001
+    [54109.644515] c0   1162 Call trace:
+    [54109.644524] c0   1162  __switch_to+0x138/0x158
+    [54109.644536] c0   1162  __schedule+0xba4/0x1434
+    [54109.644546] c0   1162  schedule_preempt_disabled+0x80/0xb0
+    [54109.644555] c0   1162  __mutex_lock+0x3a8/0x7f0
+    [54109.644563] c0   1162  __mutex_lock_slowpath+0x14/0x20
+    [54109.644575] c0   1162  thermal_zone_get_temp+0x84/0x360
+    [54109.644586] c0   1162  temp_show+0x30/0x78
+    [54109.644609] c0   1162  dev_attr_show+0x5c/0xf0
+    [54109.644628] c0   1162  sysfs_kf_seq_show+0xcc/0x1a4
+    [54109.644636] c0   1162  kernfs_seq_show+0x48/0x88
+    [54109.644656] c0   1162  seq_read+0x1f4/0x73c
+    [54109.644664] c0   1162  kernfs_fop_read+0x84/0x318
+    [54109.644683] c0   1162  __vfs_read+0x50/0x1bc
+    [54109.644692] c0   1162  vfs_read+0xa4/0x140
+    [54109.644701] c0   1162  SyS_read+0xbc/0x144
+    [54109.644708] c0   1162  el0_svc_naked+0x34/0x38
+    [54109.845800] c0   1162 D 720.000s 1->7766->7766 cat [panic]
+    
+    Fixes: 1851799e1d29 ("thermal: Fix use-after-free when unregistering thermal zone device")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Wei Wang <wvw@google.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 30533049aadf3e25b79792c0da7eb8609c9707c5
+Author: Evan Green <evgreen@chromium.org>
+Date:   Tue Dec 4 11:14:19 2018 -0800
+
+    iio: adc: qcom-spmi-adc5: Initialize prescale properly
+    
+    commit db23d88756abd38e0995ea8449d0025b3de4b26b upstream.
+    
+    adc5_get_dt_data uses a local, prop, feeds it to adc5_get_dt_channel_data,
+    and then puts the result into adc->chan_props. The problem is
+    adc5_get_dt_channel_data may not initialize that structure fully, so a
+    garbage value is used for prescale if the optional "qcom,pre-scaling" is
+    not defined in DT. adc5_read_raw then uses this as an array index,
+    generating a crash that looks like this:
+    
+    [    6.683186] Unable to handle kernel paging request at virtual address ffffff90e78c7964
+    Call trace:
+    qcom_vadc_scale_code_voltage_factor+0x74/0x104
+    qcom_vadc_scale_hw_calib_die_temp+0x20/0x60
+    qcom_adc5_hw_scale+0x78/0xa4
+    adc5_read_raw+0x3d0/0x65c
+    iio_channel_read+0x240/0x30c
+    iio_read_channel_processed+0x10c/0x150
+    qpnp_tm_get_temp+0xc0/0x40c
+    of_thermal_get_temp+0x7c/0x98
+    thermal_zone_get_temp+0xac/0xd8
+    thermal_zone_device_update+0xc0/0x38c
+    qpnp_tm_probe+0x624/0x81c
+    platform_drv_probe+0xe4/0x11c
+    really_probe+0x188/0x3fc
+    driver_probe_device+0xb8/0x188
+    __device_attach_driver+0x114/0x180
+    bus_for_each_drv+0xd8/0x118
+    __device_attach+0x180/0x27c
+    device_initial_probe+0x20/0x2c
+    bus_probe_device+0x78/0x124
+    deferred_probe_work_func+0xfc/0x138
+    process_one_work+0x3d8/0x8b0
+    process_scheduled_works+0x48/0x6c
+    worker_thread+0x488/0x7cc
+    kthread+0x24c/0x264
+    ret_from_fork+0x10/0x18
+    
+    Unfortunately, when I went to add the initializer for this and tried to
+    boot it, my machine shut down immediately, complaining that it was
+    hotter than the sun. It appears that adc5_chans_pmic and adc5_chans_rev2
+    were initializing prescale_index as if it were directly a divisor,
+    rather than the index into adc5_prescale_ratios that it is.
+    
+    Fix the uninitialized value, and change the static initialization to use
+    indices into adc5_prescale_ratios.
+    
+    Signed-off-by: Evan Green <evgreen@chromium.org>
+    Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+    Cc: <Stable@vger.kernel.org>
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit db23d88756abd38e0995ea8449d0025b3de4b26b
+Author: Evan Green <evgreen@chromium.org>
+Date:   Tue Dec 4 11:14:19 2018 -0800
+
+    iio: adc: qcom-spmi-adc5: Initialize prescale properly
+    
+    adc5_get_dt_data uses a local, prop, feeds it to adc5_get_dt_channel_data,
+    and then puts the result into adc->chan_props. The problem is
+    adc5_get_dt_channel_data may not initialize that structure fully, so a
+    garbage value is used for prescale if the optional "qcom,pre-scaling" is
+    not defined in DT. adc5_read_raw then uses this as an array index,
+    generating a crash that looks like this:
+    
+    [    6.683186] Unable to handle kernel paging request at virtual address ffffff90e78c7964
+    Call trace:
+    qcom_vadc_scale_code_voltage_factor+0x74/0x104
+    qcom_vadc_scale_hw_calib_die_temp+0x20/0x60
+    qcom_adc5_hw_scale+0x78/0xa4
+    adc5_read_raw+0x3d0/0x65c
+    iio_channel_read+0x240/0x30c
+    iio_read_channel_processed+0x10c/0x150
+    qpnp_tm_get_temp+0xc0/0x40c
+    of_thermal_get_temp+0x7c/0x98
+    thermal_zone_get_temp+0xac/0xd8
+    thermal_zone_device_update+0xc0/0x38c
+    qpnp_tm_probe+0x624/0x81c
+    platform_drv_probe+0xe4/0x11c
+    really_probe+0x188/0x3fc
+    driver_probe_device+0xb8/0x188
+    __device_attach_driver+0x114/0x180
+    bus_for_each_drv+0xd8/0x118
+    __device_attach+0x180/0x27c
+    device_initial_probe+0x20/0x2c
+    bus_probe_device+0x78/0x124
+    deferred_probe_work_func+0xfc/0x138
+    process_one_work+0x3d8/0x8b0
+    process_scheduled_works+0x48/0x6c
+    worker_thread+0x488/0x7cc
+    kthread+0x24c/0x264
+    ret_from_fork+0x10/0x18
+    
+    Unfortunately, when I went to add the initializer for this and tried to
+    boot it, my machine shut down immediately, complaining that it was
+    hotter than the sun. It appears that adc5_chans_pmic and adc5_chans_rev2
+    were initializing prescale_index as if it were directly a divisor,
+    rather than the index into adc5_prescale_ratios that it is.
+    
+    Fix the uninitialized value, and change the static initialization to use
+    indices into adc5_prescale_ratios.
+    
+    Signed-off-by: Evan Green <evgreen@chromium.org>
+    Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+    Cc: <Stable@vger.kernel.org>
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+commit 10a54d8196d11f6cc0db2f71249f93854cb9fe55
+Author: Luca Coelho <luciano.coelho@intel.com>
+Date:   Tue Aug 22 10:37:29 2017 +0300
+
+    iwlwifi: pcie: move rx workqueue initialization to iwl_trans_pcie_alloc()
+    
+    Work queues cannot be allocated when a mutex is held because the mutex
+    may be in use and that would make it sleep.  Doing so generates the
+    following splat with 4.13+:
+    
+    [   19.513298] ======================================================
+    [   19.513429] WARNING: possible circular locking dependency detected
+    [   19.513557] 4.13.0-rc5+ #6 Not tainted
+    [   19.513638] ------------------------------------------------------
+    [   19.513767] cpuhp/0/12 is trying to acquire lock:
+    [   19.513867]  (&tz->lock){+.+.+.}, at: [<ffffffff924afebb>] thermal_zone_get_temp+0x5b/0xb0
+    [   19.514047]
+    [   19.514047] but task is already holding lock:
+    [   19.514166]  (cpuhp_state){+.+.+.}, at: [<ffffffff91cc4baa>] cpuhp_thread_fun+0x3a/0x210
+    [   19.514338]
+    [   19.514338] which lock already depends on the new lock.
+    
+    This lock dependency already existed with previous kernel versions,
+    but it was not detected until commit 49dfe2a67797 ("cpuhotplug: Link
+    lock stacks for hotplug callbacks") was introduced.
+    
+    Reported-by: David Weinehall <david.weinehall@intel.com>
+    Reported-by: Jiri Kosina <jikos@kernel.org>
+    Signed-off-by: Luca Coelho <luciano.coelho@intel.com>
+    Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
+
+commit 8312a3fe84b96e30a010fa20f933606d976ac002
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Jul 27 11:58:58 2017 +0200
+
+    tinydrm: repaper: add CONFIG_THERMAL dependency
+    
+    The new RePaper driver uses the thermal subsystem, and fails to link
+    when it is built-in but thermal is a loadable module:
+    
+    drivers/gpu/drm/tinydrm/repaper.o: In function `repaper_probe':
+    repaper.c:(.text+0x540): undefined reference to `thermal_zone_get_zone_by_name'
+    drivers/gpu/drm/tinydrm/repaper.o: In function `repaper_fb_dirty':
+    repaper.c:(.text+0xff4): undefined reference to `thermal_zone_get_temp'
+    
+    This adds another Kconfig dependency to prevent the broken configuration,
+    forcing repaper to be a module too.
+    
+    Fixes: 3589211e9b03 ("drm/tinydrm: Add RePaper e-ink driver")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Noralf Trønnes <noralf@tronnes.org>
+    Link: https://patchwork.freedesktop.org/patch/msgid/20170727100004.300665-1-arnd@arndb.de
+
+commit 3f0f77b6bb4fa56f6b22610f11d75464ac65743c
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece upstream.
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit acbda596b5cdf4784938fe6feca43b28c2dc8a53
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece upstream.
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 260c505e55b51645affb70a2c456b350f7e7460a
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    [ Upstream commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece ]
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+
+commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+
+commit 79e5421cf0bd9b3e56f523e95e3511757edb9616
+Author: Sascha Hauer <s.hauer@pengutronix.de>
+Date:   Mon Jul 6 09:46:16 2015 +0200
+
+    thermal: Use IS_ENABLED instead of #ifdef
+    
+    Use IS_ENABLED(CONFIG_THERMAL_EMULATION) to make the code more readable
+    and to get rid of the addtional #ifdef around the variable definitions
+    in thermal_zone_get_temp().
+    
+    Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+    Reviewed-by: Lukasz Majewski <l.majewski@samsung.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 5a0ed0a9019725dbd985d793f8cfc7125ee24904
+Author: Philipp Zabel <p.zabel@pengutronix.de>
+Date:   Mon Mar 9 12:20:13 2015 +0100
+
+    regmap: introduce regmap_name to fix syscon regmap trace events
+    
+    [ Upstream commit c6b570d97c0e77f570bb6b2ed30d372b2b1e9aae ]
+    
+    This patch fixes a NULL pointer dereference when enabling regmap event
+    tracing in the presence of a syscon regmap, introduced by commit bdb0066df96e
+    ("mfd: syscon: Decouple syscon interface from platform devices").
+    That patch introduced syscon regmaps that have their dev field set to NULL.
+    The regmap trace events expect it to point to a valid struct device and feed
+    it to dev_name():
+    
+      $ echo 1 > /sys/kernel/debug/tracing/events/regmap/enable
+    
+      Unable to handle kernel NULL pointer dereference at virtual address 0000002c
+      pgd = 80004000
+      [0000002c] *pgd=00000000
+      Internal error: Oops: 17 [#1] SMP ARM
+      Modules linked in: coda videobuf2_vmalloc
+      CPU: 0 PID: 304 Comm: kworker/0:2 Not tainted 4.0.0-rc2+ #9197
+      Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+      Workqueue: events_freezable thermal_zone_device_check
+      task: 9f25a200 ti: 9f1ee000 task.ti: 9f1ee000
+      PC is at ftrace_raw_event_regmap_block+0x3c/0xe4
+      LR is at _regmap_raw_read+0x1bc/0x1cc
+      pc : [<803636e8>]    lr : [<80365f2c>]    psr: 600f0093
+      sp : 9f1efd78  ip : 9f1efdb8  fp : 9f1efdb4
+      r10: 00000004  r9 : 00000001  r8 : 00000001
+      r7 : 00000180  r6 : 00000000  r5 : 9f00e3c0  r4 : 00000003
+      r3 : 00000001  r2 : 00000180  r1 : 00000000  r0 : 9f00e3c0
+      Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+      Control: 10c5387d  Table: 2d91004a  DAC: 00000015
+      Process kworker/0:2 (pid: 304, stack limit = 0x9f1ee210)
+      Stack: (0x9f1efd78 to 0x9f1f0000)
+      fd60:                                                       9f1efda4 9f1efd88
+      fd80: 800708c0 805f9510 80927140 800f0013 9f1fc800 9eb2f490 00000000 00000180
+      fda0: 808e3840 00000001 9f1efdfc 9f1efdb8 80365f2c 803636b8 805f8958 800708e0
+      fdc0: a00f0013 803636ac 9f16de00 00000180 80927140 9f1fc800 9f1fc800 9f1efe6c
+      fde0: 9f1efe6c 9f732400 00000000 00000000 9f1efe1c 9f1efe00 80365f70 80365d7c
+      fe00: 80365f3c 9f1fc800 9f1fc800 00000180 9f1efe44 9f1efe20 803656a4 80365f48
+      fe20: 9f1fc800 00000180 9f1efe6c 9f1efe6c 9f732400 00000000 9f1efe64 9f1efe48
+      fe40: 803657bc 80365634 00000001 9e95f910 9f1fc800 9f1efeb4 9f1efe8c 9f1efe68
+      fe60: 80452ac0 80365778 9f1efe8c 9f1efe78 9e93d400 9e93d5e8 9f1efeb4 9f72ef40
+      fe80: 9f1efeac 9f1efe90 8044e11c 80452998 8045298c 9e93d608 9e93d400 808e1978
+      fea0: 9f1efecc 9f1efeb0 8044fd14 8044e0d0 ffffffff 9f25a200 9e93d608 9e481380
+      fec0: 9f1efedc 9f1efed0 8044fde8 8044fcec 9f1eff1c 9f1efee0 80038d50 8044fdd8
+      fee0: 9f1ee020 9f72ef40 9e481398 00000000 00000008 9f72ef54 9f1ee020 9f72ef40
+      ff00: 9e481398 9e481380 00000008 9f72ef40 9f1eff5c 9f1eff20 80039754 80038bfc
+      ff20: 00000000 9e481380 80894100 808e1662 00000000 9e4f2ec0 00000000 9e481380
+      ff40: 800396f8 00000000 00000000 00000000 9f1effac 9f1eff60 8003e020 80039704
+      ff60: ffffffff 00000000 ffffffff 9e481380 00000000 00000000 9f1eff78 9f1eff78
+      ff80: 00000000 00000000 9f1eff88 9f1eff88 9e4f2ec0 8003df30 00000000 00000000
+      ffa0: 00000000 9f1effb0 8000eb60 8003df3c 00000000 00000000 00000000 00000000
+      ffc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+      ffe0: 00000000 00000000 00000000 00000000 00000013 00000000 ffffffff ffffffff
+      Backtrace:
+      [<803636ac>] (ftrace_raw_event_regmap_block) from [<80365f2c>] (_regmap_raw_read+0x1bc/0x1cc)
+       r9:00000001 r8:808e3840 r7:00000180 r6:00000000 r5:9eb2f490 r4:9f1fc800
+      [<80365d70>] (_regmap_raw_read) from [<80365f70>] (_regmap_bus_read+0x34/0x6c)
+       r10:00000000 r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:9f1fc800
+       r4:9f1fc800
+      [<80365f3c>] (_regmap_bus_read) from [<803656a4>] (_regmap_read+0x7c/0x144)
+       r6:00000180 r5:9f1fc800 r4:9f1fc800 r3:80365f3c
+      [<80365628>] (_regmap_read) from [<803657bc>] (regmap_read+0x50/0x70)
+       r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:00000180 r4:9f1fc800
+      [<8036576c>] (regmap_read) from [<80452ac0>] (imx_get_temp+0x134/0x1a4)
+       r6:9f1efeb4 r5:9f1fc800 r4:9e95f910 r3:00000001
+      [<8045298c>] (imx_get_temp) from [<8044e11c>] (thermal_zone_get_temp+0x58/0x74)
+       r7:9f72ef40 r6:9f1efeb4 r5:9e93d5e8 r4:9e93d400
+      [<8044e0c4>] (thermal_zone_get_temp) from [<8044fd14>] (thermal_zone_device_update+0x34/0xec)
+       r6:808e1978 r5:9e93d400 r4:9e93d608 r3:8045298c
+      [<8044fce0>] (thermal_zone_device_update) from [<8044fde8>] (thermal_zone_device_check+0x1c/0x20)
+       r5:9e481380 r4:9e93d608
+      [<8044fdcc>] (thermal_zone_device_check) from [<80038d50>] (process_one_work+0x160/0x3d4)
+      [<80038bf0>] (process_one_work) from [<80039754>] (worker_thread+0x5c/0x4f4)
+       r10:9f72ef40 r9:00000008 r8:9e481380 r7:9e481398 r6:9f72ef40 r5:9f1ee020
+       r4:9f72ef54
+      [<800396f8>] (worker_thread) from [<8003e020>] (kthread+0xf0/0x108)
+       r10:00000000 r9:00000000 r8:00000000 r7:800396f8 r6:9e481380 r5:00000000
+       r4:9e4f2ec0
+      [<8003df30>] (kthread) from [<8000eb60>] (ret_from_fork+0x14/0x34)
+       r7:00000000 r6:00000000 r5:8003df30 r4:9e4f2ec0
+      Code: e3140040 1a00001a e3140020 1a000016 (e596002c)
+      ---[ end trace 193c15c2494ec960 ]---
+    
+    Fixes: bdb0066df96e (mfd: syscon: Decouple syscon interface from platform devices)
+    Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+    Signed-off-by: Mark Brown <broonie@kernel.org>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+
+commit 55a86f9e3ca7fb1f95bd806a6bf91ba2cd74f4a6
+Author: Philipp Zabel <p.zabel@pengutronix.de>
+Date:   Mon Mar 9 12:20:13 2015 +0100
+
+    regmap: introduce regmap_name to fix syscon regmap trace events
+    
+    commit c6b570d97c0e77f570bb6b2ed30d372b2b1e9aae upstream.
+    
+    This patch fixes a NULL pointer dereference when enabling regmap event
+    tracing in the presence of a syscon regmap, introduced by commit bdb0066df96e
+    ("mfd: syscon: Decouple syscon interface from platform devices").
+    That patch introduced syscon regmaps that have their dev field set to NULL.
+    The regmap trace events expect it to point to a valid struct device and feed
+    it to dev_name():
+    
+      $ echo 1 > /sys/kernel/debug/tracing/events/regmap/enable
+    
+      Unable to handle kernel NULL pointer dereference at virtual address 0000002c
+      pgd = 80004000
+      [0000002c] *pgd=00000000
+      Internal error: Oops: 17 [#1] SMP ARM
+      Modules linked in: coda videobuf2_vmalloc
+      CPU: 0 PID: 304 Comm: kworker/0:2 Not tainted 4.0.0-rc2+ #9197
+      Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+      Workqueue: events_freezable thermal_zone_device_check
+      task: 9f25a200 ti: 9f1ee000 task.ti: 9f1ee000
+      PC is at ftrace_raw_event_regmap_block+0x3c/0xe4
+      LR is at _regmap_raw_read+0x1bc/0x1cc
+      pc : [<803636e8>]    lr : [<80365f2c>]    psr: 600f0093
+      sp : 9f1efd78  ip : 9f1efdb8  fp : 9f1efdb4
+      r10: 00000004  r9 : 00000001  r8 : 00000001
+      r7 : 00000180  r6 : 00000000  r5 : 9f00e3c0  r4 : 00000003
+      r3 : 00000001  r2 : 00000180  r1 : 00000000  r0 : 9f00e3c0
+      Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+      Control: 10c5387d  Table: 2d91004a  DAC: 00000015
+      Process kworker/0:2 (pid: 304, stack limit = 0x9f1ee210)
+      Stack: (0x9f1efd78 to 0x9f1f0000)
+      fd60:                                                       9f1efda4 9f1efd88
+      fd80: 800708c0 805f9510 80927140 800f0013 9f1fc800 9eb2f490 00000000 00000180
+      fda0: 808e3840 00000001 9f1efdfc 9f1efdb8 80365f2c 803636b8 805f8958 800708e0
+      fdc0: a00f0013 803636ac 9f16de00 00000180 80927140 9f1fc800 9f1fc800 9f1efe6c
+      fde0: 9f1efe6c 9f732400 00000000 00000000 9f1efe1c 9f1efe00 80365f70 80365d7c
+      fe00: 80365f3c 9f1fc800 9f1fc800 00000180 9f1efe44 9f1efe20 803656a4 80365f48
+      fe20: 9f1fc800 00000180 9f1efe6c 9f1efe6c 9f732400 00000000 9f1efe64 9f1efe48
+      fe40: 803657bc 80365634 00000001 9e95f910 9f1fc800 9f1efeb4 9f1efe8c 9f1efe68
+      fe60: 80452ac0 80365778 9f1efe8c 9f1efe78 9e93d400 9e93d5e8 9f1efeb4 9f72ef40
+      fe80: 9f1efeac 9f1efe90 8044e11c 80452998 8045298c 9e93d608 9e93d400 808e1978
+      fea0: 9f1efecc 9f1efeb0 8044fd14 8044e0d0 ffffffff 9f25a200 9e93d608 9e481380
+      fec0: 9f1efedc 9f1efed0 8044fde8 8044fcec 9f1eff1c 9f1efee0 80038d50 8044fdd8
+      fee0: 9f1ee020 9f72ef40 9e481398 00000000 00000008 9f72ef54 9f1ee020 9f72ef40
+      ff00: 9e481398 9e481380 00000008 9f72ef40 9f1eff5c 9f1eff20 80039754 80038bfc
+      ff20: 00000000 9e481380 80894100 808e1662 00000000 9e4f2ec0 00000000 9e481380
+      ff40: 800396f8 00000000 00000000 00000000 9f1effac 9f1eff60 8003e020 80039704
+      ff60: ffffffff 00000000 ffffffff 9e481380 00000000 00000000 9f1eff78 9f1eff78
+      ff80: 00000000 00000000 9f1eff88 9f1eff88 9e4f2ec0 8003df30 00000000 00000000
+      ffa0: 00000000 9f1effb0 8000eb60 8003df3c 00000000 00000000 00000000 00000000
+      ffc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+      ffe0: 00000000 00000000 00000000 00000000 00000013 00000000 ffffffff ffffffff
+      Backtrace:
+      [<803636ac>] (ftrace_raw_event_regmap_block) from [<80365f2c>] (_regmap_raw_read+0x1bc/0x1cc)
+       r9:00000001 r8:808e3840 r7:00000180 r6:00000000 r5:9eb2f490 r4:9f1fc800
+      [<80365d70>] (_regmap_raw_read) from [<80365f70>] (_regmap_bus_read+0x34/0x6c)
+       r10:00000000 r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:9f1fc800
+       r4:9f1fc800
+      [<80365f3c>] (_regmap_bus_read) from [<803656a4>] (_regmap_read+0x7c/0x144)
+       r6:00000180 r5:9f1fc800 r4:9f1fc800 r3:80365f3c
+      [<80365628>] (_regmap_read) from [<803657bc>] (regmap_read+0x50/0x70)
+       r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:00000180 r4:9f1fc800
+      [<8036576c>] (regmap_read) from [<80452ac0>] (imx_get_temp+0x134/0x1a4)
+       r6:9f1efeb4 r5:9f1fc800 r4:9e95f910 r3:00000001
+      [<8045298c>] (imx_get_temp) from [<8044e11c>] (thermal_zone_get_temp+0x58/0x74)
+       r7:9f72ef40 r6:9f1efeb4 r5:9e93d5e8 r4:9e93d400
+      [<8044e0c4>] (thermal_zone_get_temp) from [<8044fd14>] (thermal_zone_device_update+0x34/0xec)
+       r6:808e1978 r5:9e93d400 r4:9e93d608 r3:8045298c
+      [<8044fce0>] (thermal_zone_device_update) from [<8044fde8>] (thermal_zone_device_check+0x1c/0x20)
+       r5:9e481380 r4:9e93d608
+      [<8044fdcc>] (thermal_zone_device_check) from [<80038d50>] (process_one_work+0x160/0x3d4)
+      [<80038bf0>] (process_one_work) from [<80039754>] (worker_thread+0x5c/0x4f4)
+       r10:9f72ef40 r9:00000008 r8:9e481380 r7:9e481398 r6:9f72ef40 r5:9f1ee020
+       r4:9f72ef54
+      [<800396f8>] (worker_thread) from [<8003e020>] (kthread+0xf0/0x108)
+       r10:00000000 r9:00000000 r8:00000000 r7:800396f8 r6:9e481380 r5:00000000
+       r4:9e4f2ec0
+      [<8003df30>] (kthread) from [<8000eb60>] (ret_from_fork+0x14/0x34)
+       r7:00000000 r6:00000000 r5:8003df30 r4:9e4f2ec0
+      Code: e3140040 1a00001a e3140020 1a000016 (e596002c)
+      ---[ end trace 193c15c2494ec960 ]---
+    
+    Fixes: bdb0066df96e (mfd: syscon: Decouple syscon interface from platform devices)
+    Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+    Signed-off-by: Mark Brown <broonie@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 54d8ccc30270586f869bfb46ff8a8ca330c8aa23
+Merge: 56fd85b5dd59 541d529f9845
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Apr 12 10:43:30 2015 -0700
+
+    Merge branch 'fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/evalenti/linux-soc-thermal
+    
+    Pull last minute thermal-SoC management fixes from Eduardo Valentin:
+     "Specifics:
+    
+       - Minor fixes on ST and RCAR thermal drivers.
+       - Avoid flooding kernel log when driver returns -EAGAIN.
+    
+      Note: I am sending this pull on Rui's behalf while he fixes issues in
+      his Linux box"
+    
+    * 'fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/evalenti/linux-soc-thermal:
+      drivers: thermal: st: remove several sparse warnings
+      thermal: constify of_device_id array
+      thermal: Do not log an error if thermal_zone_get_temp returns -EAGAIN
+      thermal: rcar: Fix typo in r8a73a4 SoC name
+
+commit 2f55b0b64dab9063fd0ce63bb810b6beb7133d24
+Author: Philipp Zabel <p.zabel@pengutronix.de>
+Date:   Mon Mar 9 12:20:13 2015 +0100
+
+    regmap: introduce regmap_name to fix syscon regmap trace events
+    
+    commit c6b570d97c0e77f570bb6b2ed30d372b2b1e9aae upstream.
+    
+    This patch fixes a NULL pointer dereference when enabling regmap event
+    tracing in the presence of a syscon regmap, introduced by commit bdb0066df96e
+    ("mfd: syscon: Decouple syscon interface from platform devices").
+    That patch introduced syscon regmaps that have their dev field set to NULL.
+    The regmap trace events expect it to point to a valid struct device and feed
+    it to dev_name():
+    
+      $ echo 1 > /sys/kernel/debug/tracing/events/regmap/enable
+    
+      Unable to handle kernel NULL pointer dereference at virtual address 0000002c
+      pgd = 80004000
+      [0000002c] *pgd=00000000
+      Internal error: Oops: 17 [#1] SMP ARM
+      Modules linked in: coda videobuf2_vmalloc
+      CPU: 0 PID: 304 Comm: kworker/0:2 Not tainted 4.0.0-rc2+ #9197
+      Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+      Workqueue: events_freezable thermal_zone_device_check
+      task: 9f25a200 ti: 9f1ee000 task.ti: 9f1ee000
+      PC is at ftrace_raw_event_regmap_block+0x3c/0xe4
+      LR is at _regmap_raw_read+0x1bc/0x1cc
+      pc : [<803636e8>]    lr : [<80365f2c>]    psr: 600f0093
+      sp : 9f1efd78  ip : 9f1efdb8  fp : 9f1efdb4
+      r10: 00000004  r9 : 00000001  r8 : 00000001
+      r7 : 00000180  r6 : 00000000  r5 : 9f00e3c0  r4 : 00000003
+      r3 : 00000001  r2 : 00000180  r1 : 00000000  r0 : 9f00e3c0
+      Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+      Control: 10c5387d  Table: 2d91004a  DAC: 00000015
+      Process kworker/0:2 (pid: 304, stack limit = 0x9f1ee210)
+      Stack: (0x9f1efd78 to 0x9f1f0000)
+      fd60:                                                       9f1efda4 9f1efd88
+      fd80: 800708c0 805f9510 80927140 800f0013 9f1fc800 9eb2f490 00000000 00000180
+      fda0: 808e3840 00000001 9f1efdfc 9f1efdb8 80365f2c 803636b8 805f8958 800708e0
+      fdc0: a00f0013 803636ac 9f16de00 00000180 80927140 9f1fc800 9f1fc800 9f1efe6c
+      fde0: 9f1efe6c 9f732400 00000000 00000000 9f1efe1c 9f1efe00 80365f70 80365d7c
+      fe00: 80365f3c 9f1fc800 9f1fc800 00000180 9f1efe44 9f1efe20 803656a4 80365f48
+      fe20: 9f1fc800 00000180 9f1efe6c 9f1efe6c 9f732400 00000000 9f1efe64 9f1efe48
+      fe40: 803657bc 80365634 00000001 9e95f910 9f1fc800 9f1efeb4 9f1efe8c 9f1efe68
+      fe60: 80452ac0 80365778 9f1efe8c 9f1efe78 9e93d400 9e93d5e8 9f1efeb4 9f72ef40
+      fe80: 9f1efeac 9f1efe90 8044e11c 80452998 8045298c 9e93d608 9e93d400 808e1978
+      fea0: 9f1efecc 9f1efeb0 8044fd14 8044e0d0 ffffffff 9f25a200 9e93d608 9e481380
+      fec0: 9f1efedc 9f1efed0 8044fde8 8044fcec 9f1eff1c 9f1efee0 80038d50 8044fdd8
+      fee0: 9f1ee020 9f72ef40 9e481398 00000000 00000008 9f72ef54 9f1ee020 9f72ef40
+      ff00: 9e481398 9e481380 00000008 9f72ef40 9f1eff5c 9f1eff20 80039754 80038bfc
+      ff20: 00000000 9e481380 80894100 808e1662 00000000 9e4f2ec0 00000000 9e481380
+      ff40: 800396f8 00000000 00000000 00000000 9f1effac 9f1eff60 8003e020 80039704
+      ff60: ffffffff 00000000 ffffffff 9e481380 00000000 00000000 9f1eff78 9f1eff78
+      ff80: 00000000 00000000 9f1eff88 9f1eff88 9e4f2ec0 8003df30 00000000 00000000
+      ffa0: 00000000 9f1effb0 8000eb60 8003df3c 00000000 00000000 00000000 00000000
+      ffc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+      ffe0: 00000000 00000000 00000000 00000000 00000013 00000000 ffffffff ffffffff
+      Backtrace:
+      [<803636ac>] (ftrace_raw_event_regmap_block) from [<80365f2c>] (_regmap_raw_read+0x1bc/0x1cc)
+       r9:00000001 r8:808e3840 r7:00000180 r6:00000000 r5:9eb2f490 r4:9f1fc800
+      [<80365d70>] (_regmap_raw_read) from [<80365f70>] (_regmap_bus_read+0x34/0x6c)
+       r10:00000000 r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:9f1fc800
+       r4:9f1fc800
+      [<80365f3c>] (_regmap_bus_read) from [<803656a4>] (_regmap_read+0x7c/0x144)
+       r6:00000180 r5:9f1fc800 r4:9f1fc800 r3:80365f3c
+      [<80365628>] (_regmap_read) from [<803657bc>] (regmap_read+0x50/0x70)
+       r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:00000180 r4:9f1fc800
+      [<8036576c>] (regmap_read) from [<80452ac0>] (imx_get_temp+0x134/0x1a4)
+       r6:9f1efeb4 r5:9f1fc800 r4:9e95f910 r3:00000001
+      [<8045298c>] (imx_get_temp) from [<8044e11c>] (thermal_zone_get_temp+0x58/0x74)
+       r7:9f72ef40 r6:9f1efeb4 r5:9e93d5e8 r4:9e93d400
+      [<8044e0c4>] (thermal_zone_get_temp) from [<8044fd14>] (thermal_zone_device_update+0x34/0xec)
+       r6:808e1978 r5:9e93d400 r4:9e93d608 r3:8045298c
+      [<8044fce0>] (thermal_zone_device_update) from [<8044fde8>] (thermal_zone_device_check+0x1c/0x20)
+       r5:9e481380 r4:9e93d608
+      [<8044fdcc>] (thermal_zone_device_check) from [<80038d50>] (process_one_work+0x160/0x3d4)
+      [<80038bf0>] (process_one_work) from [<80039754>] (worker_thread+0x5c/0x4f4)
+       r10:9f72ef40 r9:00000008 r8:9e481380 r7:9e481398 r6:9f72ef40 r5:9f1ee020
+       r4:9f72ef54
+      [<800396f8>] (worker_thread) from [<8003e020>] (kthread+0xf0/0x108)
+       r10:00000000 r9:00000000 r8:00000000 r7:800396f8 r6:9e481380 r5:00000000
+       r4:9e4f2ec0
+      [<8003df30>] (kthread) from [<8000eb60>] (ret_from_fork+0x14/0x34)
+       r7:00000000 r6:00000000 r5:8003df30 r4:9e4f2ec0
+      Code: e3140040 1a00001a e3140020 1a000016 (e596002c)
+      ---[ end trace 193c15c2494ec960 ]---
+    
+    Fixes: bdb0066df96e (mfd: syscon: Decouple syscon interface from platform devices)
+    Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+    Signed-off-by: Mark Brown <broonie@kernel.org>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit 7e497a7375fe5d5c5d751a71d006f4fd515bbcd8
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Sat Mar 21 15:02:55 2015 +0100
+
+    thermal: Do not log an error if thermal_zone_get_temp returns -EAGAIN
+    
+    Some temperature sensors only get updated every few seconds and while
+    waiting for the first irq reporting a (new) temperature to happen there
+    get_temp operand will return -EAGAIN as it does not have any data to report
+    yet.
+    
+    Not logging an error in this case avoids messages like these from showing
+    up in dmesg on affected systems:
+    
+    [    1.219353] thermal thermal_zone0: failed to read out thermal zone 0
+    [    2.015433] thermal thermal_zone0: failed to read out thermal zone 0
+    [    2.416737] thermal thermal_zone0: failed to read out thermal zone 0
+    
+    Reviewed-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit c6b570d97c0e77f570bb6b2ed30d372b2b1e9aae
+Author: Philipp Zabel <p.zabel@pengutronix.de>
+Date:   Mon Mar 9 12:20:13 2015 +0100
+
+    regmap: introduce regmap_name to fix syscon regmap trace events
+    
+    This patch fixes a NULL pointer dereference when enabling regmap event
+    tracing in the presence of a syscon regmap, introduced by commit bdb0066df96e
+    ("mfd: syscon: Decouple syscon interface from platform devices").
+    That patch introduced syscon regmaps that have their dev field set to NULL.
+    The regmap trace events expect it to point to a valid struct device and feed
+    it to dev_name():
+    
+      $ echo 1 > /sys/kernel/debug/tracing/events/regmap/enable
+    
+      Unable to handle kernel NULL pointer dereference at virtual address 0000002c
+      pgd = 80004000
+      [0000002c] *pgd=00000000
+      Internal error: Oops: 17 [#1] SMP ARM
+      Modules linked in: coda videobuf2_vmalloc
+      CPU: 0 PID: 304 Comm: kworker/0:2 Not tainted 4.0.0-rc2+ #9197
+      Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+      Workqueue: events_freezable thermal_zone_device_check
+      task: 9f25a200 ti: 9f1ee000 task.ti: 9f1ee000
+      PC is at ftrace_raw_event_regmap_block+0x3c/0xe4
+      LR is at _regmap_raw_read+0x1bc/0x1cc
+      pc : [<803636e8>]    lr : [<80365f2c>]    psr: 600f0093
+      sp : 9f1efd78  ip : 9f1efdb8  fp : 9f1efdb4
+      r10: 00000004  r9 : 00000001  r8 : 00000001
+      r7 : 00000180  r6 : 00000000  r5 : 9f00e3c0  r4 : 00000003
+      r3 : 00000001  r2 : 00000180  r1 : 00000000  r0 : 9f00e3c0
+      Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+      Control: 10c5387d  Table: 2d91004a  DAC: 00000015
+      Process kworker/0:2 (pid: 304, stack limit = 0x9f1ee210)
+      Stack: (0x9f1efd78 to 0x9f1f0000)
+      fd60:                                                       9f1efda4 9f1efd88
+      fd80: 800708c0 805f9510 80927140 800f0013 9f1fc800 9eb2f490 00000000 00000180
+      fda0: 808e3840 00000001 9f1efdfc 9f1efdb8 80365f2c 803636b8 805f8958 800708e0
+      fdc0: a00f0013 803636ac 9f16de00 00000180 80927140 9f1fc800 9f1fc800 9f1efe6c
+      fde0: 9f1efe6c 9f732400 00000000 00000000 9f1efe1c 9f1efe00 80365f70 80365d7c
+      fe00: 80365f3c 9f1fc800 9f1fc800 00000180 9f1efe44 9f1efe20 803656a4 80365f48
+      fe20: 9f1fc800 00000180 9f1efe6c 9f1efe6c 9f732400 00000000 9f1efe64 9f1efe48
+      fe40: 803657bc 80365634 00000001 9e95f910 9f1fc800 9f1efeb4 9f1efe8c 9f1efe68
+      fe60: 80452ac0 80365778 9f1efe8c 9f1efe78 9e93d400 9e93d5e8 9f1efeb4 9f72ef40
+      fe80: 9f1efeac 9f1efe90 8044e11c 80452998 8045298c 9e93d608 9e93d400 808e1978
+      fea0: 9f1efecc 9f1efeb0 8044fd14 8044e0d0 ffffffff 9f25a200 9e93d608 9e481380
+      fec0: 9f1efedc 9f1efed0 8044fde8 8044fcec 9f1eff1c 9f1efee0 80038d50 8044fdd8
+      fee0: 9f1ee020 9f72ef40 9e481398 00000000 00000008 9f72ef54 9f1ee020 9f72ef40
+      ff00: 9e481398 9e481380 00000008 9f72ef40 9f1eff5c 9f1eff20 80039754 80038bfc
+      ff20: 00000000 9e481380 80894100 808e1662 00000000 9e4f2ec0 00000000 9e481380
+      ff40: 800396f8 00000000 00000000 00000000 9f1effac 9f1eff60 8003e020 80039704
+      ff60: ffffffff 00000000 ffffffff 9e481380 00000000 00000000 9f1eff78 9f1eff78
+      ff80: 00000000 00000000 9f1eff88 9f1eff88 9e4f2ec0 8003df30 00000000 00000000
+      ffa0: 00000000 9f1effb0 8000eb60 8003df3c 00000000 00000000 00000000 00000000
+      ffc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+      ffe0: 00000000 00000000 00000000 00000000 00000013 00000000 ffffffff ffffffff
+      Backtrace:
+      [<803636ac>] (ftrace_raw_event_regmap_block) from [<80365f2c>] (_regmap_raw_read+0x1bc/0x1cc)
+       r9:00000001 r8:808e3840 r7:00000180 r6:00000000 r5:9eb2f490 r4:9f1fc800
+      [<80365d70>] (_regmap_raw_read) from [<80365f70>] (_regmap_bus_read+0x34/0x6c)
+       r10:00000000 r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:9f1fc800
+       r4:9f1fc800
+      [<80365f3c>] (_regmap_bus_read) from [<803656a4>] (_regmap_read+0x7c/0x144)
+       r6:00000180 r5:9f1fc800 r4:9f1fc800 r3:80365f3c
+      [<80365628>] (_regmap_read) from [<803657bc>] (regmap_read+0x50/0x70)
+       r9:00000000 r8:9f732400 r7:9f1efe6c r6:9f1efe6c r5:00000180 r4:9f1fc800
+      [<8036576c>] (regmap_read) from [<80452ac0>] (imx_get_temp+0x134/0x1a4)
+       r6:9f1efeb4 r5:9f1fc800 r4:9e95f910 r3:00000001
+      [<8045298c>] (imx_get_temp) from [<8044e11c>] (thermal_zone_get_temp+0x58/0x74)
+       r7:9f72ef40 r6:9f1efeb4 r5:9e93d5e8 r4:9e93d400
+      [<8044e0c4>] (thermal_zone_get_temp) from [<8044fd14>] (thermal_zone_device_update+0x34/0xec)
+       r6:808e1978 r5:9e93d400 r4:9e93d608 r3:8045298c
+      [<8044fce0>] (thermal_zone_device_update) from [<8044fde8>] (thermal_zone_device_check+0x1c/0x20)
+       r5:9e481380 r4:9e93d608
+      [<8044fdcc>] (thermal_zone_device_check) from [<80038d50>] (process_one_work+0x160/0x3d4)
+      [<80038bf0>] (process_one_work) from [<80039754>] (worker_thread+0x5c/0x4f4)
+       r10:9f72ef40 r9:00000008 r8:9e481380 r7:9e481398 r6:9f72ef40 r5:9f1ee020
+       r4:9f72ef54
+      [<800396f8>] (worker_thread) from [<8003e020>] (kthread+0xf0/0x108)
+       r10:00000000 r9:00000000 r8:00000000 r7:800396f8 r6:9e481380 r5:00000000
+       r4:9e4f2ec0
+      [<8003df30>] (kthread) from [<8000eb60>] (ret_from_fork+0x14/0x34)
+       r7:00000000 r6:00000000 r5:8003df30 r4:9e4f2ec0
+      Code: e3140040 1a00001a e3140020 1a000016 (e596002c)
+      ---[ end trace 193c15c2494ec960 ]---
+    
+    Fixes: bdb0066df96e (mfd: syscon: Decouple syscon interface from platform devices)
+    Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+    Signed-off-by: Mark Brown <broonie@kernel.org>
+    Cc: stable@vger.kernel.org
+
+commit 05629296eec7e18038ca90ca4d5fa03824026429
+Author: Maurice Petallo <mauricex.r.petallo@intel.com>
+Date:   Fri Nov 28 10:11:41 2014 +0800
+
+    thermal: Intel SoC DTS: Don't do thermal zone update inside spin_lock
+    
+    The driver calls spin_lock_irqsave during DTS interrupt. The interrupt
+    handle then calls thermal_zone_device_update which implicitly calls
+    a sleep function and produce the following bug:
+    
+    BUG: sleeping function called from invalid context at kernel/locking/mutex.c:97
+    in_atomic(): 1, irqs_disabled(): 1, pid: 920, name: irq/86-soc_dts
+    CPU: 0 PID: 920 Comm: irq/86-soc_dts Tainted: G            E  3.17.0-rc2+ #1
+    Hardware name: Intel Corp. VALLEYVIEW B3 PLATFORM/NOTEBOOK, BIOS BYTICRB1.86C.0092.R31.1408290850 08/29/2014
+     00000000 00000000 c25dbe74 c1818cfd f3cc488c c25dbe9c c1059305 c1b4063b
+     00000001 00000001 00000398 f3cc488c f6817644 f6817644 f3ecc6c0 c25dbea8
+     c18208f2 f6817400 c25dbebc c159b0bb c25dbedc f6817400 f32a2300 c25dbee8
+    Call Trace:
+     [<c1818cfd>] dump_stack+0x48/0x60
+     [<c1059305>] __might_sleep+0xec/0xf4
+     [<c18208f2>] mutex_lock+0x1c/0x34
+     [<c159b0bb>] thermal_zone_get_temp+0x34/0x59
+     [<c159bde5>] thermal_zone_device_update+0x2d/0xcb
+     [<f85da16a>] ? iosf_mbi_write+0x6c/0x74 [iosf_mbi]
+     [<f7c7445d>] soc_irq_thread_fn+0x10c/0x163 [intel_soc_dts_thermal]
+     [<c107b72b>] irq_thread_fn+0x18/0x2a
+     [<c107bedb>] irq_thread+0x81/0x11f
+     [<c107b713>] ? irq_finalize_oneshot+0x7c/0x7c
+     [<c107bf79>] ? irq_thread+0x11f/0x11f
+     [<c107be5a>] ? wake_threads_waitq+0x31/0x31
+     [<c1054217>] kthread+0x87/0x8c
+     [<c1821e41>] ret_from_kernel_thread+0x21/0x30
+     [<c1054190>] ? __kthread_parkme+0x55/0x55
+    
+    Signed-off-by: Maurice Petallo <mauricex.r.petallo@intel.com>
+    Acked-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Acked-by: Eduardo Valentin <edubezval@gmail.com>
+    CC: Kweh, Hock Leong <hock.leong.kweh@intel.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 767a001799421965635c7f524cde66ff34231701
+Author: Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Mon Oct 13 15:34:30 2014 +0200
+
+    power: charger-manager: Fix accessing invalidated power supply after fuel gauge unbind
+    
+    commit bdbe81445407644492b9ac69a24d35e3202d773b upstream.
+    
+    The charger manager obtained reference to fuel gauge power supply in probe
+    with power_supply_get_by_name() for later usage. However if fuel gauge
+    driver was removed and re-added then this reference would point to old
+    power supply (from driver which was removed).
+    
+    This lead to accessing old (and probably invalid) memory which could be
+    observed with:
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/unbind
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/bind
+    $ cat /sys/devices/virtual/power_supply/battery/capacity
+    [  240.480084] INFO: task cat:1393 blocked for more than 120 seconds.
+    [  240.484799]       Not tainted 3.17.0-next-20141007-00028-ge60b6dd79570 #203
+    [  240.491782] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+    [  240.499589] cat             D c0469530     0  1393      1 0x00000000
+    [  240.505947] [<c0469530>] (__schedule) from [<c0469d3c>] (schedule_preempt_disabled+0x14/0x20)
+    [  240.514449] [<c0469d3c>] (schedule_preempt_disabled) from [<c046af08>] (mutex_lock_nested+0x1bc/0x458)
+    [  240.523736] [<c046af08>] (mutex_lock_nested) from [<c0287a98>] (regmap_read+0x30/0x60)
+    [  240.531647] [<c0287a98>] (regmap_read) from [<c032238c>] (max17042_get_property+0x2e8/0x350)
+    [  240.540055] [<c032238c>] (max17042_get_property) from [<c03247d8>] (charger_get_property+0x264/0x348)
+    [  240.549252] [<c03247d8>] (charger_get_property) from [<c0320764>] (power_supply_show_property+0x48/0x1e0)
+    [  240.558808] [<c0320764>] (power_supply_show_property) from [<c027308c>] (dev_attr_show+0x1c/0x48)
+    [  240.567664] [<c027308c>] (dev_attr_show) from [<c0141fb0>] (sysfs_kf_seq_show+0x84/0x104)
+    [  240.575814] [<c0141fb0>] (sysfs_kf_seq_show) from [<c0140b18>] (kernfs_seq_show+0x24/0x28)
+    [  240.584061] [<c0140b18>] (kernfs_seq_show) from [<c0104574>] (seq_read+0x1b0/0x484)
+    [  240.591702] [<c0104574>] (seq_read) from [<c00e1e24>] (vfs_read+0x88/0x144)
+    [  240.598640] [<c00e1e24>] (vfs_read) from [<c00e1f20>] (SyS_read+0x40/0x8c)
+    [  240.605507] [<c00e1f20>] (SyS_read) from [<c000e760>] (ret_fast_syscall+0x0/0x48)
+    [  240.612952] 4 locks held by cat/1393:
+    [  240.616589]  #0:  (&p->lock){+.+.+.}, at: [<c01043f4>] seq_read+0x30/0x484
+    [  240.623414]  #1:  (&of->mutex){+.+.+.}, at: [<c01417dc>] kernfs_seq_start+0x1c/0x8c
+    [  240.631086]  #2:  (s_active#31){++++.+}, at: [<c01417e4>] kernfs_seq_start+0x24/0x8c
+    [  240.638777]  #3:  (&map->mutex){+.+...}, at: [<c0287a98>] regmap_read+0x30/0x60
+    
+    The charger-manager should get reference to fuel gauge power supply on
+    each use of get_property callback. The thermal zone 'tzd' field of
+    power supply should not be used because of the same reason.
+    
+    Additionally this change solves also the issue with nested
+    thermal_zone_get_temp() calls and related false lockdep positive for
+    deadlock for thermal zone's mutex [1]. When fuel gauge is used as source of
+    temperature then the charger manager forwards its get_temp calls to fuel
+    gauge thermal zone. So actually different mutexes are used (one for
+    charger manager thermal zone and second for fuel gauge thermal zone) but
+    for lockdep this is one class of mutex.
+    
+    The recursion is removed by retrieving temperature through power
+    supply's get_property().
+    
+    In case external thermal zone is used ('cm-thermal-zone' property is
+    present in DTS) the recursion does not exist. Charger manager simply
+    exports POWER_SUPPLY_PROP_TEMP_AMBIENT property (instead of
+    POWER_SUPPLY_PROP_TEMP) thus no thermal zone is created for this power
+    supply.
+    
+    [1] https://lkml.org/lkml/2014/10/6/309
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Fixes: 3bb3dbbd56ea ("power_supply: Add initial Charger-Manager driver")
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 122d385ba70565ff11d3dc0383d07819f2e9a612
+Author: Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Mon Oct 13 15:34:30 2014 +0200
+
+    power: charger-manager: Fix accessing invalidated power supply after fuel gauge unbind
+    
+    commit bdbe81445407644492b9ac69a24d35e3202d773b upstream.
+    
+    The charger manager obtained reference to fuel gauge power supply in probe
+    with power_supply_get_by_name() for later usage. However if fuel gauge
+    driver was removed and re-added then this reference would point to old
+    power supply (from driver which was removed).
+    
+    This lead to accessing old (and probably invalid) memory which could be
+    observed with:
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/unbind
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/bind
+    $ cat /sys/devices/virtual/power_supply/battery/capacity
+    [  240.480084] INFO: task cat:1393 blocked for more than 120 seconds.
+    [  240.484799]       Not tainted 3.17.0-next-20141007-00028-ge60b6dd79570 #203
+    [  240.491782] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+    [  240.499589] cat             D c0469530     0  1393      1 0x00000000
+    [  240.505947] [<c0469530>] (__schedule) from [<c0469d3c>] (schedule_preempt_disabled+0x14/0x20)
+    [  240.514449] [<c0469d3c>] (schedule_preempt_disabled) from [<c046af08>] (mutex_lock_nested+0x1bc/0x458)
+    [  240.523736] [<c046af08>] (mutex_lock_nested) from [<c0287a98>] (regmap_read+0x30/0x60)
+    [  240.531647] [<c0287a98>] (regmap_read) from [<c032238c>] (max17042_get_property+0x2e8/0x350)
+    [  240.540055] [<c032238c>] (max17042_get_property) from [<c03247d8>] (charger_get_property+0x264/0x348)
+    [  240.549252] [<c03247d8>] (charger_get_property) from [<c0320764>] (power_supply_show_property+0x48/0x1e0)
+    [  240.558808] [<c0320764>] (power_supply_show_property) from [<c027308c>] (dev_attr_show+0x1c/0x48)
+    [  240.567664] [<c027308c>] (dev_attr_show) from [<c0141fb0>] (sysfs_kf_seq_show+0x84/0x104)
+    [  240.575814] [<c0141fb0>] (sysfs_kf_seq_show) from [<c0140b18>] (kernfs_seq_show+0x24/0x28)
+    [  240.584061] [<c0140b18>] (kernfs_seq_show) from [<c0104574>] (seq_read+0x1b0/0x484)
+    [  240.591702] [<c0104574>] (seq_read) from [<c00e1e24>] (vfs_read+0x88/0x144)
+    [  240.598640] [<c00e1e24>] (vfs_read) from [<c00e1f20>] (SyS_read+0x40/0x8c)
+    [  240.605507] [<c00e1f20>] (SyS_read) from [<c000e760>] (ret_fast_syscall+0x0/0x48)
+    [  240.612952] 4 locks held by cat/1393:
+    [  240.616589]  #0:  (&p->lock){+.+.+.}, at: [<c01043f4>] seq_read+0x30/0x484
+    [  240.623414]  #1:  (&of->mutex){+.+.+.}, at: [<c01417dc>] kernfs_seq_start+0x1c/0x8c
+    [  240.631086]  #2:  (s_active#31){++++.+}, at: [<c01417e4>] kernfs_seq_start+0x24/0x8c
+    [  240.638777]  #3:  (&map->mutex){+.+...}, at: [<c0287a98>] regmap_read+0x30/0x60
+    
+    The charger-manager should get reference to fuel gauge power supply on
+    each use of get_property callback. The thermal zone 'tzd' field of
+    power supply should not be used because of the same reason.
+    
+    Additionally this change solves also the issue with nested
+    thermal_zone_get_temp() calls and related false lockdep positive for
+    deadlock for thermal zone's mutex [1]. When fuel gauge is used as source of
+    temperature then the charger manager forwards its get_temp calls to fuel
+    gauge thermal zone. So actually different mutexes are used (one for
+    charger manager thermal zone and second for fuel gauge thermal zone) but
+    for lockdep this is one class of mutex.
+    
+    The recursion is removed by retrieving temperature through power
+    supply's get_property().
+    
+    In case external thermal zone is used ('cm-thermal-zone' property is
+    present in DTS) the recursion does not exist. Charger manager simply
+    exports POWER_SUPPLY_PROP_TEMP_AMBIENT property (instead of
+    POWER_SUPPLY_PROP_TEMP) thus no thermal zone is created for this power
+    supply.
+    
+    [1] https://lkml.org/lkml/2014/10/6/309
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Fixes: 3bb3dbbd56ea ("power_supply: Add initial Charger-Manager driver")
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit d4ce860a687380c55bd840492c121eccd6a6d0b7
+Author: Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Mon Oct 13 15:34:30 2014 +0200
+
+    power: charger-manager: Fix accessing invalidated power supply after fuel gauge unbind
+    
+    commit bdbe81445407644492b9ac69a24d35e3202d773b upstream.
+    
+    The charger manager obtained reference to fuel gauge power supply in probe
+    with power_supply_get_by_name() for later usage. However if fuel gauge
+    driver was removed and re-added then this reference would point to old
+    power supply (from driver which was removed).
+    
+    This lead to accessing old (and probably invalid) memory which could be
+    observed with:
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/unbind
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/bind
+    $ cat /sys/devices/virtual/power_supply/battery/capacity
+    [  240.480084] INFO: task cat:1393 blocked for more than 120 seconds.
+    [  240.484799]       Not tainted 3.17.0-next-20141007-00028-ge60b6dd79570 #203
+    [  240.491782] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+    [  240.499589] cat             D c0469530     0  1393      1 0x00000000
+    [  240.505947] [<c0469530>] (__schedule) from [<c0469d3c>] (schedule_preempt_disabled+0x14/0x20)
+    [  240.514449] [<c0469d3c>] (schedule_preempt_disabled) from [<c046af08>] (mutex_lock_nested+0x1bc/0x458)
+    [  240.523736] [<c046af08>] (mutex_lock_nested) from [<c0287a98>] (regmap_read+0x30/0x60)
+    [  240.531647] [<c0287a98>] (regmap_read) from [<c032238c>] (max17042_get_property+0x2e8/0x350)
+    [  240.540055] [<c032238c>] (max17042_get_property) from [<c03247d8>] (charger_get_property+0x264/0x348)
+    [  240.549252] [<c03247d8>] (charger_get_property) from [<c0320764>] (power_supply_show_property+0x48/0x1e0)
+    [  240.558808] [<c0320764>] (power_supply_show_property) from [<c027308c>] (dev_attr_show+0x1c/0x48)
+    [  240.567664] [<c027308c>] (dev_attr_show) from [<c0141fb0>] (sysfs_kf_seq_show+0x84/0x104)
+    [  240.575814] [<c0141fb0>] (sysfs_kf_seq_show) from [<c0140b18>] (kernfs_seq_show+0x24/0x28)
+    [  240.584061] [<c0140b18>] (kernfs_seq_show) from [<c0104574>] (seq_read+0x1b0/0x484)
+    [  240.591702] [<c0104574>] (seq_read) from [<c00e1e24>] (vfs_read+0x88/0x144)
+    [  240.598640] [<c00e1e24>] (vfs_read) from [<c00e1f20>] (SyS_read+0x40/0x8c)
+    [  240.605507] [<c00e1f20>] (SyS_read) from [<c000e760>] (ret_fast_syscall+0x0/0x48)
+    [  240.612952] 4 locks held by cat/1393:
+    [  240.616589]  #0:  (&p->lock){+.+.+.}, at: [<c01043f4>] seq_read+0x30/0x484
+    [  240.623414]  #1:  (&of->mutex){+.+.+.}, at: [<c01417dc>] kernfs_seq_start+0x1c/0x8c
+    [  240.631086]  #2:  (s_active#31){++++.+}, at: [<c01417e4>] kernfs_seq_start+0x24/0x8c
+    [  240.638777]  #3:  (&map->mutex){+.+...}, at: [<c0287a98>] regmap_read+0x30/0x60
+    
+    The charger-manager should get reference to fuel gauge power supply on
+    each use of get_property callback. The thermal zone 'tzd' field of
+    power supply should not be used because of the same reason.
+    
+    Additionally this change solves also the issue with nested
+    thermal_zone_get_temp() calls and related false lockdep positive for
+    deadlock for thermal zone's mutex [1]. When fuel gauge is used as source of
+    temperature then the charger manager forwards its get_temp calls to fuel
+    gauge thermal zone. So actually different mutexes are used (one for
+    charger manager thermal zone and second for fuel gauge thermal zone) but
+    for lockdep this is one class of mutex.
+    
+    The recursion is removed by retrieving temperature through power
+    supply's get_property().
+    
+    In case external thermal zone is used ('cm-thermal-zone' property is
+    present in DTS) the recursion does not exist. Charger manager simply
+    exports POWER_SUPPLY_PROP_TEMP_AMBIENT property (instead of
+    POWER_SUPPLY_PROP_TEMP) thus no thermal zone is created for this power
+    supply.
+    
+    [1] https://lkml.org/lkml/2014/10/6/309
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Fixes: 3bb3dbbd56ea ("power_supply: Add initial Charger-Manager driver")
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit bdbe81445407644492b9ac69a24d35e3202d773b
+Author: Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Mon Oct 13 15:34:30 2014 +0200
+
+    power: charger-manager: Fix accessing invalidated power supply after fuel gauge unbind
+    
+    The charger manager obtained reference to fuel gauge power supply in probe
+    with power_supply_get_by_name() for later usage. However if fuel gauge
+    driver was removed and re-added then this reference would point to old
+    power supply (from driver which was removed).
+    
+    This lead to accessing old (and probably invalid) memory which could be
+    observed with:
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/unbind
+    $ echo "12-0036" > /sys/bus/i2c/drivers/max17042/bind
+    $ cat /sys/devices/virtual/power_supply/battery/capacity
+    [  240.480084] INFO: task cat:1393 blocked for more than 120 seconds.
+    [  240.484799]       Not tainted 3.17.0-next-20141007-00028-ge60b6dd79570 #203
+    [  240.491782] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+    [  240.499589] cat             D c0469530     0  1393      1 0x00000000
+    [  240.505947] [<c0469530>] (__schedule) from [<c0469d3c>] (schedule_preempt_disabled+0x14/0x20)
+    [  240.514449] [<c0469d3c>] (schedule_preempt_disabled) from [<c046af08>] (mutex_lock_nested+0x1bc/0x458)
+    [  240.523736] [<c046af08>] (mutex_lock_nested) from [<c0287a98>] (regmap_read+0x30/0x60)
+    [  240.531647] [<c0287a98>] (regmap_read) from [<c032238c>] (max17042_get_property+0x2e8/0x350)
+    [  240.540055] [<c032238c>] (max17042_get_property) from [<c03247d8>] (charger_get_property+0x264/0x348)
+    [  240.549252] [<c03247d8>] (charger_get_property) from [<c0320764>] (power_supply_show_property+0x48/0x1e0)
+    [  240.558808] [<c0320764>] (power_supply_show_property) from [<c027308c>] (dev_attr_show+0x1c/0x48)
+    [  240.567664] [<c027308c>] (dev_attr_show) from [<c0141fb0>] (sysfs_kf_seq_show+0x84/0x104)
+    [  240.575814] [<c0141fb0>] (sysfs_kf_seq_show) from [<c0140b18>] (kernfs_seq_show+0x24/0x28)
+    [  240.584061] [<c0140b18>] (kernfs_seq_show) from [<c0104574>] (seq_read+0x1b0/0x484)
+    [  240.591702] [<c0104574>] (seq_read) from [<c00e1e24>] (vfs_read+0x88/0x144)
+    [  240.598640] [<c00e1e24>] (vfs_read) from [<c00e1f20>] (SyS_read+0x40/0x8c)
+    [  240.605507] [<c00e1f20>] (SyS_read) from [<c000e760>] (ret_fast_syscall+0x0/0x48)
+    [  240.612952] 4 locks held by cat/1393:
+    [  240.616589]  #0:  (&p->lock){+.+.+.}, at: [<c01043f4>] seq_read+0x30/0x484
+    [  240.623414]  #1:  (&of->mutex){+.+.+.}, at: [<c01417dc>] kernfs_seq_start+0x1c/0x8c
+    [  240.631086]  #2:  (s_active#31){++++.+}, at: [<c01417e4>] kernfs_seq_start+0x24/0x8c
+    [  240.638777]  #3:  (&map->mutex){+.+...}, at: [<c0287a98>] regmap_read+0x30/0x60
+    
+    The charger-manager should get reference to fuel gauge power supply on
+    each use of get_property callback. The thermal zone 'tzd' field of
+    power supply should not be used because of the same reason.
+    
+    Additionally this change solves also the issue with nested
+    thermal_zone_get_temp() calls and related false lockdep positive for
+    deadlock for thermal zone's mutex [1]. When fuel gauge is used as source of
+    temperature then the charger manager forwards its get_temp calls to fuel
+    gauge thermal zone. So actually different mutexes are used (one for
+    charger manager thermal zone and second for fuel gauge thermal zone) but
+    for lockdep this is one class of mutex.
+    
+    The recursion is removed by retrieving temperature through power
+    supply's get_property().
+    
+    In case external thermal zone is used ('cm-thermal-zone' property is
+    present in DTS) the recursion does not exist. Charger manager simply
+    exports POWER_SUPPLY_PROP_TEMP_AMBIENT property (instead of
+    POWER_SUPPLY_PROP_TEMP) thus no thermal zone is created for this power
+    supply.
+    
+    [1] https://lkml.org/lkml/2014/10/6/309
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Cc: <stable@vger.kernel.org>
+    Fixes: 3bb3dbbd56ea ("power_supply: Add initial Charger-Manager driver")
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+
+commit ba9c91825d4a3bb49532d4a59c72e98b529b7eff
+Author: Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Tue Oct 7 17:47:37 2014 +0200
+
+    power: charger-manager: Avoid recursive thermal get_temp call
+    
+    The charger manager supports POWER_SUPPLY_PROP_TEMP property and acts
+    as a thermal zone if any of these conditions match:
+    1. Fuel gauge used by charger manager supports POWER_SUPPLY_PROP_TEMP.
+    2. 'cm-thermal-zone' property is present in DTS (then it will supersede
+       the fuel gauge temperature property).
+    
+    However in case 1 (fuel gauge reports temperature and 'cm-thermal-zone'
+    is not set) the charger manager forwards its get_temp calls to fuel
+    gauge thermal zone.
+    
+    This leads to reporting by lockdep a false positive deadlock for thermal
+    zone's mutex because of nested calls to thermal_zone_get_temp(). This is
+    false positive because these are different mutexes: one for charger
+    manager thermal zone and second for fuel gauge thermal zone.
+    
+    Get rid of false lockdep alert and recursive call by setting
+    'no_thermal' property for this power supply class. The thermal zone for
+    charger manager won't be created (user space does not use it anyway).
+    
+    The lockdep report:
+    [    2.540339] charger-manager charger-manager@0: Ignoring full-battery voltage threshold as it is not supplied
+    [    2.540351] charger-manager charger-manager@0: Ignoring full-battery full capacity threshold as it is not supplied
+    [    2.546296]
+    [    2.546302] =============================================
+    [    2.546305] [ INFO: possible recursive locking detected ]
+    [    2.546312] 3.17.0-rc6-next-20140926-00012-gbb13895e46af-dirty #39 Not tainted
+    [    2.546316] ---------------------------------------------
+    [    2.546321] swapper/0/1 is trying to acquire lock:
+    [    2.546348]  (&tz->lock){+.+...}, at: [<c0321d24>] thermal_zone_get_temp+0x38/0x68
+    [    2.546352]
+    [    2.546352] but task is already holding lock:
+    [    2.546369]  (&tz->lock){+.+...}, at: [<c0321d24>] thermal_zone_get_temp+0x38/0x68
+    [    2.546373]
+    [    2.546373] other info that might help us debug this:
+    [    2.546376]  Possible unsafe locking scenario:
+    [    2.546376]
+    [    2.546378]        CPU0
+    [    2.546380]        ----
+    [    2.546386]   lock(&tz->lock);
+    [    2.546392]   lock(&tz->lock);
+    [    2.546394]
+    [    2.546394]  *** DEADLOCK ***
+    [    2.546394]
+    [    2.546397]  May be due to missing lock nesting notation
+    [    2.546397]
+    [    2.546401] 2 locks held by swapper/0/1:
+    [    2.546430]  #0:  (&dev->mutex){......}, at: [<c02720c4>] __driver_attach+0x58/0x98
+    [    2.546448]  #1:  (&tz->lock){+.+...}, at: [<c0321d24>] thermal_zone_get_temp+0x38/0x68
+    [    2.546451]
+    [    2.546451] stack backtrace:
+    [    2.546460] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.17.0-rc6-next-20140926-00012-gbb13895e46af-dirty #39
+    [    2.546497] [<c00140f0>] (unwind_backtrace) from [<c0011228>] (show_stack+0x10/0x14)
+    [    2.546526] [<c0011228>] (show_stack) from [<c046158c>] (dump_stack+0x70/0xbc)
+    [    2.546554] [<c046158c>] (dump_stack) from [<c005e32c>] (validate_chain.isra.24+0x718/0x890)
+    [    2.546569] [<c005e32c>] (validate_chain.isra.24) from [<c005f0a0>] (__lock_acquire+0x498/0xa78)
+    [    2.546581] [<c005f0a0>] (__lock_acquire) from [<c005fb50>] (lock_acquire+0x78/0xb8)
+    [    2.546594] [<c005fb50>] (lock_acquire) from [<c0464260>] (mutex_lock_nested+0x64/0x458)
+    [    2.546605] [<c0464260>] (mutex_lock_nested) from [<c0321d24>] (thermal_zone_get_temp+0x38/0x68)
+    [    2.546634] [<c0321d24>] (thermal_zone_get_temp) from [<c031f1e0>] (charger_get_property+0x10c/0x348)
+    [    2.546649] [<c031f1e0>] (charger_get_property) from [<c031af18>] (power_supply_read_temp+0x28/0x58)
+    [    2.546662] [<c031af18>] (power_supply_read_temp) from [<c0321d38>] (thermal_zone_get_temp+0x4c/0x68)
+    [    2.546676] [<c0321d38>] (thermal_zone_get_temp) from [<c03233d8>] (thermal_zone_device_update+0x24/0x9c)
+    [    2.546687] [<c03233d8>] (thermal_zone_device_update) from [<c0323874>] (thermal_zone_device_register+0x424/0x550)
+    [    2.546701] [<c0323874>] (thermal_zone_device_register) from [<c031b3c0>] (__power_supply_register+0x2a4/0x348)
+    [    2.546714] [<c031b3c0>] (__power_supply_register) from [<c031ff64>] (charger_manager_probe+0x600/0xe5c)
+    [    2.546727] [<c031ff64>] (charger_manager_probe) from [<c0273384>] (platform_drv_probe+0x48/0xa4)
+    [    2.546746] [<c0273384>] (platform_drv_probe) from [<c0271f54>] (driver_probe_device+0x10c/0x224)
+    [    2.546760] [<c0271f54>] (driver_probe_device) from [<c0272100>] (__driver_attach+0x94/0x98)
+    [    2.546772] [<c0272100>] (__driver_attach) from [<c0270780>] (bus_for_each_dev+0x54/0x88)
+    [    2.546784] [<c0270780>] (bus_for_each_dev) from [<c027173c>] (bus_add_driver+0xd4/0x1d0)
+    [    2.546797] [<c027173c>] (bus_add_driver) from [<c027271c>] (driver_register+0x78/0xf4)
+    [    2.546809] [<c027271c>] (driver_register) from [<c0008984>] (do_one_initcall+0x80/0x1d4)
+    [    2.546829] [<c0008984>] (do_one_initcall) from [<c0612d60>] (kernel_init_freeable+0x10c/0x1d8)
+    [    2.546847] [<c0612d60>] (kernel_init_freeable) from [<c045c238>] (kernel_init+0x8/0xec)
+    [    2.546863] [<c045c238>] (kernel_init) from [<c000e828>] (ret_from_fork+0x14/0x2c)
+    [    2.551396] charger-manager charger-manager@0: 'chg-reg' regulator's externally_control is 0
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+
+commit a69d82b9bdf1e53e94423048e8bda8c5f5a3dd4e
+Author: Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Tue Oct 7 17:47:36 2014 +0200
+
+    power_supply: Add no_thermal property to prevent recursive get_temp calls
+    
+    Add a 'no_thermal' property to the power supply class. If true then
+    thermal zone won't be created for this power supply in
+    power_supply_register().
+    
+    Power supply drivers may want to set it if they support
+    POWER_SUPPLY_PROP_TEMP and they are forwarding this get property call to
+    other thermal zone.
+    
+    If they won't set it lockdep may report false positive deadlock for
+    thermal zone's mutex because of nested calls to thermal_zone_get_temp().
+    First is the call to thermal_zone_get_temp() of the driver's thermal
+    zone. Thermal core gets POWER_SUPPLY_PROP_TEMP property from this
+    driver. The driver then calls other thermal zone thermal_zone_get_temp()
+    and returns result.
+    
+    Example of such driver is charger manager.
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+
+commit 837b26bb2e4a83d224e725f07a1d9ca824bf905c
+Author: Eduardo Valentin <eduardo.valentin@ti.com>
+Date:   Fri Apr 5 12:32:29 2013 +0000
+
+    thermal: expose thermal_zone_get_temp API
+    
+    This patch exports the thermal_zone_get_temp API so that driver
+    writers can fetch temperature of thermal zones managed by other
+    drivers.
+    
+    Acked-by: Durgadoss R <durgadoss.r@intel.com>
+    Signed-off-by: Eduardo Valentin <eduardo.valentin@ti.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>

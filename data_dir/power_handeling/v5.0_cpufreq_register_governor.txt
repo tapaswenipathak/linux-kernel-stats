@@ -1,0 +1,34 @@
+commit 098ef215b1e87cff51f983bae4e4e1358b932ec9
+Merge: b922df738374 4f6e6b9f97b0
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Oct 11 08:49:34 2008 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/davej/cpufreq
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/davej/cpufreq:
+      [CPUFREQ] Fix BUG: using smp_processor_id() in preemptible code
+      [CPUFREQ] Don't export governors for default governor
+      [CPUFREQ][6/6] cpufreq: Add idle microaccounting in ondemand governor
+      [CPUFREQ][5/6] cpufreq: Changes to get_cpu_idle_time_us(), used by ondemand governor
+      [CPUFREQ][4/6] cpufreq_ondemand: Parameterize down differential
+      [CPUFREQ][3/6] cpufreq: get_cpu_idle_time() changes in ondemand for idle-microaccounting
+      [CPUFREQ][2/6] cpufreq: Change load calculation in ondemand for software coordination
+      [CPUFREQ][1/6] cpufreq: Add cpu number parameter to __cpufreq_driver_getavg()
+      [CPUFREQ] use deferrable delayed work init in conservative governor
+      [CPUFREQ] drivers/cpufreq/cpufreq.c: Adjust error handling code involving cpufreq_cpu_put
+      [CPUFREQ] add error handling for cpufreq_register_governor() error
+      [CPUFREQ] acpi-cpufreq: add error handling for cpufreq_register_driver() error
+      [CPUFREQ] Coding style fixes to arch/x86/kernel/cpu/cpufreq/powernow-k6.c
+      [CPUFREQ] Coding style fixes to arch/x86/kernel/cpu/cpufreq/elanfreq.c
+
+commit 888a794cacd8950ac6be701db20b62a4ab2ce90c
+Author: Akinobu Mita <akinobu.mita@gmail.com>
+Date:   Mon Jul 14 12:00:45 2008 +0900
+
+    [CPUFREQ] add error handling for cpufreq_register_governor() error
+    
+    Add error handling for cpufreq_register_governor() error
+    
+    Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+    Cc: cpufreq@lists.linux.org.uk
+    Signed-off-by: Dave Jones <davej@redhat.com>

@@ -1,0 +1,787 @@
+commit e557bca49b812908f380c56b5b4b2f273848b676
+Author: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+Date:   Wed Apr 20 10:32:41 2022 +0800
+
+    soundwire: bus: pm_runtime_request_resume on peripheral attachment
+    
+    In typical use cases, the peripheral becomes pm_runtime active as a
+    result of the ALSA/ASoC framework starting up a DAI. The parent/child
+    hierarchy guarantees that the manager device will be fully resumed
+    beforehand.
+    
+    There is however a corner case where the manager device may become
+    pm_runtime active, but without ALSA/ASoC requesting any functionality
+    from the peripherals. In this case, the hardware peripheral device
+    will report as ATTACHED and its initialization routine will be
+    executed. If this initialization routine initiates any sort of
+    deferred processing, there is a possibility that the manager could
+    suspend without the peripheral suspend sequence being invoked: from
+    the pm_runtime framework perspective, the peripheral is *already*
+    suspended.
+    
+    To avoid such disconnects between hardware state and pm_runtime state,
+    this patch adds an asynchronous pm_request_resume() upon successful
+    attach/initialization which will result in the proper resume/suspend
+    sequence to be followed on the peripheral side.
+    
+    BugLink: https://github.com/thesofproject/linux/issues/3459
+    Signed-off-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Reviewed-by: Ranjani Sridharan <ranjani.sridharan@linux.intel.com>
+    Reviewed-by: Rander Wang <rander.wang@intel.com>
+    Signed-off-by: Bard Liao <yung-chuan.liao@linux.intel.com>
+    Link: https://lore.kernel.org/r/20220420023241.14335-4-yung-chuan.liao@linux.intel.com
+    Signed-off-by: Vinod Koul <vkoul@kernel.org>
+
+commit e286472cff8a6785f6fa7950a1ab1b485cc87885
+Author: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+Date:   Wed Apr 20 10:32:40 2022 +0800
+
+    soundwire: intel: disable WAKEEN in pm_runtime resume
+    
+    When the manager device is pm_runtime resumed, we see a series of
+    spurious wakes and attempts to resume the same device:
+    
+    soundwire_intel.link.0: intel_resume_runtime: start
+    soundwire_intel.link.0: intel_link_power_up: powering up all links
+    soundwire_intel.link.0: intel_link_power_up: first link up, programming SYNCPRD
+    soundwire_intel.link.0: intel_shim_wake: WAKEEN disabled for link 0
+    soundwire_intel.link.0: intel_link_process_wakeen_event: pm_request_resume start
+    soundwire_intel.link.0: intel_link_process_wakeen_event: pm_request_resume done
+    soundwire_intel.link.0: intel_shim_wake: WAKEEN disabled for link 0
+    soundwire_intel.link.0: intel_link_process_wakeen_event: pm_request_resume start
+    soundwire_intel.link.0: intel_link_process_wakeen_event: pm_request_resume done
+    
+    This sequence does not break anything but is totally unnecessary.
+    
+    Currently the wakes are only disabled after the peripheral generates a
+    wake, e.g. for jack detection.
+    
+    If the resume is initiated by the host drivers as a result of
+    userspace actions (play/record typically), we need to disable wake
+    detection as well. Doing so prevents the spurious wakes and calls to
+    pm_request_resume().
+    
+    Signed-off-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Reviewed-by: Ranjani Sridharan <ranjani.sridharan@linux.intel.com>
+    Reviewed-by: Rander Wang <rander.wang@intel.com>
+    Signed-off-by: Bard Liao <yung-chuan.liao@linux.intel.com>
+    Link: https://lore.kernel.org/r/20220420023241.14335-3-yung-chuan.liao@linux.intel.com
+    Signed-off-by: Vinod Koul <vkoul@kernel.org>
+
+commit d55d15a332ec651ccb49c42a8a10c03447fdf418
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Tue Dec 8 21:29:51 2020 -0800
+
+    scsi: block: Do not accept any requests while suspended
+    
+    [ Upstream commit 52abca64fd9410ea6c9a3a74eab25663b403d7da ]
+    
+    blk_queue_enter() accepts BLK_MQ_REQ_PM requests independent of the runtime
+    power management state. Now that SCSI domain validation no longer depends
+    on this behavior, modify the behavior of blk_queue_enter() as follows:
+    
+       - Do not accept any requests while suspended.
+    
+       - Only process power management requests while suspending or resuming.
+    
+    Submitting BLK_MQ_REQ_PM requests to a device that is runtime suspended
+    causes runtime-suspended devices not to resume as they should. The request
+    which should cause a runtime resume instead gets issued directly, without
+    resuming the device first. Of course the device can't handle it properly,
+    the I/O fails, and the device remains suspended.
+    
+    The problem is fixed by checking that the queue's runtime-PM status isn't
+    RPM_SUSPENDED before allowing a request to be issued, and queuing a
+    runtime-resume request if it is.  In particular, the inline
+    blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and the
+    code is unified by merging the surrounding checks into the routine.  If the
+    queue isn't set up for runtime PM, or there currently is no restriction on
+    allowed requests, the request is allowed.  Likewise if the BLK_MQ_REQ_PM
+    flag is set and the status isn't RPM_SUSPENDED.  Otherwise a runtime resume
+    is queued and the request is blocked until conditions are more suitable.
+    
+    [ bvanassche: modified commit message and removed Cc: stable because
+      without the previous patches from this series this patch would break
+      parallel SCSI domain validation + introduced queue_rpm_status() ]
+    
+    Link: https://lore.kernel.org/r/20201209052951.16136-9-bvanassche@acm.org
+    Cc: Jens Axboe <axboe@kernel.dk>
+    Cc: Christoph Hellwig <hch@lst.de>
+    Cc: Hannes Reinecke <hare@suse.de>
+    Cc: Can Guo <cang@codeaurora.org>
+    Cc: Stanley Chu <stanley.chu@mediatek.com>
+    Cc: Ming Lei <ming.lei@redhat.com>
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
+    Reviewed-by: Hannes Reinecke <hare@suse.de>
+    Reviewed-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 092898b070e0fa53df6e598a5a5f1ea8f35476f1
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Tue Dec 8 21:29:44 2020 -0800
+
+    scsi: block: Fix a race in the runtime power management code
+    
+    commit fa4d0f1992a96f6d7c988ef423e3127e613f6ac9 upstream.
+    
+    With the current implementation the following race can happen:
+    
+     * blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
+       blk_mq_unfreeze_queue().
+    
+     * blk_queue_enter() calls blk_queue_pm_only() and that function returns
+       true.
+    
+     * blk_queue_enter() calls blk_pm_request_resume() and that function does
+       not call pm_request_resume() because the queue runtime status is
+       RPM_ACTIVE.
+    
+     * blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
+    
+    Fix this race by changing the queue runtime status into RPM_SUSPENDING
+    before switching q_usage_counter to atomic mode.
+    
+    Link: https://lore.kernel.org/r/20201209052951.16136-2-bvanassche@acm.org
+    Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
+    Cc: Ming Lei <ming.lei@redhat.com>
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: stable <stable@vger.kernel.org>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Reviewed-by: Hannes Reinecke <hare@suse.de>
+    Reviewed-by: Jens Axboe <axboe@kernel.dk>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Acked-by: Stanley Chu <stanley.chu@mediatek.com>
+    Co-developed-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit af07e4dd07839fd64841c31edf5682e09008e98c
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Tue Dec 8 21:29:44 2020 -0800
+
+    scsi: block: Fix a race in the runtime power management code
+    
+    commit fa4d0f1992a96f6d7c988ef423e3127e613f6ac9 upstream.
+    
+    With the current implementation the following race can happen:
+    
+     * blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
+       blk_mq_unfreeze_queue().
+    
+     * blk_queue_enter() calls blk_queue_pm_only() and that function returns
+       true.
+    
+     * blk_queue_enter() calls blk_pm_request_resume() and that function does
+       not call pm_request_resume() because the queue runtime status is
+       RPM_ACTIVE.
+    
+     * blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
+    
+    Fix this race by changing the queue runtime status into RPM_SUSPENDING
+    before switching q_usage_counter to atomic mode.
+    
+    Link: https://lore.kernel.org/r/20201209052951.16136-2-bvanassche@acm.org
+    Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
+    Cc: Ming Lei <ming.lei@redhat.com>
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: stable <stable@vger.kernel.org>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Reviewed-by: Hannes Reinecke <hare@suse.de>
+    Reviewed-by: Jens Axboe <axboe@kernel.dk>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Acked-by: Stanley Chu <stanley.chu@mediatek.com>
+    Co-developed-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 52abca64fd9410ea6c9a3a74eab25663b403d7da
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Tue Dec 8 21:29:51 2020 -0800
+
+    scsi: block: Do not accept any requests while suspended
+    
+    blk_queue_enter() accepts BLK_MQ_REQ_PM requests independent of the runtime
+    power management state. Now that SCSI domain validation no longer depends
+    on this behavior, modify the behavior of blk_queue_enter() as follows:
+    
+       - Do not accept any requests while suspended.
+    
+       - Only process power management requests while suspending or resuming.
+    
+    Submitting BLK_MQ_REQ_PM requests to a device that is runtime suspended
+    causes runtime-suspended devices not to resume as they should. The request
+    which should cause a runtime resume instead gets issued directly, without
+    resuming the device first. Of course the device can't handle it properly,
+    the I/O fails, and the device remains suspended.
+    
+    The problem is fixed by checking that the queue's runtime-PM status isn't
+    RPM_SUSPENDED before allowing a request to be issued, and queuing a
+    runtime-resume request if it is.  In particular, the inline
+    blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and the
+    code is unified by merging the surrounding checks into the routine.  If the
+    queue isn't set up for runtime PM, or there currently is no restriction on
+    allowed requests, the request is allowed.  Likewise if the BLK_MQ_REQ_PM
+    flag is set and the status isn't RPM_SUSPENDED.  Otherwise a runtime resume
+    is queued and the request is blocked until conditions are more suitable.
+    
+    [ bvanassche: modified commit message and removed Cc: stable because
+      without the previous patches from this series this patch would break
+      parallel SCSI domain validation + introduced queue_rpm_status() ]
+    
+    Link: https://lore.kernel.org/r/20201209052951.16136-9-bvanassche@acm.org
+    Cc: Jens Axboe <axboe@kernel.dk>
+    Cc: Christoph Hellwig <hch@lst.de>
+    Cc: Hannes Reinecke <hare@suse.de>
+    Cc: Can Guo <cang@codeaurora.org>
+    Cc: Stanley Chu <stanley.chu@mediatek.com>
+    Cc: Ming Lei <ming.lei@redhat.com>
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
+    Reviewed-by: Hannes Reinecke <hare@suse.de>
+    Reviewed-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+commit fa4d0f1992a96f6d7c988ef423e3127e613f6ac9
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Tue Dec 8 21:29:44 2020 -0800
+
+    scsi: block: Fix a race in the runtime power management code
+    
+    With the current implementation the following race can happen:
+    
+     * blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
+       blk_mq_unfreeze_queue().
+    
+     * blk_queue_enter() calls blk_queue_pm_only() and that function returns
+       true.
+    
+     * blk_queue_enter() calls blk_pm_request_resume() and that function does
+       not call pm_request_resume() because the queue runtime status is
+       RPM_ACTIVE.
+    
+     * blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
+    
+    Fix this race by changing the queue runtime status into RPM_SUSPENDING
+    before switching q_usage_counter to atomic mode.
+    
+    Link: https://lore.kernel.org/r/20201209052951.16136-2-bvanassche@acm.org
+    Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
+    Cc: Ming Lei <ming.lei@redhat.com>
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: stable <stable@vger.kernel.org>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Reviewed-by: Hannes Reinecke <hare@suse.de>
+    Reviewed-by: Jens Axboe <axboe@kernel.dk>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Acked-by: Stanley Chu <stanley.chu@mediatek.com>
+    Co-developed-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Can Guo <cang@codeaurora.org>
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+commit 6aafca025b27628e518e000a9943b7b0e4ba694a
+Author: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+Date:   Mon Oct 12 13:27:04 2020 +0300
+
+    ALSA: hda: fix jack detection with Realtek codecs when in D3
+    
+    commit a6e7d0a4bdb02a7a3ffe0b44aaa8842b7efdd056 upstream.
+    
+    In case HDA controller becomes active, but codec is runtime suspended,
+    jack detection is not successful and no interrupt is raised. This has
+    been observed with multiple Realtek codecs and HDA controllers from
+    different vendors. Bug does not occur if both codec and controller are
+    active, or both are in suspend. Bug can be easily hit on desktop systems
+    with no built-in speaker.
+    
+    The problem can be fixed by powering up the codec once after every
+    controller runtime resume. Even if codec goes back to suspend later, the
+    jack detection will continue to work. Add a flag to 'hda_codec' to
+    describe codecs that require this flow from the controller driver.
+    Modify __azx_runtime_resume() to use pm_request_resume() to make the
+    intent clearer.
+    
+    Mark all Realtek codecs with the new forced_resume flag.
+    
+    BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=209379
+    Cc: Kailang Yang <kailang@realtek.com>
+    Co-developed-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20201012102704.794423-1-kai.vehmanen@linux.intel.com
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 2b7a2a0be1040e1be7bda3b27d16c9aaf31b4656
+Author: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+Date:   Mon Oct 12 13:27:04 2020 +0300
+
+    ALSA: hda: fix jack detection with Realtek codecs when in D3
+    
+    commit a6e7d0a4bdb02a7a3ffe0b44aaa8842b7efdd056 upstream.
+    
+    In case HDA controller becomes active, but codec is runtime suspended,
+    jack detection is not successful and no interrupt is raised. This has
+    been observed with multiple Realtek codecs and HDA controllers from
+    different vendors. Bug does not occur if both codec and controller are
+    active, or both are in suspend. Bug can be easily hit on desktop systems
+    with no built-in speaker.
+    
+    The problem can be fixed by powering up the codec once after every
+    controller runtime resume. Even if codec goes back to suspend later, the
+    jack detection will continue to work. Add a flag to 'hda_codec' to
+    describe codecs that require this flow from the controller driver.
+    Modify __azx_runtime_resume() to use pm_request_resume() to make the
+    intent clearer.
+    
+    Mark all Realtek codecs with the new forced_resume flag.
+    
+    BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=209379
+    Cc: Kailang Yang <kailang@realtek.com>
+    Co-developed-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20201012102704.794423-1-kai.vehmanen@linux.intel.com
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 17784cec2da4beac41fc9eb3e479f74ad7cce95a
+Author: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+Date:   Mon Oct 12 13:27:04 2020 +0300
+
+    ALSA: hda: fix jack detection with Realtek codecs when in D3
+    
+    commit a6e7d0a4bdb02a7a3ffe0b44aaa8842b7efdd056 upstream.
+    
+    In case HDA controller becomes active, but codec is runtime suspended,
+    jack detection is not successful and no interrupt is raised. This has
+    been observed with multiple Realtek codecs and HDA controllers from
+    different vendors. Bug does not occur if both codec and controller are
+    active, or both are in suspend. Bug can be easily hit on desktop systems
+    with no built-in speaker.
+    
+    The problem can be fixed by powering up the codec once after every
+    controller runtime resume. Even if codec goes back to suspend later, the
+    jack detection will continue to work. Add a flag to 'hda_codec' to
+    describe codecs that require this flow from the controller driver.
+    Modify __azx_runtime_resume() to use pm_request_resume() to make the
+    intent clearer.
+    
+    Mark all Realtek codecs with the new forced_resume flag.
+    
+    BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=209379
+    Cc: Kailang Yang <kailang@realtek.com>
+    Co-developed-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20201012102704.794423-1-kai.vehmanen@linux.intel.com
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a6e7d0a4bdb02a7a3ffe0b44aaa8842b7efdd056
+Author: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+Date:   Mon Oct 12 13:27:04 2020 +0300
+
+    ALSA: hda: fix jack detection with Realtek codecs when in D3
+    
+    In case HDA controller becomes active, but codec is runtime suspended,
+    jack detection is not successful and no interrupt is raised. This has
+    been observed with multiple Realtek codecs and HDA controllers from
+    different vendors. Bug does not occur if both codec and controller are
+    active, or both are in suspend. Bug can be easily hit on desktop systems
+    with no built-in speaker.
+    
+    The problem can be fixed by powering up the codec once after every
+    controller runtime resume. Even if codec goes back to suspend later, the
+    jack detection will continue to work. Add a flag to 'hda_codec' to
+    describe codecs that require this flow from the controller driver.
+    Modify __azx_runtime_resume() to use pm_request_resume() to make the
+    intent clearer.
+    
+    Mark all Realtek codecs with the new forced_resume flag.
+    
+    BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=209379
+    Cc: Kailang Yang <kailang@realtek.com>
+    Co-developed-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20201012102704.794423-1-kai.vehmanen@linux.intel.com
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+commit b1234e3b3b265588bab1e7a28508621045b87efa
+Author: Peter Chen <peter.chen@nxp.com>
+Date:   Wed Sep 2 17:57:32 2020 +0800
+
+    usb: cdns3: add runtime PM support
+    
+    Introduce runtime PM and wakeup interrupt handler for cdns3,
+    the runtime PM is default off since other cdns3 may not
+    implement glue layer support for runtime PM.
+    
+    One typical wakeup event use case is xHCI runtime suspend will clear
+    USBCMD.RS bit, after that the xHCI will not trigger any interrupts,
+    so its parent (cdns core device) needs to resume xHCI device when
+    any (wakeup) events occurs at host port.
+    
+    When the controller is in low power mode, the lpm flag will be set.
+    The interrupt triggered later than lpm flag is set considers as
+    wakeup interrupt and handled at cdns_wakeup_irq. Once the wakeup
+    occurs, it first disables interrupt to avoid later interrupt
+    occurrence since the controller is in low power mode at that
+    time, and access registers may be invalid at that time. At wakeup
+    handler, it will call pm_request_resume to wakeup xHCI device, and
+    at runtime resume handler, it will enable interrupt again.
+    
+    The API platform_suspend is introduced for glue layer to implement
+    platform specific PM sequence.
+    
+    Reviewed-by: Pawel Laszczak <pawell@cadence.com>
+    Signed-off-by: Peter Chen <peter.chen@nxp.com>
+    Signed-off-by: Felipe Balbi <balbi@kernel.org>
+
+commit f0e4cd948b918d5277cd141eaf8d2ab79b0c78b2
+Author: Ajay Gupta <ajayg@nvidia.com>
+Date:   Fri Jun 7 09:34:23 2019 -0700
+
+    usb: typec: ucsi: ccg: add runtime pm workaround
+    
+    Cypress USB Type-C CCGx controller firmware version 3.1.10
+    (which is being used in many NVIDIA GPU cards) has known issue of
+    not triggering interrupt when a USB device is hot plugged to runtime
+    resume the controller. If any GPU card gets latest kernel with runtime
+    pm support but does not get latest fixed firmware then also it should
+    continue to work and therefore a workaround is required to check for
+    any connector change event.
+    
+    The workaround is that i2c bus driver will call pm_request_resume()
+    to runtime resume ucsi_ccg driver. CCG driver will call the ISR
+    for any connector change event for NVIDIA GPU card and only if it has
+    old CCG firmware with the known issue.
+    
+    Signed-off-by: Ajay Gupta <ajayg@nvidia.com>
+    Acked-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+
+commit 0d25bd072b494a0290a7855a2e0286c4a0c92041
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Wed Sep 26 14:01:06 2018 -0700
+
+    block: Schedule runtime resume earlier
+    
+    Instead of scheduling runtime resume of a request queue after a
+    request has been queued, schedule asynchronous resume during request
+    allocation. The new pm_request_resume() calls occur after
+    blk_queue_enter() has increased the q_usage_counter request queue
+    member. This change is needed for a later patch that will make request
+    allocation block while the queue status is not RPM_ACTIVE.
+    
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Reviewed-by: Ming Lei <ming.lei@redhat.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+    Cc: Hannes Reinecke <hare@suse.com>
+    Cc: Johannes Thumshirn <jthumshirn@suse.de>
+    Cc: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+commit 154b00d566e221152514ba8259f38b21571081ef
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Wed Sep 26 14:01:05 2018 -0700
+
+    block: Split blk_pm_add_request() and blk_pm_put_request()
+    
+    Move the pm_request_resume() and pm_runtime_mark_last_busy() calls into
+    two new functions and thereby separate legacy block layer code from code
+    that works for both the legacy block layer and blk-mq. A later patch will
+    add calls to the new functions in the blk-mq code.
+    
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Reviewed-by: Ming Lei <ming.lei@redhat.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Cc: Martin K. Petersen <martin.petersen@oracle.com>
+    Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+    Cc: Hannes Reinecke <hare@suse.com>
+    Cc: Johannes Thumshirn <jthumshirn@suse.de>
+    Cc: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+commit b09c61522c81886c34966825f9e5afcbfafac446
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Wed Mar 14 23:06:02 2018 +0100
+
+    Revert "Bluetooth: hci_bcm: Streamline runtime PM code"
+    
+    This reverts commit 43fff7683468 ("Bluetooth: hci_bcm: Streamline runtime
+    PM code"). The commit msg for this commit states "No functional change
+    intended.", but replacing:
+    
+     pm_runtime_get();
+     pm_runtime_mark_last_busy();
+     pm_runtime_put_autosuspend();
+    
+    with:
+    
+     pm_request_resume();
+    
+    Does result in a functional change, pm_request_resume() only calls
+    pm_runtime_mark_last_busy() if the device was suspended before the call.
+    
+    This results in the following happening:
+    
+    1) Device is runtime suspended
+    2) Device drives host_wake IRQ logically high as it starts receiving data
+    3) bcm_host_wake() gets called, causes the device to runtime-resume,
+       current time gets marked as last_busy time
+    4) After 5 seconds the autosuspend timer expires and the dev autosuspends
+       as no one has been calling pm_runtime_mark_last_busy(), the device was
+       resumed during those 5 seconds, so all the pm_request_resume() calls
+       while receiving data and/or bcm_host_wake() calls were nops
+    5) If 4) happens while the device has (just received) data in its buffer to
+       be read by the host the IRQ line is *already* / still logically high
+       when we autosuspend and since we use an edge triggered IRQ, the IRQ
+       will never trigger, causing the device to get stuck in suspend
+    
+    Therefor this commit has to be reverted, so that we avoid the device
+    getting stuck in suspend.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Acked-by: Lukas Wunner <lukas@wunner.de>
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+commit 43fff768346810042836df325d736bd2c2a634a7
+Author: Lukas Wunner <lukas@wunner.de>
+Date:   Tue Dec 26 17:07:34 2017 +0200
+
+    Bluetooth: hci_bcm: Streamline runtime PM code
+    
+    This driver seeks to force the Bluetooth device on for the duration of
+    5 seconds when the Bluetooth device has woken the host and after a
+    complete packet has been received.  It does that by calling:
+    
+        pm_runtime_get();
+        pm_runtime_mark_last_busy();
+        pm_runtime_put_autosuspend();
+    
+    The same can be achieved more succinctly with:
+    
+        pm_request_resume();
+    
+    That's because after runtime resuming the device, rpm_resume() invokes
+    pm_runtime_mark_last_busy() followed by rpm_idle(), which will cause
+    the device to be suspended after expiration of the autosuspend_delay.
+    
+    No functional change intended.
+    
+    Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
+    Signed-off-by: Lukas Wunner <lukas@wunner.de>
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+commit 7027df36e41836b11f01b0d30eee40c55df7d013
+Author: Dan Williams <dan.j.williams@intel.com>
+Date:   Tue May 20 18:09:36 2014 -0700
+
+    usb: resume child device when port is powered on
+    
+    Unconditionally wake up the child device when the power session is
+    recovered.
+    
+    This addresses the following scenarios:
+    
+    1/ The device may need a reset on power-session loss, without this
+       change port power-on recovery exposes khubd to scenarios that
+       usb_port_resume() is set to handle.  Prior to port power control the
+       only time a power session would be lost is during dpm_suspend of the
+       hub.  In that scenario usb_port_resume() is guaranteed to be called
+       prior to khubd running for that port.  With this change we wakeup the
+       child device as soon as possible (prior to khubd running again for this
+       port).
+    
+       Although khubd has facilities to wake a child device it will only do
+       so if the portstatus / portchange indicates a suspend state.  In the
+       case of port power control we are not coming from a hub-port-suspend
+       state.  This implementation simply uses pm_request_resume() to wake the
+       device and relies on the port_dev->status_lock to prevent any collisions
+       between khubd and usb_port_resume().
+    
+    2/ This mechanism rate limits port power toggling.  The minimum port
+       power on/off period is now gated by the child device suspend/resume
+       latency.  Empirically this mitigates devices downgrading their connection
+       on perceived instability of the host connection.  This ratelimiting is
+       really only relevant to port power control testing, but it is a nice
+       side effect of closing the above race.  Namely, the race of khubd for
+       the given port running while a usb_port_resume() event is pending.
+    
+    3/ Going forward we are finding that power-session recovery requires
+       warm-resets (http://marc.info/?t=138659232900003&r=1&w=2).  This
+       mechanism allows for warm-resets to be requested at the same point in
+       the resume path for hub dpm_suspend power session losses, or port
+       rpm_suspend power session losses.
+    
+    4/ If the device *was* disconnected the only time we'll know for sure is
+       after a failed resume, so it's necessary for usb_port_runtime_resume()
+       to expedite a usb_port_resume() to clean up the removed device.  The
+       reasoning for this is "least surprise" for the user. Turning on a port
+       means that hotplug detection is again enabled for the port, it is
+       surprising that devices that were removed while the port was off are not
+       disconnected until they are attempted to be used.  As a user "why would
+       I try to use a device I removed from the system?"
+    
+    1, 2, and 4 are not a problem in the system dpm_resume() case because,
+    although the power-session is lost, khubd is frozen until after device
+    resume.  For the rpm_resume() case pm_request_resume() is used to
+    request re-validation of the device, and if it happens to collide with a
+    khubd run we rely on the port_dev->status_lock to synchronize those
+    operations.
+    
+    Besides testing, the primary scenario where this mechanism is expected
+    to be triggered is when the user changes the port power policy
+    (control/pm_qos_no_poweroff, or power/control).   Each time power is
+    enabled want to revalidate the child device, where the revalidation is
+    handled by usb_port_resume().
+    
+    Given that this arranges for port_dev->child to be de-referenced in
+    usb_port_runtime_resume() we need to make sure not to collide with
+    usb_disconnect() that frees the usb_device.  To this end we hold the
+    port active with the "child_usage" reference across the disconnect
+    event.  Subsequently, the need to access hub->child_usage_bits lead to
+    the creation of hub_disconnect_children() to remove any ambiguity of
+    which "hub" is being acted on in usb_disconnect() (prompted-by sharp
+    eyes from Alan).
+    
+    Cc: Rafael J. Wysocki <rjw@rjwysocki.net>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit aae4518b3124b29f8dc81c829c704fd2df72e98b
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Fri May 16 02:46:50 2014 +0200
+
+    PM / sleep: Mechanism to avoid resuming runtime-suspended devices unnecessarily
+    
+    Currently, some subsystems (e.g. PCI and the ACPI PM domain) have to
+    resume all runtime-suspended devices during system suspend, mostly
+    because those devices may need to be reprogrammed due to different
+    wakeup settings for system sleep and for runtime PM.
+    
+    For some devices, though, it's OK to remain in runtime suspend
+    throughout a complete system suspend/resume cycle (if the device was in
+    runtime suspend at the start of the cycle).  We would like to do this
+    whenever possible, to avoid the overhead of extra power-up and power-down
+    events.
+    
+    However, problems may arise because the device's descendants may require
+    it to be at full power at various points during the cycle.  Therefore the
+    most straightforward way to do this safely is if the device and all its
+    descendants can remain runtime suspended until the complete stage of
+    system resume.
+    
+    To this end, introduce a new device PM flag, power.direct_complete
+    and modify the PM core to use that flag as follows.
+    
+    If the ->prepare() callback of a device returns a positive number,
+    the PM core will regard that as an indication that it may leave the
+    device runtime-suspended.  It will then check if the system power
+    transition in progress is a suspend (and not hibernation in particular)
+    and if the device is, indeed, runtime-suspended.  In that case, the PM
+    core will set the device's power.direct_complete flag.  Otherwise it
+    will clear power.direct_complete for the device and it also will later
+    clear it for the device's parent (if there's one).
+    
+    Next, the PM core will not invoke the ->suspend() ->suspend_late(),
+    ->suspend_irq(), ->resume_irq(), ->resume_early(), or ->resume()
+    callbacks for all devices having power.direct_complete set.  It
+    will invoke their ->complete() callbacks, however, and those
+    callbacks are then responsible for resuming the devices as
+    appropriate, if necessary.  For example, in some cases they may
+    need to queue up runtime resume requests for the devices using
+    pm_request_resume().
+    
+    Changelog partly based on an Alan Stern's description of the idea
+    (http://marc.info/?l=linux-pm&m=139940466625569&w=2).
+    
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+
+commit 1bfee5bc86fdaecc912e06080583eddab7263df2
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Sat Sep 25 23:35:00 2010 +0200
+
+    PM / Runtime: Merge synchronous and async runtime routines
+    
+    This patch (as1423) merges the asynchronous routines
+    __pm_request_idle(), __pm_request_suspend(), and __pm_request_resume()
+    with their synchronous counterparts.  The RPM_ASYNC bitflag argument
+    serves to indicate what sort of operation to perform.
+    
+    In the course of performing this merger, it became apparent that the
+    various functions don't all behave consistenly with regard to error
+    reporting and cancellation of outstanding requests.  A new routine,
+    rpm_check_suspend_allowed(), was written to centralize much of the
+    testing, and the other functions were revised to follow a simple
+    algorithm:
+    
+            If the operation is disallowed because of the device's
+            settings or current state, return an error.
+    
+            Cancel pending or scheduled requests of lower priority.
+    
+            Schedule, queue, or perform the desired operation.
+    
+    A few special cases and exceptions are noted in comments.
+    
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+
+commit dad3de7d0090280f44ff27131ed2878f1ab6ddad
+Merge: ed9216c1717a 7a1a8eb58a2c
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 8 08:07:16 2009 -0800
+
+    Merge branch 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/suspend-2.6
+    
+    * 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/suspend-2.6:
+      PM: Add flag for devices capable of generating run-time wake-up events
+      PM / Runtime: Remove unnecessary braces in __pm_runtime_set_status()
+      PM / Runtime: Make documentation of runtime_idle() agree with the code
+      PM / Runtime: Ensure timer_expires is nonzero in pm_schedule_suspend()
+      PM / Runtime: Use deferred_resume flag in pm_request_resume
+      PM / Runtime: Export the PM runtime workqueue
+      PM / Runtime: Fix lockdep warning in __pm_runtime_set_status()
+      PM / Hibernate: Swap, use KERN_CONT
+      PM / Hibernate: Shift remaining code from swsusp.c to hibernate.c
+      PM / Hibernate: Move swap functions to kernel/power/swap.c.
+      PM / freezer: Don't get over-anxious while waiting
+
+commit 63c94801701abfea21570d3302687ec027ed33e8
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Thu Dec 3 20:22:34 2009 +0100
+
+    PM / Runtime: Use deferred_resume flag in pm_request_resume
+    
+    This patch (as1307) adds a small optimization to
+    __pm_request_resume().  If the device is currently being suspended,
+    there's no need to queue a work routine to resume it.  Setting the
+    deferred_resume flag will suffice.  (There's also a minor improvement
+    to the function's code layout: An unnecessary "else" is removed.)
+    
+    Also, the patch clarifies the usage of the deferred_resume flag.  It
+    is meaningful only while a suspend is in progress, so it should be
+    cleared just before a suspend starts, not just after one ends.
+    
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
