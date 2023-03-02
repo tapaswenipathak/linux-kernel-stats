@@ -1,0 +1,332 @@
+commit ffea17ecc2b64a68724362e18133229dd91bde0e
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Jun 2 01:50:27 2022 +0200
+
+    v2.5.0
+    
+    libkfont:
+    * Make libkfont public library.
+    * Add kfont_free().
+    * Initialize kfont_context->options.
+    * Тake the verbose parameter into account when logging messages.
+    
+    libkeymap:
+    * Better error message on unsupported unicode value.
+    
+    setvtrgb:
+    * Add hexadecimal file support.
+    
+    keymaps:
+    * fa.map: drop high codepoint character that chokes loadkeys.
+    * i386/neo/3l.map: Add 3l keymap.
+    * i386/neo: use Delete instead of Backspace.
+    * i386/qwerty/ie.map: Add Irish keyboard map.
+    * i386/qwerty/it.map: Add braces to IT keyboard map.
+    * pine/en.map: Keymap for PinePhone keyboard.
+    * pt-latin1.map: Add Euro at Portuguese keyboards.
+    
+    docs:
+    * Fix typos.
+    
+    po:
+    * Update translations (from translationproject.org).
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 11683bfae542fc14f012960a58a5b9b36617af37
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Mar 22 00:22:16 2022 +0100
+
+    v2.5-rc1
+    
+    libkfont:
+    * Make libkfont public library.
+    * Add kfont_free().
+    * Initialize kfont_context->options.
+    * Тake the verbose parameter into account when logging messages.
+    
+    libkeymap:
+    * Better error message on unsupported unicode value.
+    
+    setvtrgb:
+    * Add hexadecimal file support.
+    
+    keymaps:
+    * i386/qwerty/ie.map: Add Irish keyboard map.
+    * i386/neo/3l.map: Add 3l keymap.
+    * i386/qwerty/it.map: Add braces to IT keyboard map.
+    * pt-latin1.map: Add Euro at Portuguese keyboards.
+    * fa.map: drop high codepoint character that chokes loadkeys.
+    * i386/neo: use Delete instead of Backspace.
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit ce52f192af4d2fd91f39dfcfe3e6f8ed214b6e55
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Jan 27 19:12:05 2022 +0100
+
+    Make libkfont public library
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 1f567a60e346d1af6bebf0a2d167298cdba46b90
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Jan 27 18:39:30 2022 +0100
+
+    kfont: Тake the verbose parameter into account when logging messages
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit ef3b76e0a9fb094632f1d7414363ec342e88b0ac
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Jan 27 16:32:25 2022 +0100
+
+    kfont: Add kfont_free()
+    
+    In order to be able to use libkfont not only as an internal library, we
+    need to add a context destructor.
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 269aded8035ae1f4441e2e25fd11185dad7f332d
+Merge: 6f27016 501efd7
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jan 14 15:46:32 2022 +0100
+
+    Merge branch 'github-pull-68'
+    
+    kfont_init did not set the options member, so it had essentially random
+    content. This made setfont behave weirdly.
+    
+    Switch to calloc for good measure to avoid issues like this.
+    
+    Initially found by openQA which randomly saw huge text:
+    https://openqa.opensuse.org/tests/2087792#step/consoletest_setup/52
+    
+    Can be reproduced reliably with MALLOC_PERTURB_=69 setfont eurlatgr.
+    
+    Link: https://github.com/legionus/kbd/pull/68
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 501efd7b873e1462da986f763398ea8d98df2767
+Author: Fabian Vogt <fvogt@suse.de>
+Date:   Fri Jan 14 15:22:24 2022 +0100
+
+    libkfont: Initialize kfont_context->options
+    
+    kfont_init did not set the options member, so it had essentially random
+    content. This made setfont behave weirdly.
+    
+    Switch to calloc for good measure to avoid issues like this.
+    
+    Signed-off-by: Fabian Vogt <fvogt@suse.de>
+
+commit 42bd43c73445950046c9d7b39c90e2dd5659646c
+Author: Vitezslav Crhonek <vcrhonek@redhat.com>
+Date:   Thu May 27 10:17:41 2021 +0200
+
+    libkfont: fix memory leak
+
+commit 2b68ba3ef22e6f68dcd9dc5c7fc47f72761f3764
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Dec 13 21:21:01 2020 +0100
+
+    libkfont: Use only KDFONTOP
+    
+    Drop deprecated ioctl's to get or set a console font. The KDFONTOP was
+    introduced in linux 2.1.111. So by this commit we are removing support
+    for earlier linux kernels.
+    
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=90bfdeef83f1
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit d8372df646ba9b7ff514c3cdc034146c83cdc51f
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sat Apr 18 11:26:35 2020 +0200
+
+    Rename kfont functions for better readability
+    
+    kfont_loadnewmap     -> kfont_load_consolemap
+    kfont_saveoldmap     -> kfont_save_consolemap
+    kfont_loadunicodemap -> kfont_load_unicodemap
+    kfont_saveunicodemap -> kfont_save_unicodemap
+    kfont_getunimap      -> kfont_get_unicodemap
+    kfont_loadunimap     -> kfont_put_unicodemap
+    kfont_getuniscrnmap  -> kfont_get_uniscrnmap
+    kfont_loaduniscrnmap -> kfont_put_uniscrnmap
+    kfont_getfont        -> kfont_get_font
+    kfont_putfont        -> kfont_put_font
+    kfont_getfontsize    -> kfont_get_fontsize
+    kfont_restorefont    -> kfont_restore_font
+    kfont_loadnewfont    -> kfont_load_font
+    kfont_loadnewfonts   -> kfont_load_fonts
+    kfont_readpsffont    -> kfont_read_psffont
+    kfont_writepsffont   -> kfont_write_psffont
+    kfont_read_itable    -> kfont_read_unicodetable
+    kfont_write_itable   -> kfont_write_unicodetable
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit ff85ca04a563229be40bc2f0874f3a8fe8c557eb
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Apr 17 18:34:54 2020 +0200
+
+    Replace kfont_saveoldfont and kfont_saveoldfontplusunicodemap by kfont_save_font
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit ea2ac448f3d5ff30ac55ff70e0cc8f0db3006a8f
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Apr 17 13:19:38 2020 +0200
+
+    kfont: Add copyright information
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 5fcb9debc2158dd836cccc9480a150b164fd267d
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Apr 16 13:00:52 2020 +0200
+
+    kfont: Move into a separate function the part responsible for reading the font
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 18c147f29c985944b94d163e7b6772b933d71a2a
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Apr 15 17:48:03 2020 +0200
+
+    Make kfont_context private
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 840adf37e7608e2c09e7a84b0788f8824e254995
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Apr 15 15:05:44 2020 +0200
+
+    Make kfont logging functions private
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 7a8f1b4e6764a5be88aabdc0c7294df0e4bc741a
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Apr 15 13:43:03 2020 +0200
+
+    kfont: Drop obsolete header
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 4da0114cbf99156a3790fa659392a748dc3cd8cd
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Apr 15 12:31:49 2020 +0200
+
+    Add to kfont function to manipulate unicode tables
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 5ff6e59a975f745bdcdef7a77d3323eca5b792ea
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Apr 14 22:00:11 2020 +0200
+
+    Split external and internal kfont functions
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit b8e7b524b63658074ff202c78e6eaeddb9afd031
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Apr 14 18:31:25 2020 +0200
+
+    Add kfont_ prefix to all external functions
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 7e2fb5fa37906ac20fd1071cbd4af0737cf679c0
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Apr 14 11:28:06 2020 +0200
+
+    Add options for kfont
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit fec381b031b8356ad632ea876f9863a3ae31336f
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Apr 13 13:41:01 2020 +0200
+
+    Move font locations to kfont_context
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit b568f18911efb1d2eb7b734ba5a3731d112a90af
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Apr 13 01:35:28 2020 +0200
+
+    Add verbose field into kfont_context
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 46d0ebd9346497d391c8e594b9deb1682a7db0ff
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Apr 12 23:57:58 2020 +0200
+
+    Add "kfont_" prefix
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit f4bf7700e146c8a1f12700a0efb85a62efe723e5
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Apr 10 18:44:48 2020 +0200
+
+    Add kfont_context
+    
+    For now this is a placeholder of logging function for all kfont related
+    functions.
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 401297cd4bd06664cfbc959e5ab68e307f638306
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Sep 26 21:55:57 2018 +0200
+
+    Add kfont context (part 3)
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 316cee301ed3b9ce56a185b1d608a32042ca9c0c
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Sep 25 10:23:00 2018 +0200
+
+    Add kfont context (part 2)
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 3281793ec154eb44c4397eef2515006bd4961c4e
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Sep 24 21:00:23 2018 +0200
+
+    Add kfont context (part 1)
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit d0907b0fa219a7f8f63b867fedb688a8f238852c
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Sep 20 11:36:46 2018 +0200
+
+    Add kfont context
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit e4eff2285c257ee600b460ec893a627aa4bed5d6
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Jul 10 11:08:58 2018 +0200
+
+    libkfont do not do exit(1)
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 8c45383e73747674c4b6b2d7d1f86c5b152ed228
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jul 6 15:37:43 2018 +0200
+
+    Move libkfont in separate directory
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>

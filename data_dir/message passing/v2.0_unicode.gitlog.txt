@@ -1,0 +1,516 @@
+commit ffea17ecc2b64a68724362e18133229dd91bde0e
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Jun 2 01:50:27 2022 +0200
+
+    v2.5.0
+    
+    libkfont:
+    * Make libkfont public library.
+    * Add kfont_free().
+    * Initialize kfont_context->options.
+    * Тake the verbose parameter into account when logging messages.
+    
+    libkeymap:
+    * Better error message on unsupported unicode value.
+    
+    setvtrgb:
+    * Add hexadecimal file support.
+    
+    keymaps:
+    * fa.map: drop high codepoint character that chokes loadkeys.
+    * i386/neo/3l.map: Add 3l keymap.
+    * i386/neo: use Delete instead of Backspace.
+    * i386/qwerty/ie.map: Add Irish keyboard map.
+    * i386/qwerty/it.map: Add braces to IT keyboard map.
+    * pine/en.map: Keymap for PinePhone keyboard.
+    * pt-latin1.map: Add Euro at Portuguese keyboards.
+    
+    docs:
+    * Fix typos.
+    
+    po:
+    * Update translations (from translationproject.org).
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 11683bfae542fc14f012960a58a5b9b36617af37
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Mar 22 00:22:16 2022 +0100
+
+    v2.5-rc1
+    
+    libkfont:
+    * Make libkfont public library.
+    * Add kfont_free().
+    * Initialize kfont_context->options.
+    * Тake the verbose parameter into account when logging messages.
+    
+    libkeymap:
+    * Better error message on unsupported unicode value.
+    
+    setvtrgb:
+    * Add hexadecimal file support.
+    
+    keymaps:
+    * i386/qwerty/ie.map: Add Irish keyboard map.
+    * i386/neo/3l.map: Add 3l keymap.
+    * i386/qwerty/it.map: Add braces to IT keyboard map.
+    * pt-latin1.map: Add Euro at Portuguese keyboards.
+    * fa.map: drop high codepoint character that chokes loadkeys.
+    * i386/neo: use Delete instead of Backspace.
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 1be18aa62dc919b658a217e65e77f130105a9b0d
+Author: Anisse Astier <anisse@astier.eu>
+Date:   Wed Mar 3 18:09:43 2021 +0100
+
+    src/libkeymap: better error message on unsupported unicode value
+    
+    The auto-generated (with ckbcomp) file fr-bepo_afnor did not load (even
+    partially), because of an U+1f12f (copyleft symbol) that is wrongly
+    parsed, generating this error message:
+            too many (160) entries on one line
+    
+    Fix libkeymap so that the symbol can be parsed, and later generate a
+    better error message:
+            unicode keysym out of range: U+1f12f
+    
+    At least users will know what is wrong with their keymap.
+    
+    Signed-off-by: Anisse Astier <anisse@astier.eu>
+
+commit 7dd486f8343df65c25c11425ba003f8a390cc829
+Author: Jiri Slaby <jslaby@suse.cz>
+Date:   Thu Sep 24 11:27:19 2020 +0200
+
+    libkeymap: unify non/unicode accent_table generation
+    
+    There are only couple differences. Merge the two codes and use in-place
+    tests instead.
+    
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit b66b23e0559e312bc46d975f7edd0f80c01178d7
+Author: Jiri Slaby <jslaby@suse.cz>
+Date:   Thu Sep 24 11:27:19 2020 +0200
+
+    libkeymap: note about --unicode use
+    
+    Note to the generated file that we used --unicode.
+    
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit d8372df646ba9b7ff514c3cdc034146c83cdc51f
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sat Apr 18 11:26:35 2020 +0200
+
+    Rename kfont functions for better readability
+    
+    kfont_loadnewmap     -> kfont_load_consolemap
+    kfont_saveoldmap     -> kfont_save_consolemap
+    kfont_loadunicodemap -> kfont_load_unicodemap
+    kfont_saveunicodemap -> kfont_save_unicodemap
+    kfont_getunimap      -> kfont_get_unicodemap
+    kfont_loadunimap     -> kfont_put_unicodemap
+    kfont_getuniscrnmap  -> kfont_get_uniscrnmap
+    kfont_loaduniscrnmap -> kfont_put_uniscrnmap
+    kfont_getfont        -> kfont_get_font
+    kfont_putfont        -> kfont_put_font
+    kfont_getfontsize    -> kfont_get_fontsize
+    kfont_restorefont    -> kfont_restore_font
+    kfont_loadnewfont    -> kfont_load_font
+    kfont_loadnewfonts   -> kfont_load_fonts
+    kfont_readpsffont    -> kfont_read_psffont
+    kfont_writepsffont   -> kfont_write_psffont
+    kfont_read_itable    -> kfont_read_unicodetable
+    kfont_write_itable   -> kfont_write_unicodetable
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit ff85ca04a563229be40bc2f0874f3a8fe8c557eb
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Apr 17 18:34:54 2020 +0200
+
+    Replace kfont_saveoldfont and kfont_saveoldfontplusunicodemap by kfont_save_font
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit fc8b66651f0285ac0765f4c0480cd3d5f7a61164
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Apr 15 13:25:01 2020 +0200
+
+    Check overflow in unicode parser
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 4da0114cbf99156a3790fa659392a748dc3cd8cd
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Apr 15 12:31:49 2020 +0200
+
+    Add to kfont function to manipulate unicode tables
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 4739899f87715fcf8cb6291fc2333ae73d7f9c96
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Apr 13 16:29:07 2020 +0200
+
+    loadunicodemap: Do not use global variables
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 3031d765a1e5f68fe13e92435c7a6873d1be5c7a
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Apr 12 14:47:44 2020 +0200
+
+    Functions saveoldfont, saveoldfontplusunicodemap, do_saveoldfont always return a code
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 15f9e1071ec616d9970a28073ea899f7c4f5df03
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Apr 12 14:20:30 2020 +0200
+
+    Make appendunicodemap() always return a code
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit c45ea61ee386ee1aba9afc4356bd0f872f193df2
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Apr 12 14:10:37 2020 +0200
+
+    Make loadunicodemap() always return a code
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 3bd767703a3c41f6af6c6a4402c69a66f0c25f65
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Apr 12 13:50:35 2020 +0200
+
+    Make saveunicodemap() always return a code
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit e59c06738b183dddca388f76d3bb31c1b4707f61
+Author: Bjarni Ingi Gislason <bjarniig@rhi.hi.is>
+Date:   Wed Mar 18 23:13:15 2020 +0000
+
+    docs/man/man1: Fix warnings from "groff" and some other formatting
+    
+    1) Remove space at end of lines
+    
+    2) Fix some wrong fonts
+    
+    3)  Fix warnings from test-groff.
+    
+    Output is from: test-groff -b -e -mandoc -T utf8 -rF0 -t -w w -z
+    
+      [ "test-groff" is a developmental version of "groff" ]
+    
+    Input file is ./dumpkeys.1.in
+    
+    <dumpkeys.1.in>:218 (macro BI): only 1 argument, but more are expected
+    ####
+    
+    Input file is ./fgconsole.1
+    
+    <fgconsole.1>:8 (macro BI): only 1 argument, but more are expected
+    <fgconsole.1>:42 (macro IR): only 1 argument, but more are expected
+    ####
+    
+    Input file is ./loadkeys.1.in
+    
+    <loadkeys.1.in>:220 (macro BI): only 1 argument, but more are expected
+    <loadkeys.1.in>:224 (macro BI): only 1 argument, but more are expected
+    ####
+    
+    Input file is ./openvt.1
+    
+    <openvt.1>:12 (macro BR): only 1 argument, but more are expected
+    <openvt.1>:67 (macro BR): only 0 argument, but more are expected
+    <openvt.1>:83 (macro BR): only 0 argument, but more are expected
+    ####
+    
+    Input file is ./psfxtable.1
+    
+    <psfxtable.1>:34 (macro IR): only 1 argument, but more are expected
+    ####
+    
+    Input file is ./setleds.1
+    
+    troff: <setleds.1>:63: warning: escape character ignored before '+'
+    troff: <setleds.1>:69: warning: escape character ignored before '+'
+    troff: <setleds.1>:75: warning: escape character ignored before '+'
+    ####
+    
+    Input file is ./unicode_start.1
+    
+    <unicode_start.1>:38 (macro BR): only 1 argument, but more are expected
+    ####
+    
+    Input file is ./unicode_stop.1
+    
+    <unicode_stop.1>:19 (macro BR): only 1 argument, but more are expected
+    
+    Signed-off-by: Bjarni Ingi Gislason <bjarniig@rhi.hi.is>
+    ####
+
+commit 15cd2ee27eb6f9b37dda5318148df8db90496432
+Author: Oleg Bulatov <oleg@bulatov.me>
+Date:   Sun Nov 13 23:56:25 2016 +0300
+
+    Respect charset in non-unicode dumpkeys
+    
+    Signed-off-by: Oleg Bulatov <oleg@bulatov.me>
+
+commit 3ee2b05cb434eb23f3652baefab62b18244261db
+Author: Oleg Bulatov <oleg@bulatov.me>
+Date:   Sun Nov 13 02:26:20 2016 +0300
+
+    Use unicode name for letter ghe with upturn
+    
+    Signed-off-by: Oleg Bulatov <oleg@bulatov.me>
+
+commit 937faefdd094ec9dde41210592a5c8eb25d09ede
+Author: Oleg Bulatov <oleg@bulatov.me>
+Date:   Sun Nov 13 01:22:40 2016 +0300
+
+    Use unicode name for cyrillic letter dzhe (was dze)
+    
+    Signed-off-by: Oleg Bulatov <oleg@bulatov.me>
+
+commit a5c950bdc69e0743bb5339405c8e398c388dca1c
+Author: Oleg Bulatov <oleg@bulatov.me>
+Date:   Sat Nov 12 20:09:21 2016 +0300
+
+    Fix unicode and diacs dump
+    
+    Signed-off-by: Oleg Bulatov <oleg@bulatov.me>
+
+commit c446cff7e073845dbf95c9ee491cf8c16cc5731a
+Author: Oleg Bulatov <oleg@bulatov.me>
+Date:   Mon Oct 31 14:25:06 2016 +0300
+
+    Fix loop limits for unicode case
+    
+    Signed-off-by: Oleg Bulatov <oleg@bulatov.me>
+
+commit 9aaf5b054d3c2a7ad97a1560b0da9ba3cd49742d
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Apr 29 17:02:49 2013 +0400
+
+    Replace prefer_unicode with LKFLAG_PREFER_UNICODE
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit bccf0fe357bb05f3c8d490f93ec05b36b7a9a759
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Aug 6 02:11:34 2012 +0400
+
+    loadkeys: Move prefer_unicode to loadkeys.y
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 1396aa83df22d3ca6c21f6121f4e851f520d5713
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Sun Jul 29 00:33:07 2012 +0400
+
+    loadkeys: Move code changes prefer_unicode variable from set_charset()
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit d206b86afe48d9432fa3115993dc10aeeb057530
+Author: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date:   Fri Apr 22 01:40:04 2011 +0400
+
+    loadkeys: Fix -C option
+    
+    The latest version of loadkeys has a small problem that it is not
+    honoring the console passed in -C option to check whether keyboard is in
+    unicode mode.
+    
+    Signed-off-by: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+
+commit 50f674d1775bc75f799c583b887c3329088ff620
+Author: Nicolas Delvaux <nicolas.delvaux@gmx.com>
+Date:   Thu Sep 9 01:01:00 2010 +0400
+
+    [consolefonts]: Add unicode spaces
+    
+    This was only a partial fix, because fonts that don't have a build-in
+    Unicode map were still defective.
+    So I made a patch to update all unimaps files (so the 'data/unimaps'
+    folder).
+    
+    You can get it here: http://malaria.perso.sfr.fr/kbd/unimaps.patch
+    
+    I also made a tar.gz with an updated 'data/consolefonts' folder (thanks
+    to my script). You can download it here:
+    http://malaria.perso.sfr.fr/kbd/updated_consolefonts.tar.gz
+    
+    So, basically, if you apply this patch and replace all fonts by their
+    updated version, then your KBD will support all Unicode spaces (and so
+    the 'narrow no-break space' which is the one I primarily want).
+    
+    You can test with "/usr/bin/printf '\uCODEx\n'" where 'CODE' can be
+    0020, 00a0, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+    200a or 202f.
+    (Yes, all are different kinds of Unicode spaces. See this site if you
+    want more details about each char:
+    http://www.fileformat.info/info/unicode/char/search.htm )
+    
+    Signed-off-by: Nicolas Delvaux <nicolas.delvaux@gmx.com>
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit b4735104164bb5b5b23f885caa5011f8506eb773
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Jul 6 01:44:00 2010 +0400
+
+    Do not set prefer_unicode for iso-8859-1
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit b9f77f5ff920867fd9a27de1220ce5ac0c266e3b
+Author: Michael Schutte <michi@uiae.at>
+Date:   Tue Apr 28 15:27:44 2009 +0200
+
+    Support bidirectional conversion of keysyms
+    
+    Enhance ksymtocode() and convert_code() to accept a “direction”
+    parameter which can be one of TO_UNICODE, TO_8BIT or TO_AUTO.  The
+    latter enables the old behavior of using prefer_unicode.
+    
+    This prepares the codebase for another patch to make loadkeys convert
+    diacriticals (for the KD?KBDIACRUC ioctls present in newer kernels).
+    
+    Signed-off-by: Michael Schutte <michi@uiae.at>
+
+commit 68cbd1ca28598ed399280e15878d75f6040b2726
+Author: Michael Schutte <michi@uiae.at>
+Date:   Sat Apr 25 16:41:41 2009 +0200
+
+    Fix two problems with the keymap auto-conversion patch
+    
+    * Correctly resolve plain ASCII characters in codetoksym.  The original
+      auto-conversion patch handles keysyms smaller than 0x80 incorrectly if
+      prefer_unicode is set.
+    
+    * Avoid a memory leak in set_charset.
+    
+    Signed-off-by: Michael Schutte <michi@uiae.at>
+
+commit 005cfa2f9c6a2c8ad3e6c06d666034291a30ed20
+Author: Dmitry V. Levin <ldv@altlinux.org>
+Date:   Wed Nov 19 22:55:53 2008 +0000
+
+    console-scripts/console.{csh,sh}: Do nothing if $DISPLAY is set
+    
+    Executing linux console hooks in shell running under X11 is useless.
+    Also, this change fixes nasty stty hangup in unicode_start.
+    
+    Signed-off-by: Dmitry V. Levin <ldv@altlinux.org>
+
+commit 1caa4a2cc9654c520d1beb0313462f7136678095
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Thu Oct 30 01:01:04 2008 +0300
+
+    0:1.14.1.20081023-alt1
+    
+    - New release version (1.14.1).
+    - Print an error message when calls to exec* functions fail (thx Michael Schutte).
+    - openvt: Document the -f switch (thx Michael Schutte).
+    - loadkeys: dump binary keymap (thx Michel Stempin).
+    - Keymaps:
+      + Add turkish F (trf) keyboard map.
+      + Add qwertz/cz.map keymap.
+      + Add Norwegian dvorak keymap.
+      + Fix turkish Q (trq) keymap (thx Ozgur Murat Homurlu).
+      + Understand the CapsShift modifiers (thx Michael Schutte).
+      + ruwin_*: Use qwerty-layout.inc.
+    - vt_activate_user_map: Allow absolute path in SYSFONTACM variable.
+    - unicode_{start,stop}: To run loadkeys is allowed only to root.
+    - unicode_start: Without any arguments utility will only set
+      unicode mode.
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit b1f4fa337f553f39d27a7a807bc7a54d79eeb81a
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Fri Jun 20 15:28:27 2008 +0400
+
+    unicode_start: Without any arguments utility will only set unicode mode
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit 1b7e62d0229ac16350ec2059a04ef8b924c02cf5
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Fri Feb 22 01:36:54 2008 +0300
+
+    unicode_{start,stop}: To run loadkeys is allowed only to root
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit 295cd4b0a7c4610202acceabde0acbf4d8c88aaf
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Thu Jan 3 03:34:22 2008 +0300
+
+    0:1.13.99-alt1
+    
+    - New prerelease version (1.13.99).
+    - Add new subpackage: kbd-data.
+    - Add '.acm' suffix for compatibility with console-tools.
+    - Add Terminus font.
+    - Add unicode cyrillic fonts.
+    - Add more romanian keymaps.
+    - Add another ukrainian keymap.
+    - Add Belarusian (Belarus) keymaps.
+    - Add Kazakh keymap.
+    - Add Kyrgyz keymap.
+    - Add Bashkir (Russia) keymap.
+    - Add Tatar keymaps.
+    - Add more russian keymaps.
+    - Migrate to autoconf.
+    - Apply patches from other linux vendors.
+    - Fix some build warnings.
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit ecff86ec7c85a870477d43b8b4f044d076e06823
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Sat Jan 12 20:59:25 2008 +0300
+
+    unicode_start: remove -e from script
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit 30039071f03693647eeafc01ec9dd9b99dd4cf30
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Wed Dec 5 00:40:58 2007 +0300
+
+    Fix font unicode mapping table
+    
+    We ship latsun-fonts with Fedora and the font sun12x22 has fixed
+    unicode mapping table.
+    
+    Best regards,
+    Vitezslav Crhonek
+    
+    Signed-off-by: Vitezslav Crhonek <vcrhonek@redhat.com>
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit ef73ea3b71d364f836ca7ced8226ec45404a3ef1
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Mon Nov 19 01:36:05 2007 +0300
+
+    Add unicode cyrillic fonts
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
+
+commit 1402ffbf12b8b09d0ad2513e6e3a7d5d918c5607
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Sat Feb 10 18:37:47 2007 +0300
+
+    Update unicode_start/unicode_stop scripts.
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>

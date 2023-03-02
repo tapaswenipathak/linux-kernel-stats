@@ -1,0 +1,34 @@
+commit 9da7ed8df9aaa8b948723c23100271d801eaccbd
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jul 26 15:33:02 2019 +0200
+
+    setfont: Do not close kbdfile until the end of processing
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 504b1df79fd01383620c8f5946575ccfdbac5861
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jul 26 14:56:04 2019 +0200
+
+    loadkeys: Close kbdfile pointer after processing
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 4bbdaca9a8b9015d374aaa390438f52f8d6c32c4
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Apr 26 16:41:19 2013 +0400
+
+    Fix keymaps stack processing
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 9d987aa79647e20620eb668656591df9f90b2893
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Mon Feb 19 10:46:23 2007 +0300
+
+    Fix race condition.
+    
+    When openvt reopen a console descriptor this descriptor maybe
+    opened by another process.
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>

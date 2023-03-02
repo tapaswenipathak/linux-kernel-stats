@@ -1,0 +1,344 @@
+commit f79e5351608302264fbd909f99f5420b01079582
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Sat Jul 4 23:25:40 1992 +0000
+
+    0.96c out
+    
+    The latest kernel version is 0.96c: the binary and sources can be found
+    on banjo.concert.net: pub/Linux/Linus as usual. I haven't made the
+    cdiffs yet, and I'll upload those tomorrow (at the same time I'll put it
+    on the other sites as well).
+    
+    0.96c is actually what I called patch3 earlier this week, but as the new
+    features were pretty big and the cdiff's are probably going to be bigger
+    than the normal patches, I decided I might as well make it a totally new
+    minor release and make a bootimage and complete source available.
+    
+    0.96c contains:
+     - bugfixes (tty, console driver, pty's, sockets)
+     - fifo's (names pipes - Paul Hargrove & editing by me)
+     - the alpha extended filesystem (Remy Card)
+     - st_blocks implemented (ie du, ls give reasonable if not exact values
+       for disk-space used)
+     - Makefile cleanups and warnings at compile-time removed
+    
+    Note that while the extended filesystem code is there, and this kernel
+    successfully mounts and uses the new filesystem (with long filenames and
+    >64MB partitions), it's still under testing: I haven't made the mkefs
+    program available, and the extended filesystem features shouldn't be
+    used for other than testing right now.
+    
+    Some of the changes are just cleanups: most of the warnings when
+    compiling the new kernel should be gone (not counting the scsi code
+    which is still the old non-cleaned-up version), and the make'ing of the
+    kernel is more logical now.
+    
+    The bugfixes include the corrected console.c driver, the socket
+    corrections (without which X sometimes locks up), some pty semantics
+    corrections (although I'm still not certain it's correct) and some
+    editing in the general tty driver (including fixing the bug introduced
+    in 0.96b.pl2 that caused a reboot with uninitialized tty devices).
+    
+    While the extended filesystem support isn't "official" yet, I can
+    happily report that my limited testing hasn't found any problems with
+    long filenames etc. It still needs a fsck program, but 1.0 looks like a
+    real possibility soon.
+    
+                    Linus
+
+commit 8404560378fc29692399a65c34d39d80699f7288
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Fri May 22 21:01:59 1992 +0000
+
+    0.96a available
+    
+    Oh, well, no use in delaying it any more, so I sent out my latest
+    release to nic.funet.fi, tsx-11.mit.edu and banjo.concert.net. They
+    should show up in the next couple of days (they are already visible on
+    banjo: /pub/Linux/Linus). I hope all the bugs got fixed, but I did
+    something potentially stupid:
+    
+    I had expected that lankaster wouldn't get his hd-speedup patches ready
+    for 0.96a, and I was resigned to the same hd-performance as with all
+    older releases. But when I saw them on the newsgroup today I thought
+    I'd try them out just in case, as I could always use my backup-version
+    if they backfired...
+    
+    The point here is that the patch ended up in 0.96a after some minor
+    edits by me (one benign bug and some editing due to changed files). So
+    now hd-performance is much better on most operations. I just hope it
+    doesn't result in yet another release just to fix new bugs (but I doubt
+    it: the patches were really minor and clean - no ugly hacks needed I'm
+    happy to say). Branko already posted benchmarks, and I can only confirm
+    that it's indeed snappier, especially on writes. syncing is no longer a
+    pain even after heavy writing.
+    
+    Other than the hd-performance, there are no new features I haven't
+    already mentioned in other posts. Bug-fixes, rewrites in C, better
+    debugging. I haven't made the cdiffs yet, so right now the new release
+    is only available as complete source and as a binary, but I'll try to
+    get patches done tonight. Possibly tomorrow. The patches will be
+    against the original 0.96, and shouldn't be too big.
+    
+                    Linus
+    
+    PS. No need for more 16550 info: even if somebody doesn't implement it
+    for the next release, I think I can get it going. Doesn't seem too
+    hard. I'll also start to look into core-files. Eventually. Promise.
+    
+    PPS. Ja 0.96a on taas saatavilla klaavasta /usr/tmp/linux'ssa
+    yliopistolla kirjoilla oleville.
+    
+    -----
+    
+    From: torvalds@klaava.Helsinki.FI (Linus Benedict Torvalds)
+    Subject: 0.96a out today/tomorrow
+    Date: 21 May 1992 12:19:55 GMT
+    
+    The subject say it all: I haven't heard any bad results (except somewhat
+    worse performance on the serial lines) from the testimage testers, so
+    I'll make 0.96a available tonight (Finnish time: EST) or tomorrow.
+    tsx-11, nic and banjo will be the sites I'll upload it to.
+    
+    0.96a doesn't have any major new features: I just tried to correct known
+    bugs and get a stable version out the door. I hope 0.96 won't need any
+    more interim releases, but we'll see.
+    
+    0.96a has gone back to non-interruptible hd-interrupts, and as long as
+    I'm not sure about the reason for the need of this, it's going to stay
+    that way. I hope this new version will run on all drives that have been
+    supported in the past, and the only known remaining problem is the Kalok
+    drives which have spurious interrupts. That's definitely a hardware
+    problem, and Branko Lankaster has patches that fake away these..
+    
+    0.96a should also correct most of the serial line problems, and the
+    keyboard driver is now in C - I expect somebody will change it to allow
+    run-time keyboard changing. Additionally, there are various minor fixes
+    in various places:
+    
+    - the kill fix by tytso that allows any process to wake up a stopped
+      process as long as it's in the same session.
+    
+    - chown fix by card and me. Users can chgrp files they own to any group
+      they belong to etc - _POSIX_CHOWN_RESTRICTED should now be implemented
+      correctly. Also, chown() on a symlink now actually chown's the symlink
+      and not the file it points to (but GNU fileutils don't seem to want to
+      chown symlinks anyway - or maybe I have an older version)
+    
+    - SIGSEGV fix by lankaster (?) which allows for better debugging after
+      protection faults. Most such errors are now trappable in gdb
+      (although some circumstances can still result in the process exiting
+      at once: out-of-memory errors etc)
+    
+    I have also changed the memory manager to check for illegal memory
+    references (ie using the area between brk and stack), so debugging bad
+    pointer references should be much easier. This fix will hopefully also
+    trap the uncompress problem with bad files, but I haven't tried it out.
+    Programs can still call brk() with any value, so it doesn't mean that
+    you can't use up all available memory, but at least this should fix
+    /bad/ memory references. My limited tests with gdb seems to indicate it
+    all works nicely.
+    
+    Core files are still not generated (I haven't got the slightest idea
+    what format they should have), so debugging isn't perfect yet, but it
+    should certainly be much easier.
+    
+                    Linus
+    
+    -----
+    
+    [ Committer's note: this commit also folds the lost 0.96 release. ]
+    
+    From: torvalds@klaava.Helsinki.FI (Linus Benedict Torvalds)
+    Subject: 0.96 uploaded
+    Date: 12 May 1992 16:51:12 GMT
+    
+    Well, the title says it all: I've sent off 0.96 to banjo.concert.net,
+    where it can be found in pub/Linux/Linus along with a new bootimage and
+    a program for formatting floppies under linux (which works only under
+    0.96).
+    
+    I've also sent it to tsx-11.mit.edu and I'll send it to nic as soon as
+    the lines clear up.
+    
+    General warning about 0.96:
+    
+    - the scsi code is in the kernel, but I haven't personally tested it,
+      so who knows... The SCSI code also results in a 4-5 second pause at
+      bootup with the current bootimage, while it searches for an adapter:
+      if you find this disturbing, you have to recompile the kernel with the
+      appropriate changes to config.h.
+    
+    - The harddisk timings have changed: the testimage got a generally good
+      review, but it hasn't been tested very much. The changes seem to help
+      at least some "HD times out" problems, but there might be new bugs..
+    
+    - The serial code was totally rewritten this weekend, and I haven't
+      tested it out under any heavier load. I found one bug as late as
+      today, and there might be others lurking around.
+    
+    - There have been generally pretty heavy rewrites: it's binary
+      compatible with the old kernels, but the changes might not all be
+      correct. Oh, well.
+    
+    That said, I hope 0.96 will be an improvement on earlier versions, and
+    most of the old bugs corrected. If the new version still has some
+    problem - please mail me with a new bugreport. Otherwise I'll just
+    assume the problem went away: I'm afraid don't have time to go through
+    old mail searching for any bugs that might still be in there.
+    
+    Partial list of features:
+    
+    - automatic floppy detection. Please add the following devices:
+    
+            mknod /dev/fd0 b 2 0
+            mknod /dev/fd1 b 2 1
+    
+      which act as A and B floppies respectively, finding out automatically
+      what kind of disk there is.
+    
+      The floppy driver now also contains a timeout, so an empty diskdrive
+      no longer results in a floppy driver hang.
+    
+    - serial lines now support dropping DTR on closing, and sending SIGHUP
+      to the process group that is logged in on a serial line. It's also a
+      lot easier to change the interrupts etc of the lines.
+    
+    - unix sockets supported for X, as well as mmap() on /dev/mem etc.
+    
+    - pty's corrected. Hopefully no more hangs under X due to pty trouble.
+    
+    - better IO-performance when there are computationally intensive jobs in
+      the background or on another VC. Partly due to new scheduler
+      mechanism, partly due to read-ahead on normal files.
+    
+    - cleaned up vfs layer.
+    
+    - no more mismatched children
+    
+    - minor corrections all over the place.
+    
+    The new release is in fact different enough that there is no use trying
+    to make context diffs: files have disappeared, others are new, others
+    have simply changed a lot. Even compared to pre-0.96 there has been
+    quite a lot of changes.
+    
+                    Linus
+    
+    -----
+    
+    From: torvalds@klaava.Helsinki.FI (Linus Benedict Torvalds)
+    Subject: 0.96 out next week
+    Date: 4 May 1992 07:38:03 GMT
+    
+    Ok, the subject says most of it: I'll send out 0.96 sometimes next week
+    (ie 92.05.11-17), and this is just an announcement to confirm that.
+    
+    0.96 has a lot of changes (even relative to pre-0.96), and it's entirely
+    possible that making it available as cdiffs isn't feasible. It contains
+    a lot of new files, as well as some re-organizations in the old ones.
+    
+    Main new things are:
+    
+    - The SCSI distribution is now in the standard package. I (obviously)
+      haven't been able to test my patchings, so there might be problems in
+      this first release. I had to do some changes "blind" to the cdiffs,
+      but most of them were pretty trivial.
+    
+    - X11r5 as ported by obz is supported. It's still in beta-testing (join
+      the X11-channel on the original mailing-list), but as I'm writing this
+      from an xterm under linux, it works pretty well. Changes to pre-0.96
+      are just the socket-code by obz, and some small tweaking by me.
+    
+    - Hopefully better interrupt latency - I've changed select() not to use
+      cli-sti, and most IRQ's to enable interrupts, and instead disable just
+      their own interrupt-line. The interrupt latency has been noticeable at
+      higher serial speeds, and I hope 0.96 will be better in this respect.
+      Again, I only have 2400bps, so I've never seen the problems, and
+      cannot guarantee the new version will help. (btw, I hope the problems
+      with select are gone now)
+    
+    - Reorganisation of the vfs routines and minix filesystem driver. These
+      shouldn't bother anyone but people that have implemented their own
+      filesystems (I know of just 2 to date), but I hope the current
+      vfs-interface will prove to be relatively stable. The new vfs
+      interface has made some things much cleaner, and the promised cleanup
+      of special devices has happened.
+    
+    - ps/uptime patches + added readahead, so having computationally
+      intensive background processes isn't as noticeable any more when doing
+      IO.
+    
+    Additionally, there /might/ be a new floppy-driver that supports
+    formatting and autodetecting floppies, but I haven't had time to check
+    into it yet.
+    
+    There are probably any number of minor changes: I've lost track. People
+    have sent me some diffs, and some of them went in, depending on how
+    energetic I was that day. I've tried to correct all the bugs I've
+    gotten reports on, and hopefully 0.96 will work with just about
+    everything (gdb etc).
+    
+    Things I wanted, but didn't have time for:
+    
+    - The config patches aren't there. Sorry everybody. That means still no
+      wd8003 driver etc.
+    
+    - Any number of minor patches (quota, auto-SVGA etc)
+    
+    Generally, 0.96 is cleaning some things up, but on the other hand the
+    new features can have their share of problems. We'll see. Anyway, most
+    things seem to work, and I hope there won't be the same type of problems
+    as with the first 0.95 release.
+    
+                    Linus
+
+commit 2d7bd0389f1494040efcddd5a1b651f362bbf2c9
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Mon Jun 15 20:04:54 1992 +0000
+
+    patch3....
+    
+    Ok, I already announced it on the kernel mailing-list, but I might as
+    well go all the way. I put out patch3 to 0.96a yesterday, and it's
+    available on banjo in pub/Linux/Linus, and I'll upload it to the other
+    normal ftp-sites tonight.
+    
+    NOTE! Patch3 is (like patch2) more of a kernel-hacker patch: it's just
+    in case you want to keep up with my kernel. It has some problems with
+    some serial lines, and if you experience them, I'd like to know what
+    type of chip you are running (and what linux reports on bootup). If you
+    don't think patching the kernel is fun, you might as well forget this
+    and wait for a real release (next month?).
+    
+    Patch 3 contains:
+    
+     - support for attaching and detaching processes under gdb (but you need
+       a gdb that knows about this).
+     - 16550A support
+     - full core-dumping (again, you need a gdb that supports it)
+     - sockets have no problems with non-root binding etc
+     - /dev/zero implemented (mknod /dev/zero c 1 5)
+    
+    None of the patches are very big (the whole patch is 17kB compressed,
+    most of it attach/detach code), but they are all pretty useful.
+    
+    The 16550A support means that with the appropriate chip you now should
+    be able to use the serial ports at much higher speeds, but as mentioned,
+    it seems to break on some machines.
+    
+    The detaching isn't perfect yet (I noticed only after making the diffs
+    that I had forgotten to do some cleanups), but it's not generally a
+    problem (the code just forgets to give the process back to it's rightful
+    father).
+    
+    The patch is relative to the pl2 kernel, so you have to use the earlier
+    patches first. This time, I've added the lib/itimer.c code.
+    
+    16550A support was written by tdavis, the correct format of the
+    core-dumps was written by eric (who also wrote the attach/detach code I
+    used as an example when implementing it), /dev/zero was written by
+    almesber. Nice to see good patches: I just did the socket-thing and
+    rewrote the attaching to suit me.
+    
+                    Linus
