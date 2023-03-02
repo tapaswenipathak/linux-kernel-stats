@@ -1,0 +1,1876 @@
+commit a0a6c76cf2a506c061072db6c187f8a641dc85de
+Merge: ab425febda94 08dcf0732cb4
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Dec 14 09:34:26 2022 -0800
+
+    Merge tag 'i3c/for-6.2' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull i3c updates from Alexandre Belloni:
+     "A non-urgent fix and SETDASA is now exported to drivers"
+    
+    * tag 'i3c/for-6.2' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      MAINTAINERS: mark I3C DRIVER FOR SYNOPSYS DESIGNWARE orphan
+      i3c: export SETDASA method
+      i3c: Correct the macro module_i3c_i2c_driver
+
+commit 08dcf0732cb4d97b85493d9f60470e48eebf87fe
+Author: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Date:   Sun Dec 11 21:55:38 2022 +0100
+
+    MAINTAINERS: mark I3C DRIVER FOR SYNOPSYS DESIGNWARE orphan
+    
+    Vitor left Synopsys and the email address is now bouncing.
+    
+    Link: https://lore.kernel.org/r/20221211205539.19353-1-alexandre.belloni@bootlin.com
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+commit 672825cd2823a0cee4687ce80fef5b702ff3caa3
+Author: Jack Chen <zenghuchen@google.com>
+Date:   Wed Dec 7 15:50:59 2022 -0500
+
+    i3c: export SETDASA method
+    
+    Because not all I3C drivers have the hot-join feature ready, and
+    especially not all I3C devices support hot-join feature, exporting
+    SETDASA method could be useful. With this function, the I3C controller
+    could perform a DAA to I3C devices when users decide to turn these I3C
+    devices off and on again during run-time.
+    
+    Tested: This change has been tested with turnning off an I3C device and
+    turning on it again during run-time. The device driver calls SETDASA
+    method to perform DAA to the device. And communication between I3C
+    controller and device is set up again correctly.
+    
+    Signed-off-by: Jack Chen <zenghuchen@google.com>
+    Link: https://lore.kernel.org/r/20221207205059.3848851-1-zenghuchen@google.com
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+commit 01744ce9f07f0b76b0b2d30adba2a7c104f1ff2a
+Author: Naveen Krishna Chatradhi <nchatrad@amd.com>
+Date:   Mon Dec 5 10:54:13 2022 +0000
+
+    i3c: Correct the macro module_i3c_i2c_driver
+    
+    Present definition for module_i3c_i2c_driver uses only the
+    1st argument i.e., struct i3c_driver.
+    Irrespective of CONFIG_I3C being enabled/disabled,
+    struct i2c_driver is never passed to module_driver()
+    
+    Passing struct i2c_driver as the 4th argument works.
+    
+    Signed-off-by: Akshay Gupta <Akshay.Gupta@amd.com>
+    Signed-off-by: Naveen Krishna Chatradhi <nchatrad@amd.com>
+    Link: https://lore.kernel.org/r/20221205105413.937704-1-naveenkrishna.chatradhi@amd.com
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+commit 2cfb2180c3e8002719234c43b88b040e4f89396f
+Author: Lorenzo Bianconi <lorenzo@kernel.org>
+Date:   Fri Oct 28 13:23:42 2022 +0200
+
+    iio: imu: st_lsm6dsx: introduce sw trigger support
+    
+    There are some hw configuration where irq0 and/or irq1 pins are not
+    connected to the SPI or I2C/I3C controller. In order to avoid polling
+    the output register introduce iio-sw trigger support when irq line is
+    not available (or hw FIFO is not supported).
+    
+    Suggested-by: Mario Tesi <mario.tesi@st.com>
+    Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+    Link: https://lore.kernel.org/r/93ae6ff1150b531a9d7a4d3d1b1adb8383613717.1666955685.git.lorenzo@kernel.org
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+commit 90f4a09a15239f4a819b2e90a7a0b92a75060655
+Author: Billy Tsai <billy_tsai@aspeedtech.com>
+Date:   Mon Sep 26 18:51:45 2022 +0800
+
+    i3c: master: Remove the wrong place of reattach.
+    
+    The reattach should be used when an I3C device has its address changed.
+    But the modified place in this patch doesn't have the address changed of
+    the newdev. This wrong reattach will reserve the same address slot twice
+    and return unexpected -EBUSY when the bus find the duplicate device with
+    diffent dynamic address.
+    
+    Signed-off-by: Billy Tsai <billy_tsai@aspeedtech.com>
+    Link: https://lore.kernel.org/r/20220926105145.8145-2-billy_tsai@aspeedtech.com
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+commit 66ed42caf286a7aaeb6f1db4b2995dd9416226c2
+Author: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Date:   Wed Jun 1 09:42:12 2022 +0200
+
+    MAINTAINERS: rectify entries for some i3c drivers after dt conversion
+    
+    Commit 4bd69ecfa672 ("dt-bindings: i3c: Convert cdns,i3c-master to DT
+    schema") and commit 6742ca620bd9 ("dt-bindings: i3c: Convert
+    snps,dw-i3c-master to DT schema") convert some i3c dt-bindings to yaml,
+    but miss to adjust its reference in MAINTAINERS.
+    
+    Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about
+    broken references.
+    
+    Repair these file references in I3C DRIVER FOR CADENCE I3C MASTER IP and
+    I3C DRIVER FOR SYNOPSYS DESIGNWARE.
+    
+    Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20220601074212.19984-1-lukas.bulwahn@gmail.com
+
+commit 6742ca620bd929ee96bd6724692132056203fb95
+Author: Rob Herring <robh@kernel.org>
+Date:   Fri Apr 22 14:22:36 2022 -0500
+
+    dt-bindings: i3c: Convert snps,dw-i3c-master to DT schema
+    
+    Convert the Synopsys Designware I3C master to DT schema format.
+    
+    Signed-off-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20220422192236.2594577-1-robh@kernel.org
+
+commit 4bd69ecfa672e94334618ef9ec653b2a237cf2d9
+Author: Rob Herring <robh@kernel.org>
+Date:   Fri Apr 22 14:22:23 2022 -0500
+
+    dt-bindings: i3c: Convert cdns,i3c-master to DT schema
+    
+    Convert the Cadence I3C master to DT schema format. This fixes a warning
+    as it is used in the i3c.yaml example.
+    
+    The "nintendo,nunchuk" is not documented by a schema, so change the
+    example child device to something which is documented.
+    
+    Signed-off-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20220422192224.2594098-1-robh@kernel.org
+
+commit e5264d44f73288b9a4842f5ddce639aec040e81b
+Author: Jamie Iles <quic_jiles@quicinc.com>
+Date:   Wed Sep 22 17:56:00 2021 +0100
+
+    i3c: fix incorrect address slot lookup on 64-bit
+    
+    [ Upstream commit f18f98110f2b179792cb70d85cba697320a3790f ]
+    
+    The address slot bitmap is an array of unsigned long's which are the
+    same size as an int on 32-bit platforms but not 64-bit.  Loading the
+    bitmap into an int could result in the incorrect status being returned
+    for a slot and slots being reported as the wrong status.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Signed-off-by: Jamie Iles <quic_jiles@quicinc.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210922165600.179394-1-quic_jiles@quicinc.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit b2635263a750b7760cbec170a5e1c928e406378f
+Author: Jamie Iles <quic_jiles@quicinc.com>
+Date:   Wed Sep 22 17:56:00 2021 +0100
+
+    i3c: fix incorrect address slot lookup on 64-bit
+    
+    [ Upstream commit f18f98110f2b179792cb70d85cba697320a3790f ]
+    
+    The address slot bitmap is an array of unsigned long's which are the
+    same size as an int on 32-bit platforms but not 64-bit.  Loading the
+    bitmap into an int could result in the incorrect status being returned
+    for a slot and slots being reported as the wrong status.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Signed-off-by: Jamie Iles <quic_jiles@quicinc.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210922165600.179394-1-quic_jiles@quicinc.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 173fcb27210b18b38f1080f1c8f806e02cf8a53b
+Author: Clark Wang <xiaoning.wang@nxp.com>
+Date:   Mon Dec 27 15:45:26 2021 +0800
+
+    i3c: master: svc: set ODSTOP to let I2C device see the STOP signal
+    
+    If using I2C/I3C mixed mode, need to set ODSTOP. Otherwise, the I2C
+    devices cannot see the stop signal. It may cause message sending errors.
+    
+    Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+    Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Reviewed-by: Jun Li <jun.li@nxp.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20211227074529.1660398-6-xiaoning.wang@nxp.com
+
+commit 57d8d3fc060c7337bc78376ccc699ab80162b7d5
+Author: Clark Wang <xiaoning.wang@nxp.com>
+Date:   Mon Dec 27 15:45:22 2021 +0800
+
+    i3c: master: svc: move module reset behind clk enable
+    
+    Reset I3C module will R/W its regs, so enable its clocks first.
+    
+    Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+    Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Reviewed-by: Jun Li <jun.li@nxp.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20211227074529.1660398-2-xiaoning.wang@nxp.com
+
+commit b8545f9d3a5426a5f76814c8aaebc5cb46a3213a
+Author: Aswath Govindraju <a-govindraju@ti.com>
+Date:   Tue Dec 7 13:39:02 2021 +0530
+
+    arm64: dts: ti: Add initial support for J721S2 SoC
+    
+    The J721S2 SoC belongs to the K3 Multicore SoC architecture platform,
+    providing advanced system integration in automotive ADAS applications and
+    industrial applications requiring AI at the network edge. This SoC extends
+    the Jacinto 7 family of SoCs with focus on lowering system costs and power
+    while providing interfaces, memory architecture and compute performance for
+    single and multi-sensor applications.
+    
+    Some highlights of this SoC are:
+    
+    * Dual Cortex-A72s in a single cluster, three clusters of lockstep capable
+    dual Cortex-R5F MCUs, Deep-learning Matrix Multiply Accelerator(MMA), C7x
+    floating point Vector DSP.
+    * 3D GPU: Automotive grade IMG BXS-4-64
+    * Vision Processing Accelerator (VPAC) with image signal processor and
+    Depth and Motion Processing Accelerator (DMPAC)
+    * Two CSI2.0 4L RX plus one eDP/DP, two DSI Tx, and one DPI interface.
+    * Two Ethernet ports with RGMII support.
+    * Single 4 lane PCIe-GEN3 controllers, USB3.0 Dual-role device subsystems,
+    * Up to 20 MCANs, 5 McASP, eMMC and SD, OSPI/HyperBus memory controller,
+    QSPI, I3C and I2C, eCAP/eQEP, eHRPWM, MLB among other peripherals.
+    * Hardware accelerator blocks containing AES/DES/SHA/MD5 called SA2UL
+    management.
+    * Chips and Media Wave521CL H.264/H.265 encode/decode engine
+    
+    See J721S2 Technical Reference Manual (SPRUJ28 – NOVEMBER 2021)
+    for further details: http://www.ti.com/lit/pdf/spruj28
+    
+    Introduce basic support for the J721S2 SoC.
+    
+    Signed-off-by: Aswath Govindraju <a-govindraju@ti.com>
+    Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Reviewed-by: Kishon Vijay Abraham I <kishon@ti.com>
+    Link: https://lore.kernel.org/r/20211207080904.14324-4-a-govindraju@ti.com
+
+commit f18f98110f2b179792cb70d85cba697320a3790f
+Author: Jamie Iles <quic_jiles@quicinc.com>
+Date:   Wed Sep 22 17:56:00 2021 +0100
+
+    i3c: fix incorrect address slot lookup on 64-bit
+    
+    The address slot bitmap is an array of unsigned long's which are the
+    same size as an int on 32-bit platforms but not 64-bit.  Loading the
+    bitmap into an int could result in the incorrect status being returned
+    for a slot and slots being reported as the wrong status.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Signed-off-by: Jamie Iles <quic_jiles@quicinc.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210922165600.179394-1-quic_jiles@quicinc.com
+
+commit 579839a918d71e955603e0b9ba5cc38efc740f05
+Author: Sam Protsenko <semen.protsenko@linaro.org>
+Date:   Mon Nov 22 01:27:37 2021 +0200
+
+    clk: samsung: exynos850: Implement CMU_APM domain
+    
+    CMU_APM clock domain provides clocks for APM IP-core (Active Power
+    Management). According to Exynos850 TRM, CMU_APM generates I3C, Mailbox,
+    Speedy, Timer, WDT, RTC and PMU clocks for BLK_ALIVE.
+    
+    This patch adds next clocks:
+      - bus clocks in CMU_TOP needed for CMU_APM
+      - all internal CMU_APM clocks
+      - leaf clocks for I3C, Speedy and RTC IP-cores
+      - bus clocks for CMU_CMGP and CMU_CHUB
+    
+    CMU_APM doesn't belong to Power Domains, but platform driver is used for
+    its registration to keep its bus clock always running. Otherwise rtc-s3c
+    driver disables that clock and system freezes.
+    
+    Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+    Signed-off-by: Sylwester Nawrocki <s.nawrocki@samsung.com>
+    Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+    Acked-by: Chanwoo Choi <cw00.choi@samsung.com>
+    Link: https://lore.kernel.org/r/20211121232741.6967-3-semen.protsenko@linaro.org
+
+commit c67e3613d76af7327d6b6942536c9f797f6a4ba1
+Author: Dylan Hung <dylan_hung@aspeedtech.com>
+Date:   Thu Oct 29 14:27:23 2020 +0800
+
+    ARM: dts: aspeed-g6: Fix HVI3C function-group in pinctrl dtsi
+    
+    [ Upstream commit 8c295b7f3d01359ff4336fcb6e406e6ed37957d6 ]
+    
+    The HVI3C shall be a group of I3C function, not an independent function.
+    Correct the function name from "HVI3C" to "I3C".
+    
+    Signed-off-by: Dylan Hung <dylan_hung@aspeedtech.com>
+    Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+    Fixes: f510f04c8c83 ("ARM: dts: aspeed: Add AST2600 pinmux nodes")
+    Link: https://lore.kernel.org/r/20201029062723.20798-1-dylan_hung@aspeedtech.com
+    Signed-off-by: Joel Stanley <joel@jms.id.au>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit cd5bfa9dee343c8524a722fa2aef9c239c64b761
+Author: Dylan Hung <dylan_hung@aspeedtech.com>
+Date:   Thu Oct 29 14:27:23 2020 +0800
+
+    ARM: dts: aspeed-g6: Fix HVI3C function-group in pinctrl dtsi
+    
+    [ Upstream commit 8c295b7f3d01359ff4336fcb6e406e6ed37957d6 ]
+    
+    The HVI3C shall be a group of I3C function, not an independent function.
+    Correct the function name from "HVI3C" to "I3C".
+    
+    Signed-off-by: Dylan Hung <dylan_hung@aspeedtech.com>
+    Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+    Fixes: f510f04c8c83 ("ARM: dts: aspeed: Add AST2600 pinmux nodes")
+    Link: https://lore.kernel.org/r/20201029062723.20798-1-dylan_hung@aspeedtech.com
+    Signed-off-by: Joel Stanley <joel@jms.id.au>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a8c1eaed23741f246a2356d718de2f0d4cca7972
+Author: Dylan Hung <dylan_hung@aspeedtech.com>
+Date:   Thu Oct 29 14:27:23 2020 +0800
+
+    ARM: dts: aspeed-g6: Fix HVI3C function-group in pinctrl dtsi
+    
+    [ Upstream commit 8c295b7f3d01359ff4336fcb6e406e6ed37957d6 ]
+    
+    The HVI3C shall be a group of I3C function, not an independent function.
+    Correct the function name from "HVI3C" to "I3C".
+    
+    Signed-off-by: Dylan Hung <dylan_hung@aspeedtech.com>
+    Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+    Fixes: f510f04c8c83 ("ARM: dts: aspeed: Add AST2600 pinmux nodes")
+    Link: https://lore.kernel.org/r/20201029062723.20798-1-dylan_hung@aspeedtech.com
+    Signed-off-by: Joel Stanley <joel@jms.id.au>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 6c106c73208a9ac6a4e4e8a63f21c5447f13e817
+Author: Dylan Hung <dylan_hung@aspeedtech.com>
+Date:   Thu Oct 29 14:27:23 2020 +0800
+
+    ARM: dts: aspeed-g6: Fix HVI3C function-group in pinctrl dtsi
+    
+    [ Upstream commit 8c295b7f3d01359ff4336fcb6e406e6ed37957d6 ]
+    
+    The HVI3C shall be a group of I3C function, not an independent function.
+    Correct the function name from "HVI3C" to "I3C".
+    
+    Signed-off-by: Dylan Hung <dylan_hung@aspeedtech.com>
+    Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+    Fixes: f510f04c8c83 ("ARM: dts: aspeed: Add AST2600 pinmux nodes")
+    Link: https://lore.kernel.org/r/20201029062723.20798-1-dylan_hung@aspeedtech.com
+    Signed-off-by: Joel Stanley <joel@jms.id.au>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8c295b7f3d01359ff4336fcb6e406e6ed37957d6
+Author: Dylan Hung <dylan_hung@aspeedtech.com>
+Date:   Thu Oct 29 14:27:23 2020 +0800
+
+    ARM: dts: aspeed-g6: Fix HVI3C function-group in pinctrl dtsi
+    
+    The HVI3C shall be a group of I3C function, not an independent function.
+    Correct the function name from "HVI3C" to "I3C".
+    
+    Signed-off-by: Dylan Hung <dylan_hung@aspeedtech.com>
+    Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+    Fixes: f510f04c8c83 ("ARM: dts: aspeed: Add AST2600 pinmux nodes")
+    Link: https://lore.kernel.org/r/20201029062723.20798-1-dylan_hung@aspeedtech.com
+    Signed-off-by: Joel Stanley <joel@jms.id.au>
+
+commit e43d5c7c3c3459b428431754672052503c5db9c8
+Author: Rob Herring <robh@kernel.org>
+Date:   Thu Mar 11 16:40:56 2021 -0700
+
+    dt-bindings: i3c: Fix silvaco,i3c-master-v1 compatible string
+    
+    The example for the Silvaco I3C master doesn't match the schema's
+    compatible string. Fix it.
+    
+    Cc: Miquel Raynal <miquel.raynal@bootlin.com>
+    Cc: Conor Culhane <conor.culhane@silvaco.com>
+    Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Cc: linux-i3c@lists.infradead.org
+    Signed-off-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210311234056.1588751-1-robh@kernel.org
+
+commit a68a90b2ecd392a98a351e927a55ba037d0f51bb
+Author: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+Date:   Tue Mar 9 13:17:10 2021 +0100
+
+    media: media/i2c: fix kerneldoc issues for media i2c headers
+    
+    This fixes these kernel-doc warnings:
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI1A' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI1B' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI1C' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI2A' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI2B' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI2C' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI3A' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI3B' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI3C' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_CVBS_VI4A' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI2A_VI1A' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI2B_VI1B' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI2C_VI1C' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI2A_VI3A' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI2B_VI3B' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI2C_VI3C' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI4A_VI1A' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI4A_VI1B' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI4A_VI1C' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI4A_VI3A' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI4A_VI3B' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_SVIDEO_VI4A_VI3C' not described in enum 'tvp514x_input'
+    
+    include/media/i2c/tvp514x.h:70: warning: Enum value 'INPUT_INVALID' not described in enum 'tvp514x_input'
+    include/media/i2c/tvp514x.h:82: warning: Enum value 'OUTPUT_10BIT_422_EMBEDDED_SYNC' not described in enum 'tvp514x_output'
+    include/media/i2c/tvp514x.h:82: warning: Enum value 'OUTPUT_20BIT_422_SEPERATE_SYNC' not described in enum 'tvp514x_output'
+    include/media/i2c/tvp514x.h:82: warning: Enum value 'OUTPUT_10BIT_422_SEPERATE_SYNC' not described in enum 'tvp514x_output'
+    include/media/i2c/tvp514x.h:82: warning: Enum value 'OUTPUT_INVALID' not described in enum 'tvp514x_output'
+    include/media/i2c/adv7343.h:38: warning: cannot understand function prototype: 'struct adv7343_power_mode '
+    include/media/i2c/s5k4ecgx.h:31: warning: expecting prototype for struct ss5k4ecgx_platform_data. Prototype was for struct
+    s5k4ecgx_platform_data instead
+    include/media/i2c/mt9t112.h:21: warning: cannot understand function prototype: 'struct mt9t112_platform_data '
+    include/media/i2c/noon010pc30.h:13: warning: Cannot understand  * @clk_rate: the clock frequency in Hz
+    include/media/i2c/s5k6aa.h:45: warning: Function parameter or member 'bus_type' not described in 's5k6aa_platform_data'
+    include/media/i2c/tw9910.h:19: warning: cannot understand function prototype: 'enum tw9910_mpout_pin '
+    include/media/i2c/tw9910.h:36: warning: cannot understand function prototype: 'struct tw9910_video_info '
+    include/media/i2c/ov772x.h:53: warning: cannot understand function prototype: 'struct ov772x_camera_info '
+    include/media/i2c/s5c73m3.h:53: warning: Function parameter or member 'bus_type' not described in 's5c73m3_platform_data'
+    drivers/media/i2c/ccs/ccs-quirk.h:50: warning: Function parameter or member 'post_streamoff' not described in 'ccs_quirk'
+    drivers/media/i2c/ccs/ccs-quirk.h:50: warning: Function parameter or member 'flags' not described in 'ccs_quirk'
+    drivers/media/i2c/ccs/ccs-data.h:144: warning: expecting prototype for struct ccs_pdaf_pix_loc_block_desc. Prototype was for struct
+    ccs_pdaf_pix_loc_pixel_desc instead
+    drivers/media/i2c/tvp514x_regs.h:272: warning: Function parameter or member 'token' not described in 'tvp514x_reg'
+    drivers/media/i2c/tvp514x_regs.h:272: warning: Function parameter or member 'reg' not described in 'tvp514x_reg'
+    drivers/media/i2c/tvp514x_regs.h:272: warning: Function parameter or member 'val' not described in 'tvp514x_reg'
+    drivers/media/i2c/m5mols/m5mols.h:69: warning: Function parameter or member 'brightness' not described in 'm5mols_exif'
+    drivers/media/i2c/m5mols/m5mols.h:147: error: Cannot parse struct or union!
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN0' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN1' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN2' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN3' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN4' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN5' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN6' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_AIN7' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_HDMI' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_TTL' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_TXA' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_TXB' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:65: warning: Enum value 'ADV748X_PORT_MAX' not described in enum 'adv748x_ports'
+    drivers/media/i2c/adv748x/adv748x.h:199: warning: Function parameter or member 'i2c_clients' not described in 'adv748x_state'
+    drivers/media/i2c/adv748x/adv748x.h:199: warning: Function parameter or member 'regmap' not described in 'adv748x_state'
+    
+    Signed-off-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+commit 436cb709f8a9fd1a52e00e830e715c63191c2e63
+Author: Colin Ian King <colin.king@canonical.com>
+Date:   Wed Feb 24 15:13:49 2021 +0000
+
+    i3c: master: svc: remove redundant assignment to cmd->read_len
+    
+    The assignment of xfer_len to cmd->read_len appears to be redundant
+    as the next statement re-assigns the value 0 to it.  Clean up the
+    code by removing the redundant first assignment.
+    
+    Addresses-Coverity: ("Unused value")
+    Fixes: dd3c52846d59 ("i3c: master: svc: Add Silvaco I3C master driver")
+    Signed-off-by: Colin Ian King <colin.king@canonical.com>
+    Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210224151349.202332-1-colin.king@canonical.com
+
+commit 36c1b20d15703662aa0f14a32a8bd19ab3a33076
+Merge: 579f50cee1a1 5c34b8e7e8bb
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Feb 22 09:52:55 2021 -0800
+
+    Merge tag 'i3c/for-5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull i3c update from Alexandre Belloni:
+     "Subsystem:
+       - Handle drivers without probe or remove callback
+       - Remove callback now returns void
+       - DT documentation is now in yaml
+    
+      New driver:
+       - Silvaco I3C master"
+    
+    * tag 'i3c/for-5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      i3c: master: dw: Drop redundant disec call
+      MAINTAINERS: Add Silvaco I3C master
+      i3c: master: svc: Add Silvaco I3C master driver
+      dt-bindings: i3c: Describe Silvaco master binding
+      dt-bindings: Add vendor prefix for Silvaco
+      dt-bindings: i3c: mipi-hci: Include the bus binding
+      dt-bindings: i3c: Convert the bus description to yaml
+      i3c: Make remove callback return void
+      i3c: Handle drivers without probe or remove callback
+      i3c/master/mipi-i3c-hci: Specify HAS_IOMEM dependency
+
+commit f06a1af8e739cb573b79cd175fd88534e912bea0
+Author: Miquel Raynal <miquel.raynal@bootlin.com>
+Date:   Thu Jan 21 11:18:08 2021 +0100
+
+    MAINTAINERS: Add Silvaco I3C master
+    
+    Add Conor and myself as maintainers.
+    
+    Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210121101808.14654-7-miquel.raynal@bootlin.com
+
+commit dd3c52846d5954acd43f0e771689302f27dadc28
+Author: Miquel Raynal <miquel.raynal@bootlin.com>
+Date:   Thu Jan 21 11:18:07 2021 +0100
+
+    i3c: master: svc: Add Silvaco I3C master driver
+    
+    Add support for Silvaco I3C dual-role IP. The master role is supported
+    in SDR mode only. I2C transfers have not been tested but are shared
+    because they are very close to the I3C transfers in terms of register
+    configuration.
+    
+    The IBI processing follows this logic:
+    - When a slave advertizes an interrupt (SDA pulled low) an interrupt
+      gets generated by the master. This time is unbounded and may be
+      deferred.
+    - The IRQ handler itself does not process anything: it only queues a
+      work that will be run in non-atomic context. This is needed because
+      short wait periods must be experienced.
+    - The IBI job is divided in two parts: the first one is "critical" in
+      the sense that it may not support getting interrupted. If this
+      happens, after this first section the driver checks the master error
+      register and depending on its content either flushes everything and
+      errors out, or ends the processing (this second section may be
+      interrupted).
+    - If the critical section got interrupted, the slave will
+      automatically respin it's IBI request when it will be allowed to.
+    
+    Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210121101808.14654-6-miquel.raynal@bootlin.com
+
+commit b8b0446f1f1afd58e5a9ba14ab2caa08797f3bb5
+Author: Miquel Raynal <miquel.raynal@bootlin.com>
+Date:   Thu Jan 21 11:18:06 2021 +0100
+
+    dt-bindings: i3c: Describe Silvaco master binding
+    
+    Silvaco provide a dual-role I3C master.
+    
+    Description is rather simple: it needs a register mapping, three
+    clocks and an interrupt.
+    
+    Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/r/20210121101808.14654-5-miquel.raynal@bootlin.com
+
+commit f74b3025506046e8662ebb2026697d7755b1d6ff
+Author: Sia Jee Heng <jee.heng.sia@intel.com>
+Date:   Mon Jan 25 09:32:53 2021 +0800
+
+    dmaengine: dw-axi-dmac: Add Intel KeemBay AxiDMA BYTE and HALFWORD registers
+    
+    Add support for Intel KeemBay AxiDMA BYTE and HALFWORD registers
+    programming.
+    
+    Intel KeemBay AxiDMA supports data transfer between device to memory
+    and memory to device operations.
+    
+    This code is needed by I2C, I3C, I2S, SPI and UART which uses FIFO
+    size of 8bits and 16bits to perform memory to device data transfer
+    operation. 0-padding functionality is provided to avoid
+    pre-processing of data on CPU.
+    
+    Signed-off-by: Sia Jee Heng <jee.heng.sia@intel.com>
+    Tested-by: Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Reviewed-by: Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>
+    Link: https://lore.kernel.org/r/20210125013255.25799-16-jee.heng.sia@intel.com
+    Signed-off-by: Vinod Koul <vkoul@kernel.org>
+
+commit 190daf19206783bb16655db14e604a0d724c4bbf
+Merge: 11c336526e25 95393f3e07ab
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Dec 19 12:46:52 2020 -0800
+
+    Merge tag 'i3c/for-5.11' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull i3c updates from Boris Brezillon:
+    
+     - Add the HCI driver
+    
+     - Add a missing destroy_workqueue() in an error path
+    
+     - Flag Alexandre Belloni as the new maintainer
+    
+    * tag 'i3c/for-5.11' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      i3c/master/mipi-i3c-hci: quiet maybe-unused variable warning
+      i3c: Resign from my maintainer role
+      i3c/master: Fix uninitialized variable next_addr
+      i3c/master: introduce the mipi-i3c-hci driver
+      dt-bindings: i3c: MIPI I3C Host Controller Interface
+      i3c master: fix missing destroy_workqueue() on error in i3c_master_register
+
+commit 015cbe1f05067cb0374514fcf0a45e17a2b39527
+Author: Boris Brezillon <boris.brezillon@collabora.com>
+Date:   Wed Nov 25 11:16:43 2020 +0100
+
+    i3c: Resign from my maintainer role
+    
+    I simply don't have time to maintain the I3C subsystem anymore.
+    Alexandre Belloni proposed to take over which I gladly accepted.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+    Link: https://lore.kernel.org/linux-i3c/20201125101643.461658-1-boris.brezillon@collabora.com
+
+commit 9ad9a52cce2828d932ae9495181e3d6414f72c07
+Author: Nicolas Pitre <npitre@baylibre.com>
+Date:   Wed Nov 11 17:05:10 2020 -0500
+
+    i3c/master: introduce the mipi-i3c-hci driver
+    
+    This adds basic support for hardware implementing the MIPI I3C HCI
+    specification. This driver is currently limited by the capabilities
+    of the I3C subsystem, meaning things like scheduled commands,
+    auto-commands and NCM mode are not yet supported.
+    
+    This supports version 1.0 of the MIPI I3C HCI spec, as well as the
+    imminent release of version 1.1. Support for draft version 2.0 of the
+    spec is also largely included with the caveat that future adjustments
+    to this code are likely as the spec is still a work in progress.
+    
+    This is also lightly tested as actual hardware is still very scarce,
+    even for HCI v1.0. Hence the EXPERIMENTAL tag. Further contributions
+    to this driver are expected once vendor implementations and new I3C
+    devices become available.
+    
+    Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/20201111220510.3622216-3-nico@fluxnic.net
+
+commit c307912d28cac3ca9c68af55e79c4061e5b1a54c
+Author: Nicolas Pitre <npitre@baylibre.com>
+Date:   Wed Nov 11 17:05:09 2020 -0500
+
+    dt-bindings: i3c: MIPI I3C Host Controller Interface
+    
+    The MIPI I3C HCI (Host Controller Interface) specification defines
+    a common software driver interface to support compliant MIPI I3C
+    host controller hardware implementations from multiple vendors.
+    
+    All that is needed is an I/O area and an interrupt signal;. The hardware
+    is self-advertising wrt its implementor and implemented capabilities so
+    there is currently no details that the driver can't figure out on its own.
+    
+    Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/20201111220510.3622216-2-nico@fluxnic.net
+
+commit 158a620c5219c16a323198e8039a6f3c5e20c5e5
+Author: Parshuram Thombare <pthombar@cadence.com>
+Date:   Thu May 21 11:32:22 2020 +0200
+
+    i3c: master add i3c_master_attach_boardinfo to preserve boardinfo
+    
+    [ Upstream commit 9da36a7ec42135428e1d41621e3703429bda3b2e ]
+    
+    Boardinfo was lost if I3C object for devices with boardinfo
+    available are not created or not added to the I3C device list
+    because of some failure e.g. SETDASA failed, retrieve info failed etc
+    This patch adds i3c_master_attach_boardinfo which scan boardinfo list
+    in the master object and 'attach' it to the I3C device object.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/1590053542-389-1-git-send-email-pthombar@cadence.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c5e25cf59765353523e8b25f862c4b6b3bbf3db2
+Author: Parshuram Thombare <pthombar@cadence.com>
+Date:   Thu May 21 11:32:22 2020 +0200
+
+    i3c: master add i3c_master_attach_boardinfo to preserve boardinfo
+    
+    [ Upstream commit 9da36a7ec42135428e1d41621e3703429bda3b2e ]
+    
+    Boardinfo was lost if I3C object for devices with boardinfo
+    available are not created or not added to the I3C device list
+    because of some failure e.g. SETDASA failed, retrieve info failed etc
+    This patch adds i3c_master_attach_boardinfo which scan boardinfo list
+    in the master object and 'attach' it to the I3C device object.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/1590053542-389-1-git-send-email-pthombar@cadence.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8d44d75812cf8908c30d9f104bde8c8b84206816
+Author: Parshuram Thombare <pthombar@cadence.com>
+Date:   Thu May 21 11:32:22 2020 +0200
+
+    i3c: master add i3c_master_attach_boardinfo to preserve boardinfo
+    
+    [ Upstream commit 9da36a7ec42135428e1d41621e3703429bda3b2e ]
+    
+    Boardinfo was lost if I3C object for devices with boardinfo
+    available are not created or not added to the I3C device list
+    because of some failure e.g. SETDASA failed, retrieve info failed etc
+    This patch adds i3c_master_attach_boardinfo which scan boardinfo list
+    in the master object and 'attach' it to the I3C device object.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/1590053542-389-1-git-send-email-pthombar@cadence.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit d361ed88455feae5f7e555828b0d8104588cc53d
+Author: Lokesh Vutla <lokeshvutla@ti.com>
+Date:   Mon Sep 14 21:52:30 2020 +0530
+
+    arm64: dts: ti: Add support for J7200 SoC
+    
+    The J7200 SoC is a part of the K3 Multicore SoC architecture platform.
+    It is targeted for automotive gateway, vehicle compute systems,
+    Vehicle-to-Vehicle (V2V) and Vehicle-to-Everything (V2X) applications.
+    The SoC aims to meet the complex processing needs of modern embedded
+    products.
+    
+    Some highlights of this SoC are:
+    * Dual Cortex-A72s in a single cluster, two clusters of lockstep
+      capable dual Cortex-R5F MCUs and a Centralized Device Management and
+      Security Controller (DMSC).
+    * Configurable L3 Cache and IO-coherent architecture with high data
+      throughput capable distributed DMA architecture under NAVSS.
+    * Integrated Ethernet switch supporting up to a total of 4 external ports
+      in addition to legacy Ethernet switch of up to 2 ports.
+    * Upto 1 PCIe-GEN3 controller, 1 USB3.0 Dual-role device subsystems,
+      20 MCANs, 3 McASP, eMMC and SD, OSPI/HyperBus memory controller, I3C
+      and I2C, eCAP/eQEP, eHRPWM among other peripherals.
+    * One hardware accelerator block containing AES/DES/SHA/MD5 called SA2UL
+      management.
+    
+    See J7200 Technical Reference Manual (SPRUIU1, June 2020)
+    for further details: https://www.ti.com/lit/pdf/spruiu1
+    
+    Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Reviewed-by: Grygorii Strashko <grygorii.strashko@ti.com>
+    Reviewed-by: Suman Anna <s-anna@ti.com>
+    Reviewed-by: Vignesh Raghavendra <vigneshr@ti.com>
+    Reviewed-by: Kishon Vijay Abraham I <kishon@ti.com>
+    Link: https://lore.kernel.org/r/20200914162231.2535-5-lokeshvutla@ti.com
+
+commit 214b0eb35e55d9d726ad02ffec62f087c09864fb
+Author: Lokesh Vutla <lokeshvutla@ti.com>
+Date:   Mon Sep 14 21:52:29 2020 +0530
+
+    dt-bindings: arm: ti: Add bindings for J7200 SoC
+    
+    The J7200 SoC is a part of the K3 Multicore SoC architecture platform.
+    It is targeted for automotive gateway, vehicle compute systems,
+    Vehicle-to-Vehicle (V2V) and Vehicle-to-Everything (V2X) applications.
+    The SoC aims to meet the complex processing needs of modern embedded
+    products.
+    
+    Some highlights of this SoC are:
+    * Dual Cortex-A72s in a single cluster, two clusters of lockstep
+      capable dual Cortex-R5F MCUs and a Centralized Device Management and
+      Security Controller (DMSC).
+    * Configurable L3 Cache and IO-coherent architecture with high data
+      throughput capable distributed DMA architecture under NAVSS.
+    * Integrated Ethernet switch supporting up to a total of 4 external ports
+      in addition to legacy Ethernet switch of up to 2 ports.
+    * Upto 1 PCIe-GEN3 controller, 1 USB3.0 Dual-role device subsystems,
+      20 MCANs, 3 McASP, eMMC and SD, OSPI/HyperBus memory controller, I3C and
+      I2C, eCAP/eQEP, eHRPWM among other peripherals.
+    * One hardware accelerator block containing AES/DES/SHA/MD5 called SA2UL
+      management.
+    
+    See J7200 Technical Reference Manual (SPRUIU1, June 2020)
+    for further details: https://www.ti.com/lit/pdf/spruiu1
+    
+    Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Reviewed-by: Grygorii Strashko <grygorii.strashko@ti.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Suman Anna <s-anna@ti.com>
+    Link: https://lore.kernel.org/r/20200914162231.2535-4-lokeshvutla@ti.com
+
+commit cc3a392d69b62e21d016f0d45be688af133f9122
+Author: Parshuram Thombare <pthombar@cadence.com>
+Date:   Tue Aug 25 08:31:49 2020 +0200
+
+    i3c: master: fix for SETDASA and DAA process
+    
+    This patch fix following issue.
+    Controller slots blocked for devices with static_addr
+    but no init_dyn_addr may limit the number of I3C devices
+    on the bus which gets dynamic address in DAA. So
+    instead of attaching all the devices with static_addr,
+    now we only attach the devices which successfully
+    complete SETDASA. For remaining devices with init_dyn_addr,
+    i3c_master_add_i3c_dev_locked() will try to set requested
+    dynamic address after DAA.
+    
+    Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/1598337109-14770-1-git-send-email-pthombar@cadence.com
+
+commit 9da36a7ec42135428e1d41621e3703429bda3b2e
+Author: Parshuram Thombare <pthombar@cadence.com>
+Date:   Thu May 21 11:32:22 2020 +0200
+
+    i3c: master add i3c_master_attach_boardinfo to preserve boardinfo
+    
+    Boardinfo was lost if I3C object for devices with boardinfo
+    available are not created or not added to the I3C device list
+    because of some failure e.g. SETDASA failed, retrieve info failed etc
+    This patch adds i3c_master_attach_boardinfo which scan boardinfo list
+    in the master object and 'attach' it to the I3C device object.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/1590053542-389-1-git-send-email-pthombar@cadence.com
+
+commit 31c24c1e93c341069def3c55cc1cf0dca9239d75
+Author: Jean-Baptiste Maneyrol <jmaneyrol@invensense.com>
+Date:   Mon Jun 22 17:37:17 2020 +0200
+
+    iio: imu: inv_icm42600: add core of new inv_icm42600 driver
+    
+    Core component of a new driver for InvenSense ICM-426xx devices.
+    It includes registers definition, main probe/setup, and device
+    utility functions.
+    
+    ICM-426xx devices are latest generation of 6-axis IMU,
+    gyroscope+accelerometer and temperature sensor. This device
+    includes a 2K FIFO, supports I2C/I3C/SPI, and provides
+    intelligent motion features like pedometer, tilt detection,
+    and tap detection.
+    
+    Signed-off-by: Jean-Baptiste Maneyrol <jmaneyrol@invensense.com>
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+commit caf1d1c7f87daf4db0f9d4dfeeae6208e713db9e
+Author: Lorenzo Bianconi <lorenzo@kernel.org>
+Date:   Fri Mar 13 19:06:00 2020 +0100
+
+    iio: imu: st_lsm6dsx: flush hw FIFO before resetting the device
+    
+    commit 3a63da26db0a864134f023f088d41deacd509997 upstream.
+    
+    flush hw FIFO before device reset in order to avoid possible races
+    on interrupt line 1. If the first interrupt line is asserted during
+    hw reset the device will work in I3C-only mode (if it is supported)
+    
+    Fixes: 801a6e0af0c6 ("iio: imu: st_lsm6dsx: add support to LSM6DSO")
+    Fixes: 43901008fde0 ("iio: imu: st_lsm6dsx: add support to LSM6DSR")
+    Reported-by: Mario Tesi <mario.tesi@st.com>
+    Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+    Reviewed-by: Vitor Soares <vitor.soares@synopsys.com>
+    Tested-by: Vitor Soares <vitor.soares@synopsys.com>
+    Cc: <Stable@vger.kernel.org>
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3a63da26db0a864134f023f088d41deacd509997
+Author: Lorenzo Bianconi <lorenzo@kernel.org>
+Date:   Fri Mar 13 19:06:00 2020 +0100
+
+    iio: imu: st_lsm6dsx: flush hw FIFO before resetting the device
+    
+    flush hw FIFO before device reset in order to avoid possible races
+    on interrupt line 1. If the first interrupt line is asserted during
+    hw reset the device will work in I3C-only mode (if it is supported)
+    
+    Fixes: 801a6e0af0c6 ("iio: imu: st_lsm6dsx: add support to LSM6DSO")
+    Fixes: 43901008fde0 ("iio: imu: st_lsm6dsx: add support to LSM6DSR")
+    Reported-by: Mario Tesi <mario.tesi@st.com>
+    Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+    Reviewed-by: Vitor Soares <vitor.soares@synopsys.com>
+    Tested-by: Vitor Soares <vitor.soares@synopsys.com>
+    Cc: <Stable@vger.kernel.org>
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+commit b4203ce0556348dcfe29f897d1dbe65102874d89
+Author: Nicolas Pitre <npitre@baylibre.com>
+Date:   Wed Apr 15 16:30:01 2020 -0400
+
+    i3c master: GETMRL's 3rd byte is optional even with BCR_IBI_PAYLOAD
+    
+    According to the I3C spec v1.1 document, GETMRL's payload is 2 bytes,
+    with an optional 3rd byte if the IBI private payload is larger than
+    1 byte. The whole GETMRL may also be optional so max_ibi_len already
+    defaults to 1 if BCR_IBI_PAYLOAD prior to the i3c_master_getmrl_locked()
+    call.
+    
+    Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Link: https://lore.kernel.org/linux-i3c/nycvar.YSQ.7.76.2004151623060.2671@knanqh.ubzr
+
+commit b9b627a449889e9dacfe9e7ac3cdf829a0004845
+Merge: 067ba54c7a7d 3952cf8ff2f7
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Jan 27 10:28:43 2020 -0800
+
+    Merge tag 'i3c/for-5.6' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull i3c updates from Boris Brezillon:
+     "Core changes:
+    
+       - Make i3c_bus_set_mode() static
+    
+      Driver changes:
+    
+       - Add a per-SoC data_hold_delay property to the Cadence driver
+    
+       - Fix formatting issues in the 'CADENCE I3C MASTER IP' MAINTAINERS
+         entry
+    
+       - Use devm_platform_ioremap_resource() where appropriate
+    
+       - Adjust DesignWare reattach logic"
+    
+    * tag 'i3c/for-5.6' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      i3c: master: dw: reattach device on first available location of address table
+      i3c: master: cdns: convert to devm_platform_ioremap_resource
+      i3c: master: dw: convert to devm_platform_ioremap_resource
+      MAINTAINERS: fix style in CADENCE I3C MASTER IP entry
+      i3c: master: make i3c_bus_set_mode static
+      i3c: master: cdns: add data hold delay support
+
+commit 8b99fb9feb0149fd1dc80552b50993137d75611a
+Author: Johnny Huang <johnny_huang@aspeedtech.com>
+Date:   Mon Dec 2 16:44:27 2019 +1030
+
+    pinctrl: aspeed-g6: Add AST2600 I3C1 and I3C2 pinmux config
+    
+    These pins only expose a single function but are not fixed-function as
+    their I3C capability can be disabled.
+    
+    Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+    [AJ: Tweak commit message, sort pins list]
+    Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+    Link: https://lore.kernel.org/r/20191202061432.3996-3-andrew@aj.id.au
+    Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+
+commit 608b68b67a309e96ee6a97fdb090553b14a814d0
+Author: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Date:   Sat Dec 7 19:27:03 2019 +0100
+
+    MAINTAINERS: fix style in CADENCE I3C MASTER IP entry
+    
+    Commit ae24f2b6f828 ("MAINTAINERS: add myself as maintainer of Cadence I3C
+    master controller driver") slips in some formatting with spaces instead of
+    tabs, which ./scripts/checkpatch.pl -f MAINTAINERS complains about:
+    
+      #7838: FILE: MAINTAINERS:7838:
+      M:      Przemysław Gaj <pgaj@cadence.com>
+    
+      WARNING: MAINTAINERS entries use one tab after TYPE:
+      #7839: FILE: MAINTAINERS:7839:
+      S:      Maintained
+    
+      WARNING: MAINTAINERS entries use one tab after TYPE:
+      #7840: FILE: MAINTAINERS:7840:
+      F:      Documentation/devicetree/bindings/i3c/cdns,i3c-master.txt
+    
+      WARNING: MAINTAINERS entries use one tab after TYPE:
+      #7841: FILE: MAINTAINERS:7841:
+      F:      drivers/i3c/master/i3c-master-cdns.c
+    
+    Fixes: ae24f2b6f828 ("MAINTAINERS: add myself as maintainer of Cadence I3C master controller driver")
+    Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit dbd6654329fcb0f5fc11d07997ddb61683c085f2
+Author: Przemyslaw Gaj <pgaj@cadence.com>
+Date:   Mon Nov 18 16:01:14 2019 +0100
+
+    i3c: master: cdns: add data hold delay support
+    
+    This patch adds support for THD_DEL (Data Hold Delay) to Cadence
+    I3C master constoller driver.
+    
+    As per MIPI I3C Specification 1.0, Table 75 (page 142) defines
+    non-zero minimal tHD_PP timing on master output (Fig 65). This
+    setting allows to meet this timing on master's soc outputs,
+    regardless of PCB balancing.
+    
+    Signed-off-by: Przemyslaw Gaj <pgaj@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit a11b696975f257ad2410cbb26f288cc52724f81a
+Merge: ae2dc032773d ae24f2b6f828
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Nov 25 21:39:23 2019 -0800
+
+    Merge tag 'i3c/for-5.5' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull i3c updates from Boris Brezillon:
+     "Minor fixes and MAINTAINERS updates"
+    
+    * tag 'i3c/for-5.5' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      MAINTAINERS: add myself as maintainer of Cadence I3C master controller driver
+      MAINTAINERS: Mark linux-i3c mailing list moderated
+      i3c: Spelling s/dicovered/discovered/
+      i3c: master: use i3c_dev_get_master()
+
+commit ae24f2b6f828f4ae37d0f0fd3be4e7744b6aab13
+Author: Przemyslaw Gaj <pgaj@cadence.com>
+Date:   Thu Nov 14 06:51:55 2019 +0100
+
+    MAINTAINERS: add myself as maintainer of Cadence I3C master controller driver
+    
+    As discussed with Boris Brezillon - I'm adding myself as the maintainer.
+    
+    Signed-off-by: Przemyslaw Gaj <pgaj@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit aae7c82d01219bf568a7b12f5839d7ca52b17d59
+Author: Keyon Jie <yang.jie@linux.intel.com>
+Date:   Fri Oct 25 17:41:06 2019 -0500
+
+    ASoC: SOF: Intel: hda-dsp: align the comments for D0I3C update
+    
+    Align the logs for CIP timeout at D0I3C.I3 updating.
+    
+    Signed-off-by: Keyon Jie <yang.jie@linux.intel.com>
+    Signed-off-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Link: https://lore.kernel.org/r/20191025224122.7718-11-pierre-louis.bossart@linux.intel.com
+    Signed-off-by: Mark Brown <broonie@kernel.org>
+
+commit 3b7c59a1950c75f2c0152e5a9cd77675b09233d6
+Merge: 7d194c2100ad d6e7a1a5119c
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Oct 22 06:40:07 2019 -0400
+
+    Merge tag 'pinctrl-v5.4-2' of git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl
+    
+    Pull pin control fixes from Linus Walleij:
+     "Here is a bunch of pin control fixes. I was lagging behind on this
+      one, some fixes should have come in earlier, sorry about that.
+    
+      Anyways here it is, pretty straight-forward fixes, the Strago fix
+      stand out as something serious affecting a lot of machines.
+    
+      Summary:
+       - Handle multiple instances of Intel chips without complaining.
+       - Restore the Intel Strago DMI workaround
+       - Make the Armada 37xx handle pins over 32
+       - Fix the polarity of the LED group on Armada 37xx
+       - Fix an off-by-one bug in the NS2 driver
+       - Fix error path for iproc's platform_get_irq()
+       - Fix error path on the STMFX driver
+       - Fix a typo in the Berlin AS370 driver
+       - Fix up misc errors in the Aspeed 2600 BMC support
+       - Fix a stray SPDX tag"
+    
+    * tag 'pinctrl-v5.4-2' of git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl:
+      pinctrl: aspeed-g6: Rename SD3 to EMMC and rework pin groups
+      pinctrl: aspeed-g6: Fix UART13 group pinmux
+      pinctrl: aspeed-g6: Make SIG_DESC_CLEAR() behave intuitively
+      pinctrl: aspeed-g6: Fix I3C3/I3C4 pinmux configuration
+      pinctrl: aspeed-g6: Fix I2C14 SDA description
+      pinctrl: aspeed-g6: Sort pins for sanity
+      dt-bindings: pinctrl: aspeed-g6: Rework SD3 function and groups
+      pinctrl: berlin: as370: fix a typo s/spififib/spdifib
+      pinctrl: armada-37xx: swap polarity on LED group
+      pinctrl: stmfx: fix null pointer on remove
+      pinctrl: iproc: allow for error from platform_get_irq()
+      pinctrl: ns2: Fix off by one bugs in ns2_pinmux_enable()
+      pinctrl: bcm-iproc: Use SPDX header
+      pinctrl: armada-37xx: fix control of pins 32 and up
+      pinctrl: cherryview: restore Strago DMI workaround for all versions
+      pinctrl: intel: Allocate IRQ chip dynamic
+
+commit 9979346f5560956daf2a73da854e88d60a5309cf
+Author: Johnny Huang <johnny_huang@aspeedtech.com>
+Date:   Tue Oct 8 15:11:50 2019 +1030
+
+    pinctrl: aspeed-g6: Fix I3C3/I3C4 pinmux configuration
+    
+    The documentation to configure I3C3/FSI1 and I3C4/FSI2 was initially
+    unclear.
+    
+    Fixes: 58dc52ad00a0 ("pinctrl: aspeed: Add AST2600 pinmux support")
+    Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+    [AJ: Tweak commit message, resolve rebase conflicts]
+    Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+    Link: https://lore.kernel.org/r/20191008044153.12734-5-andrew@aj.id.au
+    Reviewed-by: Joel Stanley <joel@jms.id.au>
+    Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+
+commit 934d24a5e1508e73c0001afb54a3916e4270428f
+Author: Vitor Soares <Vitor.Soares@synopsys.com>
+Date:   Fri Jul 19 15:30:54 2019 +0200
+
+    i3c: move i3c_device_match_id to device.c and export it
+    
+    Some I3C device drivers need to know which entry matches the
+    i3c_device object passed to the probe function
+    
+    Let's move i3c_device_match_id() to device.c and export it so it can be
+    used by drivers.
+    
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit 3620a72ccc726aef247e4d7c5968546a94fdb551
+Author: Vitor Soares <Vitor.Soares@synopsys.com>
+Date:   Wed Jun 19 20:36:31 2019 +0200
+
+    i3c: fix i2c and i3c scl rate by bus mode
+    
+    commit ecc8fb54bd443bf69996d9d5ddb8d90a50f14936 upstream.
+    
+    Currently the I3C framework limits SCL frequency to FM speed when
+    dealing with a mixed slow bus, even if all I2C devices are FM+ capable.
+    
+    The core was also not accounting for I3C speed limitations when
+    operating in mixed slow mode and was erroneously using FM+ speed as the
+    max I2C speed when operating in mixed fast mode.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Cc: <linux-kernel@vger.kernel.org>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 76e1c730e6d4fb22b6b73e95aa766d880f6cb363
+Author: Vitor Soares <Vitor.Soares@synopsys.com>
+Date:   Wed Jun 19 20:36:31 2019 +0200
+
+    i3c: fix i2c and i3c scl rate by bus mode
+    
+    commit ecc8fb54bd443bf69996d9d5ddb8d90a50f14936 upstream.
+    
+    Currently the I3C framework limits SCL frequency to FM speed when
+    dealing with a mixed slow bus, even if all I2C devices are FM+ capable.
+    
+    The core was also not accounting for I3C speed limitations when
+    operating in mixed slow mode and was erroneously using FM+ speed as the
+    max I2C speed when operating in mixed fast mode.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Cc: <linux-kernel@vger.kernel.org>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 12a5146bda2f21728bdd475f10e5785fc62c9c29
+Merge: 2ec98f567888 aaccf3863ce2
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Jul 9 09:11:22 2019 -0700
+
+    Merge tag 'regmap-v5.3' of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regmap
+    
+    Pull regmap updates from Mark Brown:
+     "This is a relatively busy release for regmap, though not busy in the
+      grand scheme of things, with the addition of support for I3C from
+      Vitor Soares and a few small fixes and cleanups"
+    
+    * tag 'regmap-v5.3' of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regmap:
+      regmap: select CONFIG_REGMAP while REGMAP_SCCB is set
+      regmap: lzo: Switch to bitmap_zalloc()
+      regmap: fix bulk writes on paged registers
+      regmap: add i3c bus support
+      regmap: debugfs: Fix memory leak in regmap_debugfs_init
+
+commit ea3bfeec6bf77033608b81a5e9a7cd6d686ab054
+Author: Qii Wang <qii.wang@mediatek.com>
+Date:   Mon Jul 1 14:42:02 2019 +0800
+
+    dt-bindings: i3c: cdns: Use correct cells for I2C device
+    
+    I2C device reg should be "reg = <0x52 0x0 0x10>;"
+    
+    Fixes: e29d0d9c90c9 ("dt-bindings: i3c: Document Cadence I3C master bindings")
+    Signed-off-by: Qii Wang <qii.wang@mediatek.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit ecc8fb54bd443bf69996d9d5ddb8d90a50f14936
+Author: Vitor Soares <Vitor.Soares@synopsys.com>
+Date:   Wed Jun 19 20:36:31 2019 +0200
+
+    i3c: fix i2c and i3c scl rate by bus mode
+    
+    Currently the I3C framework limits SCL frequency to FM speed when
+    dealing with a mixed slow bus, even if all I2C devices are FM+ capable.
+    
+    The core was also not accounting for I3C speed limitations when
+    operating in mixed slow mode and was erroneously using FM+ speed as the
+    max I2C speed when operating in mixed fast mode.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Cc: <linux-kernel@vger.kernel.org>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit 2d87061e70dea4c05e148e2d1facf9e814bb6662
+Author: Nishanth Menon <nm@ti.com>
+Date:   Wed May 22 11:19:18 2019 -0500
+
+    arm64: dts: ti: Add Support for J721E SoC
+    
+    The J721E SoC belongs to the K3 Multicore SoC architecture platform,
+    providing advanced system integration to enable lower system costs
+    of automotive applications such as infotainment, cluster, premium
+    Audio, Gateway, industrial and a range of broad market applications.
+    This SoC is designed around reducing the system cost by eliminating
+    the need of an external system MCU and is targeted towards ASIL-B/C
+    certification/requirements in addition to allowing complex software
+    and system use-cases.
+    
+    Some highlights of this SoC are:
+    * Dual Cortex-A72s in a single cluster, three clusters of lockstep
+      capable dual Cortex-R5F MCUs, Deep-learning Matrix Multiply Accelerator(MMA),
+      C7x floating point Vector DSP, Two C66x floating point DSPs.
+    * 3D GPU PowerVR Rogue 8XE GE8430
+    * Vision Processing Accelerator (VPAC) with image signal processor and Depth
+      and Motion Processing Accelerator (DMPAC)
+    * Two Gigabit Industrial Communication Subsystems (ICSSG), each with dual
+      PRUs and dual RTUs
+    * Two CSI2.0 4L RX plus one CSI2.0 4L TX, one eDP/DP, One DSI Tx, and
+      up to two DPI interfaces.
+    * Integrated Ethernet switch supporting up to a total of 8 external ports in
+      addition to legacy Ethernet switch of up to 2 ports.
+    * System MMU (SMMU) Version 3.0 and advanced virtualisation
+      capabilities.
+    * Upto 4 PCIe-GEN3 controllers, 2 USB3.0 Dual-role device subsystems,
+      16 MCANs, 12 McASP, eMMC and SD, UFS, OSPI/HyperBus memory controller, QSPI,
+      I3C and I2C, eCAP/eQEP, eHRPWM, MLB among other peripherals.
+    * Two hardware accelerator block containing AES/DES/SHA/MD5 called SA2UL
+      management.
+    * Configurable L3 Cache and IO-coherent architecture with high data throughput
+      capable distributed DMA architecture under NAVSS
+    * Centralized System Controller for Security, Power, and Resource
+      Management (DMSC)
+    
+    See J721E Technical Reference Manual (SPRUIL1, May 2019)
+    for further details: http://www.ti.com/lit/pdf/spruil1
+    
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Reviewed-by: Suman Anna <s-anna@ti.com>
+    Signed-off-by: Tero Kristo <t-kristo@ti.com>
+
+commit 7c42f43c29e2613536f34a39bf42df6fb838989a
+Author: Nishanth Menon <nm@ti.com>
+Date:   Wed May 22 11:19:16 2019 -0500
+
+    dt-bindings: arm: ti: Add bindings for J721E SoC
+    
+    The J721E SoC belongs to the K3 Multicore SoC architecture platform,
+    providing advanced system integration to enable lower system costs
+    of automotive applications such as infotainment, cluster, premium
+    Audio, Gateway, industrial and a range of broad market applications.
+    This SoC is designed around reducing the system cost by eliminating
+    the need of an external system MCU and is targeted towards ASIL-B/C
+    certification/requirements in addition to allowing complex software
+    and system use-cases.
+    
+    Some highlights of this SoC are:
+    * Dual Cortex-A72s in a single cluster, three clusters of lockstep
+      capable dual Cortex-R5F MCUs, Deep-learning Matrix Multiply Accelerator(MMA),
+      C7x floating point Vector DSP, Two C66x floating point DSPs.
+    * 3D GPU PowerVR Rogue 8XE GE8430
+    * Vision Processing Accelerator (VPAC) with image signal processor and Depth
+      and Motion Processing Accelerator (DMPAC)
+    * Two Gigabit Industrial Communication Subsystems (ICSSG), each with dual
+      PRUs and dual RTUs
+    * Two CSI2.0 4L RX plus one CSI2.0 4L TX, one eDP/DP, One DSI Tx, and
+      up to two DPI interfaces.
+    * Integrated Ethernet switch supporting up to a total of 8 external ports in
+      addition to legacy Ethernet switch of up to 2 ports.
+    * System MMU (SMMU) Version 3.0 and advanced virtualisation
+      capabilities.
+    * Upto 4 PCIe-GEN3 controllers, 2 USB3.0 Dual-role device subsystems,
+      16 MCANs, 12 McASP, eMMC and SD, UFS, OSPI/HyperBus memory controller, QSPI,
+      I3C and I2C, eCAP/eQEP, eHRPWM, MLB among other peripherals.
+    * Two hardware accelerator block containing AES/DES/SHA/MD5 called SA2UL
+      management.
+    * Configurable L3 Cache and IO-coherent architecture with high data throughput
+      capable distributed DMA architecture under NAVSS
+    * Centralized System Controller for Security, Power, and Resource
+      Management (DMSC)
+    
+    See J721E Technical Reference Manual (SPRUIL1, May 2019)
+    for further details: http://www.ti.com/lit/pdf/spruil1
+    
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Tero Kristo <t-kristo@ti.com>
+
+commit 81956a93b552205b35250f19120058fc3337e01e
+Author: Lorenzo Bianconi <lorenzo@kernel.org>
+Date:   Sat Jun 8 14:30:08 2019 +0200
+
+    iio: imu: st_lsm6dsx: get device name from st_lsm6dsx_sensor_settings
+    
+    Introduce sensor name in st_lsm6dsx_sensor_settings table. This is
+    a preliminary patch to add I3C support to st_lsm6dsx since i3c_device_id
+    data structure does not contain a name field
+    
+    Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+    Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+commit 88c50322449a4dea8687ed155968d19cfc763393
+Author: Przemyslaw Gaj <pgaj@cadence.com>
+Date:   Tue Apr 16 09:36:14 2019 +0100
+
+    i3c: Drop support for I2C 10 bit addresing
+    
+    This patch drops support for I2C devices with 10 bit addressing. When I2C
+    device with 10 bit address is defined in DT, I3C master registration fails.
+    
+    Address space for I2C devices has been reduced and ->i2c_funcs() hook has been
+    removed.
+    
+    Because this patch series dropped support for 10 bit I2C devices, support is
+    also dropped in Cadence I3C master driver and Synopsys DesignWare I3C master
+    driver.
+    
+    Signed-off-by: Przemyslaw Gaj <pgaj@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit 3ae39e99e5395bee9dfa6796c2e2f125d96d0096
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Tue Apr 23 13:40:20 2019 +0300
+
+    i3c: Fix a shift wrap bug in i3c_bus_set_addr_slot_status()
+    
+    commit 476c7e1d34f2a03b1aa5a924c50703053fe5f77c upstream.
+    
+    The problem here is that addr can be I3C_BROADCAST_ADDR (126).  That
+    means we're shifting by (126 * 2) % 64 which is 60.  The
+    I3C_ADDR_SLOT_STATUS_MASK is an enum which is an unsigned int in GCC
+    so shifts greater than 31 are undefined.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit be4b9a303a25614f92ef1574a1af730ec358fc04
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Tue Apr 23 13:40:20 2019 +0300
+
+    i3c: Fix a shift wrap bug in i3c_bus_set_addr_slot_status()
+    
+    commit 476c7e1d34f2a03b1aa5a924c50703053fe5f77c upstream.
+    
+    The problem here is that addr can be I3C_BROADCAST_ADDR (126).  That
+    means we're shifting by (126 * 2) % 64 which is 60.  The
+    I3C_ADDR_SLOT_STATUS_MASK is an enum which is an unsigned int in GCC
+    so shifts greater than 31 are undefined.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 476c7e1d34f2a03b1aa5a924c50703053fe5f77c
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Tue Apr 23 13:40:20 2019 +0300
+
+    i3c: Fix a shift wrap bug in i3c_bus_set_addr_slot_status()
+    
+    The problem here is that addr can be I3C_BROADCAST_ADDR (126).  That
+    means we're shifting by (126 * 2) % 64 which is 60.  The
+    I3C_ADDR_SLOT_STATUS_MASK is an enum which is an unsigned int in GCC
+    so shifts greater than 31 are undefined.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit 922270b4f0182c0f00284881b2e4eb98a76d1232
+Author: Vitor Soares <vitor.soares@synopsys.com>
+Date:   Tue Apr 9 18:59:59 2019 +0200
+
+    i3c: Fix the verification of random PID
+    
+    commit 9752c37cc89f43675e70cf9acff23519fa84b48c upstream.
+    
+    The validation of random PID should be done by checking the
+    boardinfo->pid instead of info.pid which is empty.
+    
+    Doing the change the info struture declaration is no longer necessary.
+    
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 34396bdfd2b7b41b9dcd2126eb1a57e43fe13368
+Merge: 4b609f1e26f3 709a53e19484
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Apr 20 10:43:37 2019 -0700
+
+    Merge tag 'i3c/fixes-for-5.1-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pill i3c fixes from Boris Brezillon:
+    
+     - fix the random PID check
+    
+     - fix the disable controller logic in the designware driver
+    
+     - fix I3C entry in MAINTAINERS
+    
+    * tag 'i3c/fixes-for-5.1-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      MAINTAINERS: Fix the I3C entry
+      i3c: dw: Fix dw_i3c_master_disable controller by using correct mask
+      i3c: Fix the verification of random PID
+
+commit 709a53e1948494cc4f6c4636c6f84a4d36a8117e
+Author: Boris Brezillon <boris.brezillon@collabora.com>
+Date:   Sat Mar 30 09:02:14 2019 +0100
+
+    MAINTAINERS: Fix the I3C entry
+    
+    There's no include/dt-bindings/i3c/ directory, remove this F: entry
+    from the I3C file patterns.
+    
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: Joe Perches <joe@perches.com>
+    Reported-by: Joe Perches <joe@perches.com>
+    Fixes: 4f26d0666961 ("MAINTAINERS: Add myself as the I3C subsystem maintainer")
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit 9752c37cc89f43675e70cf9acff23519fa84b48c
+Author: Vitor Soares <vitor.soares@synopsys.com>
+Date:   Tue Apr 9 18:59:59 2019 +0200
+
+    i3c: Fix the verification of random PID
+    
+    The validation of random PID should be done by checking the
+    boardinfo->pid instead of info.pid which is empty.
+    
+    Doing the change the info struture declaration is no longer necessary.
+    
+    Cc: Boris Brezillon <bbrezillon@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit c8d950ab24987cad4fb4de60c554ac12c2658991
+Merge: 811c16a2a2de 988bb4a1937b
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Mar 4 19:05:02 2019 -0800
+
+    Merge tag 'i3c/for-5.1' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull i3c updates from Boris Brezillon:
+    
+     - Add a /* fall-through */ comment in the dw-i3c-master driver
+    
+     - Update the I3C entries in MAINTAINERS to add an IRC chan
+    
+    * tag 'i3c/for-5.1' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      i3c: master: dw-i3c-master: mark expected switch fall-through
+      MAINTAINERS: Add an IRC channel for the I3C subsystem
+
+commit 988bb4a1937bd083267444dda21b901dc6a959b3
+Author: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Date:   Mon Feb 11 16:14:13 2019 -0600
+
+    i3c: master: dw-i3c-master: mark expected switch fall-through
+    
+    In preparation to enabling -Wimplicit-fallthrough, mark switch
+    cases where we are expecting to fall through.
+    
+    This patch fixes the following warning:
+    
+    drivers/i3c/master/dw-i3c-master.c: In function ‘dw_i3c_master_bus_init’:
+    drivers/i3c/master/dw-i3c-master.c:603:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (ret)
+          ^
+    drivers/i3c/master/dw-i3c-master.c:605:2: note: here
+      case I3C_BUS_MODE_PURE:
+      ^~~~
+    
+    Warning level 3 was used: -Wimplicit-fallthrough=3
+    
+    This patch is part of the ongoing efforts to enable
+    -Wimplicit-fallthrough.
+    
+    Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+    Acked-by: Vitor Soares <vitor.soares@synopsys.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@collabora.com>
+
+commit 65907c5d1ed1dbc03b3b4f2a438101a7b7064389
+Author: Boris Brezillon <bbrezillon@kernel.org>
+Date:   Wed Jan 30 09:21:22 2019 +0100
+
+    MAINTAINERS: Add an IRC channel for the I3C subsystem
+    
+    The #linux-i3c chan has been created on freenode to discuss I3C related
+    topics.
+    
+    Signed-off-by: Boris Brezillon <bbrezillon@kernel.org>
+
+commit b3cc2bfe7244e848f5e8caa77bbdc72c04abd17c
+Merge: 4971f090aa7f 25ac3da61ba1
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 25 12:26:34 2018 -0800
+
+    Merge tag 'i3c/for-4.21' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
+    
+    Pull initial i3c support from Boris Brezillon:
+     "Add initial support for I3C along with two I3C master controller
+      drivers"
+    
+    * tag 'i3c/for-4.21' of git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux:
+      i3c: master: cdns: fix I2C transfers in Cadence I3C master driver
+      ic3: off by one in mode_show()
+      i3c: fix an error code in i3c_master_add_i3c_dev_locked()
+      i3c: master: dw: fix mask operation by using the correct operator
+      MAINTAINERS: Add myself as the dw-i3c-master module maintainer
+      dt-binding: i3c: Document Synopsys DesignWare I3C
+      i3c: master: Add driver for Synopsys DesignWare IP
+      i3c: master: Remove set but not used variable 'old_i3c_scl_lim'
+      dt-bindings: i3c: Document Cadence I3C master bindings
+      i3c: master: Add driver for Cadence IP
+      MAINTAINERS: Add myself as the I3C subsystem maintainer
+      dt-bindings: i3c: Document core bindings
+      i3c: Add sysfs ABI spec
+      docs: driver-api: Add I3C documentation
+      i3c: Add core I3C infrastructure
+
+commit 25ac3da61ba144f8dbfe377eeec6b1da7ad0854a
+Author: Przemyslaw Gaj <pgaj@cadence.com>
+Date:   Wed Dec 12 11:39:40 2018 +0000
+
+    i3c: master: cdns: fix I2C transfers in Cadence I3C master driver
+    
+    This patch fixes I2C transfers in Cadence I3C master driver.
+    There was no way to queue more than one I2C transfer before.
+    
+    Fixes: 603f2bee2c54 ("i3c: master: Add driver for Cadence IP")
+    Signed-off-by: Przemyslaw Gaj <pgaj@cadence.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+
+commit afe120c777b7a6aa23b8c8a5fedae9201a7ced0c
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Fri Nov 23 10:15:05 2018 +0300
+
+    ic3: off by one in mode_show()
+    
+    This should be >= ARRAY_SIZE() to avoid reading one element beyond the
+    end of the array.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+
+commit 840414ae59d8858bca0a704e7f9c910d661348d7
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Fri Nov 23 10:14:42 2018 +0300
+
+    i3c: fix an error code in i3c_master_add_i3c_dev_locked()
+    
+    We should return "ret" as-is.  The "newdev" variable is a valid pointer.
+    
+    Fixes: 3a379bbcea0a ("i3c: Add core I3C infrastructure")
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+
+commit 16da99cf0e4d7ccaebe6c095ee31abfeb4025ee5
+Author: Vitor Soares <vitor.soares@synopsys.com>
+Date:   Tue Nov 13 14:09:53 2018 +0000
+
+    MAINTAINERS: Add myself as the dw-i3c-master module maintainer
+    
+    Create for the DesignWare I3C master driver and add myself as the
+    maintainer of this driver.
+    
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+
+commit 116e246a8bcd5ace5cac887228afe60152b30d10
+Author: Vitor Soares <vitor.soares@synopsys.com>
+Date:   Tue Nov 13 14:09:52 2018 +0000
+
+    dt-binding: i3c: Document Synopsys DesignWare I3C
+    
+    Document Synopsys DesignWare I3C master module
+    
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+
+commit 1dd728f5d4d4b8b53196c1e0fcf86bbaaee39cef
+Author: Vitor Soares <vitor.soares@synopsys.com>
+Date:   Tue Nov 13 14:09:51 2018 +0000
+
+    i3c: master: Add driver for Synopsys DesignWare IP
+    
+    Add driver for Synopsys DesignWare I3C master IP
+    
+    Signed-off-by: Vitor Soares <vitor.soares@synopsys.com>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+
+commit e29d0d9c90c9592dea18d0a838fffc85d6e3d028
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Fri Jul 21 12:22:23 2017 +0200
+
+    dt-bindings: i3c: Document Cadence I3C master bindings
+    
+    Document Cadence I3C master DT bindings.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 603f2bee2c5419f6bcccc53be7f1f643122c97b7
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Wed Jul 19 11:53:04 2017 +0200
+
+    i3c: master: Add driver for Cadence IP
+    
+    Add a driver for Cadence I3C master IP.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4f26d06669619b960aa7246378dcdf1690c97384
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Fri Mar 23 11:38:16 2018 +0100
+
+    MAINTAINERS: Add myself as the I3C subsystem maintainer
+    
+    Create an entry for the I3C subsystem and mark it as maintained by me.
+    There's no official git repository, patchwork instance, mailing list or
+    website yet, but this will be added after the subsystem has been
+    accepted.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 54820b4a6627e87afc0425c8b4ce338d3dbdbb80
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Fri Jul 21 12:08:59 2017 +0200
+
+    dt-bindings: i3c: Document core bindings
+    
+    A new I3C subsystem has been added and a generic description has been
+    created to represent the I3C bus and the devices connected on it.
+    
+    Document this generic representation.
+    
+    Cc: Rob Herring <robh@kernel.org>
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a9f3edd0dd876bb9d39dec1dea90821460631ce4
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Thu Dec 14 10:43:47 2017 +0100
+
+    i3c: Add sysfs ABI spec
+    
+    Document sysfs files/directories/symlinks exposed by the I3C subsystem.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit bd360e8175f4e07418a8427786dfaf9d42867e71
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Tue Dec 12 11:00:07 2017 +0100
+
+    docs: driver-api: Add I3C documentation
+    
+    Add the I3C documentation describing the protocol, the master driver API
+    and the device driver API.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+    Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3a379bbcea0af6280e1ca0d1edfcf4e68cde6ee0
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Wed Jul 19 11:52:29 2017 +0200
+
+    i3c: Add core I3C infrastructure
+    
+    Add core infrastructure to support I3C in Linux and document it.
+    
+    This infrastructure adds basic I3C support. Advanced features will be
+    added afterwards.
+    
+    There are a few design choices that are worth mentioning because they
+    impact the way I3C device drivers can interact with their devices:
+    
+    - all functions used to send I3C/I2C frames must be called in
+      non-atomic context. Mainly done this way to ease implementation, but
+      this is not set in stone, and if anyone needs async support, new
+      functions can be added later on.
+    - the bus element is a separate object, but it's tightly coupled with
+      the master object. We thus have a 1:1 relationship between i3c_bus
+      and i3c_master_controller objects, and if 2 master controllers are
+      connected to the same bus and both exposed to the same Linux instance
+      they will appear as two distinct busses, and devices on this bus will
+      be exposed twice.
+    - I2C backward compatibility has been designed to be transparent to I2C
+      drivers and the I2C subsystem. The I3C master just registers an I2C
+      adapter which creates a new I2C bus. I'd say that, from a
+      representation PoV it's not ideal because what should appear as a
+      single I3C bus exposing I3C and I2C devices here appears as 2
+      different buses connected to each other through the parenting (the
+      I3C master is the parent of the I2C and I3C busses).
+      On the other hand, I don't see a better solution if we want something
+      that is not invasive.
+    
+    Missing features:
+    - I3C HDR modes are not supported
+    - no support for multi-master and the associated concepts (mastership
+      handover, support for secondary masters, ...)
+    - I2C devices can only be described using DT because this is the only
+      use case I have. However, the framework can easily be extended with
+      ACPI and board info support
+    - I3C slave framework. This has been completely omitted, but shouldn't
+      have a huge impact on the I3C framework because I3C slaves don't see
+      the whole bus, it's only about handling master requests and generating
+      IBIs. Some of the struct, constant and enum definitions could be
+      shared, but most of the I3C slave framework logic will be different
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 9bca19a01d50143b736f0f59eb3ccc05b1106172
+Merge: 463f202172c3 53e39628ac22
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Jun 14 16:21:46 2018 +0900
+
+    Merge branch 'i2c/for-4.18' of git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux
+    
+    Pull i2c updates from Wolfram Sang:
+    
+     - mainly feature additions to drivers (stm32f7, qup, xlp9xx, mlxcpld, ...)
+    
+     - conversion to use the i2c_8bit_addr_from_msg macro consistently
+    
+     - move includes to platform_data
+    
+     - core updates to allow the (still in review) I3C subsystem to connect
+    
+     - and the regular share of smaller driver updates
+    
+    * 'i2c/for-4.18' of git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux: (68 commits)
+      i2c: qup: fix building without CONFIG_ACPI
+      i2c: tegra: Remove suspend-resume
+      i2c: imx-lpi2c: Switch to SPDX identifier
+      i2c: mxs: Switch to SPDX identifier
+      i2c: busses: make use of i2c_8bit_addr_from_msg
+      i2c: algos: make use of i2c_8bit_addr_from_msg
+      i2c: rcar: document R8A77980 bindings
+      i2c: qup: Add command-line parameter to override SCL frequency
+      i2c: qup: Correct duty cycle for FM and FM+
+      i2c: qup: Add support for Fast Mode Plus
+      i2c: qup: add probe path for Centriq ACPI devices
+      i2c: robotfuzz-osif: drop pointless test
+      i2c: robotfuzz-osif: remove pointless local variable
+      i2c: rk3x: Don't print visible virtual mapping MMIO address
+      i2c: opal: don't check number of messages in the driver
+      i2c: ibm_iic: don't check number of messages in the driver
+      i2c: imx: Switch to SPDX identifier
+      i2c: mux: pca954x: merge calls to of_match_device and of_device_get_match_data
+      i2c: mux: demux-pinctrl: use proper parent device for demux adapter
+      i2c: mux: improve error message for failed symlink
+      ...
+
+commit da0086d018223529c686ef46db039533572418d8
+Author: Boris Brezillon <boris.brezillon@bootlin.com>
+Date:   Sun Mar 25 14:49:03 2018 +0200
+
+    i2c: Export of_i2c_get_board_info()
+    
+    I3C busses have to know about all I2C devices connected on the I3C bus
+    to properly initialize the I3C master, and I2C frames can't be sent on
+    the bus until this initialization is done.
+    
+    We can't let the I2C core parse the DT and instantiate I2C devices as
+    part of its i2c_add_adapter() procedure because, when done this way,
+    I2C devices are directly registered to the device-model and might be
+    attached to drivers which could in turn start sending frames on the bus,
+    which won't work since, as said above, the bus is not yet initialized.
+    
+    Export of_i2c_register_device() in order to let the I3C core parse the
+    I2C device nodes by itself and initialize the bus.
+    
+    Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+
+commit eddac5af06546d2e7a0730e3dc02dde3dc91098a
+Author: Karthikeyan Ramasubramanian <kramasub@codeaurora.org>
+Date:   Fri Mar 30 11:08:17 2018 -0600
+
+    soc: qcom: Add GENI based QUP Wrapper driver
+    
+    This driver manages the Generic Interface (GENI) firmware based Qualcomm
+    Universal Peripheral (QUP) Wrapper. GENI based QUP is the next generation
+    programmable module composed of multiple Serial Engines (SE) and supports
+    a wide range of serial interfaces like UART, SPI, I2C, I3C, etc. This
+    driver also enables managing the serial interface independent aspects of
+    Serial Engines.
+    
+    Signed-off-by: Karthikeyan Ramasubramanian <kramasub@codeaurora.org>
+    Signed-off-by: Sagar Dharia <sdharia@codeaurora.org>
+    Signed-off-by: Girish Mahadevan <girishm@codeaurora.org>
+    Reviewed-by: Evan Green <evgreen@chromium.org>
+    Signed-off-by: Andy Gross <andy.gross@linaro.org>
