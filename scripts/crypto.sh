@@ -1,3 +1,4 @@
+
 SRCDIR_e=~/linux-stable/linux-stable
 cd $SRCDIR_e
 
@@ -22,9 +23,8 @@ for ((i=2; i<=$n; i++)); do
            else
            echo -e "\e[6;35m \n ${all_versions[$i]}\n \e[0m"
            echo "No such string '$string' exists in the git log."
-           fi
-        done 
-    else
-        continue
-    fi
-done 
+
+
+   
+
+
