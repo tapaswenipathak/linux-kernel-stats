@@ -1,0 +1,25 @@
+    warning: (VIDEO_TIMBERDALE) selects TIMB_DMA which has unmet direct dependencies (DMADEVICES && MFD_TIMBERDALE)
+      symbol DMADEVICES is selected by SAMSUNG_DMADEV
+      symbol MX3_IPU depends on DMADEVICES
+    optional by unselecting CONFIG_DMADEVICES.
+    warning: (ARCH_MOXART) selects DMA_OF which has unmet direct dependencies (DMADEVICES && OF)
+      ARM: keystone: config: fix build warning when CONFIG_DMADEVICES is not set
+    ARM: keystone: config: fix build warning when CONFIG_DMADEVICES is not set
+    as it produces build warning in case if CONFIG_DMADEVICES is not set:
+    warning: (ARCH_KEYSTONE) selects TI_EDMA which has unmet direct dependencies (DMADEVICES && (ARCH_DAVINCI || ARCH_OMAP || ARCH_KEYSTONE))
+    warning: (ARCH_KEYSTONE && SPI_DAVINCI) selects TI_EDMA which has unmet direct dependencies (DMADEVICES && (ARCH_DAVINCI || ARCH_OMAP || ARCH_KEYSTONE))
+    this driver by default additionally CONFIG_DMADEVICES has to be
+        1.1) we enable CONFIG_DMA_API_DEBUG, CONFIG_DMADEVICES_DEBUG,
+      spi: omap2-mcspi: Fix transfers if DMADEVICES is not set
+    spi: omap2-mcspi: Fix transfers if DMADEVICES is not set
+    Selecting CONFIG_DMADEVICES is optional, and we must
+      ata: PATA_ARASAN_CF depends on DMADEVICES
+    ata: PATA_ARASAN_CF depends on DMADEVICES
+    warning: (PATA_ARASAN_CF && VIDEO_TIMBERDALE && SND_SOC_SH4_SIU) selects DMA_ENGINE which has unmet direct dependencies (DMADEVICES)
+    warning: (VIDEO_TIMBERDALE) selects TIMB_DMA which has unmet direct dependencies (DMADEVICES && (MFD_TIMBERDALE || HAS_IOMEM))
+    Thus, "select PCH_DMA" and DMADEVICES are unnecessary
+    built when DMADEVICES is not enabled, so make the driver depend on
+    DMADEVICES.  Also, the help text says that the driver enables & uses
+    dmaengine: remove arch dependency from DMADEVICES
+    dependency for the DMADEVICES menu.
+    consequence CONFIG_DMADEVICES now depends on !CONFIG_HIGHMEM64G.  It also

@@ -1,0 +1,2 @@
+    and a hci_ver of BLUETOOTH_VER_4_0.
+    and a hci_ver of BLUETOOTH_VER_2_0.

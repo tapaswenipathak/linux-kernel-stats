@@ -1,0 +1,19 @@
+    Staging: rts_pstor: s/rtsx_alloc_dma_buf/kmalloc/
+    Replace rtsx_alloc_dma_buf() with kfree() back,
+    Staging: rts_pstor: s/rtsx_free_dma_buf/kfree/
+    musb_g_giveback(), even if txstate()/rxstate() has called unmap_dma_buffer()
+    Moreover, check for musb_ep->dma is moved within map_dma_buffer() so where
+        [<c0204148>] (ep93xx_pcm_preallocate_dma_buffer+0x44/0x60)
+    The constant DMA_ACTIVE is defined with the dma_buffparams structure rather
+    2) s3c24xx_pcm_preallocate_dma_buffer -> s3c_preallocate_dma_buffer
+    s3c64xx_dma_buffdone.
+    ARM: S3C64XX: DMA: struct s3c64xx_dma_buff lli fix.
+    Correct the lli structure in struct s3c64xx_dma_buff which should
+    As a result, pxafb_dma_buff.dma_desc[], pxafb_dma_buff.pal_desc[]
+    Also, since we now have introduced the 'struct pxafb_dma_buff' for DMA
+    drivers/spi/pxa2xx_spi.c: In function 'map_dma_buffers':
+    pxafb: introduce "struct pxafb_dma_buff" for palette and dma descriptors
+    drivers/char/synclinkmp.c:3420:5: warning: symbol 'alloc_dma_bufs' was not declared. Should it be static?
+    drivers/char/synclinkmp.c:3570:6: warning: symbol 'free_dma_bufs' was not declared. Should it be static?
+    drivers/char/synclinkmp.c:5040:6: warning: symbol 'tx_load_dma_buffer' was not declared. Should it be static?
+     > Function map_dma_buffers now return 0 for success and -1 for failure.
