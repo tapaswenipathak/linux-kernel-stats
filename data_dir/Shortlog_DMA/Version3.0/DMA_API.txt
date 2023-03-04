@@ -1,0 +1,65 @@
+      [media] MEDIA: Fix non-ISA_DMA_API link failure of sound code
+    [media] MEDIA: Fix non-ISA_DMA_API link failure of sound code
+    warning: (RADIO_MIROPCM20) selects SND_ISA which has unmet direct dependencies (SOUND && !M68K && SND && ISA && ISA_DMA_API)
+    A build with ISA && ISA_DMA && !ISA_DMA_API results in:
+    Adding a dependency on ISA_DMA_API to RADIO_MIROPCM20 fixes these issues.
+    CONFIG_DMA_API_DEBUG enabled.
+    x86: allow CONFIG_ISA_DMA_API to be disabled
+    kernel/dma.c, so require it only when CONFIG_ISA_DMA_API is enabled.
+    Disabling CONFIG_ISA_DMA_API is dependent on x86_64 since those machines
+    x86: only compile floppy driver if CONFIG_ISA_DMA_API is enabled
+    CONFIG_ISA_DMA_API, specifically claim_dma_lock(), release_dma_lock(),
+    x86: only compile 8237A if CONFIG_ISA_DMA_API is enabled
+    8237A utilizes the interface provided by CONFIG_ISA_DMA_API, specifically
+    pnp: only assign IORESOURCE_DMA if CONFIG_ISA_DMA_API is enabled
+    provided by CONFIG_ISA_DMA_API, specifically request_dma() and
+    happen, and this is trapped CONFIG_DMA_API_DEBUG:
+    and CONFIG_DMA_API_DEBUG=y be assigned to the correct device
+    This fixes warnings when CONFIG_DMA_API_DEBUG=y:
+      MIPS: Enable ISA_DMA_API config to fix build failure
+    MIPS: Enable ISA_DMA_API config to fix build failure
+    Add ISA_DMA_API config item and select it when GENERIC_ISA_DMA enabled.
+    CONFIG_DMA_API_DEBUG is enabled. This should be caused by we didn't
+    ASoC: fix compile breakage if CONFIG_SH_DMA_API=y && CONFIG_SND_SIU_MIGOR!=n
+    Audio on Migo-R cannot work if CONFIG_SH_DMA_API=y, but compilation should not
+      ARM: 5870/1: arch/arm: Fix build failure for defconfigs without CONFIG_ISA_DMA_API set
+    ARM: 5870/1: arch/arm: Fix build failure for defconfigs without CONFIG_ISA_DMA_API set
+    A lot of ARM-defconfigs (those without CONFIG_ISA_DMA_API set) fail to
+    enclosed by the CONFIG_ISA_DMA_API conditional all configs without this
+    If CONFIG_HAVE_DMA_API_DEBUG is defined and "dma_debug=off" is
+    powerpc: Add CONFIG_DMA_API_DEBUG support
+    sparc: Add CONFIG_DMA_API_DEBUG support
+    All we need to do for CONFIG_DMA_API_DEBUG support is call
+    add CONFIG_DMA_API_DEBUG support to IA64 however I forgot to add
+    dma-mapping: ia64: add CONFIG_DMA_API_DEBUG support
+    enables us to easily add CONFIG_DMA_API_DEBUG support, which only x86
+    supports for now.  The 4th patch adds CONFIG_DMA_API_DEBUG support to IA64
+    These functions being meaningless on x86 (if CONFIG_DMA_API_DEBUG is not set).
+    changes when compiling with CONFIG_DMA_API_DEBUG=y :
+    CONFIG_DMA_API_DEBUG spotted an instance of appletouch using
+    [ Impact: reduce the scope of CONFIG_DMA_API_DEBUG=y checks ]
+    x86 gart: reimplement IOMMU_LEAK feature by using DMA_API_DEBUG
+    DMA_API_DEBUG provides the similar feature, debug_dma_dump_mappings,
+    DMA_API_DEBUG.
+    CONFIG_DMA_API_DEBUG. Without an iommu or DMA_API_DEBUG it is a no-op on 32 bit
+      dma-debug: fix dma_debug_add_bus() definition for !CONFIG_DMA_API_DEBUG
+    dma-debug: fix dma_debug_add_bus() definition for !CONFIG_DMA_API_DEBUG
+    [ARM] Hide ISA DMA API when ISA_DMA_API is unset
+    [ARM] Hide ISA DMA API when ISA_DMA_API is unset
+    When ISA_DMA_API is unset, we're not implementing the ISA DMA API,
+    The default setting of CONFIG_ISA_DMA_API is set to match the protection
+      sh: Make dma-isa depend on ISA_DMA_API.
+    sh: Make dma-isa depend on ISA_DMA_API.
+    [PATCH] arch/sh/Kconfig: fix the ISA_DMA_API dependencies
+    which set ISA_DMA_API, we don't need to define MAX_DMA_CHANNELS
+    [ARM] Refine selection of ISA_DMA_API and generic dma.c code
+    ISA_DMA_API tells the rest of the kernel if the ISA DMA API is
+    the driver should depend on ISA_DMA_API to build on all systems, and this
+    [PATCH] Kconfig fix (tms380tr and ISA_DMA_API)
+    ISA_DMA_API.
+    [PATCH] Kconfig fix (ISA_DMA_API and sound/*)
+    fixed kconfig dependencies on ISA_DMA_API for parts of sound/* that rely
+       ISA_DMA_API (it uses helpers in question and irda is usable on
+       ISA_DMA_API
+    CONFIG_ISA_DMA_API.  As the result, driver got usable for boxen that do
+    New symbol added - ISA_DMA_API.  Set when we have functional

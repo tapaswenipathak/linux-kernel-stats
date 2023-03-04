@@ -1,0 +1,12 @@
+    Use the dmaengine_get_device_for_dma_api() to get the device pointer which
+    should be used for with the dma_api to use matching dma_ops for the
+    iommu: remove iommu_set_cmd_line_dma_api and iommu_cmd_line_dma_api
+    dma_api use, the dmatest can support per channel coherency if it is
+    device (the DMA controller's device) can not be used for dma_api for all
+    the device pointer to be used for dma_api for the given channel.
+    crypto: hisilicon - remove use_dma_api related codes
+    The codes related use_dma_api is useless which should be removed.
+      vring: Introduce vring_use_dma_api()
+    vring: Introduce vring_use_dma_api()
+    We'll introduce DMA API support guarded by vring_use_dma_api().
+    and hopefully we can get rid of vring_use_dma_api() entirely some

@@ -1,0 +1,4 @@
+      vring: Introduce vring_use_dma_api()
+    vring: Introduce vring_use_dma_api()
+    We'll introduce DMA API support guarded by vring_use_dma_api().
+    and hopefully we can get rid of vring_use_dma_api() entirely some

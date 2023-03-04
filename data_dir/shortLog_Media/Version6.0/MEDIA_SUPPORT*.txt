@@ -1,0 +1,87 @@
+    Fixes: 46d2a3b964dd ("media: place CEC menu before MEDIA_SUPPORT")
+    default y if MEDIA_SUPPORT_FILTER is disabled, so they fall out of the
+           (MEDIA_SUPPORT=y || MEDIA_SUPPORT=SND_USB_AUDIO)
+      Depends on [n]: MEDIA_SUPPORT [=y] && GPIOLIB [=n] && VIDEO_V4L2 [=y] && I2C [=y]
+      - STA2X11_VIP [=y] && MEDIA_SUPPORT [=y] && MEDIA_PCI_SUPPORT [=y] && MEDIA_CAMERA_SUPPORT [=y] && PCI [=y] && VIDEO_V4L2 [=y] && VIRT_TO_BUS [=y] && I2C [=y] && (STA2X11 [=n] || COMPILE_TEST [=y]) && MEDIA_SUBDRV_AUTOSELECT [=y]
+      CONFIG_MEDIA_SUPPORT_FILTER not set
+    media: Remove superfluous dependency for MEDIA_SUPPORT_FILTER
+    The MEDIA_SUPPORT_FILTER configuration option is located inside a block
+    protected by "#if MEDIA_SUPPORT", so there is no need to have an
+    explicit dependency on MEDIA_SUPPORT.  Drop it.
+    platforms these changes set CONFIG_MEDIA_SUPPORT_FILTER=y which keeps
+      media: medium: cec: Make MEDIA_CEC_SUPPORT default to n if !MEDIA_SUPPORT
+    media: medium: cec: Make MEDIA_CEC_SUPPORT default to n if !MEDIA_SUPPORT
+    Recently, MEDIA_CEC_SUPPORT became indepedent of MEDIA_SUPPORT.
+    However, if MEDIA_SUPPORT is not enabled, MEDIA_SUPPORT_FILTER is not
+    Fixes: 46d2a3b964ddbe63 ("media: place CEC menu before MEDIA_SUPPORT")
+      Depends on [n]: MEDIA_SUPPORT [=y] && (I2C [=y] || I2C [=y]=n) && VIDEO_DEV [=n]
+      - VIDEO_TEGRA [=y] && STAGING [=y] && STAGING_MEDIA [=y] && MEDIA_SUPPORT [=y] && TEGRA_HOST1X [=y]
+              Depends on [n]: MEDIA_SUPPORT [=y] && MEDIA_DIGITAL_TV_SUPPORT [=y] && DVB_CORE [=y] && I2C [=y] && I2C_MUX [=y] && VIDEO_V4L2 [=n] && MEDIA_SDR_SUPPORT [=y] && USB [=y]
+              - DVB_USB_RTL28XXU [=y] && USB [=y] && MEDIA_SUPPORT [=y] && MEDIA_USB_SUPPORT [=y] && I2C [=y] && MEDIA_DIGITAL_TV_SUPPORT [=y] && DVB_USB_V2 [=y] && I2C_MUX [=y] && MEDIA_SUBDRV_AUTOSELECT [=y] && MEDIA_SDR_SUPPORT [=y]
+              Depends on [n]: (MEDIA_ANALOG_TV_SUPPORT [=y] || MEDIA_DIGITAL_TV_SUPPORT [=y] || MEDIA_RADIO_SUPPORT [=y] || MEDIA_SDR_SUPPORT [=y]) && MEDIA_SUPPORT [=y] && I2C [=y] && VIDEO_V4L2 [=n]
+              - DVB_USB_RTL28XXU [=y] && USB [=y] && MEDIA_SUPPORT [=y] && MEDIA_USB_SUPPORT [=y] && I2C [=y] && MEDIA_DIGITAL_TV_SUPPORT [=y] && DVB_USB_V2 [=y] && I2C_MUX [=y] && MEDIA_SUBDRV_AUTOSELECT [=y]
+              Depends on [n]: (MEDIA_ANALOG_TV_SUPPORT [=y] || MEDIA_DIGITAL_TV_SUPPORT [=y] || MEDIA_RADIO_SUPPORT [=y] || MEDIA_SDR_SUPPORT [=y]) && MEDIA_SUPPORT [=y] && I2C [=y] && VIDEO_V4L2 [=n]
+              - DVB_USB_RTL28XXU [=y] && USB [=y] && MEDIA_SUPPORT [=y] && MEDIA_USB_SUPPORT [=y] && I2C [=y] && MEDIA_DIGITAL_TV_SUPPORT [=y] && DVB_USB_V2 [=y] && I2C_MUX [=y] && MEDIA_SUBDRV_AUTOSELECT [=y]
+              Depends on [n]: MEDIA_SUPPORT [=y] && I2C [=y] && VIDEO_V4L2 [=n]
+              - VIDEO_VIA_CAMERA [=y] && MEDIA_SUPPORT [=y] && MEDIA_PLATFORM_SUPPORT [=y] && V4L_PLATFORM_DRIVERS [=y] && FB_VIA [=y]
+      Depends on [n]: STAGING [=y] && STAGING_MEDIA [=y] && MEDIA_SUPPORT [=y] && (ARCH_ROCKCHIP || COMPILE_TEST [=y]) && OF [=n]
+      - VIDEO_ROCKCHIP_ISP1 [=y] && STAGING [=y] && STAGING_MEDIA [=y] && MEDIA_SUPPORT [=y] && VIDEO_V4L2 [=y] && (ARCH_ROCKCHIP || COMPILE_TEST [=y])
+              Depends on [m]: MEDIA_SUPPORT [=y] && MEDIA_DIGITAL_TV_SUPPORT [=y] && (I2C [=m] || I2C [=m]=n)
+              - DVB_DUMMY_FE [=y] && MEDIA_SUPPORT [=y] && MEDIA_TEST_SUPPORT [=y]
+    As CEC support doesn't depend on MEDIA_SUPPORT, let's
+    As CEC support doesn't depend on MEDIA_SUPPORT, let's
+    media: place CEC menu before MEDIA_SUPPORT
+    independent of MEDIA_SUPPORT.
+              Depends on [m]: MEDIA_SUPPORT [=m]
+              - VIDEO_SAMSUNG_S5P_CEC [=m] && MEDIA_SUPPORT [=m] && MEDIA_PLATFORM_SUPPORT [=y] && CEC_PLATFORM_DRIVERS [=y] && (ARCH_EXYNOS [=y] || COMPILE_TEST [=n])
+       MEDIA_SUPPORT dependency, as we can't have a core
+    both DVB_CORE and VIDEO_DEV already depends on MEDIA_SUPPORT,
+    media: Kconfig: update the MEDIA_SUPPORT help message
+      - VIDEO_SECO_RC [=y] && MEDIA_SUPPORT [=y] && CEC_PLATFORM_DRIVERS [=y] && VIDEO_SECO_CEC [=y]
+        warning: (TOUCHSCREEN_SUR40 && VIDEO_TW68 && VIDEO_CX23885 && VIDEO_CX25821 && VIDEO_CX88 && VIDEO_SAA7134 && VIDEO_COBALT && VIDEO_QCOM_CAMSS) selects VIDEOBUF2_DMA_SG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+    media: rc-core: do not depend on MEDIA_SUPPORT
+    MEDIA_SUPPORT.
+            warning: (VIDEO_EM28XX_V4L2) selects VIDEO_OV2640 which has unmet direct dependencies (MEDIA_SUPPORT && VIDEO_V4L2 && I2C && GPIOLIB && MEDIA_CAMERA_SUPPORT)
+     warning: (VIDEO_EM28XX_V4L2) selects VIDEO_MT9V011 which has unmet direct dependencies (MEDIA_SUPPORT && I2C && VIDEO_V4L2 && MEDIA_CAMERA_SUPPORT)
+    warning: (VIDEO_GO7007) selects VIDEO_OV7640 which has unmet direct dependencies (MEDIA_SUPPORT && I2C && VIDEO_V4L2 && MEDIA_CAMERA_SUPPORT)
+    CONFIG_MEDIA is not a thing, but CONFIG_MEDIA_SUPPORT is, so use that.
+    warning: (VIDEO_TW5864 && VIDEO_MEDIATEK_VCODEC) selects VIDEOBUF2_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+      [media] staging: add MEDIA_SUPPORT dependency
+    [media] staging: add MEDIA_SUPPORT dependency
+    only be a loadable module if MEDIA_SUPPORT=m, but its build dependency
+    This encloses all of the staging media drivers in a CONFIG_MEDIA_SUPPORT
+      MEDIA_SUPPORT (just as is done for the media controller code).
+    [media] cec: add MEDIA_SUPPORT dependency
+    The MEDIA_CEC_EDID option is guarded by MEDIA_SUPPORT, so selecting
+    warning: (MEDIA_CEC) selects MEDIA_CEC_EDID which has unmet direct dependencies (MEDIA_SUPPORT)
+    CONFIG_MEDIA_SUPPORT=m
+    CONFIG_MEDIA_SUPPORT=y
+    CONFIG_MEDIA_SUPPORT=y
+    CONFIG_MEDIA_SUPPORT=y
+    warning: (VIDEO_PVRUSB2 && VIDEO_USBVISION && VIDEO_GO7007 && VIDEO_AU0828_V4L2 && VIDEO_CX231XX && VIDEO_TM6000 && VIDEO_EM28XX && VIDEO_IVTV && VIDEO_MXB && VIDEO_CX18 && VIDEO_CX23885 && VIDEO_CX88 && VIDEO_BT848 && VIDEO_SAA7134 && VIDEO_SAA7164) selects VIDEO_TUNER which has unmet direct dependencies (MEDIA_SUPPORT && MEDIA_TUNER)
+        warning: (VIDEO_STI_BDISP && VIDEO_RENESAS_JPU && VIDEO_DM365_VPFE && VIDEO_OMAP4) selects VIDEOBUF2_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+        warning: (TOUCHSCREEN_SUR40 && VIDEO_TW68 && VIDEO_CX23885 && VIDEO_CX25821 && VIDEO_CX88 && VIDEO_SAA7134) selects VIDEOBUF2_DMA_SG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+        warning: (VIDEO_XILINX && VIDEO_DM365_VPFE && VIDEO_DT3155 && VIDEO_OMAP4) selects VIDEOBUF2_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+        warning: (VIDEO_OMAP2_VOUT && VIDEO_VIU && VIDEO_TIMBERDALE) selects VIDEOBUF_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+        warning: (VIDEO_AM437X_VPFE && VIDEO_DM365_VPFE && VIDEO_DT3155 && VIDEO_OMAP4) selects VIDEOBUF2_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+            warning: (VIDEO_PVRUSB2 && VIDEO_TLG2300 && VIDEO_USBVISION && VIDEO_GO7007 && VIDEO_AU0828_V4L2 && VIDEO_CX231XX && VIDEO_TM6000 && VIDEO_EM28XX && VIDEO_IVTV && VIDEO_MXB && VIDEO_CX18 && VIDEO_CX23885 && VIDEO_CX88 && VIDEO_BT848 && VIDEO_SAA7134 && VIDEO_SAA7164) selects VIDEO_TUNER which has unmet direct dependencies (MEDIA_SUPPORT && MEDIA_TUNER)
+            CONFIG_MEDIA_SUPPORT=y
+    warning: (DVB_USB_RTL28XXU) selects DVB_RTL2832 which has unmet direct dependencies (MEDIA_SUPPORT && DVB_CORE && I2C && I2C_MUX)
+        warning: (VIDEO_DM6446_CCDC && VIDEO_DM355_CCDC && VIDEO_DM365_ISIF && VIDEO_OMAP2_VOUT && VIDEO_SH_VOU && VIDEO_VIU && VIDEO_TIMBERDALE && VIDEO_MX1 && VIDEO_OMAP1) selects VIDEOBUF_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+    > warning: (VIDEO_EM28XX_DVB) selects DVB_M88DS3103 which has unmet direct dependencies (MEDIA_SUPPORT && DVB_CORE && I2C && I2C_MUX)
+    warning: (... && VIDEO_RENESAS_VSP1 && ...) selects VIDEOBUF2_DMA_CONTIG which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+            warning: (SND_ES1968_RADIO && SND_FM801_TEA575X_BOOL) selects RADIO_TEA575X which has unmet direct dependencies (MEDIA_SUPPORT && RADIO_ADAPTERS && VIDEO_V4L2)
+    As USB/PCI/MEDIA_SUPPORT dependencies can be tristate, we can't
+            depends on USB && MEDIA_SUPPORT
+    > warning: (STA2X11_VIP) selects VIDEO_ADV7180 which has unmet direct dependencies (MEDIA_SUPPORT && VIDEO_V4L2 && I2C)
+    warning: (DVB_USB_AZ6007 && VIDEO_GO7007) selects CYPRESS_FIRMWARE which has unmet direct dependencies (MEDIA_SUPPORT && USB)
+    warning: (VIDEO_DM6446_CCDC && VIDEO_DM355_CCDC && VIDEO_ISIF && VIDEO_DAVINCI_VPBE_DISPLAY) selects VIDEO_VPSS_SYSTEM which has unmet direct dependencies (MEDIA_SUPPORT && V4L_PLATFORM_DRIVERS && ARCH_DAVINCI)
+            warning: (DVB_USB_PCTV452E) selects TTPCI_EEPROM which has unmet direct dependencies (MEDIA_SUPPORT && MEDIA_PCI_SUPPORT && MEDIA_DIGITAL_TV_SUPPORT && I2C)
+    Instead of such weird approach, let's just use the MEDIA_SUPPORT
+    warning: (VIDEO_AU0828) selects DVB_AU8522 which has unmet direct dependencies (MEDIA_SUPPORT && DVB_CAPTURE_DRIVERS && DVB_CORE && I2C && VIDEO_V4L2)
+    warning: (VIDEO_CX231XX_DVB) selects DVB_MB86A20S which has unmet direct dependencies (MEDIA_SUPPORT && DVB_CAPTURE_DRIVERS && DVB_CORE && I2C)
+    dependencies (MEDIA_SUPPORT && VIDEO_MEDIA && I2C && EXPERIMENTAL)
+    warning: (VIDEO_BT848 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_DEV && PCI && I2C && VIDEO_V4L2 && INPUT || VIDEO_SAA7134 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && VIDEO_DEV && PCI && I2C && INPUT || VIDEO_CX88 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && VIDEO_DEV && PCI && I2C && INPUT || VIDEO_IVTV && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && PCI && I2C && INPUT || VIDEO_CX18 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && DVB_CORE && PCI && I2C && EXPERIMENTAL && INPUT || VIDEO_EM28XX && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && V4L_USB_DRIVERS && USB && VIDEO_DEV && I2C && INPUT || VIDEO_TLG2300 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && V4L_USB_DRIVERS && USB && VIDEO_DEV && I2C && INPUT && SND && DVB_CORE || VIDEO_CX231XX && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && V4L_USB_DRIVERS && USB && VIDEO_DEV && I2C && INPUT || DVB_BUDGET_CI && MEDIA_SUPPORT && DVB_CAPTURE_DRIVERS && DVB_CORE && DVB_BUDGET_CORE && I2C && INPUT || DVB_DM1105 && MEDIA_SUPPORT && DVB_CAPTURE_DRIVERS && DVB_CORE && PCI && I2C && INPUT || VIDEO_GO7007 && STAGING && !STAGING_EXCLUDE_BUILD && VIDEO_DEV && PCI && I2C && INPUT && SND || VIDEO_CX25821 && STAGING && !STAGING_EXCLUDE_BUILD && DVB_CORE && VIDEO_DEV && PCI && I2C && INPUT) selects VIDEO_IR which has unmet direct dependencies (IR_CORE)
+     if MEDIA_SUPPORT
+    If VIDEO_DEV was enabled, the script will miss the fact that MEDIA_SUPPORT
+    The MEDIA_SUPPORT option disabled soc-camera support, so re-enable it for
