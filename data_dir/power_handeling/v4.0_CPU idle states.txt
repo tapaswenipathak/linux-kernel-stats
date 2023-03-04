@@ -1,0 +1,1060 @@
+commit 1bd524f7e8d8f194cd94bc4535df91391d0f1dc8
+Author: Anup Patel <anup.patel@wdc.com>
+Date:   Thu Feb 10 11:19:46 2022 +0530
+
+    dt-bindings: Add common bindings for ARM and RISC-V idle states
+    
+    The RISC-V CPU idle states will be described in under the
+    /cpus/idle-states DT node in the same way as ARM CPU idle
+    states.
+    
+    This patch adds common bindings documentation for both ARM
+    and RISC-V idle states.
+    
+    Signed-off-by: Anup Patel <anup.patel@wdc.com>
+    Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Guo Ren <guoren@kernel.org>
+    Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+
+commit f53cbdab011b200c67c7e5f476046828014501eb
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Wed Jun 2 20:15:10 2021 +0200
+
+    cpuidle: teo: Cosmetic modifications of teo_update()
+    
+    Rename a local variable in teo_update() so that its purpose is better
+    reflected by its name and use one more local variable in the loop
+    over the CPU idle states in that function to make the code somewhat
+    easier to read.
+    
+    No functional impact.
+    
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 542b9f11e5643d165d43e45675993e040cf32e5f
+Merge: e9cb878ec238 18d6e3f6744d
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Tue Feb 2 18:00:48 2021 +0100
+
+    Merge tag 'v5.11-next-dts64' of git://git.kernel.org/pub/scm/linux/kernel/git/matthias.bgg/linux into arm/dt
+    
+    mt6779:
+    - add DEVAPC node to detect mallicious bus accesses
+    - add PMIC wrapper node
+    
+    mt7622:
+    - add reset to mmc node
+    
+    mt8183:
+    - fix typo in drma-fifo-size property
+    - refine compatible for the disp-gamma
+    - add phandel of PM domain to the PWM node
+    - add second PWM node
+    - add regulator to MFG power domain
+    - enable DSI node in kukui
+    - add krane sku0, which uses different panel
+    - fix mailbox dt-bindings include path
+    
+    mt8192:
+    - add NOR flash node
+    - add PSCI based CPU idle states
+    
+    mt8516:
+    - add node for the UART's APDMA controller
+    
+    * tag 'v5.11-next-dts64' of git://git.kernel.org/pub/scm/linux/kernel/git/matthias.bgg/linux:
+      arm64: dts: mt8183: Fix GCE include path
+      dts64: mt7622: fix slow sd card access
+      dt-bindings: arm64: dts: mediatek: Add krane sku0
+      arm64: dts: mt8183: Add krane-sku0 board.
+      arm64: dts: mt8183: config dsi node
+      arm64: dts: mt6779: Support pwrap on Mediatek MT6779 platform
+      arm64: dts: mt6779: Support devapc
+      arm64: dts: mt8192: Add cpu-idle-states
+      arm64: dts: mediatek: mt8183: Add domain supply for mfg
+      arm64: dts: mt8192: add nor_flash device node
+      arm64: dts: mediatek: mt8516: add support for APDMA
+      arm64: dts: mediatek: mt8183-evb: add PWM support
+      arm64: dts: mediatek: mt8183: add pwm node
+      arm64: dts: mt8183: Add missing power-domain for pwm0 node
+      arm64: dts: mt8183: refine gamma compatible name
+      arm64: dts: mt8183: rename rdma fifo size
+    
+    Link: https://lore.kernel.org/r/565be0cc-460a-7d0b-47da-09bf0401e8fe@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 16d83a540ca4e7f1ebb2b3756869b77451d31414
+Author: Pratik Rajesh Sampat <psampat@linux.ibm.com>
+Date:   Wed Aug 26 13:59:18 2020 +0530
+
+    Revert "powerpc/powernv/idle: Replace CPU feature check with PVR check"
+    
+    cpuidle stop state implementation has minor optimizations for P10
+    where hardware preserves more SPR registers compared to P9. The
+    current P9 driver works for P10, although does few extra
+    save-restores. P9 driver can provide the required power management
+    features like SMT thread folding and core level power savings on a P10
+    platform.
+    
+    Until the P10 stop driver is available, revert the commit which allows
+    for only P9 systems to utilize cpuidle and blocks all idle stop states
+    for P10. CPU idle states are enabled and tested on the P10 platform
+    with this fix.
+    
+    This reverts commit 8747bf36f312356f8a295a0c39ff092d65ce75ae.
+    
+    Fixes: 8747bf36f312 ("powerpc/powernv/idle: Replace CPU feature check with PVR check")
+    Signed-off-by: Pratik Rajesh Sampat <psampat@linux.ibm.com>
+    Reviewed-by: Vaidyanathan Srinivasan <svaidy@linux.ibm.com>
+    Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+    Link: https://lore.kernel.org/r/20200826082918.89306-1-psampat@linux.ibm.com
+
+commit 12ecf0680c2126112e25db4b37ce48f8b29eb60c
+Merge: 0db5ee73df16 836e4a2e3d9e
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Mar 25 22:26:19 2020 +0100
+
+    Merge tag 'v5.6-next-dts64' of git://git.kernel.org/pub/scm/linux/kernel/git/matthias.bgg/linux into arm/dt
+    
+    mt2712:
+    - add real time clock node
+    
+    mt8173:
+    - mark arch timer invalid in suspend
+    
+    mt8183:
+    - add CPU idle states
+    - add watchdog node
+    - add dynamic power coefficient and cooling cells for all CPUs
+    
+    mt8516:
+    - add basic support for the SoC
+    - add basic support for the pumpkin board
+    
+    * tag 'v5.6-next-dts64' of git://git.kernel.org/pub/scm/linux/kernel/git/matthias.bgg/linux:
+      arm64: dts: add RTC nodes for MT2712
+      arm64: dts: mediatek: add pumpkin board dts
+      arm64: dts: mediatek: add dtsi for MT8516
+      arm64: dts: mt8183: Add #cooling-cells to CPU nodes
+      arm64: dts: mt8183: add/update dynamic power coefficients
+      arm64: dts: mediatek: rename scpsys nodes to power-controller
+      amr64: dts: mt8183: Add watchdog node
+      arm64: dts: mt8173: add arm,no-tick-in-suspend in timer
+      arm64: dts: mt8183: Enable CPU idle-states
+    
+    Link: https://lore.kernel.org/r/c512b5cb-e639-1429-64db-9c1a53378c49@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 40a9012a3b24334796403491b317a83935719809
+Merge: 1bee7aaa075b e37131556801
+Author: Olof Johansson <olof@lixom.net>
+Date:   Wed Jan 8 10:26:26 2020 -0800
+
+    Merge tag 'cpuidle_psci-v5.5-rc4' of git://git.linaro.org/people/ulf.hansson/linux-pm into arm/drivers
+    
+    Initial support for hierarchical CPU arrangement, managed by PSCI and its
+    corresponding cpuidle driver. This support is based upon using the generic
+    PM domain, which already supports devices belonging to CPUs.
+    
+    Finally, these is a DTS patch that enables the hierarchical topology to be
+    used for the Qcom 410c Dragonboard, which supports the PSCI OS-initiated
+    mode.
+    
+    * tag 'cpuidle_psci-v5.5-rc4' of git://git.linaro.org/people/ulf.hansson/linux-pm: (611 commits)
+      arm64: dts: Convert to the hierarchical CPU topology layout for MSM8916
+      cpuidle: psci: Add support for PM domains by using genpd
+      PM / Domains: Introduce a genpd OF helper that removes a subdomain
+      cpuidle: psci: Support CPU hotplug for the hierarchical model
+      cpuidle: psci: Manage runtime PM in the idle path
+      cpuidle: psci: Prepare to use OS initiated suspend mode via PM domains
+      cpuidle: psci: Attach CPU devices to their PM domains
+      cpuidle: psci: Add a helper to attach a CPU to its PM domain
+      cpuidle: psci: Support hierarchical CPU idle states
+      cpuidle: psci: Simplify OF parsing of CPU idle state nodes
+      cpuidle: dt: Support hierarchical CPU idle states
+      of: base: Add of_get_cpu_state_node() to get idle states for a CPU node
+      firmware: psci: Export functions to manage the OSI mode
+      dt: psci: Update DT bindings to support hierarchical PSCI states
+      cpuidle: psci: Align psci_power_state count with idle state count
+      Linux 5.5-rc4
+      locks: print unsigned ino in /proc/locks
+      riscv: export flush_icache_all to modules
+      riscv: reject invalid syscalls below -1
+      riscv: fix compile failure with EXPORT_SYMBOL() & !MMU
+      ...
+    
+    Link: https://lore.kernel.org/r/20200102160820.3572-1-ulf.hansson@linaro.org
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit a0cf319460745a6102555ecf99994374704dcb4c
+Author: Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Thu Oct 10 12:01:48 2019 +0200
+
+    cpuidle: psci: Prepare to use OS initiated suspend mode via PM domains
+    
+    The per CPU variable psci_power_state, contains an array of fixed values,
+    which reflects the corresponding arm,psci-suspend-param parsed from DT, for
+    each of the available CPU idle states.
+    
+    This isn't sufficient when using the hierarchical CPU topology in DT, in
+    combination with having PSCI OS initiated (OSI) mode enabled. More
+    precisely, in OSI mode, Linux is responsible of telling the PSCI FW what
+    idle state the cluster (a group of CPUs) should enter, while in PSCI
+    Platform Coordinated (PC) mode, each CPU independently votes for an idle
+    state of the cluster.
+    
+    For this reason, introduce a per CPU variable called domain_state and
+    implement two helper functions to read/write its value. Then let the
+    domain_state take precedence over the regular selected state, when entering
+    and idle state.
+    
+    To avoid executing the above OSI specific code in the ->enter() callback,
+    while operating in the default PSCI Platform Coordinated mode, let's also
+    add a new enter-function and use it for OSI.
+    
+    Co-developed-by: Lina Iyer <lina.iyer@linaro.org>
+    Signed-off-by: Lina Iyer <lina.iyer@linaro.org>
+    Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+    Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+    Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+
+commit f08cfbfa4fb1b5cf15d9f3d3f8ef2280236f4a12
+Author: Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Thu Oct 10 12:01:48 2019 +0200
+
+    cpuidle: psci: Support hierarchical CPU idle states
+    
+    Currently CPU's idle states are represented using the flattened model.
+    Let's add support for the hierarchical layout, via converting to use
+    of_get_cpu_state_node().
+    
+    Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+    Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+    Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+
+commit 778f173eb4528a6b48ff6a8600515899de75333c
+Author: Lina Iyer <lina.iyer@linaro.org>
+Date:   Thu Oct 10 12:01:48 2019 +0200
+
+    cpuidle: dt: Support hierarchical CPU idle states
+    
+    Currently CPU's idle states are represented using the flattened model.
+    Let's add support for the hierarchical layout, via converting to use
+    of_get_cpu_state_node().
+    
+    Suggested-by: Sudeep Holla <sudeep.holla@arm.com>
+    Signed-off-by: Lina Iyer <lina.iyer@linaro.org>
+    Reviewed-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Co-developed-by: Ulf Hansson <ulf.hansson@linaro.org>
+    Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+    Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+    Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+
+commit 6b2b568d985fc969f3dc6e422fc4194ff33bcf89
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Oct 10 23:37:39 2019 +0200
+
+    cpuidle: teo: Fix "early hits" handling for disabled idle states
+    
+    commit 159e48560f51d9c2aa02d762a18cd24f7868ab27 upstream.
+    
+    The TEO governor uses idle duration "bins" defined in accordance with
+    the CPU idle states table provided by the driver, so that each "bin"
+    covers the idle duration range between the target residency of the
+    idle state corresponding to it and the target residency of the closest
+    deeper idle state.  The governor collects statistics for each bin
+    regardless of whether or not the idle state corresponding to it is
+    currently enabled.
+    
+    In particular, the "early hits" metric measures the likelihood of a
+    situation in which the idle duration measured after wakeup falls into
+    to given bin, but the time till the next timer (sleep length) falls
+    into a bin corresponding to one of the deeper idle states.  It is
+    used when the "hits" and "misses" metrics indicate that the state
+    "matching" the sleep length should not be selected, so that the state
+    with the maximum "early hits" value is selected instead of it.
+    
+    If the idle state corresponding to the given bin is disabled, it
+    cannot be selected and if it turns out to be the one that should be
+    selected, a shallower idle state needs to be used instead of it.
+    Nevertheless, the metrics collected for the bin corresponding to it
+    are still valid and need to be taken into account as though that
+    state had not been disabled.
+    
+    As far as the "early hits" metric is concerned, teo_select() tries to
+    take disabled states into account, but the state index corresponding
+    to the maximum "early hits" value computed by it may be incorrect.
+    Namely, it always uses the index of the previous maximum "early hits"
+    state then, but there may be enabled idle states closer to the
+    disabled one in question.  In particular, if the current candidate
+    state (whose index is the idx value) is closer to the disabled one
+    and the "early hits" value of the disabled state is greater than the
+    current maximum, the index of the current candidate state (idx)
+    should replace the "maximum early hits state" index.
+    
+    Modify the code to handle that case correctly.
+    
+    Fixes: b26bf6ab716f ("cpuidle: New timer events oriented governor for tickless systems")
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: 5.1+ <stable@vger.kernel.org> # 5.1+
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 91e505f2ea7457e6cbd03981f9622d425f5b1eaa
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Oct 10 23:36:15 2019 +0200
+
+    cpuidle: teo: Consider hits and misses metrics of disabled states
+    
+    commit e43dcf20215f0287ea113102617ca04daa76b70e upstream.
+    
+    The TEO governor uses idle duration "bins" defined in accordance with
+    the CPU idle states table provided by the driver, so that each "bin"
+    covers the idle duration range between the target residency of the
+    idle state corresponding to it and the target residency of the closest
+    deeper idle state.  The governor collects statistics for each bin
+    regardless of whether or not the idle state corresponding to it is
+    currently enabled.
+    
+    In particular, the "hits" and "misses" metrics measure the likelihood
+    of a situation in which both the time till the next timer (sleep
+    length) and the idle duration measured after wakeup fall into the
+    given bin.  Namely, if the "hits" value is greater than the "misses"
+    one, that situation is more likely than the one in which the sleep
+    length falls into the given bin, but the idle duration measured after
+    wakeup falls into a bin corresponding to one of the shallower idle
+    states.
+    
+    If the idle state corresponding to the given bin is disabled, it
+    cannot be selected and if it turns out to be the one that should be
+    selected, a shallower idle state needs to be used instead of it.
+    Nevertheless, the metrics collected for the bin corresponding to it
+    are still valid and need to be taken into account as though that
+    state had not been disabled.
+    
+    For this reason, make teo_select() always use the "hits" and "misses"
+    values of the idle duration range that the sleep length falls into
+    even if the specific idle state corresponding to it is disabled and
+    if the "hits" values is greater than the "misses" one, select the
+    closest enabled shallower idle state in that case.
+    
+    Fixes: b26bf6ab716f ("cpuidle: New timer events oriented governor for tickless systems")
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: 5.1+ <stable@vger.kernel.org> # 5.1+
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 18feee7b1cadac8b3f3a1885ff1708826966fa90
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Oct 10 23:37:39 2019 +0200
+
+    cpuidle: teo: Fix "early hits" handling for disabled idle states
+    
+    commit 159e48560f51d9c2aa02d762a18cd24f7868ab27 upstream.
+    
+    The TEO governor uses idle duration "bins" defined in accordance with
+    the CPU idle states table provided by the driver, so that each "bin"
+    covers the idle duration range between the target residency of the
+    idle state corresponding to it and the target residency of the closest
+    deeper idle state.  The governor collects statistics for each bin
+    regardless of whether or not the idle state corresponding to it is
+    currently enabled.
+    
+    In particular, the "early hits" metric measures the likelihood of a
+    situation in which the idle duration measured after wakeup falls into
+    to given bin, but the time till the next timer (sleep length) falls
+    into a bin corresponding to one of the deeper idle states.  It is
+    used when the "hits" and "misses" metrics indicate that the state
+    "matching" the sleep length should not be selected, so that the state
+    with the maximum "early hits" value is selected instead of it.
+    
+    If the idle state corresponding to the given bin is disabled, it
+    cannot be selected and if it turns out to be the one that should be
+    selected, a shallower idle state needs to be used instead of it.
+    Nevertheless, the metrics collected for the bin corresponding to it
+    are still valid and need to be taken into account as though that
+    state had not been disabled.
+    
+    As far as the "early hits" metric is concerned, teo_select() tries to
+    take disabled states into account, but the state index corresponding
+    to the maximum "early hits" value computed by it may be incorrect.
+    Namely, it always uses the index of the previous maximum "early hits"
+    state then, but there may be enabled idle states closer to the
+    disabled one in question.  In particular, if the current candidate
+    state (whose index is the idx value) is closer to the disabled one
+    and the "early hits" value of the disabled state is greater than the
+    current maximum, the index of the current candidate state (idx)
+    should replace the "maximum early hits state" index.
+    
+    Modify the code to handle that case correctly.
+    
+    Fixes: b26bf6ab716f ("cpuidle: New timer events oriented governor for tickless systems")
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: 5.1+ <stable@vger.kernel.org> # 5.1+
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 86fe55266e56d98c4473842619246c8ed1afcb13
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Oct 10 23:36:15 2019 +0200
+
+    cpuidle: teo: Consider hits and misses metrics of disabled states
+    
+    commit e43dcf20215f0287ea113102617ca04daa76b70e upstream.
+    
+    The TEO governor uses idle duration "bins" defined in accordance with
+    the CPU idle states table provided by the driver, so that each "bin"
+    covers the idle duration range between the target residency of the
+    idle state corresponding to it and the target residency of the closest
+    deeper idle state.  The governor collects statistics for each bin
+    regardless of whether or not the idle state corresponding to it is
+    currently enabled.
+    
+    In particular, the "hits" and "misses" metrics measure the likelihood
+    of a situation in which both the time till the next timer (sleep
+    length) and the idle duration measured after wakeup fall into the
+    given bin.  Namely, if the "hits" value is greater than the "misses"
+    one, that situation is more likely than the one in which the sleep
+    length falls into the given bin, but the idle duration measured after
+    wakeup falls into a bin corresponding to one of the shallower idle
+    states.
+    
+    If the idle state corresponding to the given bin is disabled, it
+    cannot be selected and if it turns out to be the one that should be
+    selected, a shallower idle state needs to be used instead of it.
+    Nevertheless, the metrics collected for the bin corresponding to it
+    are still valid and need to be taken into account as though that
+    state had not been disabled.
+    
+    For this reason, make teo_select() always use the "hits" and "misses"
+    values of the idle duration range that the sleep length falls into
+    even if the specific idle state corresponding to it is disabled and
+    if the "hits" values is greater than the "misses" one, select the
+    closest enabled shallower idle state in that case.
+    
+    Fixes: b26bf6ab716f ("cpuidle: New timer events oriented governor for tickless systems")
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: 5.1+ <stable@vger.kernel.org> # 5.1+
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 99e98d3fb1008ef7416e16a1fd355cb73a253502
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Mon Nov 4 12:16:17 2019 +0100
+
+    cpuidle: Consolidate disabled state checks
+    
+    There are two reasons why CPU idle states may be disabled: either
+    because the driver has disabled them or because they have been
+    disabled by user space via sysfs.
+    
+    In the former case, the state's "disabled" flag is set once during
+    the initialization of the driver and it is never cleared later (it
+    is read-only effectively).  In the latter case, the "disable" field
+    of the given state's cpuidle_state_usage struct is set and it may be
+    changed via sysfs.  Thus checking whether or not an idle state has
+    been disabled involves reading these two flags every time.
+    
+    In order to avoid the additional check of the state's "disabled" flag
+    (which is effectively read-only anyway), use the value of it at the
+    init time to set a (new) flag in the "disable" field of that state's
+    cpuidle_state_usage structure and use the sysfs interface to
+    manipulate another (new) flag in it.  This way the state is disabled
+    whenever the "disable" field of its cpuidle_state_usage structure is
+    nonzero, whatever the reason, and it is the only place to look into
+    to check whether or not the state has been disabled.
+    
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+commit 159e48560f51d9c2aa02d762a18cd24f7868ab27
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Oct 10 23:37:39 2019 +0200
+
+    cpuidle: teo: Fix "early hits" handling for disabled idle states
+    
+    The TEO governor uses idle duration "bins" defined in accordance with
+    the CPU idle states table provided by the driver, so that each "bin"
+    covers the idle duration range between the target residency of the
+    idle state corresponding to it and the target residency of the closest
+    deeper idle state.  The governor collects statistics for each bin
+    regardless of whether or not the idle state corresponding to it is
+    currently enabled.
+    
+    In particular, the "early hits" metric measures the likelihood of a
+    situation in which the idle duration measured after wakeup falls into
+    to given bin, but the time till the next timer (sleep length) falls
+    into a bin corresponding to one of the deeper idle states.  It is
+    used when the "hits" and "misses" metrics indicate that the state
+    "matching" the sleep length should not be selected, so that the state
+    with the maximum "early hits" value is selected instead of it.
+    
+    If the idle state corresponding to the given bin is disabled, it
+    cannot be selected and if it turns out to be the one that should be
+    selected, a shallower idle state needs to be used instead of it.
+    Nevertheless, the metrics collected for the bin corresponding to it
+    are still valid and need to be taken into account as though that
+    state had not been disabled.
+    
+    As far as the "early hits" metric is concerned, teo_select() tries to
+    take disabled states into account, but the state index corresponding
+    to the maximum "early hits" value computed by it may be incorrect.
+    Namely, it always uses the index of the previous maximum "early hits"
+    state then, but there may be enabled idle states closer to the
+    disabled one in question.  In particular, if the current candidate
+    state (whose index is the idx value) is closer to the disabled one
+    and the "early hits" value of the disabled state is greater than the
+    current maximum, the index of the current candidate state (idx)
+    should replace the "maximum early hits state" index.
+    
+    Modify the code to handle that case correctly.
+    
+    Fixes: b26bf6ab716f ("cpuidle: New timer events oriented governor for tickless systems")
+    Reported-by: Doug Smythies <dsmythies@telus.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: 5.1+ <stable@vger.kernel.org> # 5.1+
+
+commit e43dcf20215f0287ea113102617ca04daa76b70e
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu Oct 10 23:36:15 2019 +0200
+
+    cpuidle: teo: Consider hits and misses metrics of disabled states
+    
+    The TEO governor uses idle duration "bins" defined in accordance with
+    the CPU idle states table provided by the driver, so that each "bin"
+    covers the idle duration range between the target residency of the
+    idle state corresponding to it and the target residency of the closest
+    deeper idle state.  The governor collects statistics for each bin
+    regardless of whether or not the idle state corresponding to it is
+    currently enabled.
+    
+    In particular, the "hits" and "misses" metrics measure the likelihood
+    of a situation in which both the time till the next timer (sleep
+    length) and the idle duration measured after wakeup fall into the
+    given bin.  Namely, if the "hits" value is greater than the "misses"
+    one, that situation is more likely than the one in which the sleep
+    length falls into the given bin, but the idle duration measured after
+    wakeup falls into a bin corresponding to one of the shallower idle
+    states.
+    
+    If the idle state corresponding to the given bin is disabled, it
+    cannot be selected and if it turns out to be the one that should be
+    selected, a shallower idle state needs to be used instead of it.
+    Nevertheless, the metrics collected for the bin corresponding to it
+    are still valid and need to be taken into account as though that
+    state had not been disabled.
+    
+    For this reason, make teo_select() always use the "hits" and "misses"
+    values of the idle duration range that the sleep length falls into
+    even if the specific idle state corresponding to it is disabled and
+    if the "hits" values is greater than the "misses" one, select the
+    closest enabled shallower idle state in that case.
+    
+    Fixes: b26bf6ab716f ("cpuidle: New timer events oriented governor for tickless systems")
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: 5.1+ <stable@vger.kernel.org> # 5.1+
+
+commit 6f3710f1f65fdc0da2b042ea6a9a738ddd146d4e
+Author: Sudeep Holla <sudeep.holla@arm.com>
+Date:   Wed May 29 14:29:45 2019 +0100
+
+    arm: dts: vexpress-v2p-ca15_a7: disable NOR flash node by default
+    
+    Accessing the NOR flash memory from the kernel will disrupt CPU sleep/
+    idles states and CPU hotplugging. We need to disable this DT node by
+    default. Setups that want to access the flash can modify this entry to
+    enable the flash again but also ensuring to disable CPU idle states and
+    CPU hotplug.
+    
+    The platform firmware assumes the flash is always in read mode while
+    Linux kernel driver leaves NOR flash in "read id" mode after
+    initialization. If it gets used actively, it can be in some other state.
+    
+    So far we had not seen this issue as the NOR flash drivers in kernel
+    were not enabled by default. However it was enable in multi_v7 config by
+    Commit 5f068190cc10 ("ARM: multi_v7_defconfig: Enable support for CFI NOR FLASH")
+    
+    So, let's mark the NOR flash disabled so that the platform can boot
+    again. This based on:
+    Commit 980bbff018f6 ("ARM64: juno: disable NOR flash node by default")
+    
+    Cc: Liviu Dudau <liviu.dudau@arm.com>
+    Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+    Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+    Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+commit 14d55a3df44a288a4d273dff2a5f08ae06614774
+Merge: c076dd723e37 2f03e39b5bfe
+Author: Olof Johansson <olof@lixom.net>
+Date:   Sun Apr 28 12:40:13 2019 -0700
+
+    Merge tag 'tegra-for-5.2-arm64-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/dt
+    
+    arm64: tegra: Device tree changes for v5.2-rc1
+    
+    This contains a bunch of changes all across the board. Perhaps the most
+    notable introduction here is support for the Jetson Nano Developer Kit.
+    
+    * tag 'tegra-for-5.2-arm64-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      arm64: tegra: Remove regulator hacks on Jetson TX2
+      arm64: tegra: Enable XUSB on P2771
+      arm64: tegra: Add XUSB and pad controller on Tegra186
+      arm64: tegra: Add NVIDIA Jetson Nano Developer Kit support
+      arm64: tegra: smaug: Move PLL power supplies to XUSB pad controller
+      arm64: tegra: jetson-tx1: Move PLL power supplies to XUSB pad controller
+      arm64: tegra: Enable command queue for Tegra186 SDMMC4
+      arm64: tegra: Fix default tap and trim values
+      arm64: tegra: Add supply for temperature sensor on P2888
+      arm64: tegra: Enable aconnect, ADMA and AGIC on Jetson TX1
+      arm64: tegra: Add L2 cache topology to Tegra210
+      arm64: tegra: Enable CPU idle support for Shield
+      arm64: tegra: Enable CPU idle support for Smaug
+      arm64: tegra: Enable CPU idle support for Jetson TX1
+      arm64: tegra: Add CPU idle states properties for Tegra210
+      arm64: tegra: Fix timer node for Tegra210
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit da77c6d92bf7c8815b143cc271c7f0b8af6aa15b
+Author: Joseph Lo <josephl@nvidia.com>
+Date:   Thu Feb 21 15:21:47 2019 +0800
+
+    arm64: tegra: Add CPU idle states properties for Tegra210
+    
+    Add idle states properties for generic ARM CPU idle driver. This
+    includes a cpu-sleep state which is the power down state of CPU cores.
+    
+    Signed-off-by: Joseph Lo <josephl@nvidia.com>
+    Acked-by: Jon Hunter <jonathanh@nvidia.com>
+    Acked-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Thierry Reding <treding@nvidia.com>
+
+commit 04dab58a39d402162a7effe7278df8cd41557252
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Mon Dec 10 12:30:23 2018 +0100
+
+    cpuidle: Add 'above' and 'below' idle state metrics
+    
+    Add two new metrics for CPU idle states, "above" and "below", to count
+    the number of times the given state had been asked for (or entered
+    from the kernel's perspective), but the observed idle duration turned
+    out to be too short or too long for it (respectively).
+    
+    These metrics help to estimate the quality of the CPU idle governor
+    in use.
+    
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit f83952c647695642e3679bb09c310972024eaa17
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Tue Aug 14 12:34:40 2018 +0200
+
+    cpuidle: menu: Handle stopped tick more aggressively
+    
+    commit 5ef499cd571c293b74a30d77e7ef512edb6ded6b upstream.
+    
+    Commit 87c9fe6ee495 (cpuidle: menu: Avoid selecting shallow states
+    with stopped tick) missed the case when the target residencies of
+    deep idle states of CPUs are above the tick boundary which may cause
+    the CPU to get stuck in a shallow idle state for a long time.
+    
+    Say there are two CPU idle states available: one shallow, with the
+    target residency much below the tick boundary and one deep, with
+    the target residency significantly above the tick boundary.  In
+    that case, if the tick has been stopped already and the expected
+    next timer event is relatively far in the future, the governor will
+    assume the idle duration to be equal to TICK_USEC and it will select
+    the idle state for the CPU accordingly.  However, that will cause the
+    shallow state to be selected even though it would have been more
+    energy-efficient to select the deep one.
+    
+    To address this issue, modify the governor to always use the time
+    till the closest timer event instead of the predicted idle duration
+    if the latter is less than the tick period length and the tick has
+    been stopped already.  Also make it extend the search for a matching
+    idle state if the tick is stopped to avoid settling on a shallow
+    state if deep states with target residencies above the tick period
+    length are available.
+    
+    In addition, make it always indicate that the tick should be stopped
+    if it has been stopped already for consistency.
+    
+    Fixes: 87c9fe6ee495 (cpuidle: menu: Avoid selecting shallow states with stopped tick)
+    Reported-by: Leo Yan <leo.yan@linaro.org>
+    Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: 4.17+ <stable@vger.kernel.org> # 4.17+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 5ef499cd571c293b74a30d77e7ef512edb6ded6b
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Tue Aug 14 12:34:40 2018 +0200
+
+    cpuidle: menu: Handle stopped tick more aggressively
+    
+    Commit 87c9fe6ee495 (cpuidle: menu: Avoid selecting shallow states
+    with stopped tick) missed the case when the target residencies of
+    deep idle states of CPUs are above the tick boundary which may cause
+    the CPU to get stuck in a shallow idle state for a long time.
+    
+    Say there are two CPU idle states available: one shallow, with the
+    target residency much below the tick boundary and one deep, with
+    the target residency significantly above the tick boundary.  In
+    that case, if the tick has been stopped already and the expected
+    next timer event is relatively far in the future, the governor will
+    assume the idle duration to be equal to TICK_USEC and it will select
+    the idle state for the CPU accordingly.  However, that will cause the
+    shallow state to be selected even though it would have been more
+    energy-efficient to select the deep one.
+    
+    To address this issue, modify the governor to always use the time
+    till the closest timer event instead of the predicted idle duration
+    if the latter is less than the tick period length and the tick has
+    been stopped already.  Also make it extend the search for a matching
+    idle state if the tick is stopped to avoid settling on a shallow
+    state if deep states with target residencies above the tick period
+    length are available.
+    
+    In addition, make it always indicate that the tick should be stopped
+    if it has been stopped already for consistency.
+    
+    Fixes: 87c9fe6ee495 (cpuidle: menu: Avoid selecting shallow states with stopped tick)
+    Reported-by: Leo Yan <leo.yan@linaro.org>
+    Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: 4.17+ <stable@vger.kernel.org> # 4.17+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit f2d285669aae656dfeafa0bf25e86bbbc5d22329
+Merge: be5537542743 103cf0e5799c
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Apr 3 10:45:39 2018 -0700
+
+    Merge tag 'pm-4.17-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull power management updates from Rafael Wysocki:
+     "These update the cpuidle poll state definition to reduce excessive
+      energy usage related to it, add new CPU ID to the RAPL power capping
+      driver, update the ACPI system suspend code to handle some special
+      cases better, extend the PM core's device links code slightly, add new
+      sysfs attribute for better suspend-to-idle diagnostics and easier
+      hibernation handling, update power management tools and clean up
+      cpufreq quite a bit.
+    
+      Specifics:
+    
+       - Modify the cpuidle poll state implementation to prevent CPUs from
+         staying in the loop in there for excessive times (Rafael Wysocki).
+    
+       - Add Intel Cannon Lake chips support to the RAPL power capping
+         driver (Joe Konno).
+    
+       - Add reference counting to the device links handling code in the PM
+         core (Lukas Wunner).
+    
+       - Avoid reconfiguring GPEs on suspend-to-idle in the ACPI system
+         suspend code (Rafael Wysocki).
+    
+       - Allow devices to be put into deeper low-power states via ACPI if
+         both _SxD and _SxW are missing (Daniel Drake).
+    
+       - Reorganize the core ACPI suspend-to-idle wakeup code to avoid a
+         keyboard wakeup issue on Asus UX331UA (Chris Chiu).
+    
+       - Prevent the PCMCIA library code from aborting suspend-to-idle due
+         to noirq suspend failures resulting from incorrect assumptions
+         (Rafael Wysocki).
+    
+       - Add coupled cpuidle supprt to the Exynos3250 platform (Marek
+         Szyprowski).
+    
+       - Add new sysfs file to make it easier to specify the image storage
+         location during hibernation (Mario Limonciello).
+    
+       - Add sysfs files for collecting suspend-to-idle usage and time
+         statistics for CPU idle states (Rafael Wysocki).
+    
+       - Update the pm-graph utilities (Todd Brandt).
+    
+       - Reduce the kernel log noise related to reporting Low-power Idle
+         constraings by the ACPI system suspend code (Rafael Wysocki).
+    
+       - Make it easier to distinguish dedicated wakeup IRQs in the
+         /proc/interrupts output (Tony Lindgren).
+    
+       - Add the frequency table validation in cpufreq to the core and drop
+         it from a number of cpufreq drivers (Viresh Kumar).
+    
+       - Drop "cooling-{min|max}-level" for CPU nodes from a couple of DT
+         bindings (Viresh Kumar).
+    
+       - Clean up the CPU online error code path in the cpufreq core (Viresh
+         Kumar).
+    
+       - Fix assorted issues in the SCPI, CPPC, mediatek and tegra186
+         cpufreq drivers (Arnd Bergmann, Chunyu Hu, George Cherian, Viresh
+         Kumar).
+    
+       - Drop memory allocation error messages from a few places in cpufreq
+         and cpuildle drivers (Markus Elfring)"
+    
+    * tag 'pm-4.17-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm: (56 commits)
+      ACPI / PM: Fix keyboard wakeup from suspend-to-idle on ASUS UX331UA
+      cpufreq: CPPC: Use transition_delay_us depending transition_latency
+      PM / hibernate: Change message when writing to /sys/power/resume
+      PM / hibernate: Make passing hibernate offsets more friendly
+      cpuidle: poll_state: Avoid invoking local_clock() too often
+      PM: cpuidle/suspend: Add s2idle usage and time state attributes
+      cpuidle: Enable coupled cpuidle support on Exynos3250 platform
+      cpuidle: poll_state: Add time limit to poll_idle()
+      cpufreq: tegra186: Don't validate the frequency table twice
+      cpufreq: speedstep: Don't validate the frequency table twice
+      cpufreq: sparc: Don't validate the frequency table twice
+      cpufreq: sh: Don't validate the frequency table twice
+      cpufreq: sfi: Don't validate the frequency table twice
+      cpufreq: scpi: Don't validate the frequency table twice
+      cpufreq: sc520: Don't validate the frequency table twice
+      cpufreq: s3c24xx: Don't validate the frequency table twice
+      cpufreq: qoirq: Don't validate the frequency table twice
+      cpufreq: pxa: Don't validate the frequency table twice
+      cpufreq: ppc_cbe: Don't validate the frequency table twice
+      cpufreq: powernow: Don't validate the frequency table twice
+      ...
+
+commit 35ae713355868aa493edbfbabf615473473215cc
+Author: Sudeep Holla <Sudeep.Holla@arm.com>
+Date:   Tue Jul 19 18:52:53 2016 +0100
+
+    ACPI / processor_idle: introduce ACPI_PROCESSOR_CSTATE
+    
+    ACPI 6.0 adds a new method to specify the CPU idle states(C-states)
+    called Low Power Idle(LPI) states. Since new architectures like ARM64
+    use only LPIs, introduce ACPI_PROCESSOR_CSTATE to encapsulate all the
+    code supporting the old style C-states(_CST).
+    
+    This patch will help to extend the processor_idle module to support
+    LPI.
+    
+    Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 605f30205348f1d808d98d77505149da8b047b9f
+Author: Preeti U Murthy <preeti@linux.vnet.ibm.com>
+Date:   Tue Feb 3 12:13:44 2015 +0530
+
+    powerpc/powernv: Avoid explicit endian conversions while parsing device tree
+    
+    We currently read the information about idle states from the device
+    tree, so as to find out the CPU idle states supported by the platform.
+    
+    Use the of_property_read/count_xxx() APIs, which handle endian
+    conversions for us, and mean we don't need any endian annotations in the
+    code.
+    
+    Signed-off-by: Preeti U Murthy <preeti@linux.vnet.ibm.com>
+    Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+
+commit faafcba3b5e15999cf75d5c5a513ac8e47e2545f
+Merge: 13ead805c5a1 f10e00f4bf36
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Oct 13 16:23:15 2014 +0200
+
+    Merge branch 'sched-core-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull scheduler updates from Ingo Molnar:
+     "The main changes in this cycle were:
+    
+       - Optimized support for Intel "Cluster-on-Die" (CoD) topologies (Dave
+         Hansen)
+    
+       - Various sched/idle refinements for better idle handling (Nicolas
+         Pitre, Daniel Lezcano, Chuansheng Liu, Vincent Guittot)
+    
+       - sched/numa updates and optimizations (Rik van Riel)
+    
+       - sysbench speedup (Vincent Guittot)
+    
+       - capacity calculation cleanups/refactoring (Vincent Guittot)
+    
+       - Various cleanups to thread group iteration (Oleg Nesterov)
+    
+       - Double-rq-lock removal optimization and various refactorings
+         (Kirill Tkhai)
+    
+       - various sched/deadline fixes
+    
+      ... and lots of other changes"
+    
+    * 'sched-core-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip: (72 commits)
+      sched/dl: Use dl_bw_of() under rcu_read_lock_sched()
+      sched/fair: Delete resched_cpu() from idle_balance()
+      sched, time: Fix build error with 64 bit cputime_t on 32 bit systems
+      sched: Improve sysbench performance by fixing spurious active migration
+      sched/x86: Fix up typo in topology detection
+      x86, sched: Add new topology for multi-NUMA-node CPUs
+      sched/rt: Use resched_curr() in task_tick_rt()
+      sched: Use rq->rd in sched_setaffinity() under RCU read lock
+      sched: cleanup: Rename 'out_unlock' to 'out_free_new_mask'
+      sched: Use dl_bw_of() under RCU read lock
+      sched/fair: Remove duplicate code from can_migrate_task()
+      sched, mips, ia64: Remove __ARCH_WANT_UNLOCKED_CTXSW
+      sched: print_rq(): Don't use tasklist_lock
+      sched: normalize_rt_tasks(): Don't use _irqsave for tasklist_lock, use task_rq_lock()
+      sched: Fix the task-group check in tg_has_rt_tasks()
+      sched/fair: Leverage the idle state info when choosing the "idlest" cpu
+      sched: Let the scheduler see CPU idle states
+      sched/deadline: Fix inter- exclusive cpusets migrations
+      sched/deadline: Clear dl_entity params when setscheduling to different class
+      sched/numa: Kill the wrong/dead TASK_DEAD check in task_numa_fault()
+      ...
+
+commit 442bf3aaf55a91ebfec71da46a4ee10a3c905bcc
+Author: Daniel Lezcano <daniel.lezcano@linaro.org>
+Date:   Thu Sep 4 11:32:09 2014 -0400
+
+    sched: Let the scheduler see CPU idle states
+    
+    When the cpu enters idle, it stores the cpuidle state pointer in its
+    struct rq instance which in turn could be used to make a better decision
+    when balancing tasks.
+    
+    As soon as the cpu exits its idle state, the struct rq reference is
+    cleared.
+    
+    There are a couple of situations where the idle state pointer could be changed
+    while it is being consulted:
+    
+    1. For x86/acpi with dynamic c-states, when a laptop switches from battery
+       to AC that could result on removing the deeper idle state. The acpi driver
+       triggers:
+            'acpi_processor_cst_has_changed'
+                    'cpuidle_pause_and_lock'
+                            'cpuidle_uninstall_idle_handler'
+                                    'kick_all_cpus_sync'.
+    
+    All cpus will exit their idle state and the pointed object will be set to
+    NULL.
+    
+    2. The cpuidle driver is unloaded. Logically that could happen but not
+    in practice because the drivers are always compiled in and 95% of them are
+    not coded to unregister themselves.  In any case, the unloading code must
+    call 'cpuidle_unregister_device', that calls 'cpuidle_pause_and_lock'
+    leading to 'kick_all_cpus_sync' as mentioned above.
+    
+    A race can happen if we use the pointer and then one of these two scenarios
+    occurs at the same moment.
+    
+    In order to be safe, the idle state pointer stored in the rq must be
+    used inside a rcu_read_lock section where we are protected with the
+    'rcu_barrier' in the 'cpuidle_uninstall_idle_handler' function. The
+    idle_get_state() and idle_put_state() accessors should be used to that
+    effect.
+    
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Nicolas Pitre <nico@linaro.org>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+    Cc: linux-pm@vger.kernel.org
+    Cc: linaro-kernel@lists.linaro.org
+    Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Link: http://lkml.kernel.org/n/tip-@git.kernel.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 718987d695adc991eb94501209fe5353136c8c16
+Author: Len Brown <len.brown@intel.com>
+Date:   Fri Feb 14 02:30:00 2014 -0500
+
+    intel_idle: support Bay Trail
+    
+    Bay Trail (BYT) is a family of Silvermont-core Atom Processor SOCs,
+    including the Intel Atom Processor Z36xxx and Z37xxx Series.
+    
+    Although it shares the Silvermont core with Avoton,
+    BYT is optimized for mobile, and thus it supports
+    different power saving CPU idle states.
+    
+    Note that not all versions of Bay Trail HW support all
+    of the states listed in the driver.
+    
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Tested-by: Aubrey Li <aubrey.li@linux.intel.com>
+
+commit 97a19a247c23e286814a5ac7ec0825d0ff82a16c
+Author: Tomas Janousek <tomi@nomi.cz>
+Date:   Sat Dec 8 13:48:13 2012 +0100
+
+    drm/i915: don't prevent CPU idle states
+    
+    Commit 9ee32fea5f unconditionally prevents the CPU from entering idle states
+    until intel_dp_aux_ch completes for the first time, which never happens on my
+    DisplayPort-less intel gfx, causing the CPU to get rather hot.
+    
+    Signed-off-by: Tomas Janousek <tomi@nomi.cz>
+    Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+
+commit 0b25e25bef0e03c0465c3eb1119b32cb906db689
+Author: Joseph Lo <josephl@nvidia.com>
+Date:   Wed Oct 31 17:41:15 2012 +0800
+
+    ARM: tegra: cpuidle: separate cpuidle driver for different chips
+    
+    The different Tegra chips may have different CPU idle states and data.
+    Individual CPU idle driver make it more easy to maintain.
+    
+    Signed-off-by: Joseph Lo <josephl@nvidia.com>
+    Signed-off-by: Stephen Warren <swarren@nvidia.com>
+
+commit 8651f97bd951d0bb1c10fa24e3fa3455193f3548
+Author: Preeti U Murthy <preeti@linux.vnet.ibm.com>
+Date:   Mon Jul 9 10:12:56 2012 +0200
+
+    PM / cpuidle: System resume hang fix with cpuidle
+    
+    On certain bios, resume hangs if cpus are allowed to enter idle states
+    during suspend [1].
+    
+    This was fixed in apci idle driver [2].But intel_idle driver does not
+    have this fix. Thus instead of replicating the fix in both the idle
+    drivers, or in more platform specific idle drivers if needed, the
+    more general cpuidle infrastructure could handle this.
+    
+    A suspend callback in cpuidle_driver could handle this fix. But
+    a cpuidle_driver provides only basic functionalities like platform idle
+    state detection capability and mechanisms to support entry and exit
+    into CPU idle states. All other cpuidle functions are found in the
+    cpuidle generic infrastructure for good reason that all cpuidle
+    drivers, irrepective of their platforms will support these functions.
+    
+    One option therefore would be to register a suspend callback in cpuidle
+    which handles this fix. This could be called through a PM_SUSPEND_PREPARE
+    notifier. But this is too generic a notfier for a driver to handle.
+    
+    Also, ideally the job of cpuidle is not to handle side effects of suspend.
+    It should expose the interfaces which "handle cpuidle 'during' suspend"
+    or any other operation, which the subsystems call during that respective
+    operation.
+    
+    The fix demands that during suspend, no cpus should be allowed to enter
+    deep C-states. The interface cpuidle_uninstall_idle_handler() in cpuidle
+    ensures that. Not just that it also kicks all the cpus which are already
+    in idle out of their idle states which was being done during cpu hotplug
+    through a CPU_DYING_FROZEN callbacks.
+    
+    Now the question arises about when during suspend should
+    cpuidle_uninstall_idle_handler() be called. Since we are dealing with
+    drivers it seems best to call this function during dpm_suspend().
+    Delaying the call till dpm_suspend_noirq() does no harm, as long as it is
+    before cpu_hotplug_begin() to avoid race conditions with cpu hotpulg
+    operations. In dpm_suspend_noirq(), it would be wise to place this call
+    before suspend_device_irqs() to avoid ugly interactions with the same.
+    
+    Ananlogously, during resume.
+    
+    References:
+    [1] https://bugs.launchpad.net/ubuntu/+source/linux/+bug/674075.
+    [2] http://marc.info/?l=linux-pm&m=133958534231884&w=2
+    
+    Reported-and-tested-by: Dave Hansen <dave@linux.vnet.ibm.com>
+    Signed-off-by: Preeti U Murthy <preeti@linux.vnet.ibm.com>
+    Reviewed-by: Srivatsa S. Bhat <srivatsa.bhat@linux.vnet.ibm.com>
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>

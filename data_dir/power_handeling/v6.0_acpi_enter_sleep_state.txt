@@ -1,0 +1,443 @@
+commit 3c89857a66ef15bcf54c8fd255a1fd70dbc823a6
+Author: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Date:   Thu Dec 9 16:08:02 2021 +0300
+
+    ACPI: PM: Remove redundant cache flushing
+    
+    ACPICA code takes care about cache flushing on S1/S2/S3 in
+    acpi_hw_extended_sleep() and acpi_hw_legacy_sleep().
+    
+    acpi_suspend_enter() calls into ACPICA code via acpi_enter_sleep_state()
+    for S1 or x86_acpi_suspend_lowlevel() for S3.
+    
+    acpi_sleep_prepare() call tree:
+      __acpi_pm_prepare()
+        acpi_pm_prepare()
+          acpi_suspend_ops::prepare_late()
+          acpi_hibernation_ops::pre_snapshot()
+          acpi_hibernation_ops::prepare()
+        acpi_suspend_begin_old()
+          acpi_suspend_begin_old::begin()
+      acpi_hibernation_begin_old()
+        acpi_hibernation_ops_old::acpi_hibernation_begin_old()
+      acpi_power_off_prepare()
+        pm_power_off_prepare()
+    
+    Hibernation (S4) and Power Off (S5) don't require cache flushing, so
+    the only interesting callsites are acpi_suspend_ops::prepare_late()
+    and acpi_suspend_begin_old::begin(). Both of them have cache flush
+    on ->enter() operation in acpi_suspend_enter().
+    
+    Remove redundant ACPI_FLUSH_CPU_CACHE() in acpi_sleep_prepare() and
+    acpi_suspend_enter().
+    
+    Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit c0f6feba784e1087b905ad097d2d9ac0aaf744a5
+Author: Borislav Petkov <bp@suse.de>
+Date:   Wed Apr 15 08:50:14 2015 +0200
+
+    x86/asm, x86/acpi/wakeup_64.S: Make global label a local one
+    
+    Make it a local symbol so that it doesn't appear in objdump
+    output.
+    
+    No functionality change - code remains the same, just the global
+    label disappears:
+    
+             ffffffff81039dbe:       bf 03 00 00 00          mov    $0x3,%edi
+             ffffffff81039dc3:       31 c0                   xor    %eax,%eax
+             ffffffff81039dc5:       e8 b6 fd ff ff          callq  ffffffff81039b80 <x86_acpi_enter_sleep_state>
+            -ffffffff81039dca:       eb 00                   jmp    ffffffff81039dcc <resume_point>
+            -
+            -ffffffff81039dcc <resume_point>:
+            +ffffffff81039dca:       eb 00                   jmp    ffffffff81039dcc <do_suspend_lowlevel+0x9c>
+             ffffffff81039dcc:       48 c7 c0 80 1a ca 82    mov    $0xffffffff82ca1a80,%rax
+             ffffffff81039dd3:       48 8b 98 e2 00 00 00    mov    0xe2(%rax),%rbx
+             ffffffff81039dda:       0f 22 e3                mov    %rbx,%cr4
+    
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Cc: <linux-pm@vger.kernel.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Len Brown <len.brown@intel.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Pavel Machek <pavel@ucw.cz>
+    Cc: Rafael J. Wysocki <rjw@rjwysocki.net>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Link: http://lkml.kernel.org/r/1429080614-22610-1-git-send-email-bp@alien8.de
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 3130497f5babd42b24a7febda46b46116e0adc83
+Author: Li, Aubrey <aubrey.li@linux.intel.com>
+Date:   Sun Mar 2 08:53:57 2014 +0800
+
+    ACPI / sleep: pm_power_off needs more sanity checks to be installed
+    
+    Sleep control and status registers need santity checks as well before
+    ACPI installs acpi_power_off to pm_power_off hook. The checking code in
+    acpi_enter_sleep_state() is too late, we should not allow a not-working
+    pm_power_off function to be hooked up.
+    
+    Signed-off-by: Aubrey Li <aubrey.li@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 40bce100cafb945f1fb5475a70628b4379c74f38
+Author: Lv Zheng <lv.zheng@intel.com>
+Date:   Thu Oct 31 09:31:18 2013 +0800
+
+    ACPICA: Cleanup asmlinkage for ACPICA APIs.
+    
+    Add an asmlinkage wrapper around acpi_enter_sleep_state() to prevent
+    an empty stub from being called by assmebly code for ACPI_REDUCED_HARDWARE
+    set.
+    
+    As arch/x86/kernel/acpi/wakeup_xx.S is only compiled when CONFIG_ACPI=y
+    and there are no users of ACPI_HARDWARE_REDUCED, currently this is in
+    fact not a real issue, but a cleanup to reduce source code differences
+    between Linux and ACPICA upstream.
+    
+    [rjw: Changelog]
+    Signed-off-by: Lv Zheng <lv.zheng@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit d8579fd834de224d2833ce2e82e0f691cc67e8f7
+Merge: d42d1dabf34b 9d0b01a1bbb7
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Aug 3 14:10:00 2012 -0700
+
+    Merge branch 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux
+    
+    Pull ACPI and power management fixes from Len Brown:
+     "A 3.3 sleep regression fixed, numa bugfix, plus some minor cleanups"
+    
+    * 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux:
+      ACPI processor: Fix tick_broadcast_mask online/offline regression
+      ACPI: Only count valid srat memory structures
+      ACPI: Untangle a return statement for better readability
+      ACPI / PCI: Do not try to acquire _OSC control if that is hopeless
+      ACPI: delete _GTS/_BFS support
+      ACPI/x86: revert 'x86, acpi: Call acpi_enter_sleep_state via an asmlinkage C function from assembler'
+      ACPI: replace strlen("string") with sizeof("string") -1
+      ACPI / PM: Fix build warning in sleep.c for CONFIG_ACPI_SLEEP unset
+
+commit 3b6961ba8c682cc71e51079017743c1b282fd259
+Author: Len Brown <len.brown@intel.com>
+Date:   Thu Jul 26 19:40:08 2012 -0400
+
+    ACPI/x86: revert 'x86, acpi: Call acpi_enter_sleep_state via an asmlinkage C function from assembler'
+    
+    cd74257b974d6d26442c97891c4d05772748b177
+    patched up GTS/BFS -- a feature we want to remove.
+    So revert it (by hand, due to conflict in sleep.h)
+    to prepare for GTS/BFS removal.
+    
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Acked-by: Ingo Molnar <mingo@kernel.org>
+    Acked-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+
+commit 86ec090e58fca1025676e775093a87ab699f7f4d
+Merge: bdd4f709a150 89b8835ec865
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Apr 25 21:29:26 2012 -0700
+
+    Merge branch 'x86-urgent-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull x86 fixes from H. Peter Anvin.
+    
+    * 'x86-urgent-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:
+      x32, siginfo: Provide proper overrides for x32 siginfo_t
+      asm-generic: Allow overriding clock_t and add attributes to siginfo_t
+      x32: Check __ILP32__ instead of __LP64__ for x32
+      x86, acpi: Call acpi_enter_sleep_state via an asmlinkage C function from assembler
+      ACPI: Convert wake_sleep_flags to a value instead of function
+      x86, apic: APIC code touches invalid MSR on P5 class machines
+      i387: ptrace breaks the lazy-fpu-restore logic
+      x86/platform: Remove incorrect error message in x86_default_fixup_cpu_id()
+      x86, efi: Add dedicated EFI stub entry point
+      x86/amd: Remove broken links from comment and kernel message
+      x86, microcode: Ensure that module is only loaded on supported AMD CPUs
+      x86, microcode: Fix sysfs warning during module unload on unsupported CPUs
+
+commit cd74257b974d6d26442c97891c4d05772748b177
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Sun Apr 22 23:03:18 2012 -0400
+
+    x86, acpi: Call acpi_enter_sleep_state via an asmlinkage C function from assembler
+    
+    With commit a2ef5c4fd44ce3922435139393b89f2cce47f576
+    "ACPI: Move module parameter gts and bfs to sleep.c" the
+    wake_sleep_flags is required when calling acpi_enter_sleep_state.
+    
+    The assembler code in wakeup_*.S did not do that. One solution
+    is to call it from assembler and stick the wake_sleep_flags on
+    the stack (for 32-bit) or in %esi (for 64-bit). hpa and rafael
+    both suggested however to create a wrapper function to call
+    acpi_enter_sleep_state and call said wrapper function
+    ("acpi_enter_s3") from assembler.
+    
+    For 32-bit, the acpi_enter_s3 ends up looking as so:
+    
+      push   %ebp
+      mov    %esp,%ebp
+      sub    $0x8,%esp
+      movzbl 0xc1809314,%eax [wake_sleep_flags]
+      movl   $0x3,(%esp)
+      mov    %eax,0x4(%esp)
+      call   0xc12d1fa0 <acpi_enter_sleep_state>
+      leave
+      ret
+    
+    And 64-bit:
+    
+      movzbl 0x9afde1(%rip),%esi        [wake_sleep_flags]
+      push   %rbp
+      mov    $0x3,%edi
+      mov    %rsp,%rbp
+      callq  0xffffffff812e9800 <acpi_enter_sleep_state>
+      leaveq
+      retq
+    
+    Reviewed-by: H. Peter Anvin <hpa@zytor.com>
+    Suggested-by: H. Peter Anvin <hpa@zytor.com>
+    [v2: Remove extra assembler operations, per hpa review]
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Link: http://lkml.kernel.org/r/1335150198-21899-3-git-send-email-konrad.wilk@oracle.com
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 2a14e541ed87bca0c125b82961ca3c6f808607d2
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Sun Apr 22 23:03:17 2012 -0400
+
+    ACPI: Convert wake_sleep_flags to a value instead of function
+    
+    With commit a2ef5c4fd44ce3922435139393b89f2cce47f576
+    "ACPI: Move module parameter gts and bfs to sleep.c" the wake_sleep_flags
+    is required when calling acpi_enter_sleep_state, which means
+    that if there are functions outside the sleep.c code they
+    can't get the wake_sleep_flags values.
+    
+    This converts the function in to a exported value and converts
+    the module config operands to a function.
+    
+    Acked-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Acked-by: Lin Ming <ming.m.lin@intel.com>
+    [v2: Parameters can be turned on/off dynamically]
+    [v3: unsigned char -> u8]
+    [v4: val -> kp->arg]
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Link: http://lkml.kernel.org/r/1335150198-21899-2-git-send-email-konrad.wilk@oracle.com
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit aba02e53bab9032d62c208f5e0b5bc56599b3735
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Thu Jun 17 17:40:57 2010 +0200
+
+    ACPI / PM: Do not enable GPEs for system wakeup in advance
+    
+    commit cb1cb1780f2025a7d612de09131bf6530f80fb1a upstream.
+    
+    After commit 9630bdd9b15d2f489c646d8bc04b60e53eb5ec78
+    (ACPI: Use GPE reference counting to support shared GPEs) the wakeup
+    enable mask bits of GPEs are set as soon as the GPEs are enabled to
+    wake up the system.  Unfortunately, this leads to a regression
+    reported by Michal Hocko, where a system is woken up from ACPI S5 by
+    a device that is not supposed to do that, because the wakeup enable
+    mask bit of this device's GPE is always set when
+    acpi_enter_sleep_state() calls acpi_hw_enable_all_wakeup_gpes(),
+    although it should only be set if the device is supposed to wake up
+    the system from the target state.
+    
+    To work around this issue, rework the ACPI power management code so
+    that GPEs are not enabled to wake up the system upfront, but only
+    during a system state transition when the target state of the system
+    is known.  [Of course, this means that the reference counting of
+    "wakeup" GPEs doesn't really make sense and it is sufficient to
+    set/unset the wakeup mask bits for them during system sleep
+    transitions.  This will allow us to simplify the GPE handling code
+    quite a bit, but that change is too intrusive for 2.6.35.]
+    
+    Fixes https://bugzilla.kernel.org/show_bug.cgi?id=15951
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Reported-and-tested-by: Michal Hocko <mhocko@suse.cz>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit e8b6f970107cfc9c00cdcdb12ec6c7e135cf379f
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Fri Jun 25 01:18:39 2010 +0200
+
+    ACPICA: Introduce acpi_gpe_wakeup()
+    
+    ACPICA uses reference counters to avoid disabling GPEs too early in
+    case they have been enabled for many times.  This is done separately
+    for runtime and for wakeup, but the wakeup GPE reference counter is
+    not really necessary, because GPEs are only enabled to wake up the
+    system at the hardware level by acpi_enter_sleep_state().  Thus it
+    only is necessary to set the corresponding bits in the wakeup enable
+    masks of these GPEs' registers right before the system enters a sleep
+    state.  Moreover, the GPE wakeup enable bits can only be set when the
+    target sleep state of the system is known and they need to be cleared
+    immediately after wakeup regardless of how many wakeup devices are
+    associated with a given GPE.
+    
+    On the basis of the above observations, introduce function
+    acpi_gpe_wakeup() to be used for setting or clearing the enable bit
+    corresponding to a given GPE in its enable register's enable_for_wake
+    mask.  Modify the ACPI suspend and wakeup code the use
+    acpi_gpe_wakeup() instead of acpi_{enable|disable}_gpe() to set
+    and clear GPE enable bits in their registers' enable_for_wake masks
+    during system transitions to a sleep state and back to the working
+    state, respectively.  [This will allow us to drop the third
+    argument of acpi_{enable|disable}_gpe() and simplify the GPE
+    handling code.]
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Signed-off-by: Bob Moore <robert.moore@intel.com>
+    Signed-off-by: Lin Ming <ming.m.lin@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit cb1cb1780f2025a7d612de09131bf6530f80fb1a
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Thu Jun 17 17:40:57 2010 +0200
+
+    ACPI / PM: Do not enable GPEs for system wakeup in advance
+    
+    After commit 9630bdd9b15d2f489c646d8bc04b60e53eb5ec78
+    (ACPI: Use GPE reference counting to support shared GPEs) the wakeup
+    enable mask bits of GPEs are set as soon as the GPEs are enabled to
+    wake up the system.  Unfortunately, this leads to a regression
+    reported by Michal Hocko, where a system is woken up from ACPI S5 by
+    a device that is not supposed to do that, because the wakeup enable
+    mask bit of this device's GPE is always set when
+    acpi_enter_sleep_state() calls acpi_hw_enable_all_wakeup_gpes(),
+    although it should only be set if the device is supposed to wake up
+    the system from the target state.
+    
+    To work around this issue, rework the ACPI power management code so
+    that GPEs are not enabled to wake up the system upfront, but only
+    during a system state transition when the target state of the system
+    is known.  [Of course, this means that the reference counting of
+    "wakeup" GPEs doesn't really make sense and it is sufficient to
+    set/unset the wakeup mask bits for them during system sleep
+    transitions.  This will allow us to simplify the GPE handling code
+    quite a bit, but that change is too intrusive for 2.6.35.]
+    
+    Fixes https://bugzilla.kernel.org/show_bug.cgi?id=15951
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Reported-and-tested-by: Michal Hocko <mhocko@suse.cz>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 6defa2fe2019f3729933516fba5cfd75eecd07de
+Author: Jiri Slaby <jirislaby@kernel.org>
+Date:   Sun Feb 15 22:46:45 2009 +0100
+
+    x86_64: Fix S3 fail path
+    
+    As acpi_enter_sleep_state can fail, take this into account in
+    do_suspend_lowlevel and don't return to the do_suspend_lowlevel's
+    caller. This would break (currently) fpu status and preempt count.
+    
+    Technically, this means use `call' instead of `jmp' and `jmp' to
+    the `resume_point' after the `call' (i.e. if
+    acpi_enter_sleep_state returns=fails). `resume_point' will handle
+    the restore of fpu and preempt count gracefully.
+    
+    Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit c4ec20717313daafba59225f812db89595952b83
+Merge: ec2626815bf9 00a2b433557f
+Author: Linus Torvalds <torvalds@woody.linux-foundation.org>
+Date:   Fri Oct 19 13:12:46 2007 -0700
+
+    Merge branch 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux-acpi-2.6
+    
+    * 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux-acpi-2.6: (41 commits)
+      ACPICA: hw: Don't carry spinlock over suspend
+      ACPICA: hw: remove use_lock flag from acpi_hw_register_{read, write}
+      ACPI: cpuidle: port idle timer suspend/resume workaround to cpuidle
+      ACPI: clean up acpi_enter_sleep_state_prep
+      Hibernation: Make sure that ACPI is enabled in acpi_hibernation_finish
+      ACPI: suppress uninitialized var warning
+      cpuidle: consolidate 2.6.22 cpuidle branch into one patch
+      ACPI: thinkpad-acpi: skip blanks before the data when parsing sysfs
+      ACPI: AC: Add sysfs interface
+      ACPI: SBS: Add sysfs alarm
+      ACPI: SBS: Add ACPI_PROCFS around procfs handling code.
+      ACPI: SBS: Add support for power_supply class (and sysfs)
+      ACPI: SBS: Make SBS reads table-driven.
+      ACPI: SBS: Simplify data structures in SBS
+      ACPI: SBS: Split host controller (ACPI0001) from SBS driver (ACPI0002)
+      ACPI: EC: Add new query handler to list head.
+      ACPI: Add acpi_bus_generate_event4() function
+      ACPI: Battery: add sysfs alarm
+      ACPI: Battery: Add sysfs support
+      ACPI: Battery: Misc clean-ups, no functional changes
+      ...
+    
+    Fix up conflicts in drivers/misc/thinkpad_acpi.[ch] manually
+
+commit 6cffd46651b881a11791a7ef4d99f2f20853fcd9
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Tue Oct 2 13:24:09 2007 -0700
+
+    ACPI: clean up acpi_enter_sleep_state_prep
+    
+    Remove some redundant code from acpi_enter_sleep_state_prep() and clean up
+    a comment in there.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Acked-by: Pavel Machek <pavel@ucw.cz>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit a634cc10164d1c229fbeca33923e6a0ed939e894
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Thu Jul 19 01:47:30 2007 -0700
+
+    swsusp: introduce restore platform operations
+    
+    At least on some machines it is necessary to prepare the ACPI firmware for the
+    restoration of the system memory state from the hibernation image if the
+    "platform" mode of hibernation has been used.  Namely, in that cases we need
+    to disable the GPEs before replacing the "boot" kernel with the "frozen"
+    kernel (cf.  http://bugzilla.kernel.org/show_bug.cgi?id=7887).  After the
+    restore they will be re-enabled by hibernation_ops->finish(), but if the
+    restore fails, they have to be re-enabled by the restore code explicitly.
+    
+    For this purpose we can introduce two additional hibernation operations,
+    called pre_restore() and restore_cleanup() and call them from the restore code
+    path.  Still, they should be called if the "platform" mode of hibernation has
+    been used, so we need to pass the information about the hibernation mode from
+    the "frozen" kernel to the "boot" kernel in the image header.
+    
+    Apparently, we can't drop the disabling of GPEs before the restore because of
+    Bug #7887 .   We also can't do it unconditionally, because the GPEs wouldn't
+    have been enabled after a successful restore if the suspend had been done in
+    the 'shutdown' or 'reboot' mode.
+    
+    In principle we could (and probably should) unconditionally disable the GPEs
+    before each snapshot creation *and* before the restore, but then we'd have to
+    unconditionally enable them after the snapshot creation as well as after the
+    restore (or restore failure)   Still, for this purpose we'd need to modify
+    acpi_enter_sleep_state_prep() and acpi_leave_sleep_state() and we'd have to
+    introduce some mechanism synchronizing the disablind/enabling of the GPEs with
+    the device drivers' .suspend()/.resume() routines and with
+    disable_/enable_nonboot_cpus().   However, this would have affected the
+    suspend (ie.  s2ram) code as well as the hibernation, which I'd like to avoid
+    in this patch series.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Cc: Nigel Cunningham <nigel@nigel.suspend2.net>
+    Cc: Pavel Machek <pavel@ucw.cz>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>

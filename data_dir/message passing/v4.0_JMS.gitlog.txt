@@ -1,0 +1,1216 @@
+commit 27cf2e50545a30c354755d6935c87210d94f2f44
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a upstream.
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit de24343880a61cf5660343647877d5b3cda45ff6
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a upstream.
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 2948369b5ee15f98951f24268121779129b53de0
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a upstream.
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 247dac52688a607260da5d2809efba5c85849fb6
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a upstream.
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit aa94df20c1134582cfc982e125c6c250e14d467d
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a upstream.
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e69382df6724cce4ff8f2cde08e04e48264ba008
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a upstream.
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 6f0306d1bfbc4d3e3fcfb949ee2c4af21071920a
+Merge: 42df60fcdfb8 20934c0de13b
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Aug 30 10:51:03 2020 -0700
+
+    Merge tag 'usb-5.9-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Let's try this again...  Here are some USB fixes for 5.9-rc3.
+    
+      This differs from the previous pull request for this release in that
+      the usb gadget patch now does not break some systems, and actually
+      does what it was intended to do. Many thanks to Marek Szyprowski for
+      quickly noticing and testing the patch from Andy Shevchenko to resolve
+      this issue.
+    
+      Additionally, some more new USB quirks have been added to get some new
+      devices to work properly based on user reports.
+    
+      Other than that, the patches are all here, and they contain:
+    
+       - usb gadget driver fixes
+    
+       - xhci driver fixes
+    
+       - typec fixes
+    
+       - new quirks and ids
+    
+       - fixes for USB patches that went into 5.9-rc1.
+    
+      All of these have been tested in linux-next with no reported issues"
+    
+    * tag 'usb-5.9-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb: (33 commits)
+      usb: storage: Add unusual_uas entry for Sony PSZ drives
+      USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+      usb: host: ohci-exynos: Fix error handling in exynos_ohci_probe()
+      USB: gadget: u_f: Unbreak offset calculation in VLAs
+      USB: quirks: Ignore duplicate endpoint on Sound Devices MixPre-D
+      usb: typec: tcpm: Fix Fix source hard reset response for TDA 2.3.1.1 and TDA 2.3.1.2 failures
+      USB: PHY: JZ4770: Fix static checker warning.
+      USB: gadget: f_ncm: add bounds checks to ncm_unwrap_ntb()
+      USB: gadget: u_f: add overflow checks to VLA macros
+      xhci: Always restore EP_SOFT_CLEAR_TOGGLE even if ep reset failed
+      xhci: Do warm-reset when both CAS and XDEV_RESUME are set
+      usb: host: xhci: fix ep context print mismatch in debugfs
+      usb: uas: Add quirk for PNY Pro Elite
+      tools: usb: move to tools buildsystem
+      USB: Fix device driver race
+      USB: Also match device drivers using the ->match vfunc
+      usb: host: xhci-tegra: fix tegra_xusb_get_phy()
+      usb: host: xhci-tegra: otg usb2/usb3 port init
+      usb: hcd: Fix use after free in usb_hcd_pci_remove()
+      usb: typec: ucsi: Hold con->lock for the entire duration of ucsi_register_port()
+      ...
+
+commit 9aa37788e7ebb3f489fb4b71ce07adadd444264a
+Author: Cyril Roelandt <tipecaml@gmail.com>
+Date:   Tue Aug 25 23:22:31 2020 +0200
+
+    USB: Ignore UAS for JMicron JMS567 ATA/ATAPI Bridge
+    
+    This device does not support UAS properly and a similar entry already
+    exists in drivers/usb/storage/unusual_uas.h. Without this patch,
+    storage_probe() defers the handling of this device to UAS, which cannot
+    handle it either.
+    
+    Tested-by: Brice Goglin <brice.goglin@gmail.com>
+    Fixes: bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron SATA enclosure")
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Signed-off-by: Cyril Roelandt <tipecaml@gmail.com>
+    Link: https://lore.kernel.org/r/20200825212231.46309-1-tipecaml@gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 33fda70c0f8382d72533f0d1c3f26e8bc76b480f
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b upstream.
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit be76ff05a6c0372863e6dac3c75897230ea532d9
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b upstream.
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fda668f23518b3e458e9cf03d12d968852c27ac1
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b upstream.
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 08d981a65d9901727611e9a67997920a9990d132
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b upstream.
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1b4e23a945bd539f2daad48796605908947bfa29
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b upstream.
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ddbfab6a4a85435eb10e08886038d0a814ba16a6
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b upstream.
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e9a61afb69f07b1c5880984d45e5cc232ec1bf6f
+Merge: c5f337857195 2df7405f79ce
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Apr 26 11:22:01 2020 -0700
+
+    Merge tag 'usb-5.7-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Here are a number of USB driver fixes for 5.7-rc3.
+    
+      Nothing huge, just the usual collection of:
+    
+       - xhci fixes
+    
+       - gadget driver fixes
+    
+       - syzkaller fuzzing fixes
+    
+       - new device ids and DT bindings
+    
+       - new quirks added for broken devices
+    
+      A few of the gadget driver fixes show up twice here as they were
+      applied to my branch, and also by Felipe to his branch which I then
+      pulled in as we got out of sync a bit.
+    
+      All of these have been in linux-next with no reported issues"
+    
+    * tag 'usb-5.7-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb: (33 commits)
+      USB: sisusbvga: Change port variable from signed to unsigned
+      usb-storage: Add unusual_devs entry for JMicron JMS566
+      USB: hub: Revert commit bd0e6c9614b9 ("usb: hub: try old enumeration scheme first for high speed devices")
+      USB: hub: Fix handling of connect changes during sleep
+      usb: typec: altmode: Fix typec_altmode_get_partner sometimes returning an invalid pointer
+      xhci: Don't clear hub TT buffer on ep0 protocol stall
+      xhci: prevent bus suspend if a roothub port detected a over-current condition
+      xhci: Fix handling halted endpoint even if endpoint ring appears empty
+      usb: raw-gadget: Fix copy_to/from_user() checks
+      usb: raw-gadget: fix raw_event_queue_fetch locking
+      usb: gadget: udc: atmel: Fix vbus disconnect handling
+      usb: dwc3: gadget: Fix request completion check
+      USB: Add USB_QUIRK_DELAY_CTRL_MSG and USB_QUIRK_DELAY_INIT for Corsair K70 RGB RAPIDFIRE
+      phy: tegra: Select USB_COMMON for usb_get_maximum_speed()
+      usb: typec: tcpm: Ignore CC and vbus changes in PORT_RESET change
+      usb: f_fs: Clear OS Extended descriptor counts to zero in ffs_data_reset()
+      cdc-acm: introduce a cool down
+      cdc-acm: close race betrween suspend() and acm_softint
+      UAS: fix deadlock in error handling and PM flushing work
+      UAS: no use logging any details in case of ENODEV
+      ...
+
+commit 94f9c8c3c404ee1f7aaff81ad4f24aec4e34a78b
+Author: Alan Stern <stern@rowland.harvard.edu>
+Date:   Wed Apr 22 16:14:57 2020 -0400
+
+    usb-storage: Add unusual_devs entry for JMicron JMS566
+    
+    Cyril Roelandt reports that his JMicron JMS566 USB-SATA bridge fails
+    to handle WRITE commands with the FUA bit set, even though it claims
+    to support FUA.  (Oddly enough, a later version of the same bridge,
+    version 2.03 as opposed to 1.14, doesn't claim to support FUA.  Also
+    oddly, the bridge _does_ support FUA when using the UAS transport
+    instead of the Bulk-Only transport -- but this device was blacklisted
+    for uas in commit bc3bdb12bbb3 ("usb-storage: Disable UAS on JMicron
+    SATA enclosure") for apparently unrelated reasons.)
+    
+    This patch adds a usb-storage unusual_devs entry with the BROKEN_FUA
+    flag.  This allows the bridge to work properly with usb-storage.
+    
+    Reported-and-tested-by: Cyril Roelandt <tipecaml@gmail.com>
+    Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+    CC: <stable@vger.kernel.org>
+    
+    Link: https://lore.kernel.org/r/Pine.LNX.4.44L0.2004221613110.11262-100000@iolanthe.rowland.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 8c5d8a49ecbfd28c341206cda69900691d68397c
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    commit 08d676d1685c2a29e4d0e1b0242324e564d4589e upstream.
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 43d94dafbcdd3aff2ec75ad363d4501241f3a25f
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    commit 08d676d1685c2a29e4d0e1b0242324e564d4589e upstream.
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Cc: stable <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cbf5a279a22db0a56afd6a0193f86376951aad86
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    commit 08d676d1685c2a29e4d0e1b0242324e564d4589e upstream.
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Cc: stable <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e2f523b4cf1e6ef0d5bc1b6fd06451bb4fd84c65
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    commit 08d676d1685c2a29e4d0e1b0242324e564d4589e upstream.
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Cc: stable <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit eec87271805e8fbec2fa7cec61499ce3760442d2
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    commit 08d676d1685c2a29e4d0e1b0242324e564d4589e upstream.
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Cc: stable <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 6f575b509cce81910666bdb0f4958cd01ab6d265
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    commit 08d676d1685c2a29e4d0e1b0242324e564d4589e upstream.
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Cc: stable <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 2c248f92fa4fae3036e656da2f9a077020a99f6e
+Merge: 345464fb760d 1426bd2c9f7e
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Sep 2 09:15:30 2019 -0700
+
+    Merge tag 'usb-5.3-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Here are some small USB fixes that have been in linux-next this past
+      week for 5.3-rc7
+    
+      They fix the usual xhci, syzbot reports, and other small issues that
+      have come up last week.
+    
+      All have been in linux-next with no reported issues"
+    
+    * tag 'usb-5.3-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb:
+      USB: cdc-wdm: fix race between write and disconnect due to flag abuse
+      usb: host: xhci: rcar: Fix typo in compatible string matching
+      usb: host: xhci-tegra: Set DMA mask correctly
+      USB: storage: ums-realtek: Whitelist auto-delink support
+      USB: storage: ums-realtek: Update module parameter description for auto_delink_en
+      usb: host: ohci: fix a race condition between shutdown and irq
+      usb: hcd: use managed device resources
+      typec: tcpm: fix a typo in the comparison of pdo_max_voltage
+      usb-storage: Add new JMS567 revision to unusual_devs
+      usb: chipidea: udc: don't do hardware access if gadget has stopped
+      usbtmc: more sanity checking for packet size
+      usb: udc: lpc32xx: silence fall-through warning
+
+commit 08d676d1685c2a29e4d0e1b0242324e564d4589e
+Author: Henk van der Laan <opensource@henkvdlaan.com>
+Date:   Fri Aug 16 22:08:47 2019 +0200
+
+    usb-storage: Add new JMS567 revision to unusual_devs
+    
+    Revision 0x0117 suffers from an identical issue to earlier revisions,
+    therefore it should be added to the quirks list.
+    
+    Signed-off-by: Henk van der Laan <opensource@henkvdlaan.com>
+    Cc: stable <stable@vger.kernel.org>
+    Link: https://lore.kernel.org/r/20190816200847.21366-1-opensource@henkvdlaan.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 7b7fcec5f33f4507eff3c1a9968555c85f40b639
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    commit 62354454625741f0569c2cbe45b2d192f8fd258e upstream.
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    [bwh: Backported to 3.16: adjust context]
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit f95ea9d1980fd2dd98bb253cb4b033e447b37c9b
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    commit 62354454625741f0569c2cbe45b2d192f8fd258e upstream.
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    [bwh: Backported to 3.2:
+     - Drop uas change
+     - Adjust context]
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 6be358198e6ec261dad9b9b0f735dbb741a4fd72
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    [ Upstream commit 62354454625741f0569c2cbe45b2d192f8fd258e ]
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Cc: stable <stable@vger.kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+
+commit 6391294874d505a5e8681c41439a74e7019b267f
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    commit 62354454625741f0569c2cbe45b2d192f8fd258e upstream.
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0d29ae4f5033453ea86d60a736bed58fa4c15007
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    commit 62354454625741f0569c2cbe45b2d192f8fd258e upstream.
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 05de6fa5c0e2fbbed4d41eaf2b474a863c544532
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    commit 62354454625741f0569c2cbe45b2d192f8fd258e upstream.
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a342e5368eeab3beb6ea156a53ccece114e9d883
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    commit 62354454625741f0569c2cbe45b2d192f8fd258e upstream.
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit c36c7a7c4034f2ef35c6aa6821e7c82d9968dba4
+Merge: a84ec72324e2 48a4ff1c7bb5
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Dec 15 13:03:25 2017 -0800
+
+    Merge tag 'usb-4.15-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Here are some USB fixes for 4.15-rc4.
+    
+      There is the usual handful gadget/dwc2/dwc3 fixes as always, for
+      reported issues. But the most important things in here is the core fix
+      from Alan Stern to resolve a nasty security bug (my first attempt is
+      reverted, Alan's was much cleaner), as well as a number of usbip fixes
+      from Shuah Khan to resolve those reported security issues.
+    
+      All of these have been in linux-next with no reported issues"
+    
+    * tag 'usb-4.15-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb:
+      USB: core: prevent malicious bNumInterfaces overflow
+      Revert "USB: core: only clean up what we allocated"
+      USB: core: only clean up what we allocated
+      Revert "usb: gadget: allow to enable legacy drivers without USB_ETH"
+      usb: gadget: webcam: fix V4L2 Kconfig dependency
+      usb: dwc2: Fix TxFIFOn sizes and total TxFIFO size issues
+      usb: dwc3: gadget: Fix PCM1 for ISOC EP with ep->mult less than 3
+      usb: dwc3: of-simple: set dev_pm_ops
+      usb: dwc3: of-simple: fix missing clk_disable_unprepare
+      usb: dwc3: gadget: Wait longer for controller to end command processing
+      usb: xhci: fix TDS for MTK xHCI1.1
+      xhci: Don't add a virt_dev to the devs array before it's fully allocated
+      usbip: fix stub_send_ret_submit() vulnerability to null transfer_buffer
+      usbip: prevent vhci_hcd driver from leaking a socket pointer address
+      usbip: fix stub_rx: harden CMD_SUBMIT path to handle malicious input
+      usbip: fix stub_rx: get_pipe() to validate endpoint number
+      tools/usbip: fixes potential (minor) "buffer overflow" (detected on recent gcc with -Werror)
+      USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+      usb: musb: da8xx: fix babble condition handling
+
+commit 62354454625741f0569c2cbe45b2d192f8fd258e
+Author: David Kozub <zub@linux.fjfi.cvut.cz>
+Date:   Tue Dec 5 22:40:04 2017 +0100
+
+    USB: uas and storage: Add US_FL_BROKEN_FUA for another JMicron JMS567 ID
+    
+    There is another JMS567-based USB3 UAS enclosure (152d:0578) that fails
+    with the following error:
+    
+    [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+    [sda] tag#0 Sense Key : Illegal Request [current]
+    [sda] tag#0 Add. Sense: Invalid field in cdb
+    
+    The issue occurs both with UAS (occasionally) and mass storage
+    (immediately after mounting a FS on a disk in the enclosure).
+    
+    Enabling US_FL_BROKEN_FUA quirk solves this issue.
+    
+    This patch adds an UNUSUAL_DEV with US_FL_BROKEN_FUA for the enclosure
+    for both UAS and mass storage.
+    
+    Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+    Acked-by: Alan Stern <stern@rowland.harvard.edu>
+    Cc: stable <stable@vger.kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0750ab33991ba5b99519ec20a8710a9026eac4ba
+Author: Oliver Neukum <oneukum@suse.com>
+Date:   Mon Jan 2 15:26:17 2017 +0100
+
+    usb: storage: unusual_uas: Add JMicron JMS56x to unusual device
+    
+    commit 674aea07e38200ea6f31ff6d5f200f0cf6cdb325 upstream.
+    
+    This device gives the following error on detection.
+    xhci_hcd 0000:00:11.0: ERROR Transfer event for disabled endpoint or
+    incorrect stream ring
+    
+    The same error is not seen when it is added to unusual_device
+    list with US_FL_NO_REPORT_OPCODES passed.
+    
+    Signed-off-by: George Cherian <george.cherian@cavium.com>
+    Signed-off-by: Oliver Neukum <oneukun@suse.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit d3258941ec2a9cfbf50f7939a49f3a25b156387f
+Author: Oliver Neukum <oneukum@suse.com>
+Date:   Mon Jan 2 15:26:17 2017 +0100
+
+    usb: storage: unusual_uas: Add JMicron JMS56x to unusual device
+    
+    [ Upstream commit 674aea07e38200ea6f31ff6d5f200f0cf6cdb325 ]
+    
+    This device gives the following error on detection.
+    xhci_hcd 0000:00:11.0: ERROR Transfer event for disabled endpoint or
+    incorrect stream ring
+    
+    The same error is not seen when it is added to unusual_device
+    list with US_FL_NO_REPORT_OPCODES passed.
+    
+    Signed-off-by: George Cherian <george.cherian@cavium.com>
+    Signed-off-by: Oliver Neukum <oneukun@suse.com>
+    CC: stable@vger.kernel.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+
+commit 72271ae49d6bf4011f5861fcae9e29dfbf87fb65
+Author: Oliver Neukum <oneukum@suse.com>
+Date:   Mon Jan 2 15:26:17 2017 +0100
+
+    usb: storage: unusual_uas: Add JMicron JMS56x to unusual device
+    
+    commit 674aea07e38200ea6f31ff6d5f200f0cf6cdb325 upstream.
+    
+    This device gives the following error on detection.
+    xhci_hcd 0000:00:11.0: ERROR Transfer event for disabled endpoint or
+    incorrect stream ring
+    
+    The same error is not seen when it is added to unusual_device
+    list with US_FL_NO_REPORT_OPCODES passed.
+    
+    Signed-off-by: George Cherian <george.cherian@cavium.com>
+    Signed-off-by: Oliver Neukum <oneukun@suse.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 9cc601b40d76235570637ebae5725d2c25e653fd
+Author: Oliver Neukum <oneukum@suse.com>
+Date:   Mon Jan 2 15:26:17 2017 +0100
+
+    usb: storage: unusual_uas: Add JMicron JMS56x to unusual device
+    
+    commit 674aea07e38200ea6f31ff6d5f200f0cf6cdb325 upstream.
+    
+    This device gives the following error on detection.
+    xhci_hcd 0000:00:11.0: ERROR Transfer event for disabled endpoint or
+    incorrect stream ring
+    
+    The same error is not seen when it is added to unusual_device
+    list with US_FL_NO_REPORT_OPCODES passed.
+    
+    Signed-off-by: George Cherian <george.cherian@cavium.com>
+    Signed-off-by: Oliver Neukum <oneukun@suse.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 83280e90ef001f77a64e2ce59c25ab66e47ab1f0
+Merge: cc250e267bd5 0a8fd1346254
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Jan 8 11:42:04 2017 -0800
+
+    Merge tag 'usb-4.10-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Here are a bunch of USB fixes for 4.10-rc3. Yeah, it's a lot, an
+      artifact of the holiday break I think.
+    
+      Lots of gadget and the usual XHCI fixups for reported issues (one day
+      that driver will calm down...) Also included are a bunch of usb-serial
+      driver fixes, and for good measure, a number of much-reported MUSB
+      driver issues have finally been resolved.
+    
+      All of these have been in linux-next with no reported issues"
+    
+    * tag 'usb-4.10-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb: (72 commits)
+      USB: fix problems with duplicate endpoint addresses
+      usb: ohci-at91: use descriptor-based gpio APIs correctly
+      usb: storage: unusual_uas: Add JMicron JMS56x to unusual device
+      usb: hub: Move hub_port_disable() to fix warning if PM is disabled
+      usb: musb: blackfin: add bfin_fifo_offset in bfin_ops
+      usb: musb: fix compilation warning on unused function
+      usb: musb: Fix trying to free already-free IRQ 4
+      usb: musb: dsps: implement clear_ep_rxintr() callback
+      usb: musb: core: add clear_ep_rxintr() to musb_platform_ops
+      USB: serial: ti_usb_3410_5052: fix NULL-deref at open
+      USB: serial: spcp8x5: fix NULL-deref at open
+      USB: serial: quatech2: fix sleep-while-atomic in close
+      USB: serial: pl2303: fix NULL-deref at open
+      USB: serial: oti6858: fix NULL-deref at open
+      USB: serial: omninet: fix NULL-derefs at open and disconnect
+      USB: serial: mos7840: fix misleading interrupt-URB comment
+      USB: serial: mos7840: remove unused write URB
+      USB: serial: mos7840: fix NULL-deref at open
+      USB: serial: mos7720: remove obsolete port initialisation
+      USB: serial: mos7720: fix parallel probe
+      ...
+
+commit 674aea07e38200ea6f31ff6d5f200f0cf6cdb325
+Author: Oliver Neukum <oneukum@suse.com>
+Date:   Mon Jan 2 15:26:17 2017 +0100
+
+    usb: storage: unusual_uas: Add JMicron JMS56x to unusual device
+    
+    This device gives the following error on detection.
+    xhci_hcd 0000:00:11.0: ERROR Transfer event for disabled endpoint or
+    incorrect stream ring
+    
+    The same error is not seen when it is added to unusual_device
+    list with US_FL_NO_REPORT_OPCODES passed.
+    
+    Signed-off-by: George Cherian <george.cherian@cavium.com>
+    Signed-off-by: Oliver Neukum <oneukun@suse.com>
+    CC: stable@vger.kernel.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1ff480c61e3006a5b5f6a31f72c941a3692349d4
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Feb 23 13:41:14 2015 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS539
+    
+    commit 59e980efafd27df83a5c85c054f906d82bcbf752 upstream.
+    
+    Like the JMicron JMS567 enclosures with the JMS539 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Tom Arild Naess <tanaess@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit a5c2f30b5b29313198cf430e7b48949eb97ea717
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Feb 23 13:41:14 2015 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS539
+    
+    commit 59e980efafd27df83a5c85c054f906d82bcbf752 upstream.
+    
+    Like the JMicron JMS567 enclosures with the JMS539 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Tom Arild Naess <tanaess@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ddcc85e52e9c2b9a36e5c837453421b089dab310
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Feb 23 13:41:14 2015 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS539
+    
+    commit 59e980efafd27df83a5c85c054f906d82bcbf752 upstream.
+    
+    Like the JMicron JMS567 enclosures with the JMS539 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Tom Arild Naess <tanaess@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+
+commit 1163d504ae69b5e83ab16900f6a96e30bd78bda5
+Merge: bbbce516bb49 b8cb91e058cd
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Mar 8 12:47:18 2015 -0700
+
+    Merge tag 'usb-4.0-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Here's a round of USB fixes for 4.0-rc3.
+    
+      Nothing major, the usual gadget, xhci and usb-serial fixes and a few
+      new device ids as well.
+    
+      All have been in linux-next successfully"
+    
+    * tag 'usb-4.0-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb: (36 commits)
+      xhci: Workaround for PME stuck issues in Intel xhci
+      xhci: fix reporting of 0-sized URBs in control endpoint
+      usb: ftdi_sio: Add jtag quirk support for Cyber Cortex AV boards
+      USB: ch341: set tty baud speed according to tty struct
+      USB: serial: cp210x: Adding Seletek device id's
+      USB: pl2303: disable break on shutdown
+      USB: mxuport: fix null deref when used as a console
+      USB: serial: clean up bus probe error handling
+      USB: serial: fix port attribute-creation race
+      USB: serial: fix tty-device error handling at probe
+      USB: serial: fix potential use-after-free after failed probe
+      USB: console: add dummy __module_get
+      USB: ftdi_sio: add PIDs for Actisense USB devices
+      Revert "USB: serial: make bulk_out_size a lower limit"
+      cdc-acm: Add support for Denso cradle CU-321
+      usb-storage: support for more than 8 LUNs
+      uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS539
+      USB: usbfs: don't leak kernel data in siginfo
+      xhci: Clear the host side toggle manually when endpoint is 'soft reset'
+      xhci: Allocate correct amount of scratchpad buffers
+      ...
+
+commit 59e980efafd27df83a5c85c054f906d82bcbf752
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Feb 23 13:41:14 2015 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS539
+    
+    Like the JMicron JMS567 enclosures with the JMS539 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Tom Arild Naess <tanaess@gmail.com>
+    Cc: stable@vger.kernel.org # 3.16
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 03642fd92a5763a9f60de9101ea9e0d758152ec3
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Dec 8 09:50:47 2014 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS566 with usb-id 0bc2:a013
+    
+    commit c6fa3945c8b5baf62f2e849104ecd6f3a1e5e407 upstream.
+    
+    Like the JMicron JMS567 enclosures with the JMS566 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Takeo Nakayama <javhera@gmx.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f138b8ed3bab38bce089a32a9e6430b2e51f57ea
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Dec 8 09:50:47 2014 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS566 with usb-id 0bc2:a013
+    
+    commit c6fa3945c8b5baf62f2e849104ecd6f3a1e5e407 upstream.
+    
+    Like the JMicron JMS567 enclosures with the JMS566 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Takeo Nakayama <javhera@gmx.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit 79600d4bba783147758cdb0e636010fbe02a843f
+Merge: fa818dc4884a f8359dae68bd
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Jan 17 08:02:44 2015 +1300
+
+    Merge tag 'usb-3.19-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb
+    
+    Pull USB fixes from Greg KH:
+     "Here is a bunch of USB fixes for 3.19-rc5.
+    
+      Most of these are gadget driver fixes, along with the xhci driver fix
+      that we both reported having problems with, as well as some new device
+      ids and other tiny fixes.
+    
+      All have been in linux-next with no problems"
+    
+    * tag 'usb-3.19-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb: (43 commits)
+      usb: dwc3: gadget: Stop TRB preparation after limit is reached
+      usb: dwc3: gadget: Fix TRB preparation during SG
+      usb: phy: mv-usb: fix usb_phy build errors
+      usb: serial: handle -ENODEV quietly in generic_submit_read_urb
+      usb: serial: silence all non-critical read errors
+      USB: console: fix potential use after free
+      USB: console: fix uninitialised ldisc semaphore
+      usb: gadget: udc: atmel: fix possible oops when unloading module
+      usb: gadget: gadgetfs: fix an oops in ep_write()
+      usb: phy: Fix deferred probing
+      OHCI: add a quirk for ULi M5237 blocking on reset
+      uas: Add US_FL_NO_ATA_1X for 2 more Seagate disk enclosures
+      uas: Do not blacklist ASM1153 disk enclosures
+      usb: gadget: udc: avoid dereference before NULL check in ep_queue
+      usb: host: ehci-tegra: request deferred probe when failing to get phy
+      uas: disable UAS on Apricorn SATA dongles
+      uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS566 with usb-id 0bc2:a013
+      uas: Add US_FL_NO_ATA_1X for Seagate devices with usb-id 0bc2:a013
+      xhci: Add broken-streams quirk for Fresco Logic FL1000G xhci controllers
+      USB: EHCI: adjust error return code
+      ...
+
+commit c6fa3945c8b5baf62f2e849104ecd6f3a1e5e407
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Dec 8 09:50:47 2014 +0100
+
+    uas: Add US_FL_NO_REPORT_OPCODES for JMicron JMS566 with usb-id 0bc2:a013
+    
+    Like the JMicron JMS567 enclosures with the JMS566 choke on report-opcodes,
+    so avoid it.
+    
+    Tested-and-reported-by: Takeo Nakayama <javhera@gmx.com>
+    Cc: stable@vger.kernel.org # 3.16
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit c0f5e44c171ed08de0929f83ff6f8faf912bb109
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Sep 16 18:36:52 2014 +0200
+
+    uas: Add no-report-opcodes quirk
+    
+    commit 734016b00b50a3c6a0e1fc1b7b217e783f5123a1 upstream.
+    
+    Besides the ASM1051 (*) needing sdev->no_report_opcodes = 1, it turns out that
+    the JMicron JMS567 also needs it to work properly with uas (usb-storage always
+    sets it). Since some of the scsi devs were not to keen on the idea to
+    outrightly set sdev->no_report_opcodes = 1 for all uas devices, so add a quirk
+    for this, and set it for the JMS567.
+    
+    *) Which has become a non-issue since we've completely blacklisted uas on
+    the ASM1051 for other reasons
+    
+    Reported-and-tested-by: Claudio Bizzarri <claudio.bizzarri@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 46816a619d8365ebbcfedbd83f74bcd2f004d81e
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Sep 16 18:36:52 2014 +0200
+
+    uas: Add no-report-opcodes quirk
+    
+    commit 734016b00b50a3c6a0e1fc1b7b217e783f5123a1 upstream.
+    
+    Besides the ASM1051 (*) needing sdev->no_report_opcodes = 1, it turns out that
+    the JMicron JMS567 also needs it to work properly with uas (usb-storage always
+    sets it). Since some of the scsi devs were not to keen on the idea to
+    outrightly set sdev->no_report_opcodes = 1 for all uas devices, so add a quirk
+    for this, and set it for the JMS567.
+    
+    *) Which has become a non-issue since we've completely blacklisted uas on
+    the ASM1051 for other reasons
+    
+    Reported-and-tested-by: Claudio Bizzarri <claudio.bizzarri@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 734016b00b50a3c6a0e1fc1b7b217e783f5123a1
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Sep 16 18:36:52 2014 +0200
+
+    uas: Add no-report-opcodes quirk
+    
+    Besides the ASM1051 (*) needing sdev->no_report_opcodes = 1, it turns out that
+    the JMicron JMS567 also needs it to work properly with uas (usb-storage always
+    sets it). Since some of the scsi devs were not to keen on the idea to
+    outrightly set sdev->no_report_opcodes = 1 for all uas devices, so add a quirk
+    for this, and set it for the JMS567.
+    
+    *) Which has become a non-issue since we've completely blacklisted uas on
+    the ASM1051 for other reasons
+    
+    Cc: stable@vger.kernel.org
+    Reported-and-tested-by: Claudio Bizzarri <claudio.bizzarri@gmail.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>

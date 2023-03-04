@@ -1,0 +1,39 @@
+commit 82f2d30570b7ecdf1ce7e6376805f063ae86a7e5
+Author: Lucas Rangit Magasweran <lucas.magasweran@ieee.org>
+Date:   Sat Jul 14 15:40:18 2018 -0700
+
+    ACPI: battery: remove redundant old_present check on insertion
+    
+    On removal battery_present changes from 1 to 0 after calling
+    acpi_battery_get_status() and battery->update_time is set to 0
+    before returning.
+    
+    On insertion battery_present changes from 0 to 1 after calling
+    acpi_battery_get_status() and acpi_battery_get_info() is called
+    because battery->update_time is 0.
+    
+    The old_present condition is therefore redundant.
+    
+    This was added in the commit below when there was a path without
+    sysfs that would skip getting the newly inserted battery info.
+    
+    commit 50b178512b7d ("Newly inserted battery might differ from one
+    just removed, so update of battery info fields is required.")
+    
+    Signed-off-by: Lucas Rangit Magasweran <lucas.magasweran@ieee.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit e363a755e8033e18f733fc0d1687039df8efade0
+Author: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Date:   Tue Jun 30 14:35:05 2009 +0000
+
+    ACPI: battery: Fix CONFIG_ACPI_SYSFS_POWER=n
+    
+    Disabling CONFIG_ACPI_SYSFS_POWER changes the behaviour of
+    acpi_battery_update().  It will call acpi_battery_get_info()
+    even if the battery is not present.  I haven't noticed this
+    causing any problem, but it does look like a bad idea.
+    
+    Signed-off-by: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+    Acked-by: Alexey Starikovskiy <astarikovskiy@suse.de>
+    Signed-off-by: Len Brown <len.brown@intel.com>

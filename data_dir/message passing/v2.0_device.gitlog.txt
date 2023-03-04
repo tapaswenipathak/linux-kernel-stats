@@ -1,0 +1,49 @@
+commit 39be37f74f600ff5ca21b612b0c5c64f188d0789
+Author: Alexey Sakovets <alexeysakovets@gmail.com>
+Date:   Sat Oct 2 14:23:47 2021 +0300
+
+    Help command should print '-c' (lowercase) instead of '-C' (uppercase) for "the console device to be used" option.
+    
+    Signed-off-by: Alexey Sakovets <alexeysakovets@gmail.com>
+
+commit 2740f65352e3806dac56e16e5856eac5702caf6e
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Sep 6 17:40:02 2016 +0200
+
+    loadkeys: require a console device only to load keymap
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit d9d43a1cf468284c0dda6bcaa69fb683fd708d80
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Dec 7 00:18:02 2011 +0400
+
+    Use more devices in getfd() function
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit b60ba7a5514bd313f19b8340e24cc200ffc5ff70
+Author: Olivier Mehani <olivier.mehani@nicta.com.au>
+Date:   Sun Apr 25 17:12:08 2010 +1000
+
+    Don't open console on --bkeymap
+    
+    Check that -b hasn't specified, similarly to -m, before loadkeys tries to open
+    the console. As for --mktable, --bkeymap doesn't need it. This allows to dump
+    binary keymaps in a larger range of situations where ownership of the console
+    device is not guarranteed e.g., when running from an Xterm.
+    
+    Signed-off-by: Olivier Mehani <olivier.mehani@nicta.com.au>
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 39a6dfb9361fd00a2fd5be52a942726bb6fec757
+Author: Alexey Gladkov <legion@altlinux.org>
+Date:   Sun Jan 28 23:00:29 2007 +0300
+
+    [SYSTEM] Apply patch from SUSE.
+    
+    Apply kbd-1.12-kbd_mode.diff patch from SUSE distribution.
+    - Add new option -C to able define device.
+    - Use getopt to parse arguments.
+    
+    Signed-off-by: Alexey Gladkov <legion@altlinux.org>
