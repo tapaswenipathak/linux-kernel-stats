@@ -1,0 +1,62 @@
+      Depends on [n]: DMADEVICES [=n] && (ARCH_STM32 [=y] || COMPILE_TEST [=y])
+      - AMCC_PPC440SPE_ADMA [=n] && DMADEVICES [=y] && (440SPe || 440SP)
+      - BCM_SBA_RAID [=m] && DMADEVICES [=y] && (ARM64 [=y] || ...
+      - FSL_RAID [=n] && DMADEVICES [=y] && FSL_SOC && ...
+      - INTEL_IOATDMA [=n] && DMADEVICES [=y] && PCI [=y] && X86_64
+      - MV_XOR [=n] && DMADEVICES [=y] && (PLAT_ORION || ARCH_MVEBU [=y] ...
+      - MV_XOR_V2 [=y] && DMADEVICES [=y] && ARM64 [=y]
+      - XGENE_DMA [=n] && DMADEVICES [=y] && (ARCH_XGENE [=y] || ...
+      - DMATEST [=n] && DMADEVICES [=y] && DMA_ENGINE [=y]
+      - MV_XOR_V2 [=y] && DMADEVICES [=y] && ARM64 [=y]
+      - BCM_SBA_RAID [=m] && DMADEVICES [=y] && (ARM64 [=y] || ...
+      - AMCC_PPC440SPE_ADMA [=n] && DMADEVICES [=y] && (440SPe || ...
+      - FSL_RAID [=n] && DMADEVICES [=y] && FSL_SOC && ...
+      - INTEL_IOATDMA [=n] && DMADEVICES [=y] && PCI [=y] && X86_64
+      - MV_XOR [=n] && DMADEVICES [=y] && (PLAT_ORION || ARCH_MVEBU [=y] ...
+      - XGENE_DMA [=n] && DMADEVICES [=y] && (ARCH_XGENE [=y] || ...
+      - DMATEST [=n] && DMADEVICES [=y] && DMA_ENGINE [=y]
+    ASoC: Intel: improve DMADEVICES dependency
+    - Building without DMADEVICES doesn't work in general
+    warning: (STM32_MDMA) selects DMA_OF which has unmet direct dependencies (DMADEVICES && OF)
+     - DMADEVICES and S3C24XX_DMAC are now needed for MMC_S3C;
+    arch/arm/mach-s3c64xx/Kconfig:42: symbol S3C64XX_PL080 default value contains DMADEVICES
+    drivers/dma/Kconfig:5: symbol DMADEVICES is selected by SND_SOC_SH4_SIU
+    dependent on DMADEVICES.
+    unmet direct dependencies (DMADEVICES && OF)
+    unmet direct dependencies (DMADEVICES && OF)
+      ata: dwc: add DMADEVICES dependency
+    ata: dwc: add DMADEVICES dependency
+    and may cause randconfig build errors when CONFIG_DMADEVICES is not set
+    warning: (SATA_DWC_OLD_DMA) selects DW_DMAC_CORE which has unmet direct dependencies (DMADEVICES)
+    possible to build the driver with both CONFIG_DMADEVICES
+    A DMA_ENGINE requires DMADEVICES in Kconfig
+    warning: (CRYPTO_DEV_ATMEL_AES) selects AT_HDMAC which has unmet direct dependencies (DMADEVICES && ARCH_AT91)
+    driver and that may not be available when CONFIG_DMADEVICES
+    warning: (USB_TI_CPPI41_DMA) selects TI_CPPI41 which has unmet direct dependencies (DMADEVICES && ARCH_OMAP)
+    This implies that PXA architecture selects DMADEVICES and PXA_DMA,
+    dropped the dependency of VIDEO_TIMBERDALE on DMADEVICES, and thus the
+    warning: (VIDEO_TIMBERDALE) selects TIMB_DMA which has unmet direct dependencies (DMADEVICES && MFD_TIMBERDALE)
+      symbol DMADEVICES is selected by SAMSUNG_DMADEV
+      symbol MX3_IPU depends on DMADEVICES
+    optional by unselecting CONFIG_DMADEVICES.
+    warning: (ARCH_MOXART) selects DMA_OF which has unmet direct dependencies (DMADEVICES && OF)
+      ARM: keystone: config: fix build warning when CONFIG_DMADEVICES is not set
+    ARM: keystone: config: fix build warning when CONFIG_DMADEVICES is not set
+    as it produces build warning in case if CONFIG_DMADEVICES is not set:
+    warning: (ARCH_KEYSTONE) selects TI_EDMA which has unmet direct dependencies (DMADEVICES && (ARCH_DAVINCI || ARCH_OMAP || ARCH_KEYSTONE))
+    warning: (ARCH_KEYSTONE && SPI_DAVINCI) selects TI_EDMA which has unmet direct dependencies (DMADEVICES && (ARCH_DAVINCI || ARCH_OMAP || ARCH_KEYSTONE))
+    this driver by default additionally CONFIG_DMADEVICES has to be
+        1.1) we enable CONFIG_DMA_API_DEBUG, CONFIG_DMADEVICES_DEBUG,
+      spi: omap2-mcspi: Fix transfers if DMADEVICES is not set
+    spi: omap2-mcspi: Fix transfers if DMADEVICES is not set
+    Selecting CONFIG_DMADEVICES is optional, and we must
+      ata: PATA_ARASAN_CF depends on DMADEVICES
+    ata: PATA_ARASAN_CF depends on DMADEVICES
+    warning: (PATA_ARASAN_CF && VIDEO_TIMBERDALE && SND_SOC_SH4_SIU) selects DMA_ENGINE which has unmet direct dependencies (DMADEVICES)
+    warning: (VIDEO_TIMBERDALE) selects TIMB_DMA which has unmet direct dependencies (DMADEVICES && (MFD_TIMBERDALE || HAS_IOMEM))
+    Thus, "select PCH_DMA" and DMADEVICES are unnecessary
+    built when DMADEVICES is not enabled, so make the driver depend on
+    DMADEVICES.  Also, the help text says that the driver enables & uses
+    dmaengine: remove arch dependency from DMADEVICES
+    dependency for the DMADEVICES menu.
+    consequence CONFIG_DMADEVICES now depends on !CONFIG_HIGHMEM64G.  It also

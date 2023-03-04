@@ -1,0 +1,57 @@
+    (sock.setsockopt(274 /*SOL_BLUETOOTH*/, 8 /* BT_FLUSHABLE */, 1 /* flush */))
+    BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 36 mentioned
+    [ 2833.151999]  (slock-AF_BLUETOOTH){+.?...}, at: [<ffffffffa00bcb56>] rfcomm_sk_state_change+0x46/0x170 [rfcomm]
+    Oct  2 17:41:59 darkstar kernel: [  438.001350]  #0:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.+.}, at: [<faa1d2f5>] lock_sock+0xa/0xc [l2cap]
+    The new socket options should only be evaluated for SOL_BLUETOOTH level
+    Bluetooth: Preparation for usage of SOL_BLUETOOTH
+    option level SOL_BLUETOOTH should be used. This patch prepares the clean
+    This patch fixes it by changing HID_USB_DEVICE to HID_BLUETOOTH_DEVICE in those
+    Code to handle EV_SW SW_{WLAN,WWAN,BLUETOOTH,WIMAX,...} was added as it
+    after only pressing either KEY_WLAN or KEY_BLUETOOTH).
+    So using sub-classes per AF_BLUETOOTH sub-type for lockdep.
+      [BLUETOOTH]: l2cap info_timer delete fix in hci_conn_del
+    [BLUETOOTH]: l2cap info_timer delete fix in hci_conn_del
+      [BLUETOOTH] hci_sysfs.c: Kill build warning.
+      [BLUETOOTH] net/bluetooth/hci_core.c: Use time_* macros
+    [BLUETOOTH] hci_sysfs.c: Kill build warning.
+    [BLUETOOTH] net/bluetooth/hci_core.c: Use time_* macros
+      [BLUETOOTH]: Fix bugs in previous conn add/del workqueue changes.
+    [BLUETOOTH]: Fix bugs in previous conn add/del workqueue changes.
+    [BLUETOOTH]: Add conn add/del workqueues to avoid connection fail.
+    [BLUETOOTH]: Use sockfd_put()
+      [BLUETOOTH]: Move children of connection device to NULL before connection down.
+    [BLUETOOTH]: Move children of connection device to NULL before connection down.
+      [BLUETOOTH]: Always send explicit hci_ll wake-up acks.
+      [BLUETOOTH]: rfcomm tty BUG_ON() code fix
+    [BLUETOOTH]: Always send explicit hci_ll wake-up acks.
+    [BLUETOOTH]: rfcomm tty BUG_ON() code fix
+    [BLUETOOTH]: put_device before device_del fix
+    [BLUETOOTH]: Make hidp_setup_input() return int
+      [BLUETOOTH]: Fix non-COMPAT build of hci_sock.c
+    [BLUETOOTH]: Fix non-COMPAT build of hci_sock.c
+    [BLUETOOTH] l2cap: don't mangle cmd.len
+    [BLUETOOTH]: pass (host-endian) cmd length as explicit argument to l2cap_conf_req()
+    [BLUETOOTH] l2cap: endianness annotations
+    [BLUETOOTH]: Fix endianness bug in l2cap_sock_listen()
+      [NET] BLUETOOTH: Fix whitespace errors.
+    [NET] BLUETOOTH: Fix whitespace errors.
+      [BLUETOOTH]: Fix locking in hci_sock_dev_event().
+    [BLUETOOTH]: Fix locking in hci_sock_dev_event().
+    [BLUETOOTH] rfcomm_worker(): fix wakeup race
+    [BLUETOOTH]: Introduce skb->data accessor methods for hci_{acl,event,sco}_hdr
+    [NET] BLUETOOTH: Use cpu_to_le{16,32}() where appropriate.
+       (slock-AF_BLUETOOTH){-+..}, at: [<e0ca5520>] hci_sock_dev_event+0xa8/0xc5 [bluetooth]
+    [NET] BLUETOOTH: Fix whitespace errors.
+    [BLUETOOTH] lockdep: annotate sk_lock nesting in AF_BLUETOOTH
+    [BLUETOOTH] rfcomm endianness bug: param_mask is little-endian on the wire
+    [BLUETOOTH]: rfcomm endianness annotations
+    [BLUETOOTH]: bnep endianness annotations
+    [BLUETOOTH] bnep endianness bug: filtering by packet type
+      [BLUETOOTH]: Fix unaligned access in hci_send_to_sock.
+    [BLUETOOTH]: Fix unaligned access in hci_send_to_sock.
+      Input: add KEY_BLUETOOTH and KEY_WLAN definitions
+    Input: add KEY_BLUETOOTH and KEY_WLAN definitions
+    type (such as BUS_USB, BUS_BLUETOOTH) should be specified.
+    [BLUETOOTH] sco: Possible double free.
+      [BLUETOOTH]: Return negative error constant
+    [BLUETOOTH]: Return negative error constant

@@ -1,0 +1,549 @@
+    [<bf02d5ac>] (l2cap_security_cfm+0x0/0x2ac [bluetooth]) from [<bf01f01c>] (hci_event_pac
+    ket+0xc2c/0x4aa4 [bluetooth])
+    [<bf01e3f0>] (hci_event_packet+0x0/0x4aa4 [bluetooth]) from [<bf01a844>] (hci_rx_task+0x
+    cc/0x27c [bluetooth])
+    [<bf01a778>] (hci_rx_task+0x0/0x27c [bluetooth]) from [<c008eee4>] (tasklet_action+0xa0/
+    when a wlan or bluetooth hotkey is pressed.
+    Merge branch 'master' of master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+            EINVAL: ax25, bluetooth, decnet, econet, ieee802154, iucv, netlink, netrom, packet, rds, rose, unix, x25,
+    Merge branch 'master' of master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    Merge branch 'master' of master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+      bluetooth l2cap: fix locking in l2cap_global_chan_by_psm
+    bluetooth l2cap: fix locking in l2cap_global_chan_by_psm
+       for these components: wifi, bluetooth, wwan (3g), gps
+    Modules linked in: bonding autofs4 hidp rfcomm l2cap bluetooth lockd sunrpc
+    Fix up trivial conflicts in drivers/bluetooth/hci_ldisc.c and
+    I've got a Tivo Slide bluetooth remote/dongle, which uses a fair number
+    bluetooth: Fix warnings in l2cap_core.c
+    net/bluetooth/l2cap_core.c: In function ‘l2cap_recv_frame’:
+    net/bluetooth/l2cap_core.c:3758:15: warning: ‘sk’ may be used uninitialized in this function
+    net/bluetooth/l2cap_core.c:3758:15: note: ‘sk’ was declared here
+    net/bluetooth/l2cap_core.c:3791:15: warning: ‘sk’ may be used uninitialized in this function
+    net/bluetooth/l2cap_core.c:3791:15: note: ‘sk’ was declared here
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+       dereference if we call shutdown in a bluetooth SCO socket and doesn't
+            net/bluetooth/l2cap_sock.c
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    bluetooth: Fix use-before-initiailized var.
+    net/bluetooth/l2cap_core.c: In function ‘l2cap_recv_frame’:
+    net/bluetooth/l2cap_core.c:3612:15: warning: ‘sk’ may be used uninitialized in this function
+    net/bluetooth/l2cap_core.c:3612:15: note: ‘sk’ was declared here
+    This fixes corner cases when HCI RESET is sent down from bluetooth stack
+    bluetooth would have unregistered from the system.
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+            net/bluetooth/l2cap_core.c
+            net/bluetooth/l2cap_sock.c
+            net/bluetooth/mgmt.c
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    Some bluetooth dongles want ISO mode, and the limited support that the
+    Register the dfbmcs320 device which provides the PCM DAI for the bluetooth
+       http://opensource.wolfsonmicro.com/~gg/bluetooth-pcm/bluetooth_pcm.c
+    controller even if remote Out Of Band data was present in bluetoothd.
+    domain, intended to simulate cellular modem and bluetooth subsystems
+            net/bluetooth/mgmt.c
+        microcode image uses bluetooth statistics
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    Bluetooth: convert net/bluetooth/ to kstrtox
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    bluetoothd is capable of doing (without the Management interface).
+      ARM: S3C2410: H1940: Make h1940-bluetooth.c compile again
+    ARM: S3C2410: H1940: Make h1940-bluetooth.c compile again
+    ASoC: Add driver for the dfbmcs320 bluetooth module
+    This patch adds a codec driver for the dfbmcs320 bluetooth module, which is used
+    driver instead of registering the bluetooth DAI manually.
+    Previously there was a name mismatch between the bluetooth DAI and the bluetooth
+    bluetooth chip. But they do use different AMPs though and there are some minor
+    audio to and from the bluetooth DAI.
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    and the btwilink bluetooth driver have now moved to relevant
+    Jeff Chua reports that it can cause some bluetooth devices (he mentions
+    This is the bluetooth protocol driver for the TI WiLink7 chipsets.
+    into bluetooth.ko) introduced this by calling the hci_sock_cleanup
+    [1] http://www.bluetooth.com/Specification%20Documents/HID_SPEC_V10.pdf
+            drivers/bluetooth/ath3k.c
+            drivers/bluetooth/btusb.c
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    Bluetooth: fix checkpatch errors in af_bluetooth.c
+    Make /sys/class/bluetooth/hciX a symlink to
+    Bluetooth: Merge L2CAP and SCO modules into bluetooth.ko
+    have it loaded always in bluetooth.ko without problems.
+    This patch adds support or getting and setting feature reports for bluetooth
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    Change hcid to bluetoothd.
+    [ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
+    [ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
+    [ 3556.161285] [<bf0007fc>] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
+    [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+    [ 3556.172729] [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth]) from
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6 into wireless
+    protocols like bluetooth, fm and gps telling the shared transport
+    >  [10663.821963] Modules linked in: macvlan ip6table_filter ip6_tables rfcomm ipt_MASQUERADE binfmt_misc iptable_nat nf_nat nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack sco ipt_REJECT bnep l2cap xt_tcpudp iptable_filter ip_tables x_tables bridge stp vboxnetadp vboxnetflt vboxdrv kvm_intel kvm parport_pc ppdev snd_hda_codec_intelhdmi snd_hda_codec_conexant arc4 iwlagn iwlcore mac80211 snd_hda_intel snd_hda_codec snd_hwdep snd_pcm snd_seq_midi snd_rawmidi i915 snd_seq_midi_event snd_seq thinkpad_acpi drm_kms_helper btusb tpm_tis nvram uvcvideo snd_timer snd_seq_device bluetooth videodev v4l1_compat v4l2_compat_ioctl32 tpm drm tpm_bios snd cfg80211 psmouse serio_raw intel_ips soundcore snd_page_alloc intel_agp i2c_algo_bit video output netconsole configfs lp parport usbhid hid e1000e sdhci_pci ahci libahci sdhci led_class
+    Unbreak Billionton CF bluetooth card. This actually fixes a regression
+    of review. Based on bluetooth maintainer comments, since
+      acer-wmi: Initialize wlan/bluetooth/wwan rfkill software block state
+    acer-wmi: Initialize wlan/bluetooth/wwan rfkill software block state
+    Initial wlan/bluetooth/wwan rfkill software block state when acer-wmi driver
+    eeepc-wmi: add rfkill support for wlan, bluetooth and 3g
+            net/bluetooth/Makefile
+    on 5Ghz band and when bluetooth is enabled, because
+    Merge branch 'master' of master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    The command handlers for bluetooth management messaging should be able
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    In order to accomplish this the patch adds a new member to the bluetooth
+    the bluetooth headers.
+    Net: bluetooth: Makefile: Remove deprecated kbuild goal definitions
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    the same for all bluetooth code.
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6 into test
+    in serial drivers (and later in bluetooth driver).
+    bluetooth drivers.
+      ARM: S3C2410: Adapt h1940-bluetooth to gpiolib changes
+    ARM: S3C2410: Adapt h1940-bluetooth to gpiolib changes
+    Net: bluetooth: Makefile: Remove deprecated kbuild goal definitions
+    bluetooth coexist.
+    A kernel BUG when bluetooth rfcomm connection drop while the associated
+    [  851.560536] Modules linked in: b43(-) ssb mmc_block binfmt_misc rfcomm sco bnep ppdev l2cap ipt_MASQUERADE iptable_nat nf_nat nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack ipt_REJECT xt_tcpudp iptable_filter ip_tables x_tables bridge stp kvm_intel kvm arc4 iwlagn snd_hda_codec_conexant snd_hda_intel snd_hda_codec iwlcore snd_hwdep snd_pcm thinkpad_acpi mac80211 snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq r852 joydev snd_timer sm_common pcmcia nand snd_seq_device cfg80211 sdhci_pci btusb psmouse tpm_tis yenta_socket nand_ids lp snd pcmcia_rsrc nand_ecc bluetooth sdhci tpm pcmcia_core parport mtd snd_page_alloc serio_raw tpm_bios soundcore nvram led_class sha256_generic aes_i586 aes_generic dm_crypt i915 drm_kms_helper drm ahci intel_agp i2c_algo_bit intel_gtt e1000e libahci video agpgart output
+    bluetooth: Fix missing NULL check
+    Add new module parameter that force module not to register bluetooth rfkill.
+    There is report that saying using this bluetooth rfkill to enable/disable
+    bluetooth will let bluetooth device initial failed when enable on Lenovo
+    ideapad S12. Fortunately there is another rfkill registered by bluetooth
+    driver for S12 and user can shutdown the bluetooth by either bluetooth driver
+    bluetooth with another OS if we do not register bluetooth rfkill at all. So
+    we will force bluetooth enable when no_bt_rfkill=1.
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6 into for-davem
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6
+    driver for WiLink chipsets. Each individual protocol drivers like bluetooth
+    [ 2833.151999]   [<ffffffffa000db4b>] hci_rx_task+0x2ab/0x450 [bluetooth]
+    OMAP2+: defconfig: modularize bluetooth, audio and WLAN
+    - bluetooth
+    CC: linux-bluetooth@vger.kernel.org
+    Acked-by: Gustavo F. Padovan <padovan@profusion.mobi> (for drivers/bluetooth)
+    Acked-by: Gustavo F. Padovan <padovan@profusion.mobi> (for drivers/bluetooth)
+    Acked-by: Gustavo F. Padovan <padovan@profusion.mobi> (for drivers/bluetooth)
+    Acked-by: Gustavo F. Padovan <padovan@profusion.mobi> (for drivers/bluetooth)
+    Acked-by: Gustavo F. Padovan <padovan@profusion.mobi> (for drivers/bluetooth)
+    [  485.804054] Modules linked in: iwlagn iwlcore bnep sco rfcomm l2cap crc16 bluetooth [last unloaded: iwlcore]
+    [ 1139.243195] Modules linked in: ipv6 autofs4 rfcomm l2cap crc16 bluetooth rfkill binfmt_misc
+    [ 1139.243250] Modules linked in: ipv6 autofs4 rfcomm l2cap crc16 bluetooth rfkill binfmt_misc
+    Add the debugfs file to show current bluetooth traffic load
+    Adding the bluetooth full concurrency support for WiFi/BT combo devices.
+    When bluetooth indicated high load, we should use
+    iwlagn: let bluetooth traffic load impact rate scale
+    Depending on the amount of bluetooth traffic,
+    adverse impact on both bluetooth and wireless
+    When there's high bluetooth traffic load, there's
+    6000g2b hardware implements advance bluetooth coexist command,
+    bluetooth coexist implementation on the host,
+    ath9k_htc: Add support for bluetooth coexistence.
+    [   54.625600] Modules linked in: sco bridge stp llc input_polldev rfcomm bnep l2cap crc16 sch_sfq ipv6 md_mod acpi_cpufreq mperf cryptd aes_x86_64 aes_generic xts gf128mul dm_crypt dm_mod btusb bluetooth usbhid hid zaurus cdc_ether usbnet mii cdc_wdm cdc_acm uvcvideo videodev v4l1_compat v4l2_compat_ioctl32 snd_hda_codec_conexant arc4 pcmcia ecb snd_hda_intel joydev sdhci_pci sdhci snd_hda_codec tpm_tis firewire_ohci mmc_core e1000e uhci_hcd thinkpad_acpi nvram yenta_socket pcmcia_rsrc pcmcia_core tpm wmi sr_mod firewire_core iwlagn ehci_hcd snd_hwdep snd_pcm usbcore tpm_bios thermal led_class snd_timer iwlcore snd soundcore ac snd_page_alloc pcspkr psmouse serio_raw battery sg mac80211 evdev cfg80211 i2c_i801 iTCO_wdt iTCO_vendor_support cdrom processor crc_itu_t rfkill xfs exportfs sd_mod crc_t10dif ahci libahci libata scsi_mod [last unloaded: scsi_wait_scan]
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+      HID: add proper support for Elecom BM084 bluetooth mouse
+    asus-laptop: fix wapf, wlan_status and bluetooth_status module_param permissions
+    The wlan_status and bluetooth_status module parameters are for setting the
+    wlan/bluetooth status on boot.
+    CC: linux-bluetooth@vger.kernel.org
+    Acked-by: Marcel Holtmann <marcel@holtmann.org> (for drivers/bluetooth/)
+    Acked-by: Marcel Holtmann <marcel@holtmann.org> (for drivers/bluetooth/)
+    Acked-by: Marcel Holtmann <marcel@holtmann.org> (for drivers/bluetooth/)
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    This fixes the regression in 2.6.35-rcX where bluetooth network devices
+    bluetooth driver would change /sys/class/bluetooth to /sys/bus/bluetoth,
+    "/sys/class/bluetooth/hci0/bnep0" to "/sys/class/bluetooth/hci0/net/bnep0".
+    iwlagn: add bluetooth stats to debugfs
+    For WiFi/BT combo devices, add bluetooth statistics counter
+    iwlagn: Add support for bluetooth statistics notification
+    Only WiFi/BT combo devices need to use bluetooth version of statistics
+      CC [M]  drivers/bluetooth/hci_ldisc.o
+    drivers/bluetooth/hci_ldisc.c: In function 'hci_uart_send_frame':
+    drivers/bluetooth/hci_ldisc.c:213:21: warning: variable 'tty' set but not used
+    drivers/bluetooth/btmrvl_sdio.c: In function ‘btmrvl_sdio_verify_fw_download’:
+    drivers/bluetooth/btmrvl_sdio.c:80: warning: ‘fws1’ may be used uninitialized in this function
+    drivers/bluetooth/btmrvl_sdio.c:80: note: ‘fws1’ was declared here
+    coming from the firmware. Effectively, whenever there is bluetooth traffic,
+      drivers: bluetooth: bluecard_cs.c: Fixed include error, changed to linux/io.h
+    drivers: bluetooth: bluecard_cs.c: Fixed include error, changed to linux/io.h
+             CC [M]  drivers/bluetooth/hci_bcsp.o
+            drivers/bluetooth/hci_bcsp.c: In function 'bcsp_prepare_pkt':
+            drivers/bluetooth/hci_bcsp.c:247:20: warning: operation on 'bcsp->msgq_txseq' may be undefined
+    HID: add proper support for Elecom BM084 bluetooth mouse
+    iTCO_vendor_support btusb joydev dcdbas cfg80211 bluetooth snd soundcore
+    wlan/bluetooth/wwan function keys. So, add a i8042 filter to sync sw
+    Staging: bluetooth: BT driver using ST for TI combo devices
+    CC: linux-bluetooth@vger.kernel.org
+    CC: linux-bluetooth@vger.kernel.org
+    ARM: H1940: Change h1940-bluetooth to use gpiolib API
+    Change the h1940-bluetooth driver to use gpiolib to set the output state
+    as per in net/bluetooth/hidp/core.c::hidp_output_raw_report(), by using
+      bluetooth: handle l2cap_create_connless_pdu() errors
+    bluetooth: handle l2cap_create_connless_pdu() errors
+      asus: don't modify bluetooth/wlan on boot
+    flag instructs the device to ignore bluetooth
+    be sent for bluetooth coexist, so make this a virtual
+    asus: don't modify bluetooth/wlan on boot
+    bluetooth.  This patch changes platform device registration code to
+    net/bluetooth/l2cap.c | 3 ++-
+    net/bluetooth/rfcomm/sock.c | 3 ++-
+    net/bluetooth/sco.c | 3 ++-
+     - enable wifi/bluetooth co-exist
+    The bluetooth coexistence (SG) configuration messages have changed and
+    HID: add sysfs speed attribute for wacom bluetooth tablet
+    HID: separate mode switching function for wacom bluetooth driver
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    [<bf0037a4>] (hci_rx_task+0x244/0x478 [bluetooth])
+    [ 6070.077362] [<bf003560>] (hci_rx_task+0x0/0x478 [bluetooth]) from
+      asus-laptop: add bluetooth keys found on M9V
+    asus-laptop: add bluetooth keys found on M9V
+    Also add to helpers for bluetooth and wlan.
+    asus-laptop: stop using read_status for bluetooth and wlan
+    asus-laptop: add wireless and bluetooth status parameter
+    These to parameter allow to set the status of wlan and bluetooth
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    thinkpad-acpi: fix bluetooth/wwan resume
+    confuses users and can make it difficult for them to enable bluetooth
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    bluetooth card inserted: c950ctrl is 0 and outb() faults.
+            [1530745.950651] Modules linked in: configs ipt_REJECT xt_tcpudp iptable_filter ip_tables x_tables bridge stp nfsd nfs_acl auth_rpcgss exportfs autofs4 hidp rfcomm l2cap crc16 bluetooth lockd sunrpc ib_iser rdma_cm ib_cm iw_cm ib_sa ib_mad ib_core ib_addr iscsi_tcp bnx2i cnic uio ipv6 cxgb3i cxgb3 mdio libiscsi_tcp libiscsi scsi_transport_iscsi dm_mirror dm_multipath scsi_dh video output sbs sbshc battery ac lp kvm_intel kvm sg ide_cd_mod cdrom serio_raw tpm_tis tpm tpm_bios acpi_memhotplug button parport_pc parport rtc_cmos rtc_core rtc_lib e1000 i2c_i801 i2c_core pcspkr dm_region_hash dm_log dm_mod ata_piix libata shpchp megaraid_mbox sd_mod scsi_mod megaraid_mm ext3 jbd uhci_hcd ohci_hcd ehci_hcd [last unloaded: freq_table]
+    For bluetooth 3, we will most likely not have
+    future we can, for instance, support bluetooth 3
+     - Rfkill for bluetooth and wlan
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    ARM: H1940: Convert h1940 bluetooth driver to rfkill
+    Better using standard interfaces to enable/disable bluetooth
+    CC: linux-bluetooth@vger.kernel.org
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    http://www.spinics.net/lists/linux-bluetooth/msg02473.html
+    The reason is because bluetoothd does not store link keys
+    However we often use it with a bluetooth module needing CTS/RTS
+    btusb bluetooth driver: wait for 'waker' work too before closing
+    pcmcia: deprecate CS_CHECK (bluetooth)
+    CC: linux-bluetooth@vger.kernel.org
+      bluetooth: static lock key fix
+      bluetooth: scheduling while atomic bug fix
+    as well as bluetooth and GPS coms. (Wifi and WiMax provide their own firmware)
+    bluetooth: static lock key fix
+    [   94.342509]  [<f8364963>] ? hci_rx_task+0xd2/0x1bc [bluetooth]
+    [   94.342509]  [<f8364997>] hci_rx_task+0x106/0x1bc [bluetooth]
+    bluetooth: scheduling while atomic bug fix
+    Oct  2 17:41:59 darkstar kernel: [  438.001414]  [<fa51fff7>] hci_conn_init_sysfs+0x40/0xd9 [bluetooth]
+    Oct  2 17:41:59 darkstar kernel: [  438.001422]  [<fa51cdc0>] ? hci_conn_add+0x128/0x186 [bluetooth]
+    Oct  2 17:41:59 darkstar kernel: [  438.001429]  [<fa51ce0f>] hci_conn_add+0x177/0x186 [bluetooth]
+    Oct  2 17:41:59 darkstar kernel: [  438.001437]  [<fa51cf8a>] hci_connect+0x3c/0xfb [bluetooth]
+      net: Teach pegasus driver to ignore bluetoother adapters with clashing Vendor:Product IDs
+    net: Teach pegasus driver to ignore bluetoother adapters with clashing Vendor:Product IDs
+    The Belkin F8T012xx1 bluetooth adaptor has the same vendor and product
+    ath9k: Define bus agnostic bluetooth coex prep helper
+    We disable ASPM when enabling bluetooth coexistance. Disabling
+    support bluetooth coexistance, an example is USB. To this end
+    Whether or not bluetooth coex has been enabled is a hardware
+    ath9k: split bluetooth hardware coex init into two helpers
+    There is some bluetooth coexistance data which is driver
+    never on bluetooth_rfkill.
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+     Modules linked in: bridge stp llc bnep rfcomm l2cap xfs exportfs nilfs2 cowloop loop vboxnetadp vboxnetflt vboxdrv btusb bluetooth uvcvideo videodev v4l1_compat v4l2_compat_ioctl32 arc4 snd_hda_codec_analog ecb iwlagn iwlcore rfkill lib80211 mac80211 snd_hda_intel snd_hda_codec ehci_hcd uhci_hcd usbcore snd_hwdep snd_pcm tg3 cfg80211 psmouse snd_timer joydev libphy ohci1394 snd_page_alloc hp_accel lis3lv02d ieee1394 led_class i915 drm i2c_algo_bit video backlight output i2c_core dm_crypt dm_mod
+    This patch adds 3-wire bluetooth coex support for AR9285.
+    wheel for bluetooth version of apple mighty mouse" is incomplete. If
+    we remove Apple MightyMouse (bluetooth version) from the list of
+    Fix net/bluetooth/l2cap.c build errors:
+    Used for applications such as direct bluetooth connections on
+    like /sbin/ip and bluetoothd which need to be able to trigger module loads.
+      bluetooth: rfcomm_init bug fix
+    bluetooth: rfcomm_init bug fix
+    http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
+            net/bluetooth/af_bluetooth.c
+      HID: fix inverted wheel for bluetooth version of apple mighty mouse
+      CC [M]  drivers/bluetooth/dtl1_cs.o
+    drivers/bluetooth/dtl1_cs.c: In function ‘dtl1_hci_send_frame’:
+    drivers/bluetooth/dtl1_cs.c:396: warning: ‘nsh.type’ may be used uninitialized in this function
+    tty: fix bluetooth scribbling on low latency flags
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    HID: fix inverted wheel for bluetooth version of apple mighty mouse
+    bluetooth: Kill skb_frags_no(), unused.
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    bluetooth/2518 is trying to acquire lock:
+     (bluetooth){+.+.+.}, at: [<c0130c14>] flush_work+0x28/0xb0
+     (bluetooth){+.+.+.}, at: [<c0130424>] worker_thread+0x149/0x25e
+    2 locks held by bluetooth/2518:
+     #0:  (bluetooth){+.+.+.}, at: [<c0130424>] worker_thread+0x149/0x25e
+    Pid: 2518, comm: bluetooth Not tainted 2.6.30-rc6-02911-gbb803cf #16
+     [<f8b84966>] del_conn+0x1c/0x84 [bluetooth]
+     [<f8b8494a>] ? del_conn+0x0/0x84 [bluetooth]
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    * git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6:
+    [  110.012145]  #0:  (hci_task_lock){++.-.+}, at: [<ffffffffa01f822f>] hci_rx_task+0x2f/0x2d0 [bluetooth]
+    [  110.012173]  #1:  (&hdev->lock){+.-.+.}, at: [<ffffffffa01fb9e2>] hci_event_packet+0x72/0x25c0 [bluetooth]
+    [  110.012273]  [<ffffffffa01fb9e2>] ? hci_event_packet+0x72/0x25c0 [bluetooth]
+    [  110.012289]  [<ffffffffa01ffc1d>] hci_conn_add_sysfs+0x3d/0x70 [bluetooth]
+    [  110.012303]  [<ffffffffa01fba2c>] hci_event_packet+0xbc/0x25c0 [bluetooth]
+    [  110.012328]  [<ffffffffa01fee0c>] ? hci_send_to_sock+0xfc/0x1c0 [bluetooth]
+    [  110.012354]  [<ffffffffa01fee0c>] ? hci_send_to_sock+0xfc/0x1c0 [bluetooth]
+    [  110.012360]  [<ffffffffa01f8403>] hci_rx_task+0x203/0x2d0 [bluetooth]
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    additions of bluetooth and wireless control to the driver.
+    > > Modules linked in: llc bnep l2cap bluetooth autofs4 lm90 hwmon i2c_i801 sunrpc
+    enable/disable bluetooth or WWAN in the procfs interface, instead of
+    Use the new helpers to issue deprecation warnings for bluetooth_enable
+    For consistency with __sony_pic_set_bluetoothpower, this is also needed
+    [  459.998129] Modules linked in: pciehp ipv6 autofs4 hidp rfcomm l2cap bluetooth sunrpc cpufreq_ondemand acpi_cpufreq dm_mirror dm_region_hash dm_log dm_multipath scsi_dh dm_mod sbs sbshc battery ac parport_pc lp parport mptspi mptscsih mptbase scsi_transport_spi e1000e sg sr_mod cdrom button serio_raw i2c_i801 i2c_core shpchp pcspkr ata_piix libata megaraid_sas sd_mod scsi_mod crc_t10dif ext3 jbd uhci_hcd ohci_hcd ehci_hcd [last unloaded: microcode]
+    bluetooth_rfkill->data.
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    [ 2845.743377] last sysfs file: /sys/class/bluetooth/hci0/hci0:6/type
+    [ 2845.743742] Modules linked in: btusb netconsole snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss rfcomm l2cap bluetooth vfat fuse snd_hda_codec_idt snd_hda_intel snd_hda_codec snd_hwdep snd_pcm pl2303 snd_timer psmouse usbserial snd 3c59x e100 serio_raw soundcore i2c_i801 intel_agp mii agpgart snd_page_alloc rtc_cmos rtc_core thermal processor rtc_lib button thermal_sys sg evdev
+    [ 2845.743742]  [<f8171f5a>] ? hci_conn_del+0x10a/0x1c0 [bluetooth]
+    [ 2845.743742]  [<f81795ce>] ? hci_conn_del_sysfs+0x8e/0xd0 [bluetooth]
+    [ 2845.743742]  [<f8175758>] ? hci_event_packet+0x5f8/0x31c0 [bluetooth]
+    [ 2845.743742]  [<f8178aa9>] ? hci_send_to_sock+0xe9/0x1d0 [bluetooth]
+    [ 2845.743742]  [<f816fa6a>] ? hci_rx_task+0x2ba/0x490 [bluetooth]
+    [ 2845.743742] Modules linked in: btusb netconsole snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss rfcomm l2cap bluetooth vfat fuse snd_hda_codec_idt snd_hda_intel snd_hda_codec snd_hwdep snd_pcm pl2303 snd_timer psmouse usbserial snd 3c59x e100 serio_raw soundcore i2c_i801 intel_agp mii agpgart snd_page_alloc rtc_cmos rtc_core thermal processor rtc_lib button thermal_sys sg evdev
+    [ 2845.743742]  [<f8171f5a>] hci_conn_del+0x10a/0x1c0 [bluetooth]
+    [ 2845.743742]  [<f81795ce>] ? hci_conn_del_sysfs+0x8e/0xd0 [bluetooth]
+    [ 2845.743742]  [<f8175758>] hci_event_packet+0x5f8/0x31c0 [bluetooth]
+    [ 2845.743742]  [<f8178aa9>] ? hci_send_to_sock+0xe9/0x1d0 [bluetooth]
+    [ 2845.743742]  [<f816fa6a>] hci_rx_task+0x2ba/0x490 [bluetooth]
+    [ 2845.743742] Modules linked in: btusb netconsole snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss rfcomm l2cap bluetooth vfat fuse snd_hda_codec_idt snd_hda_intel snd_hda_codec snd_hwdep snd_pcm pl2303 snd_timer psmouse usbserial snd 3c59x e100 serio_raw soundcore i2c_i801 intel_agp mii agpgart snd_page_alloc rtc_cmos rtc_core thermal processor rtc_lib button thermal_sys sg evdev
+    [ 2845.743742]  [<f8171f5a>] hci_conn_del+0x10a/0x1c0 [bluetooth]
+    [ 2845.743742]  [<f81795ce>] ? hci_conn_del_sysfs+0x8e/0xd0 [bluetooth]
+    [ 2845.743742]  [<f8175758>] hci_event_packet+0x5f8/0x31c0 [bluetooth]
+    [ 2845.743742]  [<f8178aa9>] ? hci_send_to_sock+0xe9/0x1d0 [bluetooth]
+    [ 2845.743742]  [<f816fa6a>] hci_rx_task+0x2ba/0x490 [bluetooth]
+    My logitec bluetooth mouse trying connect to pc, but
+        lockdep: include/linux/lockdep.h - fix warning in net/bluetooth/af_bluetooth.c
+    budget_core snd_rawmidi bluetooth saa7146 snd_seq_device ttpci_eeprom
+    lgapi des ipv6 xfrm_nalgo crypto_api autofs4 hidp l2cap bluetooth nfs lockd fscache nfs_acl sunrpc ip_conntrack_netbios_ns ipt_REJECT xt_state ip_conntrack nfnetlink xt_
+    - Enabled USB host and bluetooth: magician has a CSR BlueCore3 connected
+    Although rfkill support for the EEE bluetooth device has been added to
+        Modules linked in: ipt_REJECT xt_tcpudp iptable_filter ip_tables x_tables bridge stp ipv6 autofs4 hidp rfcomm l2cap bluetooth sunrpc dm_mirror dm_region_hash dm_log dm_multipath dm_mod rfkill input_polldev sbs sbshc battery ac lp sg ide_cd_mod cdrom button serio_raw acpi_memhotplug parport_pc e1000 rtc_cmos parport rtc_core rtc_lib i2c_i801 i2c_core shpchp pcspkr ata_piix libata megaraid_mbox megaraid_mm sd_mod scsi_mod ext3 jbd ehci_hcd ohci_hcd uhci_hcd [last unloaded: microcode]
+    bluetooth.  Also, try to set the initial boot state of these radios as the
+    bluetooth rfkill soft-switch, a WWAN rfkill soft-switch on thinkpads.
+    bluetooth: driver API update
+    Modules linked in: nls_utf8 fuse sco bridge stp bnep l2cap bluetooth sunrpc nf_conntrack_netbios_ns nf_conntrack_ftp ip6t_REJECT nf_conntrack_ipv6 ip6table_filter ip6_tables ipv6 cpufreq_ondemand acpi_cpufreq freq_table xfs lgdt330x dm_multipath cx88_dvb cx88_vp3054_i2c uinput tda9887 tda8290 snd_emu10k1_synth snd_emux_synth snd_seq_virmidi snd_seq_midi_emul tuner_simple tuner_types tuner msp3400 cx8800 cx88_alsa cx8802 snd_emu10k1 cx88xx snd_rawmidi snd_ac97_codec ir_common ac97_bus saa7115 snd_seq_dummy snd_seq_oss snd_seq_midi_event videobuf_dvb snd_seq dvb_core snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_device videobuf_dma_sg ppdev parport_pc snd_timer videobuf_core snd_page_alloc btcx_risc emu10k1_gp ivtv i2c_algo_bit cx2341x snd_util_mem snd_hwdep nvidia(P) gameport v4l2_common i2c_i801 snd soundcore parport videodev v4l1_compat v4l2_compat_ioctl32 tveeprom i2c_core pcspkr iTCO_wdt iTCO_vendor_support sky2 joydev floppy shpchp ata_generic pata_acpi pata_jmicron [last unloaded: microcode]
+    bluetooth: Fix unused var warning properly in rfcomm_sock_ioctl().
+    This local var is protected by all sorts of bluetooth debugging
+    bluetooth: Fix rfcomm_sock_ioctl() build failure with debugging enabled.
+    [  154.153360] Modules linked in: rfcomm l2cap ppdev lp ipt_MASQUERADE tun capi capifs kernelcapi ac battery nfsd exportfs nfs lockd nfs_acl sunrpc sit tunnel4 bridge stp llc ipt_REJECT ipt_LOG xt_tcpudp xt_state iptable_filter iptable_mangle iptable_nat nf_nat nf_conntrack_ipv4 nf_conntrack ip_tables x_tables nls_utf8 isofs nls_base zlib_inflate loop ipv6 netconsole snd_via82xx dvb_usb_dib0700 gameport dib7000p dib7000m dvb_usb snd_ac97_codec ac97_bus dvb_core mt2266 snd_pcm tuner_xc2028 dib3000mc dibx000_common mt2060 dib0070 snd_page_alloc snd_mpu401_uart snd_seq_midi snd_seq_midi_event btusb snd_rawmidi bluetooth snd_seq snd_timer snd_seq_device snd via686a i2c_viapro soundcore i2c_core parport_pc parport button dm_mirror dm_log dm_snapshot floppy sg ohci1394 uhci_hcd ehci_hcd 8139too mii ieee1394 usbcore sr_mod cdrom sd_mod thermal processor fan [last unloaded: b1]
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-next-2.6
+    bluetooth, w1/battery, ...) are depend on SAMCOP and MediaQ
+      HID: Apple ALU wireless keyboards are bluetooth devices
+      [ARM] pxa/MioA701: bluetooth resume fix
+    net/bluetooth/hci_sysfs.c: In function ‘hci_register_sysfs’:
+    net/bluetooth/hci_sysfs.c:418: warning: format not a string literal and no format arguments
+    net/bluetooth/af_bluetooth.c:60: warning: ‘bt_key_strings’ defined but not used
+    net/bluetooth/af_bluetooth.c:71: warning: ‘bt_slock_key_strings’ defined but not used
+    HID: Apple ALU wireless keyboards are bluetooth devices
+    although the keyboards are really bluetooth devices.  The same holds for
+    bluetooth: fix warning in net/bluetooth/rfcomm/sock.c
+      net/bluetooth/rfcomm/sock.c: In function ‘rfcomm_sock_ioctl’:
+      net/bluetooth/rfcomm/sock.c:795: warning: unused variable ‘sk’
+    instead of the #ifdef, but that looks quite intrusive: each bluetooth
+    [ARM] pxa/MioA701: bluetooth resume fix
+    exactly 1 to setup the bluetooth GPIOs properly. The actual
+    tvaudio bttv bridgebnep rfcomm l2cap bluetooth it87 hwmon_vid hwmon fuse sunrpc ipt_REJECT
+    lockdep: include/linux/lockdep.h - fix warning in net/bluetooth/af_bluetooth.c
+      net/bluetooth/af_bluetooth.c:60: warning: ‘bt_key_strings’ defined but not used
+      net/bluetooth/af_bluetooth.c:71: warning: ‘bt_slock_key_strings’ defined but not used
+    lockdep: include/linux/lockdep.h - fix warning in net/bluetooth/af_bluetooth.c
+      net/bluetooth/af_bluetooth.c:60: warning: ‘bt_key_strings’ defined but not used
+      net/bluetooth/af_bluetooth.c:71: warning: ‘bt_slock_key_strings’ defined but not used
+    Note: this patch leaves the type as unknown for bluetooth devices,
+    acer-wmi: Remove wireless and bluetooth sysfs entries
+    acer-wmi: Add rfkill support for wireless and bluetooth
+    This patch implements rfkill support for the wireless and bluetooth devices
+    The old sysfs interface for wireless and bluetooth will be removed in a
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    [   78.798383] Modules linked in: btusb usbhid bluetooth b43 mac80211 cfg80211 ehci_hcd ohci_hcd sungem sungem_phy usbcore ssb
+    [ 1049.404176] Modules linked in: oprofile af_packet rfcomm l2cap kvm_intel kvm i915 drm acpi_cpufreq cpufreq_userspace cpufreq_conservative cpufreq_ondemand cpufreq_powersave freq_table container sbs sbshc dm_mod arc4 ecb cryptomgr aead snd_hda_intel crypto_blkcipher snd_pcm_oss crypto_algapi snd_pcm iwlagn iwlcore snd_timer iTCO_wdt led_class btusb iTCO_vendor_support snd psmouse bluetooth mac80211 soundcore cfg80211 snd_page_alloc intel_agp video output button battery ac dcdbas evdev ext3 jbd mbcache sg sd_mod piix ata_piix libata scsi_mod dock tg3 libphy ehci_hcd uhci_hcd usbcore thermal processor fan fuse
+    bluetooth: hci_bcsp: Use SKB list interfaces instead of home-grown stuff.
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    toshiba_acpi: Add support for bluetooth toggling through rfkill (v8)
+    /proc interface to toggle the bluetooth adapter in a large number of Toshiba
+    Modules linked in: rfcomm l2cap bluetooth autofs4 sunrpc
+    [ARM] 5197/1: gumstix: conversion to MFP support and add bluetooth support
+    bluetooth support.
+      pcmcia: use pcmcia_loop_config in bluetooth drivers
+    pcmcia: use pcmcia_loop_config in bluetooth drivers
+    Use the config loop helper in bluetooth pcmcia drivers.
+    CC: linux-bluetooth@vger.kernel.org
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+      acer-wmi: Fix wireless and bluetooth on early AMW0 v2 laptops
+    acer-wmi: Fix wireless and bluetooth on early AMW0 v2 laptops
+    wireless and bluetooth values.
+    'new' WMID methods for setting wireless & bluetooth to guarantee we always
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    pegasus: add blacklist support to fix Belkin bluetooth dongle.
+    The Belkin bluetooth dongle unfortunately shares the vendor and device id
+    with the network adapter which causes lockups whenever the bluetooth
+      bluetooth: add quirks for a few hci_usb devices
+    bluetooth: add quirks for a few hci_usb devices
+    dock and toggling the state of the wifi, bluetooth and wwan hardware via
+      ACPI: thinkpad-acpi: add bluetooth and WWAN rfkill support
+      ACPI: thinkpad-acpi: prepare for bluetooth and wwan rfkill support
+    bluetooth: remove improper bluetooth class symlinks.
+    class.  If the bluetooth subsystem really wants to point to all of the
+      Input: wistron - generate normal key event if bluetooth or wifi not present
+    ACPI: thinkpad-acpi: add bluetooth and WWAN rfkill support
+    Add a read/write rfkill interface to the bluetooth radio switch on the
+    bluetooth submodule, and one for the wireless wan radio switch to the wan
+    ACPI: thinkpad-acpi: prepare for bluetooth and wwan rfkill support
+    the rfkill conversion of wwan and bluetooth a bit cleaner.
+    Change the code of hotkey_init, wan_init and bluetooth_init a bit to make it
+    Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+     bluetooth - bluetooth subsystem state: contains 0 or 1 (rw)
+    bluetooth/hci_bcsp: fix bitrev Kconfig
+    Fix bluetooth hci_bcsp Kconfig to avoid build errors:
+    bluetooth: treat firmware data as const
+    PalmTX is PXA27x based device with wifi, bluetooth,
+    [ARM] 5150/1: Tosa: support built-in bluetooth power-up
+    2) Add bluetooth and USB bluetooth drivers as modules
+    Input: wistron - generate normal key event if bluetooth or wifi not present
+    bluetooth-vhci: BKL pushdown
+    > Modules linked in: i915 drm ipw2200 sonypi ipv6 autofs4 hidp l2cap bluetooth sunrpc nf_conntrack_netbios_ns ipt_REJECT nf_conntrack_ipv4 xt_state nf_conntrack xt_tcpudp iptable_filter ip_tables x_tables acpi_cpufreq nvram ohci1394 ieee1394 ehci_hcd uhci_hcd sg joydev snd_hda_intel snd_seq_dummy sr_mod snd_seq_oss cdrom snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss ieee80211 pcspkr ieee80211_crypt snd_pcm i2c_i801 snd_timer i2c_core ide_pci_generic piix snd soundcore snd_page_alloc button ext3 jbd ide_disk ide_core [last unloaded: ipw2200]
+    bluetooth: hci_bcsp.c small cleanups/api users
+    drivers/bluetooth/hci_bcsp.c:218:26: warning: symbol 'hdr' shadows an earlier one
+    drivers/bluetooth/hci_bcsp.c:187:5: originally declared here
+    bluetooth: rfcomm_dev_state_change deadlock fix
+    1905f6c736cb618e07eca0c96e60e3c024023428 ("bluetooth :
+    commit 4c8411f8c115def968820a4df6658ccfd55d7f1a ("bluetooth: fix
+      bluetooth: fix locking bug in the rfcomm socket cleanup handling
+    bluetooth: fix locking bug in the rfcomm socket cleanup handling
+    in net/bluetooth/rfcomm/sock.c, rfcomm_sk_state_change() does the
+      bluetooth: use get/put_unaligned_* helpers
+    bluetooth: use get/put_unaligned_* helpers
+    the bluetooth controller nor the RTC.  Remove references
+      b43: Workaround invalid bluetooth settings
+    b43: Workaround invalid bluetooth settings
+    This adds a workaround for invalid bluetooth SPROM settings
+    driver, with both bluetooth and wireless simultaneously changing state
+      bluetooth : __rfcomm_dlc_close lock fix
+      bluetooth : use lockdep sub-classes for diffrent bluetooth protocol
+    bluetooth : __rfcomm_dlc_close lock fix
+    bluetooth : use lockdep sub-classes for diffrent bluetooth protocol
+    locking diffrent kinds of bluetooth sockets at the same time.
+    bluetooth: replace deprecated RW_LOCK_UNLOCKED macros
+    bluetooth: Add another Broadcom device
+    bluetooth: make bnep_sock_cleanup() return void
+    bluetooth: Make hci_sock_cleanup() return void
+    Compile-tested with 'make allyesconfig && make net/bluetooth/bluetooth.ko'
+    bluetooth: hci_core: defer hci_unregister_sysfs()
+    bluetooth ppp_generic slhc ioatdma dca cfq_iosched cpufreq_powersave
+    Feb 16 23:41:33 alon1 [<f9aaed80>] del_conn+0x0/0x70 [bluetooth]
+    Feb 16 23:41:33 alon1 [<f9aaed99>] del_conn+0x19/0x70 [bluetooth]
+    bluetooth: CONWISE Technology based adapters with buggy SCO support (bugzilla #9027)
+    bluetooth: delete timer in l2cap_conn_del()
+     bluetooth w
+      bluetooth: do not move child device other than rfcomm
+      bluetooth: put hci dev after del conn
+      [BLUETOOTH] net/bluetooth/hci_core.c: Use time_* macros
+    bluetooth: do not move child device other than rfcomm
+    bluetooth: put hci dev after del conn
+    net/bluetooth/hci_sysfs.c: In function ‘del_conn’:
+    net/bluetooth/hci_sysfs.c:339: warning: suggest parentheses around assignment used as truth value
+    [BLUETOOTH] net/bluetooth/hci_core.c: Use time_* macros
+      between the TTY layer and the bluetooth code, however the tty layer is not
+      What happens is that, on closing the bluetooth tty, the tty layer goes
+      tty layers' uart_flush_buffer() function.  (in drivers/bluetooth/hci_tty.c
+      Should the bluetooth driver even call this flush function at all??
+    As per Joshua Wise's comments, change bluetooth to jogdial (an error from
+    radio and bluetooth control, and on some laptops, exposes the mail LED and
+    * Add autodetection for bluetooth and maximum brightness on AMW0 V2 and
+    * Fix AMW0 V2 bluetooth and wireless, by using both WMID and AMW0 methods
+      bluetooth rfcomm tty: destroy before tty_close()
+      bluetooth: blacklist another Broadcom BCM2035 device
+      drivers/bluetooth/btsdio.c: fix double-free
+      drivers/bluetooth/bpa10x.c: fix memleak
+      bluetooth: uninlining
+      bluetooth: hidp_process_hid_control remove unnecessary parameter dealing
+    FATAL: drivers/bluetooth/btsdio: sizeof(struct sdio_device_id)=12 is not a modulo of the size of section __mod_sdio_device_table=30.
+    bluetooth rfcomm tty: destroy before tty_close()
+    bluetooth: blacklist another Broadcom BCM2035 device
+    This device is recognized as bluetooth, but still not works.
+    drivers/bluetooth/btsdio.c: fix double-free
+    drivers/bluetooth/bpa10x.c: fix memleak
+    bluetooth: uninlining
+    before:   6997      74       8    7079    1ba7 net/bluetooth/hidp/core.o
+    after:    6492      74       8    6574    19ae net/bluetooth/hidp/core.o
+    bluetooth: hidp_process_hid_control remove unnecessary parameter dealing
+    According to the bluetooth HID spec v1.0 chapter 7.4.2
+    drivers/bluetooth/: Spelling fixes
+    The bluetooth hci_conn sysfs add/del executed in the default
+    The MS Presenter 8000 bluetooth mouse is a "dual-use" device: If you
+    bluetooth rfcomm device moving around.
+    bluetooth sunrpc ipv6 ib_iser rdma_cm ib_cm iw_cmib_sa ib_mad ib_core
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Modules linked in: scomm l2cap bluetooth ipv6 dm_mirror dm_mod video output sbs battery lp floppy sg i2c_piix4 i2c_core pcnet32 mii button ac parport_pc parport ide_cd cdrom serio_raw mptspi mptscsih mptbase scsi_transport_spi sd_mod scsi_mod ext3 jbd ehci_hcd ohci_hcd uhci_hcd
+    > use-after-free in net/bluetooth/rfcomm/tty.c:
+    USB: hub.c loops forever on resume from ram due to bluetooth
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    fscache(U) nfs_acl(U) rfcomm(U) l2cap(U) bluetooth(U)
+    [ARM] 4359/3: H1940: Add bluetooth support
+    for the bluetooth chip and for enabling the bluetooth chipset.
+    transport-independent, or at least support for bluetooth transport is
+    Fix bluetooth HCI sysfs compile
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+      ACPI: thinkpad-acpi: add sysfs support to wan and bluetooth subdrivers
+    ACPI: thinkpad-acpi: add sysfs support to wan and bluetooth subdrivers
+    Add support to sysfs to the wan and bluetooth subdrivers.
+    ACPI: thinkpad-acpi: cleanup bluetooth and wan for sysfs conversion
+    Prepare bluetooth and wan driver code to be more easily hooked into sysfs
+    bluetooth/wan hardware installed.
+    [PATCH] bluetooth hid quirks: mightymouse quirk
+    I have a bugreport that scrollwheel of bluetooth version of apple
+    Now that bluetooth git tree is hooked to generic hid layer, it could easily
+    Below is a simple patch against bluetooth git tree, which adds quirk
+    handling to current bluetooth hidp code, and sets quirk flags for device
+    0x05ac/0x030c, which is the bluetooth version of the apple mightymouse.
+    [PATCH] bluetooth: fix socket locking in hci_sock_dev_event()
+       (slock-AF_BLUETOOTH){-+..}, at: [<e0ca5520>] hci_sock_dev_event+0xa8/0xc5 [bluetooth]
+        [<e0ca17c3>] hci_send_cmd+0x126/0x14f [bluetooth]
+        [<e0ca4ce4>] hci_event_packet+0x729/0xebd [bluetooth]
+        [<e0ca205b>] hci_rx_task+0x2a/0x20f [bluetooth]
+        [<e0ca209d>] hci_rx_task+0x6c/0x20f [bluetooth]
+    Any attempt to open/use a bluetooth rfcomm device locks up
+    asus-laptop: add bluetooth and wlan support
+    because sometime they also control the wlan/bluetooth device.
+    method, which tell if the bluetooth/wlan device is present or not.
+    there is a bluetooth device, /sys/dev.../asus-laptop/bluetooth
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+      [PATCH] bluetooth: add support for another Kensington dongle
+    [PATCH] bluetooth: add support for another Kensington dongle
+    [akpm@osdl.org: bluetooth fix]
+      MSI S270 Laptop support: backlight, wlan, bluetooth states
+    MSI S270 Laptop support: backlight, wlan, bluetooth states
+    If either wifi or bluetooth button has been detected, the code
+    Modules linked in: loop usb_storage md5 ipv6 parport_pc lp parport autofs4 i2c_dev i2c_core rfcomm l2cap bluetooth sunrpc pcdPid: 3138, comm: gpm Not tainted 2.6.11-1.1290_FC4smp
+    net/bluetooth/hidp/Kconfig:4:warning: 'select' used by config symbol
+    This patch creates a new file named "bluetooth" under /proc/acpi/asus/.
+    echo 1 > /proc/acpi/asus/bluetooth to enable, 0 to disable.
+    There's a problem in drivers/bluetooth/dtl1_cs.c::dtl1_hci_send_frame()
+    238 sock_queue_rcv_skb 2.6.16/net/bluetooth/sco.o
+    238 sock_queue_rcv_skb 2.6.16/net/bluetooth/l2cap.o
+    238 sock_queue_rcv_skb 2.6.16/net/bluetooth/hci_sock.o
+    net/bluetooth/hci_core.c:               hci_notifier
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    Input: wistron - disable wifi/bluetooth on suspend
+    Try to save battery power by disabling wifi and bluetooth on suspend.
+    This patch deletes the bluetooth.txt help file of the bluetty driver and
+    now available via /sys/class/bluetooth through appropriate functions.
+    [PATCH] bluetooth: kmalloc + memset -> kzalloc conversion
+    [PATCH] bluetooth hidp is broken on s390
+    one is using it (and if they are, they are using a closed source bluetooth
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    [PATCH] Input: convert net/bluetooth to dynamic input_dev allocation
+    Input: convert net/bluetooth to dynamic input_dev allocation
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
+    To recap: My new G4 powerbook has a bluetooth device that boots up in
+    A special command sequence is sent to switch it into full bluetooth
+    (bluetooth HID) USB device appears on the bus with a different product
+    alike are only 6 values defined), but unfortunately the bluetooth code
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6
