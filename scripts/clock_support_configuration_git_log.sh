@@ -7,8 +7,28 @@ else
     echo "Working..."
 fi
 
-keywordArray=("jiffies" "clocksource" "timekeeping" "timer" "chrony" "adjtime" "clock_gettime" "clockevents" "timeconst"
-    "hrtimer" "CLOCK_MONOTONIC" "CLOCK_REALTIME" "CLOCK_MONOTONIC" "clocksource_driver"  "timecounter" "tick")
+keywordArray=(
+    "jiffies"
+    "clocksource"
+    "timekeeping"
+    "timer"
+    "chrony"
+    "adjtime"
+    "clock_gettime"
+    "clockevents"
+    "timeconst"
+    "hrtimer"
+    "CLOCK_MONOTONIC"
+    "CLOCK_REALTIME"
+    "CLOCK_MONOTONIC"
+    "clocksource_driver"
+    "timecounter"
+    "tick"
+    ".*ktime.*"
+    ".*time.*"
+    ".*clock.*"
+    ".*power.*"
+    )
 
 # for v1.0
 SRCDIR_1=~/erofs-utils/
@@ -16,7 +36,7 @@ cd $SRCDIR_1
 
 git checkout -fq "v1.0"
 for keyword in "${keywordArray[@]}"; do
-    if [ -n "$(git log --all --grep="$keyword")" ];then 
+    if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
             if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_v1.0.txt ]; then
                 echo -e "\e[6;35m \n v1.0 \n \e[0m"
                 file_name="${keyword}_v1.0.txt"
@@ -24,7 +44,7 @@ for keyword in "${keywordArray[@]}"; do
             fi    
     else
        echo -e "\e[6;35m \n v1.0 \n \e[0m"
-       echo "No such string '$keyword' exists in the git log."
+       echo "No such string '$keyword' exists in the git log(for version v1.0)."
     fi
 done
 
@@ -36,7 +56,7 @@ cd $SRCDIR_2
 
 git checkout -fq "2.0.0"
 for keyword in "${keywordArray[@]}"; do
-    if [ -n "$(git log --all --grep="$keyword")" ];then 
+    if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
         if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_v2.0.txt ]; then
             echo -e "\e[6;35m \n v2.0 \n \e[0m"
             file_name="${keyword}_v2.0.txt"
@@ -44,7 +64,7 @@ for keyword in "${keywordArray[@]}"; do
         fi
     else
        echo -e "\e[6;35m \n v2.0 \n \e[0m"
-       echo "No such string '$keyword' exists in the git log."
+       echo "No such string '$keyword' exists in the git log(for version v2.0)."
     fi
 done
 
@@ -64,7 +84,7 @@ for ((i=n-1; i>=0; --i)); do
     git checkout -fq ${all_versions[$i]}
     if [[ $? -eq 0 ]]; then
         for keyword in ${keywordArray[@]}; do
-           if [ -n "$(git log --all --grep="$keyword")" ];then
+           if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then
                 if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_${all_versions[$i]}.txt ]; then
                     echo -e "\e[6;35m \n ${all_versions[$i]} \n \e[0m"
                     file_name="${keyword}_${all_versions[$i]}.txt"
@@ -72,7 +92,7 @@ for ((i=n-1; i>=0; --i)); do
                 fi
            else
                echo -e "\e[6;35m \n ${all_versions[$i]}\n \e[0m"
-               echo "No such string '$keyword' exists in the git log."
+               echo "No such string '$keyword' exists in the git log(for version ${all_versions[$i]})."
            fi
         done 
     else
