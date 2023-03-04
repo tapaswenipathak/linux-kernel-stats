@@ -1,0 +1,61 @@
+      xprtrdma: Allocate zero pad separately from rpcrdma_buffer
+      xprtrdma: Refactor rpcrdma_buffer_create() and rpcrdma_buffer_destroy()
+      xprtrdma: Simplify synopsis of rpcrdma_buffer_create()
+    xprtrdma: Allocate zero pad separately from rpcrdma_buffer
+    xprtrdma: Refactor rpcrdma_buffer_create() and rpcrdma_buffer_destroy()
+    xprtrdma: Simplify synopsis of rpcrdma_buffer_create()
+    Clean up: There is one call site for rpcrdma_buffer_create(). All of
+    staging: comedi: ni_labpc_isadma: convert 'dma_buffer_size' to a define
+    Currently, `interrupt_pci9118_ai_dma()` calls `defragment_dma_buffer()`
+    This fixes a bug in load_ao_dma_buffer(). That function was decrementing
+    In block write mode, when encapsulating dma_buffer, first element is
+    Currently rpcrdma_buffer_create() allocates struct rpcrdma_mw's as
+    VALID state. This FRMR can be returned by rpcrdma_buffer_get(), and
+    Instead, capture these in rpcrdma_buffer_get(), and reset them.
+    [ 1455.349350]  [<ffffffffa038a639>] rpcrdma_buffer_destroy+0x69/0x170 [xprtrdma]
+    xilly_get_dma_buffers().
+    sound/built-in.o: In function `mmp_pcm_free_dma_buffers':
+    sound/built-in.o: In function `mmp_pcm_free_dma_buffers':
+    rpcrdma_buffer_create() allocates and pre-registers a set of RPC
+    RPC buffers pre-allocated by rpcrdma_buffer_create().
+    On my 64-bit system, rpcrdma_buffer_create() requests roughly 7000
+    1. rpcrdma_buffer_create: While allocating RPCRDMA_FRMR's
+    2. rpcrdma_buffer_destroy: While cleaning up, the routine will only free
+    rpcrdma_buffer_create while the rb_mws list is being built if one of the MR
+    the rpcrdma_buffer_destroy routine which will never free the MR's on rb_mws
+    staging: comedi: gsc_hpdi: rename drain_dma_buffers()
+    The gpmi_alloc_dma_buffer will be called twice. The first time is to
+    chip when gpmi_alloc_dma_buffer is called the first time, and allocates a
+    buffer of the real NAND page size for the second time gpmi_alloc_dma_buffer
+    static inline dma_addr_t snd_sgbuf_get_addr(struct snd_dma_buffer *dmab,
+    Change the type of the `dma_buffer` member of `struct a2150_private`
+    Also change the type of the `dma_buffer` parameter of
+    sound/soc/atmel/atmel-pcm.c: In function 'atmel_pcm_preallocate_dma_buffer':
+    staging: comedi: ni_labpc: fix possible double-free of dma_buffer
+    If `labpc_attach()` allocates memory for `devpriv->dma_buffer` but fails
+    to request a DMA channel, it frees `devpriv->dma_buffer` but leaves the
+    pointer set.  Later, `labpc_detach()` frees `devpriv->dma_buffer` again,
+    Fix it by only setting `devpriv->dma_buffer` in `labpc_attach()` if the
+    drivers/built-in.o: In function `sh_eth_free_dma_buffer':
+    pxa2xx_spi_map_dma_buffer() gets called in tasklet context so we can't
+    usb: musb: gadget: do *unmap_dma_buffer* only for valid DMA addr
+    and will result in kernel OOPS if tried to *unmap_dma_buffer* for requests in
+    ep0. Fixed it by doing *unmap_dma_buffer* only for valid DMA addr and
+    drivers/spi/spi-pxa2xx.c: In function ‘map_dma_buffers’: drivers/spi/spi-pxa2xx.c:384:7: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+    `set_ai_fifo_size()`, `ai_fifo_size()`, `load_ao_dma_buffer()`, and
+    Passing struct snd_dma_buffer pointer instead, so that they work no
+      ASoC: spear: correct the check for NULL dma_buffer pointer
+    ASoC: spear: correct the check for NULL dma_buffer pointer
+    The reason is that the single dma buffer (ar_sdio->dma_buffer)
+      TTY: snyclinkmp: forever loop in tx_load_dma_buffer()
+    TTY: snyclinkmp: forever loop in tx_load_dma_buffer()
+      ASoC: Tegra: tegra_pcm_deallocate_dma_buffer: Don't OOPS
+    ASoC: Tegra: tegra_pcm_deallocate_dma_buffer: Don't OOPS
+    buffers in tegra_pcm_deallocate_dma_buffer.
+    musb_g_giveback(), even if txstate()/rxstate() has called unmap_dma_buffer()
+    Moreover, check for musb_ep->dma is moved within map_dma_buffer() so where
+        [<c0204148>] (ep93xx_pcm_preallocate_dma_buffer+0x44/0x60)
+    2) s3c24xx_pcm_preallocate_dma_buffer -> s3c_preallocate_dma_buffer
+    drivers/spi/pxa2xx_spi.c: In function 'map_dma_buffers':
+    drivers/char/synclinkmp.c:5040:6: warning: symbol 'tx_load_dma_buffer' was not declared. Should it be static?
+     > Function map_dma_buffers now return 0 for success and -1 for failure.

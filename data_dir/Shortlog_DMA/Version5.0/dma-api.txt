@@ -1,0 +1,37 @@
+    12 io/dma-api-debug/arch-support.txt
+     - updates for the IOMMU dma-api code to bring it closer to use per-cpu
+    dma-api: Teach the "DMA-from-stack" check about vmapped stacks
+    artefacts remaining from the downstream legacy dma-api.
+       generic dma-api implemention used on arm64
+     - A performance fix for said dma-api implemention
+      gaps in dma-buf so that we can do this without breaking the dma-api
+    IOMMU core and switches allocation of domain dma-api domain
+            io/ dma-api-debug        :  ok  |                  HAVE_DMA_API_DEBUG #  arch supports DMA debug facilities
+    Documentation/features/io: Add feature description and arch support status file for 'dma-api-debug'
+      ARM: dma-api: fix off-by-one error in __dma_supported()
+    ARM: dma-api: fix off-by-one error in __dma_supported()
+    Merge branches 'dma-api', 'pci/virtualization', 'pci/msi', 'pci/misc' and 'pci/resource' into next
+    * dma-api:
+    dma-api in the NET_DMA implementation (see commit 77873803363c "net_dma:
+    catch and flag these violations of the dma-api vs get_user_pages().
+    Merge branches 'amd/fixes', 'debug/dma-api', 'arm/omap', 'arm/msm', 'core', 'iommu/fault-reporting' and 'api/iommu-ops-per-bus' into next
+    Merge branches 'debug/dma-api', 'arm/omap', 'arm/msm' and 'core' into api-2
+    Fix dma-api-checking warnings in Sun HME
+    dma-api debug code to check if a driver has released all dma allocations
+    This patch adds the dma-api/driver_filter file to debugfs. The root user
+    can write a driver name into this file to see only dma-api errors for
+    dma-api implementation has no internal state which needs to be destroyed with
+    Merge branch 'dma-api/debug' of git://git.kernel.org/pub/scm/linux/kernel/git/joro/linux-2.6-iommu into core/iommu
+    (most have been due to the dma-api debug patchset.))
+    Mapping the destination multiple times is a misuse of the dma-api.
+      sh: Trivial fix for dma-api compile failure.
+    sh: Trivial fix for dma-api compile failure.
+    Trivial fix for arch/sh/drivers/dma/dma-api.c compile failure:
+      CC      arch/sh/drivers/dma/dma-api.o
+    a/arch/sh/drivers/dma/dma-api.c: In function 'dma_wait_for_completion':
+    a/arch/sh/drivers/dma/dma-api.c:233: error: 'TASK_UNINTERRUPTIBLE' undeclared (first use in this function)
+    a/arch/sh/drivers/dma/dma-api.c:233: error: (Each undeclared identifier is reported only once
+    a/arch/sh/drivers/dma/dma-api.c:233: error: for each function it appears in.)
+    a/arch/sh/drivers/dma/dma-api.c:233: warning: implicit declaration of function 'schedule'
+      sh: dma-api channel capability extensions.
+    sh: dma-api channel capability extensions.

@@ -1,0 +1,83 @@
+    natsemi 0000:00:06.0: DMA-API: device driver frees DMA memory with different size [device address=0x0000000007356840] [map size=1538 bytes] [unmap size=1522 bytes]
+    natsemi 0000:00:06.0: DMA-API: device driver frees DMA memory with
+    [  604.680465] isci 0000:03:00.0: DMA-API: device driver tries to free an invalid DMA memory address
+    aligment adjustments given that Documentation/DMA-API-HOWTO.txt sais:
+    isci: have the driver use native SG calls and DMA-API
+    and dma_unmap_sg according to the documentation in DMA-API.txt.
+    DMA-API: device driver has pending DMA allocations while released from device [count=1]
+    DMA-API: device driver has pending DMA allocations while released from device [count=1]
+    [    5.237792] ehci-omap ehci-omap.0: DMA-API: device driver maps memory fromstack [addr=d9c77dec]
+    According to the DMA-API you shall unmap the sglists with the same
+    According to the DMA-API you shall unmap the sglists with the same
+    mmc: atmel-mci: conform to DMA-API
+    pci 0000:80:00.0: DMA-API: device driver has pending DMA allocations while released from device [count=240]
+    Documentation/DMA-API-HOWTO.txt states:
+            NULL NULL: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x000000004781a020] [size=64 bytes]
+            net eth0: DMA-API: device driver frees DMA memory with different size [device address=0x000000004781a020] [map size=2048 bytes] [unmap size=64 bytes]
+    Patch fixes: "DMA-API: device driver tries to free an invalid DMA
+     [   13.305335] hpsa 0000:06:00.0: DMA-API: device driver tries to free
+    The kerneldoc for this function is at odds with the DMA-API
+    NULL NULL: DMA-API: device driver tries to free DMA memory it has not allocated
+    correctness based on the instructions in DMA-API-HOWTO.
+     DMA-API: preallocated 32768 debug entries
+     DMA-API: debugging enabled by kernel config
+    ipw2100 0000:02:02.0: DMA-API: device driver tries to sync DMA memory it has not allocated [device address=0x0000000034e88008] [size=8 bytes]
+    Documentation: DMA-API-HOWTO.txt: rename ARCH_KMALLOC_MINALIGN to ARCH_DMA_MINALIGN
+    Documentation: DMA-API-HOWTO.txt: add multiple types of IOMMUs support
+    misinterpret the definition of API in DMA-API.txt).  So it hasn't been so
+    Documentation/DMA-API-HOWTO: add ARCH_KMALLOC_MINALIGN description
+    Documentation: move the error handling to the better place in DMA-API-HOWTO
+    Documentation: update scatterlist struct description in DMA-API-HOWTO
+    Documentation: add SCSI drivers' mapping error handling to DMA-API-HOWTO
+    Documentation: add networking driver's mapping error handling to DMA-API-HOWTO
+    The reason for this is documented in Documentation/DMA-API-HOWTO.txt
+    [ 1583.107664] pci 0000:04:00.0: DMA-API: device driver has pending DMA
+    Documentation: rename PCI/PCI-DMA-mapping.txt to DMA-API-HOWTO.txt
+    This patch renames PCI/PCI-DMA-mapping.txt to DMA-API-HOWTO.txt.
+    PCI-DMA-mapping.txt to DMA-API-HOWTO.txt" was supposed to do this but it
+    Documentation: rename PCI-DMA-mapping.txt to DMA-API-HOWTO.txt
+    Documentation: remove the PCI DMA API description in DMA-API.txt
+    - remove the PCI DMA API description in DMA-API.txt
+    DMA-API.txt describes).
+    some of the DMA-API (and the same comments are in other files).
+    Documentation/DMA-API.txt have more detailed descriptions.
+    Documentation/DMA-API.txt.
+    some of the DMA-API (and the same comments are in other files).
+    Documentation/DMA-API.txt have more detailed descriptions.
+    describe the DMA API in only Documentation/DMA-API.txt.
+    some of the DMA-API (and frv has the same comments in three files).
+    Documentation/DMA-API.txt have more detailed descriptions.
+    describe the DMA API in only Documentation/DMA-API.txt.
+    DMA-API.txt: remove dma_sync_single_range description
+    DMA-API.txt: add dma_sync_single/sg API description
+    Documentation/DMA-API.txt: remove deprecated function descriptions
+    For more information please look at Documentation/DMA-API.txt
+    hme 0000:01:01.1: DMA-API: device driver frees DMA memory with wrong function [device address=0x00000000c1082000] [size=32 bytes] [mapped as page] [unmapped as single]
+    ehci_hcd 0000:00:02.1: DMA-API: device driver maps memory fromstack
+    The DMA-API debugging facility complains about b43 mapping memory from
+      atl1e: fix 2.6.31-git4 -- ATL1E 0000:03:00.0: DMA-API: device driver frees DMA
+    atl1e: fix 2.6.31-git4 -- ATL1E 0000:03:00.0: DMA-API: device driver frees DMA
+    [  121.781177] e1000 0000:0a:00.0: DMA-API: device driver tries to free DMA
+    This patch addresses three WARN_ON statements from DMA-API debug code
+    3w-xxxx 0000:02:02.0: DMA-API: device driver tries to free DMA memory
+    3w-9xxx 0001:45:00.0: DMA-API: device driver tries to free DMA memory
+    ioatdma 0000:00:08.0: DMA-API: device driver frees DMA memory with
+    > > b44 0000:02:0e.0: DMA-API: device driver tries to sync DMA memory it has not
+    Impact: add documentation about DMA-API debugging to DMA-API.txt
+    Impact: make use of DMA-API debugging code in x86
+    Impact: add debugfs interface for configuring DMA-API debugging
+    Impact: add groundwork for DMA-API debugging
+    Impact: add a Kconfig entry for DMA-API debugging
+    virtual machine domain is different from native DMA-API domain, implement separate allocation and free functions for virtual machine domain.
+    DMA-API.txt: fix description of pci_map_sg/dma_map_sg scatterlists handling
+      ssb: Fix DMA-API compilation for non-PCI systems
+    ssb: Fix DMA-API compilation for non-PCI systems
+    This fixes compilation of the SSB DMA-API code on non-PCI platforms.
+    fix an example of scatterlists handling in DMA-API.txt
+    All the x86 DMA-API functions are defined in asm/dma-mapping.h. This patch
+    This introduces an almost complete SSB-DMA-API that maps to the lowlevel
+    doc: fix DMA-API function parameters
+    DMA-API.txt has wrong argument type for some functions.  It uses struct device
+    Doc: DMA-API update
+    requirements documented in DMA-API.txt.
+       to folk reading _only_ the "new" DMA-API.txt writeup.
