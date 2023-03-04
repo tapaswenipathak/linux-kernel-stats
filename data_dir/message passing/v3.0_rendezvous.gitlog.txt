@@ -1,0 +1,2031 @@
+commit 3ecf671f1d354f40228e407ab350abd41034410b
+Author: Ashok Raj <ashok.raj@intel.com>
+Date:   Sat Aug 13 22:38:21 2022 +0000
+
+    x86/microcode: Document the whole late loading problem
+    
+    Commit
+    
+      d23d33ea0fcd ("x86/microcode: Taint and warn on late loading")
+    
+    started tainting the kernel after microcode late loading.
+    
+    There is some history behind why x86 microcode started doing the late
+    loading stop_machine() rendezvous. Document the whole situation.
+    
+    No functional changes.
+    
+      [ bp: Fix typos, heavily massage. ]
+    
+    Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Link: https://lore.kernel.org/r/20220813223825.3164861-2-ashok.raj@intel.com
+
+commit d5fd43bac8396c9b213faf14cd4560d73b30f618
+Merge: 57c06b6e1e74 a9fe7fa7d874
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Mar 30 15:11:26 2022 -0700
+
+    Merge tag 'for-5.18/parisc-2' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
+    
+    Pull more parisc architecture updates from Helge Deller:
+    
+     - Revert a patch to the invalidate/flush vmap routines which broke
+       kernel patching functions on older PA-RISC machines.
+    
+     - Fix the kernel patching code wrt locking and flushing. Works now on
+       B160L machine as well.
+    
+     - Fix CPU IRQ affinity for LASI, WAX and Dino chips
+    
+     - Add CPU hotplug support
+    
+     - Detect the hppa-suse-linux-gcc compiler when cross-compiling
+    
+    * tag 'for-5.18/parisc-2' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux:
+      parisc: Fix patch code locking and flushing
+      parisc: Find a new timesync master if current CPU is removed
+      parisc: Move common_stext into .text section when CONFIG_HOTPLUG_CPU=y
+      parisc: Rewrite arch_cpu_idle_dead() for CPU hotplugging
+      parisc: Implement __cpu_die() and __cpu_disable() for CPU hotplugging
+      parisc: Add PDC locking functions for rendezvous code
+      parisc: Move disable_sr_hashing_asm() into .text section
+      parisc: Move CPU startup-related functions into .text section
+      parisc: Move store_cpu_topology() into text section
+      parisc: Switch from GENERIC_CPU_DEVICES to GENERIC_ARCH_TOPOLOGY
+      parisc: Ensure set_firmware_width() is called only once
+      parisc: Add constants for control registers and clean up mfctl()
+      parisc: Detect hppa-suse-linux-gcc compiler for cross-building
+      parisc: Clean up cpu_check_affinity() and drop cpu_set_affinity_irq()
+      parisc: Fix CPU affinity for Lasi, WAX and Dino chips
+      Revert "parisc: Fix invalidate/flush vmap routines"
+
+commit 98903688e6106d9ca68e44c7d218e61336d54631
+Author: Helge Deller <deller@gmx.de>
+Date:   Fri Mar 25 14:27:21 2022 +0100
+
+    parisc: Rewrite arch_cpu_idle_dead() for CPU hotplugging
+    
+    Let the PDC firmware put the CPU into firmware idle loop with the
+    pdc_cpu_rendezvous() function.
+    
+    Signed-off-by: Helge Deller <deller@gmx.de>
+
+commit db2b0d76cdc4e781d32bf26d0c649ca2fe608c4e
+Author: Helge Deller <deller@gmx.de>
+Date:   Tue Mar 29 14:15:29 2022 +0200
+
+    parisc: Add PDC locking functions for rendezvous code
+    
+    Add pdc_cpu_rendezvous_lock() and pdc_cpu_rendezvous_unlock()
+    to lock PDC while CPU is transitioning into rendezvous state.
+    This is needed, because the transition phase may take up to 8 seconds.
+    
+    Add pdc_pat_get_PDC_entrypoint() to get PDC entry point for current CPU.
+    
+    Signed-off-by: Helge Deller <deller@gmx.de>
+
+commit b58c55d522b256fa54c5e9175cf3202bc452b20e
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Sat Feb 26 00:15:46 2022 +0000
+
+    KVM: selftests: Add test to populate a VM with the max possible guest mem
+    
+    Add a selftest that enables populating a VM with the maximum amount of
+    guest memory allowed by the underlying architecture.  Abuse KVM's
+    memslots by mapping a single host memory region into multiple memslots so
+    that the selftest doesn't require a system with terabytes of RAM.
+    
+    Default to 512gb of guest memory, which isn't all that interesting, but
+    should work on all MMUs and doesn't take an exorbitant amount of memory
+    or time.  E.g. testing with ~64tb of guest memory takes the better part
+    of an hour, and requires 200gb of memory for KVM's page tables when using
+    4kb pages.
+    
+    To inflicit maximum abuse on KVM' MMU, default to 4kb pages (or whatever
+    the not-hugepage size is) in the backing store (memfd).  Use memfd for
+    the host backing store to ensure that hugepages are guaranteed when
+    requested, and to give the user explicit control of the size of hugepage
+    being tested.
+    
+    By default, spin up as many vCPUs as there are available to the selftest,
+    and distribute the work of dirtying each 4kb chunk of memory across all
+    vCPUs.  Dirtying guest memory forces KVM to populate its page tables, and
+    also forces KVM to write back accessed/dirty information to struct page
+    when the guest memory is freed.
+    
+    On x86, perform two passes with a MMU context reset between each pass to
+    coerce KVM into dropping all references to the MMU root, e.g. to emulate
+    a vCPU dropping the last reference.  Perform both passes and all
+    rendezvous on all architectures in the hope that arm64 and s390x can gain
+    similar shenanigans in the future.
+    
+    Measure and report the duration of each operation, which is helpful not
+    only to verify the test is working as intended, but also to easily
+    evaluate the performance differences different page sizes.
+    
+    Provide command line options to limit the amount of guest memory, set the
+    size of each slot (i.e. of the host memory region), set the number of
+    vCPUs, and to enable usage of hugepages.
+    
+    Signed-off-by: Sean Christopherson <seanjc@google.com>
+    Message-Id: <20220226001546.360188-29-seanjc@google.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+commit 54cdbf845cf719c09b45ae588cba469aabb3159c
+Author: Ben Widawsky <ben.widawsky@intel.com>
+Date:   Tue Feb 1 13:07:51 2022 -0800
+
+    cxl/port: Add a driver for 'struct cxl_port' objects
+    
+    The need for a CXL port driver and a dedicated cxl_bus_type is driven by
+    a need to simultaneously support 2 independent physical memory decode
+    domains (cache coherent CXL.mem and uncached PCI.mmio) that also
+    intersect at a single PCIe device node. A CXL Port is a device that
+    advertises a  CXL Component Register block with an "HDM Decoder
+    Capability Structure".
+    
+    >From Documentation/driver-api/cxl/memory-devices.rst:
+    
+        Similar to how a RAID driver takes disk objects and assembles them into
+        a new logical device, the CXL subsystem is tasked to take PCIe and ACPI
+        objects and assemble them into a CXL.mem decode topology. The need for
+        runtime configuration of the CXL.mem topology is also similar to RAID in
+        that different environments with the same hardware configuration may
+        decide to assemble the topology in contrasting ways. One may choose
+        performance (RAID0) striping memory across multiple Host Bridges and
+        endpoints while another may opt for fault tolerance and disable any
+        striping in the CXL.mem topology.
+    
+    The port driver identifies whether an endpoint Memory Expander is
+    connected to a CXL topology. If an active (bound to the 'cxl_port'
+    driver) CXL Port is not found at every PCIe Switch Upstream port and an
+    active "root" CXL Port then the device is just a plain PCIe endpoint
+    only capable of participating in PCI.mmio and DMA cycles, not CXL.mem
+    coherent interleave sets.
+    
+    The 'cxl_port' driver lets the CXL subsystem leverage driver-core
+    infrastructure for setup and teardown of register resources and
+    communicating device activation status to userspace. The cxl_bus_type
+    can rendezvous the async arrival of platform level CXL resources (via
+    the 'cxl_acpi' driver) with the asynchronous enumeration of Memory
+    Expander endpoints, while also implementing a hierarchical locking model
+    independent of the associated 'struct pci_dev' locking model. The
+    locking for dport and decoder enumeration is now handled in the core
+    rather than callers.
+    
+    For now the port driver only enumerates and registers CXL resources
+    (downstream port metadata and decoder resources) later it will be used
+    to take action on its decoders in response to CXL.mem region
+    provisioning requests.
+    
+    Note1: cxlpci.h has long depended on pci.h, but port.c was the first to
+    not include pci.h. Carry that dependency in cxlpci.h.
+    
+    Note2: cxl port enumeration and probing complicates CXL subsystem init
+    to the point that it helps to have centralized debug logging of probe
+    events in cxl_bus_probe().
+    
+    Reported-by: kernel test robot <lkp@intel.com>
+    Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
+    Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+    Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+    Link: https://lore.kernel.org/r/164374948116.464348.1772618057599155408.stgit@dwillia2-desk3.amr.corp.intel.com
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+
+commit a602285ac11b019e9ce7c3907328e9f95f4967f0
+Merge: 5c4e0a21fae8 3f66f86bfed3
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Nov 3 12:15:29 2021 -0700
+
+    Merge branch 'per_signal_struct_coredumps-for-v5.16' of git://git.kernel.org/pub/scm/linux/kernel/git/ebiederm/user-namespace
+    
+    Pull per signal_struct coredumps from Eric Biederman:
+     "Current coredumps are mixed up with the exit code, the signal handling
+      code, and the ptrace code making coredumps much more complicated than
+      necessary and difficult to follow.
+    
+      This series of changes starts with ptrace_stop and cleans it up,
+      making it easier to follow what is happening in ptrace_stop. Then
+      cleans up the exec interactions with coredumps. Then cleans up the
+      coredump interactions with exit. Finally the coredump interactions
+      with the signal handling code is cleaned up.
+    
+      The first and last changes are bug fixes for minor bugs.
+    
+      I believe the fact that vfork followed by execve can kill the process
+      the called vfork if exec fails is sufficient justification to change
+      the userspace visible behavior.
+    
+      In previous discussions some of these changes were organized
+      differently and individually appeared to make the code base worse. As
+      currently written I believe they all stand on their own as cleanups
+      and bug fixes.
+    
+      Which means that even if the worst should happen and the last change
+      needs to be reverted for some unimaginable reason, the code base will
+      still be improved.
+    
+      If the worst does not happen there are a more cleanups that can be
+      made. Signals that generate coredumps can easily become eligible for
+      short circuit delivery in complete_signal. The entire rendezvous for
+      generating a coredump can move into get_signal. The function
+      force_sig_info_to_task be written in a way that does not modify the
+      signal handling state of the target task (because coredumps are
+      eligible for short circuit delivery). Many of these future cleanups
+      can be done another way but nothing so cleanly as if coredumps become
+      per signal_struct"
+    
+    * 'per_signal_struct_coredumps-for-v5.16' of git://git.kernel.org/pub/scm/linux/kernel/git/ebiederm/user-namespace:
+      coredump: Limit coredumps to a single thread group
+      coredump:  Don't perform any cleanups before dumping core
+      exit: Factor coredump_exit_mm out of exit_mm
+      exec: Check for a pending fatal signal instead of core_state
+      ptrace: Remove the unnecessary arguments from arch_ptrace_stop
+      signal: Remove the bogus sigkill_pending in ptrace_stop
+
+commit 01913c57c225a8301e9a53447507f310a4be22b6
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Tue Jul 13 09:32:52 2021 -0700
+
+    KVM: x86: Don't force set BSP bit when local APIC is managed by userspace
+    
+    Don't set the BSP bit in vcpu->arch.apic_base when the local APIC is
+    managed by userspace.  Forcing all vCPUs to be BSPs is non-sensical, and
+    was dead code when it was added by commit 97222cc83163 ("KVM: Emulate
+    local APIC in kernel").  At the time, kvm_lapic_set_base() was invoked
+    if and only if the local APIC was in-kernel (and it couldn't be called
+    before the vCPU created its APIC).
+    
+    kvm_lapic_set_base() eventually gained generic usage, but the latent bug
+    escaped notice because the only true consumer would be the guest itself
+    in the form of an explicit RDMSRs on APs.  Out of Linux, SeaBIOS, and
+    EDK2/OVMF, only OVMF consumes the BSP bit from the APIC_BASE MSR.  For
+    the vast majority of usage in OVMF, BSP confusion would be benign.
+    OVMF's BSP election upon SMI rendezvous might be broken, but practically
+    no one runs KVM with an out-of-kernel local APIC, let alone does so while
+    utilizing SMIs with OVMF.
+    
+    Fixes: 97222cc83163 ("KVM: Emulate local APIC in kernel")
+    Reviewed-by: Reiji Watanabe <reijiw@google.com>
+    Signed-off-by: Sean Christopherson <seanjc@google.com>
+    Message-Id: <20210713163324.627647-15-seanjc@google.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+commit 8fdcb1704f61a8fd9be0f3849a174d084def0666
+Author: Dan Williams <dan.j.williams@intel.com>
+Date:   Tue Jun 15 16:18:17 2021 -0700
+
+    cxl/pmem: Add initial infrastructure for pmem support
+    
+    Register an 'nvdimm-bridge' device to act as an anchor for a libnvdimm
+    bus hierarchy. Also, flesh out the cxl_bus definition to allow a
+    cxl_nvdimm_bridge_driver to attach to the bridge and trigger the
+    nvdimm-bus registration.
+    
+    The creation of the bridge is gated on the detection of a PMEM capable
+    address space registered to the root. The bridge indirection allows the
+    libnvdimm module to remain unloaded on platforms without PMEM support.
+    
+    Given that the probing of ACPI0017 is asynchronous to CXL endpoint
+    devices, and the expectation that CXL endpoint devices register other
+    PMEM resources on the 'CXL' nvdimm bus, a workqueue is added. The
+    workqueue is needed to run bus_rescan_devices() outside of the
+    device_lock() of the nvdimm-bridge device to rendezvous nvdimm resources
+    as they arrive. For now only the bus is taken online/offline in the
+    workqueue.
+    
+    Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+    Link: https://lore.kernel.org/r/162379909706.2993820.14051258608641140169.stgit@dwillia2-desk3.amr.corp.intel.com
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+
+commit 5f653f7590ab7db7379f668b2975744585206b0d
+Author: Dan Williams <dan.j.williams@intel.com>
+Date:   Thu May 13 22:22:00 2021 -0700
+
+    cxl/core: Rename bus.c to core.c
+    
+    In preparation for more generic shared functionality across endpoint
+    consumers of core cxl resources, and platform-firmware producers of
+    those resources, rename bus.c to core.c. In addition to the central
+    rendezvous for interleave coordination, the core will also define common
+    routines like CXL register block mapping.
+    
+    Acked-by: Ben Widawsky <ben.widawsky@intel.com>
+    Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+    Link: https://lore.kernel.org/r/162096972018.1865304.11079951161445408423.stgit@dwillia2-desk3.amr.corp.intel.com
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+
+commit d0a16fe934383ecdb605ab9312d700fb9099f75e
+Merge: 76f0f227cffb fcc16a9e24ba
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Sep 16 15:38:31 2019 -0700
+
+    Merge branch 'parisc-5.4-1' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
+    
+    Pull parisc updates from Helge Deller:
+    
+     - Make the powerpc implementation to read elf files available as a
+       public kexec interface so it can be re-used on other architectures
+       (Sven)
+    
+     - Implement kexec on parisc (Sven)
+    
+     - Add kprobes on ftrace on parisc (Sven)
+    
+     - Fix kernel crash with HSC-PCI cards based on card-mode Dino
+    
+     - Add assembly implementations for memset, strlen, strcpy, strncpy and
+       strcat
+    
+     - Some cleanups, documentation updates, warning fixes, ...
+    
+    * 'parisc-5.4-1' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux: (25 commits)
+      parisc: Have git ignore generated real2.S and firmware.c
+      parisc: Disable HP HSC-PCI Cards to prevent kernel crash
+      parisc: add support for kexec_file_load() syscall
+      parisc: wire up kexec_file_load syscall
+      parisc: add kexec syscall support
+      parisc: add __pdc_cpu_rendezvous()
+      kprobes/parisc: remove arch_kprobe_on_func_entry()
+      kexec_elf: support 32 bit ELF files
+      kexec_elf: remove unused variable in kexec_elf_load()
+      kexec_elf: remove Elf_Rel macro
+      kexec_elf: remove PURGATORY_STACK_SIZE
+      kexec_elf: remove parsing of section headers
+      kexec_elf: change order of elf_*_to_cpu() functions
+      kexec: add KEXEC_ELF
+      parisc: Save some bytes in dino driver
+      parisc: Drop comments which are already in pci.h
+      parisc: Convert eisa_enumerator to use pr_cont()
+      parisc: Avoid warning when loading hppb driver
+      parisc: speed up flush_tlb_all_local with qemu
+      parisc: Add ALTERNATIVE_CODE() and ALT_COND_RUN_ON_QEMU
+      ...
+
+commit 507efd63d98c4437d62bbfa932b322e72723e1fc
+Author: Sven Schnelle <svens@stackframe.org>
+Date:   Sun Sep 8 11:33:03 2019 +0200
+
+    parisc: add __pdc_cpu_rendezvous()
+    
+    When stopping SMP cpus send them into rendezvous, so we can
+    start them again later (when kexec'ing a new kernel).
+    
+    Signed-off-by: Sven Schnelle <svens@stackframe.org>
+    Signed-off-by: Helge Deller <deller@gmx.de>
+
+commit cb4c2b94f629b8c4fbb1edfc23040ef0f651f730
+Author: Danit Goldberg <danitg@mellanox.com>
+Date:   Fri Jul 5 19:21:57 2019 +0300
+
+    IB/mlx5: Report correctly tag matching rendezvous capability
+    
+    commit 89705e92700170888236555fe91b45e4c1bb0985 upstream.
+    
+    Userspace expects the IB_TM_CAP_RC bit to indicate that the device
+    supports RC transport tag matching with rendezvous offload. However the
+    firmware splits this into two capabilities for eager and rendezvous tag
+    matching.
+    
+    Only if the FW supports both modes should userspace be told the tag
+    matching capability is available.
+    
+    Cc: <stable@vger.kernel.org> # 4.13
+    Fixes: eb761894351d ("IB/mlx5: Fill XRQ capabilities")
+    Signed-off-by: Danit Goldberg <danitg@mellanox.com>
+    Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+    Reviewed-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+    Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 7211b04064474ae016c52e8b068a212c815f94ca
+Author: Danit Goldberg <danitg@mellanox.com>
+Date:   Fri Jul 5 19:21:57 2019 +0300
+
+    IB/mlx5: Report correctly tag matching rendezvous capability
+    
+    commit 89705e92700170888236555fe91b45e4c1bb0985 upstream.
+    
+    Userspace expects the IB_TM_CAP_RC bit to indicate that the device
+    supports RC transport tag matching with rendezvous offload. However the
+    firmware splits this into two capabilities for eager and rendezvous tag
+    matching.
+    
+    Only if the FW supports both modes should userspace be told the tag
+    matching capability is available.
+    
+    Cc: <stable@vger.kernel.org> # 4.13
+    Fixes: eb761894351d ("IB/mlx5: Fill XRQ capabilities")
+    Signed-off-by: Danit Goldberg <danitg@mellanox.com>
+    Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+    Reviewed-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+    Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 44ecea8be480c2e01633feee5f95dd00357050b2
+Author: Danit Goldberg <danitg@mellanox.com>
+Date:   Fri Jul 5 19:21:57 2019 +0300
+
+    IB/mlx5: Report correctly tag matching rendezvous capability
+    
+    commit 89705e92700170888236555fe91b45e4c1bb0985 upstream.
+    
+    Userspace expects the IB_TM_CAP_RC bit to indicate that the device
+    supports RC transport tag matching with rendezvous offload. However the
+    firmware splits this into two capabilities for eager and rendezvous tag
+    matching.
+    
+    Only if the FW supports both modes should userspace be told the tag
+    matching capability is available.
+    
+    Cc: <stable@vger.kernel.org> # 4.13
+    Fixes: eb761894351d ("IB/mlx5: Fill XRQ capabilities")
+    Signed-off-by: Danit Goldberg <danitg@mellanox.com>
+    Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+    Reviewed-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+    Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 2a3c389a0fde49b241430df806a34276568cfb29
+Merge: 8de262531f5f 0b043644c0ca
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Jul 15 20:38:15 2019 -0700
+
+    Merge tag 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma
+    
+    Pull rdma updates from Jason Gunthorpe:
+     "A smaller cycle this time. Notably we see another new driver, 'Soft
+      iWarp', and the deletion of an ancient unused driver for nes.
+    
+       - Revise and simplify the signature offload RDMA MR APIs
+    
+       - More progress on hoisting object allocation boiler plate code out
+         of the drivers
+    
+       - Driver bug fixes and revisions for hns, hfi1, efa, cxgb4, qib,
+         i40iw
+    
+       - Tree wide cleanups: struct_size, put_user_page, xarray, rst doc
+         conversion
+    
+       - Removal of obsolete ib_ucm chardev and nes driver
+    
+       - netlink based discovery of chardevs and autoloading of the modules
+         providing them
+    
+       - Move more of the rdamvt/hfi1 uapi to include/uapi/rdma
+    
+       - New driver 'siw' for software based iWarp running on top of netdev,
+         much like rxe's software RoCE.
+    
+       - mlx5 feature to report events in their raw devx format to userspace
+    
+       - Expose per-object counters through rdma tool
+    
+       - Adaptive interrupt moderation for RDMA (DIM), sharing the DIM core
+         from netdev"
+    
+    * tag 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma: (194 commits)
+      RMDA/siw: Require a 64 bit arch
+      RDMA/siw: Mark expected switch fall-throughs
+      RDMA/core: Fix -Wunused-const-variable warnings
+      rdma/siw: Remove set but not used variable 's'
+      rdma/siw: Add missing dependencies on LIBCRC32C and DMA_VIRT_OPS
+      RDMA/siw: Add missing rtnl_lock around access to ifa
+      rdma/siw: Use proper enumerated type in map_cqe_status
+      RDMA/siw: Remove unnecessary kthread create/destroy printouts
+      IB/rdmavt: Fix variable shadowing issue in rvt_create_cq
+      RDMA/core: Fix race when resolving IP address
+      RDMA/core: Make rdma_counter.h compile stand alone
+      IB/core: Work on the caller socket net namespace in nldev_newlink()
+      RDMA/rxe: Fill in wc byte_len with IB_WC_RECV_RDMA_WITH_IMM
+      RDMA/mlx5: Set RDMA DIM to be enabled by default
+      RDMA/nldev: Added configuration of RDMA dynamic interrupt moderation to netlink
+      RDMA/core: Provide RDMA DIM support for ULPs
+      linux/dim: Implement RDMA adaptive moderation (DIM)
+      IB/mlx5: Report correctly tag matching rendezvous capability
+      docs: infiniband: add it to the driver-api bookset
+      IB/mlx5: Implement VHCA tunnel mechanism in DEVX
+      ...
+
+commit 89705e92700170888236555fe91b45e4c1bb0985
+Author: Danit Goldberg <danitg@mellanox.com>
+Date:   Fri Jul 5 19:21:57 2019 +0300
+
+    IB/mlx5: Report correctly tag matching rendezvous capability
+    
+    Userspace expects the IB_TM_CAP_RC bit to indicate that the device
+    supports RC transport tag matching with rendezvous offload. However the
+    firmware splits this into two capabilities for eager and rendezvous tag
+    matching.
+    
+    Only if the FW supports both modes should userspace be told the tag
+    matching capability is available.
+    
+    Cc: <stable@vger.kernel.org> # 4.13
+    Fixes: eb761894351d ("IB/mlx5: Fill XRQ capabilities")
+    Signed-off-by: Danit Goldberg <danitg@mellanox.com>
+    Reviewed-by: Yishai Hadas <yishaih@mellanox.com>
+    Reviewed-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+    Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
+
+commit fe8376dbbd6ac1febb0fd6389e3ec4f349e70c71
+Author: Helge Deller <deller@gmx.de>
+Date:   Fri Oct 19 22:06:36 2018 +0200
+
+    parisc: Add PDC PAT cell_info() and pd_get_pdc_revisions() functions
+    
+    Add wrappers for the PDC_PAT_CELL_GET_INFO and
+    PDC_PAT_PD_GET_PDC_INTERF_REV PAT PDC subfunctions.
+    
+    Both provide access to the PAT capability bitfield which can guide us if
+    simultaneous PTLBs are allowed on the bus, and if firmware will
+    rendezvous all processors within PDCE_Check in case of an HPMC.
+    
+    Signed-off-by: Helge Deller <deller@gmx.de>
+
+commit d3d6923cd1ae61a493a405f2f001293ab62eb092
+Author: Borislav Petkov <bp@suse.de>
+Date:   Fri Jun 22 11:54:24 2018 +0200
+
+    x86/mce: Carve out the crashing_cpu check
+    
+    Carve out the rendezvous handler timeout avoidance check into a separate
+    function in order to simplify the #MC handler.
+    
+    No functional changes.
+    
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Link: https://lkml.kernel.org/r/20180622095428.626-4-bp@alien8.de
+
+commit 8413a3a63d3717504f2db5d6c3b018cabf15d132
+Author: Borislav Petkov <bp@suse.de>
+Date:   Wed Mar 14 19:36:15 2018 +0100
+
+    x86/microcode: Fix CPU synchronization routine
+    
+    commit bb8c13d61a629276a162c1d2b1a20a815cbcfbb7 upstream.
+    
+    Emanuel reported an issue with a hang during microcode update because my
+    dumb idea to use one atomic synchronization variable for both rendezvous
+    - before and after update - was simply bollocks:
+    
+      microcode: microcode_reload_late: late_cpus: 4
+      microcode: __reload_late: cpu 2 entered
+      microcode: __reload_late: cpu 1 entered
+      microcode: __reload_late: cpu 3 entered
+      microcode: __reload_late: cpu 0 entered
+      microcode: __reload_late: cpu 1 left
+      microcode: Timeout while waiting for CPUs rendezvous, remaining: 1
+    
+    CPU1 above would finish, leave and the others will still spin waiting for
+    it to join.
+    
+    So do two synchronization atomics instead, which makes the code a lot more
+    straightforward.
+    
+    Also, since the update is serialized and it also takes quite some time per
+    microcode engine, increase the exit timeout by the number of CPUs on the
+    system.
+    
+    That's ok because the moment all CPUs are done, that timeout will be cut
+    short.
+    
+    Furthermore, panic when some of the CPUs timeout when returning from a
+    microcode update: we can't allow a system with not all cores updated.
+    
+    Also, as an optimization, do not do the exit sync if microcode wasn't
+    updated.
+    
+    Reported-by: Emanuel Czirai <xftroxgpx@protonmail.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Tested-by: Emanuel Czirai <xftroxgpx@protonmail.com>
+    Tested-by: Ashok Raj <ashok.raj@intel.com>
+    Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
+    Link: https://lkml.kernel.org/r/20180314183615.17629-2-bp@alien8.de
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fea978223b59a9d6d358b0301d12d5997c43dcfd
+Author: Borislav Petkov <bp@suse.de>
+Date:   Wed Mar 14 19:36:15 2018 +0100
+
+    x86/microcode: Fix CPU synchronization routine
+    
+    commit bb8c13d61a629276a162c1d2b1a20a815cbcfbb7 upstream.
+    
+    Emanuel reported an issue with a hang during microcode update because my
+    dumb idea to use one atomic synchronization variable for both rendezvous
+    - before and after update - was simply bollocks:
+    
+      microcode: microcode_reload_late: late_cpus: 4
+      microcode: __reload_late: cpu 2 entered
+      microcode: __reload_late: cpu 1 entered
+      microcode: __reload_late: cpu 3 entered
+      microcode: __reload_late: cpu 0 entered
+      microcode: __reload_late: cpu 1 left
+      microcode: Timeout while waiting for CPUs rendezvous, remaining: 1
+    
+    CPU1 above would finish, leave and the others will still spin waiting for
+    it to join.
+    
+    So do two synchronization atomics instead, which makes the code a lot more
+    straightforward.
+    
+    Also, since the update is serialized and it also takes quite some time per
+    microcode engine, increase the exit timeout by the number of CPUs on the
+    system.
+    
+    That's ok because the moment all CPUs are done, that timeout will be cut
+    short.
+    
+    Furthermore, panic when some of the CPUs timeout when returning from a
+    microcode update: we can't allow a system with not all cores updated.
+    
+    Also, as an optimization, do not do the exit sync if microcode wasn't
+    updated.
+    
+    Reported-by: Emanuel Czirai <xftroxgpx@protonmail.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Tested-by: Emanuel Czirai <xftroxgpx@protonmail.com>
+    Tested-by: Ashok Raj <ashok.raj@intel.com>
+    Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
+    Link: https://lkml.kernel.org/r/20180314183615.17629-2-bp@alien8.de
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit bb8c13d61a629276a162c1d2b1a20a815cbcfbb7
+Author: Borislav Petkov <bp@suse.de>
+Date:   Wed Mar 14 19:36:15 2018 +0100
+
+    x86/microcode: Fix CPU synchronization routine
+    
+    Emanuel reported an issue with a hang during microcode update because my
+    dumb idea to use one atomic synchronization variable for both rendezvous
+    - before and after update - was simply bollocks:
+    
+      microcode: microcode_reload_late: late_cpus: 4
+      microcode: __reload_late: cpu 2 entered
+      microcode: __reload_late: cpu 1 entered
+      microcode: __reload_late: cpu 3 entered
+      microcode: __reload_late: cpu 0 entered
+      microcode: __reload_late: cpu 1 left
+      microcode: Timeout while waiting for CPUs rendezvous, remaining: 1
+    
+    CPU1 above would finish, leave and the others will still spin waiting for
+    it to join.
+    
+    So do two synchronization atomics instead, which makes the code a lot more
+    straightforward.
+    
+    Also, since the update is serialized and it also takes quite some time per
+    microcode engine, increase the exit timeout by the number of CPUs on the
+    system.
+    
+    That's ok because the moment all CPUs are done, that timeout will be cut
+    short.
+    
+    Furthermore, panic when some of the CPUs timeout when returning from a
+    microcode update: we can't allow a system with not all cores updated.
+    
+    Also, as an optimization, do not do the exit sync if microcode wasn't
+    updated.
+    
+    Reported-by: Emanuel Czirai <xftroxgpx@protonmail.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Tested-by: Emanuel Czirai <xftroxgpx@protonmail.com>
+    Tested-by: Ashok Raj <ashok.raj@intel.com>
+    Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
+    Link: https://lkml.kernel.org/r/20180314183615.17629-2-bp@alien8.de
+
+commit a4484705b1b16174757f68f19d3427427f96b643
+Merge: 3fc27b71b894 c5c1cc9c522f
+Author: David S. Miller <davem@davemloft.net>
+Date:   Thu Oct 26 18:00:30 2017 +0900
+
+    Merge branch 'tcp-smc-rendezvous'
+    
+    Ursula Braun says:
+    
+    ====================
+    TCP experimental option for SMC rendezvous
+    
+    SMC-capability is to be negotiated with a TCP experimental option.
+    As requested during code review of our previous approach using
+    netfilter hooks, here's a new version. It touches tcp-code in the
+    first patch and exploits the new tcp flag in the smc-code.
+    
+    Changelog:
+    
+    V3:
+    * move include for linux/unaligned/access_ok.h to tcp_input.c
+    
+    V2:
+    * switch to current jump labels API
+    * remove static key checking in smc_set_capability()
+      (comment from Eric Dumazet)
+    * use inet_request_sock parameter for smc_set_option_cond()
+    * smc_listen_work(): replace local variable lgr_lock_taken by new labels
+                         and separate this change into a prerequisite first
+                         patch
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit c5c1cc9c522fc337601213afeb39c3df2eb92d04
+Author: Ursula Braun <ubraun@linux.vnet.ibm.com>
+Date:   Wed Oct 25 11:01:46 2017 +0200
+
+    smc: add SMC rendezvous protocol
+    
+    The SMC protocol [1] uses a rendezvous protocol to negotiate SMC
+    capability between peers. The current Linux implementation does not yet
+    use this rendezvous protocol and, thus, is not compliant to RFC7609 and
+    incompatible with other SMC implementations like in zOS.
+    This patch adds support for the SMC rendezvous protocol. It uses a new
+    TCP experimental option. With this option, SMC capabilities are
+    exchanged between the peers during the TCP three way handshake.
+    
+    [1] SMC-R Informational RFC: http://www.rfc-editor.org/info/rfc7609
+    
+    Signed-off-by: Ursula Braun <ubraun@linux.vnet.ibm.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 145686baab68e9c7594fe9269f47da479c25ad79
+Author: Ursula Braun <ubraun@linux.vnet.ibm.com>
+Date:   Wed Oct 25 11:01:44 2017 +0200
+
+    smc: fix mutex unlocks during link group creation
+    
+    Link group creation is synchronized with the smc_create_lgr_pending
+    lock. In smc_listen_work() this mutex is sometimes unlocked, even
+    though it has not been locked before. This issue will surface in
+    presence of the SMC rendezvous code.
+    
+    Signed-off-by: Ursula Braun <ubraun@linux.vnet.ibm.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 82fb342460362ce81cce2068eb4d9bf7f9e94be2
+Author: Artemy Kovalyov <artemyko@mellanox.com>
+Date:   Thu Aug 17 15:52:12 2017 +0300
+
+    Documentation: Hardware tag matching
+    
+    Add document providing definitions of terms and core explanations
+    for tag matching (TM) protocols, eager and rendezvous,
+    TM application header, tag list manipulations and matching process.
+    
+    Signed-off-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leon@kernel.org>
+    Signed-off-by: Doug Ledford <dledford@redhat.com>
+
+commit 3fd3307ef34fc9f7198af9249c763cf7a4ac653f
+Author: Artemy Kovalyov <artemyko@mellanox.com>
+Date:   Thu Aug 17 15:52:11 2017 +0300
+
+    IB/mlx5: Support IB_SRQT_TM
+    
+    Pass to mlx5_core flag to enable rendezvous offload, list_size and CQ
+    when SRQ created with IB_SRQT_TM.
+    
+    Signed-off-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Reviewed-by: Yossi Itigin <yosefe@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leon@kernel.org>
+    Signed-off-by: Doug Ledford <dledford@redhat.com>
+
+commit 9c2c849625cf779e0fac41c8be3c163df4b80c14
+Author: Artemy Kovalyov <artemyko@mellanox.com>
+Date:   Thu Aug 17 15:52:05 2017 +0300
+
+    IB/core: Add new SRQ type IB_SRQT_TM
+    
+    This patch adds new SRQ type - IB_SRQT_TM. The new SRQ type supports tag
+    matching and rendezvous offloads for MPI applications.
+    
+    When SRQ receives a message it will search through the matching list
+    for the corresponding posted receive buffer. The process of searching
+    the matching list is called tag matching.
+    In case the tag matching results in a match, the received message will
+    be placed in the address specified by the receive buffer. In case no
+    match was found the message will be placed in a generic buffer until the
+    corresponding receive buffer will be posted. These messages are called
+    unexpected and their set is called an unexpected list.
+    
+    Signed-off-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Reviewed-by: Yossi Itigin <yosefe@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leon@kernel.org>
+    Signed-off-by: Doug Ledford <dledford@redhat.com>
+
+commit 6938fc1ee07e54c057430005f8dcaccabce027c3
+Author: Artemy Kovalyov <artemyko@mellanox.com>
+Date:   Thu Aug 17 15:52:03 2017 +0300
+
+    IB/core: Add XRQ capabilities
+    
+    This patch adds following TM XRQ capabilities:
+    
+    * max_rndv_hdr_size - Max size of rendezvous request message
+    * max_num_tags - Max number of entries in tag matching list
+    * max_ops - Max number of outstanding list operations
+    * max_sge - Max number of SGE in tag matching entry
+    * flags - the following flags are currently defined:
+        - IB_TM_CAP_RC - Support tag matching on RC transport
+    
+    Signed-off-by: Artemy Kovalyov <artemyko@mellanox.com>
+    Reviewed-by: Yossi Itigin <yosefe@mellanox.com>
+    Signed-off-by: Leon Romanovsky <leon@kernel.org>
+    Signed-off-by: Doug Ledford <dledford@redhat.com>
+
+commit 69bf9ad98c881a1ce8e30e0ecd59ed91e0bc1af1
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Wed Mar 23 15:41:58 2016 -0600
+
+    x86/mm/pat: Add pat_disable() interface
+    
+    commit 224bb1e5d67ba0f2872c98002d6a6f991ac6fd4a upstream.
+    
+    In preparation for fixing a regression caused by:
+    
+      9cd25aac1f44 ("x86/mm/pat: Emulate PAT when it is disabled")
+    
+    ... PAT needs to provide an interface that prevents the OS from
+    initializing the PAT MSR.
+    
+    PAT MSR initialization must be done on all CPUs using the specific
+    sequence of operations defined in the Intel SDM.  This requires MTRRs
+    to be enabled since pat_init() is called as part of MTRR init
+    from mtrr_rendezvous_handler().
+    
+    Make pat_disable() as the interface that prevents the OS from
+    initializing the PAT MSR.  MTRR will call this interface when it
+    cannot provide the SDM-defined sequence to initialize PAT.
+    
+    This also assures that pat_disable() called from pat_bsp_init()
+    will set the PAT table properly when CPU does not support PAT.
+    
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Borislav Petkov <bp@suse.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Juergen Gross <jgross@suse.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Luis R. Rodriguez <mcgrof@suse.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Robert Elliott <elliott@hpe.com>
+    Cc: Toshi Kani <toshi.kani@hp.com>
+    Cc: konrad.wilk@oracle.com
+    Cc: paul.gortmaker@windriver.com
+    Cc: xen-devel@lists.xenproject.org
+    Link: http://lkml.kernel.org/r/1458769323-24491-3-git-send-email-toshi.kani@hpe.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit d50e8b108ef8980bd193de587d984e986be2ecc1
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Wed Mar 23 15:41:58 2016 -0600
+
+    x86/mm/pat: Add pat_disable() interface
+    
+    commit 224bb1e5d67ba0f2872c98002d6a6f991ac6fd4a upstream.
+    
+    In preparation for fixing a regression caused by:
+    
+      9cd25aac1f44 ("x86/mm/pat: Emulate PAT when it is disabled")
+    
+    ... PAT needs to provide an interface that prevents the OS from
+    initializing the PAT MSR.
+    
+    PAT MSR initialization must be done on all CPUs using the specific
+    sequence of operations defined in the Intel SDM.  This requires MTRRs
+    to be enabled since pat_init() is called as part of MTRR init
+    from mtrr_rendezvous_handler().
+    
+    Make pat_disable() as the interface that prevents the OS from
+    initializing the PAT MSR.  MTRR will call this interface when it
+    cannot provide the SDM-defined sequence to initialize PAT.
+    
+    This also assures that pat_disable() called from pat_bsp_init()
+    will set the PAT table properly when CPU does not support PAT.
+    
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Borislav Petkov <bp@suse.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Juergen Gross <jgross@suse.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Luis R. Rodriguez <mcgrof@suse.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Robert Elliott <elliott@hpe.com>
+    Cc: Toshi Kani <toshi.kani@hp.com>
+    Cc: konrad.wilk@oracle.com
+    Cc: paul.gortmaker@windriver.com
+    Cc: xen-devel@lists.xenproject.org
+    Link: http://lkml.kernel.org/r/1458769323-24491-3-git-send-email-toshi.kani@hpe.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 224bb1e5d67ba0f2872c98002d6a6f991ac6fd4a
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Wed Mar 23 15:41:58 2016 -0600
+
+    x86/mm/pat: Add pat_disable() interface
+    
+    In preparation for fixing a regression caused by:
+    
+      9cd25aac1f44 ("x86/mm/pat: Emulate PAT when it is disabled")
+    
+    ... PAT needs to provide an interface that prevents the OS from
+    initializing the PAT MSR.
+    
+    PAT MSR initialization must be done on all CPUs using the specific
+    sequence of operations defined in the Intel SDM.  This requires MTRRs
+    to be enabled since pat_init() is called as part of MTRR init
+    from mtrr_rendezvous_handler().
+    
+    Make pat_disable() as the interface that prevents the OS from
+    initializing the PAT MSR.  MTRR will call this interface when it
+    cannot provide the SDM-defined sequence to initialize PAT.
+    
+    This also assures that pat_disable() called from pat_bsp_init()
+    will set the PAT table properly when CPU does not support PAT.
+    
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Borislav Petkov <bp@suse.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Juergen Gross <jgross@suse.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Luis R. Rodriguez <mcgrof@suse.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Robert Elliott <elliott@hpe.com>
+    Cc: Toshi Kani <toshi.kani@hp.com>
+    Cc: konrad.wilk@oracle.com
+    Cc: paul.gortmaker@windriver.com
+    Cc: xen-devel@lists.xenproject.org
+    Link: http://lkml.kernel.org/r/1458769323-24491-3-git-send-email-toshi.kani@hpe.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 29bdfddc4d5b21a9442d32afd2766a240c7127ae
+Author: Ashok Raj <ashok.raj@intel.com>
+Date:   Thu Dec 10 11:12:26 2015 +0100
+
+    x86/mce: Ensure offline CPUs don't participate in rendezvous process
+    
+    commit d90167a941f62860f35eb960e1012aa2d30e7e94 upstream.
+    
+    Intel's MCA implementation broadcasts MCEs to all CPUs on the
+    node. This poses a problem for offlined CPUs which cannot
+    participate in the rendezvous process:
+    
+      Kernel panic - not syncing: Timeout: Not all CPUs entered broadcast exception handler
+      Kernel Offset: disabled
+      Rebooting in 100 seconds..
+    
+    More specifically, Linux does a soft offline of a CPU when
+    writing a 0 to /sys/devices/system/cpu/cpuX/online, which
+    doesn't prevent the #MC exception from being broadcasted to that
+    CPU.
+    
+    Ensure that offline CPUs don't participate in the MCE rendezvous
+    and clear the RIP valid status bit so that a second MCE won't
+    cause a shutdown.
+    
+    Without the patch, mce_start() will increment mce_callin and
+    wait for all CPUs. Offlined CPUs should avoid participating in
+    the rendezvous process altogether.
+    
+    Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+    [ Massage commit message. ]
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Reviewed-by: Tony Luck <tony.luck@intel.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: linux-edac <linux-edac@vger.kernel.org>
+    Link: http://lkml.kernel.org/r/1449742346-21470-2-git-send-email-bp@alien8.de
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 075ea570ae8b6a1ee9a900214a02ad61d82a4cc0
+Author: Ashok Raj <ashok.raj@intel.com>
+Date:   Thu Dec 10 11:12:26 2015 +0100
+
+    x86/mce: Ensure offline CPUs don't participate in rendezvous process
+    
+    commit d90167a941f62860f35eb960e1012aa2d30e7e94 upstream.
+    
+    Intel's MCA implementation broadcasts MCEs to all CPUs on the
+    node. This poses a problem for offlined CPUs which cannot
+    participate in the rendezvous process:
+    
+      Kernel panic - not syncing: Timeout: Not all CPUs entered broadcast exception handler
+      Kernel Offset: disabled
+      Rebooting in 100 seconds..
+    
+    More specifically, Linux does a soft offline of a CPU when
+    writing a 0 to /sys/devices/system/cpu/cpuX/online, which
+    doesn't prevent the #MC exception from being broadcasted to that
+    CPU.
+    
+    Ensure that offline CPUs don't participate in the MCE rendezvous
+    and clear the RIP valid status bit so that a second MCE won't
+    cause a shutdown.
+    
+    Without the patch, mce_start() will increment mce_callin and
+    wait for all CPUs. Offlined CPUs should avoid participating in
+    the rendezvous process altogether.
+    
+    Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+    [ Massage commit message. ]
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Reviewed-by: Tony Luck <tony.luck@intel.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: linux-edac <linux-edac@vger.kernel.org>
+    Link: http://lkml.kernel.org/r/1449742346-21470-2-git-send-email-bp@alien8.de
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    [ luis: backported to 3.16: adjusted context ]
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit 650e5455d83dafb465b478000507468152d3c523
+Merge: de0301795848 dd7a5ab49501
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Jan 8 15:21:48 2016 -0800
+
+    Merge branch 'x86-urgent-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull x86 fixes from Ingo Molnar:
+     "A handful of x86 fixes:
+    
+       - a syscall ABI fix, fixing an Android breakage
+       - a Xen PV guest fix relating to the RTC device, causing a
+         non-working console
+       - a Xen guest syscall stack frame fix
+       - an MCE hotplug CPU crash fix"
+    
+    * 'x86-urgent-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:
+      x86/numachip: Fix NumaConnect2 MMCFG PCI access
+      x86/entry: Restore traditional SYSENTER calling convention
+      x86/entry: Fix some comments
+      x86/paravirt: Prevent rtc_cmos platform device init on PV guests
+      x86/xen: Avoid fast syscall path for Xen PV guests
+      x86/mce: Ensure offline CPUs don't participate in rendezvous process
+
+commit d90167a941f62860f35eb960e1012aa2d30e7e94
+Author: Ashok Raj <ashok.raj@intel.com>
+Date:   Thu Dec 10 11:12:26 2015 +0100
+
+    x86/mce: Ensure offline CPUs don't participate in rendezvous process
+    
+    Intel's MCA implementation broadcasts MCEs to all CPUs on the
+    node. This poses a problem for offlined CPUs which cannot
+    participate in the rendezvous process:
+    
+      Kernel panic - not syncing: Timeout: Not all CPUs entered broadcast exception handler
+      Kernel Offset: disabled
+      Rebooting in 100 seconds..
+    
+    More specifically, Linux does a soft offline of a CPU when
+    writing a 0 to /sys/devices/system/cpu/cpuX/online, which
+    doesn't prevent the #MC exception from being broadcasted to that
+    CPU.
+    
+    Ensure that offline CPUs don't participate in the MCE rendezvous
+    and clear the RIP valid status bit so that a second MCE won't
+    cause a shutdown.
+    
+    Without the patch, mce_start() will increment mce_callin and
+    wait for all CPUs. Offlined CPUs should avoid participating in
+    the rendezvous process altogether.
+    
+    Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+    [ Massage commit message. ]
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Reviewed-by: Tony Luck <tony.luck@intel.com>
+    Cc: <stable@vger.kernel.org>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: linux-edac <linux-edac@vger.kernel.org>
+    Link: http://lkml.kernel.org/r/1449742346-21470-2-git-send-email-bp@alien8.de
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
+commit 8e1d6c336d74977403b0d7ca81e1e9a098518ff0
+Author: Bryan O'Donoghue <bryan.odonoghue@linaro.org>
+Date:   Thu Dec 3 17:29:41 2015 +0000
+
+    greybus: loopback: drop bus aggregate calculation
+    
+    At some point we had a statement in a Jira work item to pull out 'bus
+    level' data from greybus and to have messages to different interfaces be
+    synchronized with respect to each other. Synchronizing threads with respect
+    to each other is slow and it turns out we can get the same 'bus level'
+    stastics by making the user-space test application smarter.
+    
+    That's great news for the in-kernel code since it means we can cut out a
+    whole lot of code to-do with calculating 'bus level' aggregate data and we
+    can stop forcing threads to hit a rendezvous before sending out another
+    loopback operation.
+    
+    So this patch drops bus level aggregates in favour of doing that in
+    user-space. It subtracts a lot of code and cycles that in practice nobody
+    cares about anyway.
+    
+    Signed-off-by: Bryan O'Donoghue <bryan.odonoghue@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@google.com>
+
+commit 243d657eaf540db882f73497060da5a4f7d86a90
+Author: Ashok Raj <ashok.raj@intel.com>
+Date:   Thu Jun 4 18:55:24 2015 +0200
+
+    x86/mce: Handle Local MCE events
+    
+    Add the necessary changes to do_machine_check() to be able to
+    process MCEs signaled as local MCEs. Typically, only recoverable
+    errors (SRAR type) will be Signaled as LMCE. The architecture
+    does not restrict to only those errors, however.
+    
+    When errors are signaled as LMCE, there is no need for the MCE
+    handler to perform rendezvous with other logical processors
+    unlike earlier processors that would broadcast machine check
+    errors.
+    
+    Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Tony Luck <tony.luck@intel.com>
+    Cc: linux-edac <linux-edac@vger.kernel.org>
+    Link: http://lkml.kernel.org/r/1433436928-31903-17-git-send-email-bp@alien8.de
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 6857336c7fddaf460a13adc0c395698fcf9423ff
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Thu Jun 23 11:19:26 2011 -0700
+
+    x86, mtrr: lock stop machine during MTRR rendezvous sequence
+    
+    commit 6d3321e8e2b3bf6a5892e2ef673c7bf536e3f904 upstream.
+    
+    MTRR rendezvous sequence using stop_one_cpu_nowait() can potentially
+    happen in parallel with another system wide rendezvous using
+    stop_machine(). This can lead to deadlock (The order in which
+    works are queued can be different on different cpu's. Some cpu's
+    will be running the first rendezvous handler and others will be running
+    the second rendezvous handler. Each set waiting for the other set to join
+    for the system wide rendezvous, leading to a deadlock).
+    
+    MTRR rendezvous sequence is not implemented using stop_machine() as this
+    gets called both from the process context aswell as the cpu online paths
+    (where the cpu has not come online and the interrupts are disabled etc).
+    stop_machine() works with only online cpus.
+    
+    For now, take the stop_machine mutex in the MTRR rendezvous sequence that
+    gets called from an online cpu (here we are in the process context
+    and can potentially sleep while taking the mutex). And the MTRR rendezvous
+    that gets triggered during cpu online doesn't need to take this stop_machine
+    lock (as the stop_machine() already ensures that there is no cpu hotplug
+    going on in parallel by doing get_online_cpus())
+    
+        TBD: Pursue a cleaner solution of extending the stop_machine()
+             infrastructure to handle the case where the calling cpu is
+             still not online and use this for MTRR rendezvous sequence.
+    
+    fixes: https://bugzilla.novell.com/show_bug.cgi?id=672008
+    
+    Reported-by: Vadim Kotelnikov <vadimuzzz@inbox.ru>
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Link: http://lkml.kernel.org/r/20110623182056.807230326@sbsiddha-MOBL3.sc.intel.com
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit cbbfa38fcb95930babc5233cf6927ec430f38abc
+Author: Tejun Heo <tj@kernel.org>
+Date:   Thu Aug 25 19:46:56 2011 +0200
+
+    mtrr: fix UP breakage caused during switch to stop_machine
+    
+    While removing custom rendezvous code and switching to stop_machine,
+    commit 192d8857427d ("x86, mtrr: use stop_machine APIs for doing MTRR
+    rendezvous") completely dropped mtrr setting code on !CONFIG_SMP
+    breaking MTRR settting on UP.
+    
+    Fix it by removing the incorrect CONFIG_SMP.
+    
+    Signed-off-by: Tejun Heo <tj@kernel.org>
+    Reported-by: Anders Eriksson <aeriksson@fastmail.fm>
+    Tested-and-acked-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Acked-by: H. Peter Anvin <hpa@zytor.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 22950d253543188b3e6488a0dbd5cad9eb71bef7
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Thu Jun 23 11:19:26 2011 -0700
+
+    x86, mtrr: lock stop machine during MTRR rendezvous sequence
+    
+    [ upstream commit 6d3321e8e2b3bf6a5892e2ef673c7bf536e3f904 ]
+    
+    MTRR rendezvous sequence using stop_one_cpu_nowait() can potentially
+    happen in parallel with another system wide rendezvous using
+    stop_machine(). This can lead to deadlock (The order in which
+    works are queued can be different on different cpu's. Some cpu's
+    will be running the first rendezvous handler and others will be running
+    the second rendezvous handler. Each set waiting for the other set to join
+    for the system wide rendezvous, leading to a deadlock).
+    
+    MTRR rendezvous sequence is not implemented using stop_machine() as this
+    gets called both from the process context aswell as the cpu online paths
+    (where the cpu has not come online and the interrupts are disabled etc).
+    stop_machine() works with only online cpus.
+    
+    For now, take the stop_machine mutex in the MTRR rendezvous sequence that
+    gets called from an online cpu (here we are in the process context
+    and can potentially sleep while taking the mutex). And the MTRR rendezvous
+    that gets triggered during cpu online doesn't need to take this stop_machine
+    lock (as the stop_machine() already ensures that there is no cpu hotplug
+    going on in parallel by doing get_online_cpus())
+    
+        TBD: Pursue a cleaner solution of extending the stop_machine()
+             infrastructure to handle the case where the calling cpu is
+             still not online and use this for MTRR rendezvous sequence.
+    
+    fixes: https://bugzilla.novell.com/show_bug.cgi?id=672008
+    
+    Reported-by: Vadim Kotelnikov <vadimuzzz@inbox.ru>
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Signed-off-by: Andi Kleen <ak@linux.intel.com>
+    Link: http://lkml.kernel.org/r/20110623182056.807230326@sbsiddha-MOBL3.sc.intel.com
+    Cc: stable@kernel.org # 2.6.35+, backport a week or two after this gets more testing in mainline
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit dc43d9fa73d82083656fb9c02f4823bcdcfb9f91
+Merge: 80775068dbcf 50c31e4a2497
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Jul 22 17:04:04 2011 -0700
+
+    Merge branch 'x86-mtrr-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip
+    
+    * 'x86-mtrr-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86, mtrr: Use pci_dev->revision
+      x86, mtrr: use stop_machine APIs for doing MTRR rendezvous
+      stop_machine: implement stop_machine_from_inactive_cpu()
+      stop_machine: reorganize stop_cpus() implementation
+      x86, mtrr: lock stop machine during MTRR rendezvous sequence
+
+commit 192d8857427dd23707d5f0b86ca990c3af6f2d74
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Thu Jun 23 11:19:29 2011 -0700
+
+    x86, mtrr: use stop_machine APIs for doing MTRR rendezvous
+    
+    MTRR rendezvous sequence is not implemened using stop_machine() before, as this
+    gets called both from the process context aswell as the cpu online paths
+    (where the cpu has not come online and the interrupts are disabled etc).
+    
+    Now that we have a new stop_machine_from_inactive_cpu() API, use it for
+    rendezvous during mtrr init of a logical processor that is coming online.
+    
+    For the rest (runtime MTRR modification, system boot, resume paths), use
+    stop_machine() to implement the rendezvous sequence. This will consolidate and
+    cleanup the code.
+    
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Link: http://lkml.kernel.org/r/20110623182057.076997177@sbsiddha-MOBL3.sc.intel.com
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 6d3321e8e2b3bf6a5892e2ef673c7bf536e3f904
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Thu Jun 23 11:19:26 2011 -0700
+
+    x86, mtrr: lock stop machine during MTRR rendezvous sequence
+    
+    MTRR rendezvous sequence using stop_one_cpu_nowait() can potentially
+    happen in parallel with another system wide rendezvous using
+    stop_machine(). This can lead to deadlock (The order in which
+    works are queued can be different on different cpu's. Some cpu's
+    will be running the first rendezvous handler and others will be running
+    the second rendezvous handler. Each set waiting for the other set to join
+    for the system wide rendezvous, leading to a deadlock).
+    
+    MTRR rendezvous sequence is not implemented using stop_machine() as this
+    gets called both from the process context aswell as the cpu online paths
+    (where the cpu has not come online and the interrupts are disabled etc).
+    stop_machine() works with only online cpus.
+    
+    For now, take the stop_machine mutex in the MTRR rendezvous sequence that
+    gets called from an online cpu (here we are in the process context
+    and can potentially sleep while taking the mutex). And the MTRR rendezvous
+    that gets triggered during cpu online doesn't need to take this stop_machine
+    lock (as the stop_machine() already ensures that there is no cpu hotplug
+    going on in parallel by doing get_online_cpus())
+    
+        TBD: Pursue a cleaner solution of extending the stop_machine()
+             infrastructure to handle the case where the calling cpu is
+             still not online and use this for MTRR rendezvous sequence.
+    
+    fixes: https://bugzilla.novell.com/show_bug.cgi?id=672008
+    
+    Reported-by: Vadim Kotelnikov <vadimuzzz@inbox.ru>
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Link: http://lkml.kernel.org/r/20110623182056.807230326@sbsiddha-MOBL3.sc.intel.com
+    Cc: stable@kernel.org # 2.6.35+, backport a week or two after this gets more testing in mainline
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 925a7e4a56ab113a1703caf76be0311f70d53b89
+Author: Ian Campbell <ian.campbell@citrix.com>
+Date:   Thu Jul 29 11:16:35 2010 +0100
+
+    xen: Do not suspend IPI IRQs.
+    
+    commit 4877c737283813bdb4bebfa3168c1585f6e3a8ca upstream.
+    
+    In general the semantics of IPIs are that they are are expected to
+    continue functioning after dpm_suspend_noirq().
+    
+    Specifically I have seen a deadlock between the callfunc IPI and the
+    stop machine used by xen's do_suspend() routine. If one CPU has already
+    called dpm_suspend_noirq() then there is a window where it can be sent
+    a callfunc IPI before all the other CPUs have entered stop_cpu().
+    
+    If this happens then the first CPU ends up spinning in stop_cpu()
+    waiting for the other to rendezvous in state STOPMACHINE_PREPARE while
+    the other is spinning in csd_lock_wait().
+    
+    Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
+    Cc: Jeremy Fitzhardinge <jeremy@goop.org>
+    Cc: xen-devel@lists.xensource.com
+    LKML-Reference: <1280398595-29708-4-git-send-email-ian.campbell@citrix.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit f38a529fddcb2dd5eb11d7821b4015a7c8dd3b50
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Fri Jul 30 11:46:42 2010 -0700
+
+    x86, mtrr: Use stop machine context to rendezvous all the cpu's
+    
+    commit 68f202e4e87cfab4439568bf397fcc5c7cf8d729 upstream.
+    
+    Use the stop machine context rather than IPI's to rendezvous all the cpus for
+    MTRR initialization that happens during cpu bringup or for MTRR modifications
+    during runtime.
+    
+    This avoids deadlock scenario (reported by Prarit) like:
+    
+    cpu A holds a read_lock (tasklist_lock for example) with irqs enabled
+    cpu B waits for the same lock with irqs disabled using write_lock_irq
+    cpu C doing set_mtrr() (during AP bringup for example), which will try to
+    rendezvous all the cpus using IPI's
+    
+    This will result in C and A come to the rendezvous point and waiting
+    for B. B is stuck forever waiting for the lock and thus not
+    reaching the rendezvous point.
+    
+    Using stop cpu (run in the process context of per cpu based keventd) to do
+    this rendezvous, avoids this deadlock scenario.
+    
+    Also make sure all the cpu's are in the rendezvous handler before we proceed
+    with the local_irq_save() on each cpu. This lock step disabling irqs on all
+    the cpus will avoid other deadlock scenarios (for example involving
+    with the blocking smp_call_function's etc).
+    
+       [ This problem is very old. Marking -stable only for 2.6.35 as the
+         stop_one_cpu_nowait() API is present only in 2.6.35. Any older
+         kernel interested in this fix need to do some more work in backporting
+         this patch. ]
+    
+    Reported-by: Prarit Bhargava <prarit@redhat.com>
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    LKML-Reference: <1280515602.2682.10.camel@sbsiddha-MOBL3.sc.intel.com>
+    Acked-by: Prarit Bhargava <prarit@redhat.com>
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit fccf1002f4767104ed75422d9e34f21e4a29661f
+Author: Ian Campbell <ian.campbell@citrix.com>
+Date:   Thu Jul 29 11:16:35 2010 +0100
+
+    xen: Do not suspend IPI IRQs.
+    
+    commit 4877c737283813bdb4bebfa3168c1585f6e3a8ca upstream.
+    
+    In general the semantics of IPIs are that they are are expected to
+    continue functioning after dpm_suspend_noirq().
+    
+    Specifically I have seen a deadlock between the callfunc IPI and the
+    stop machine used by xen's do_suspend() routine. If one CPU has already
+    called dpm_suspend_noirq() then there is a window where it can be sent
+    a callfunc IPI before all the other CPUs have entered stop_cpu().
+    
+    If this happens then the first CPU ends up spinning in stop_cpu()
+    waiting for the other to rendezvous in state STOPMACHINE_PREPARE while
+    the other is spinning in csd_lock_wait().
+    
+    Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
+    Cc: Jeremy Fitzhardinge <jeremy@goop.org>
+    Cc: xen-devel@lists.xensource.com
+    LKML-Reference: <1280398595-29708-4-git-send-email-ian.campbell@citrix.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 7d9deb060ffb6c6b38414210f1f2589c524ad1d6
+Author: Ian Campbell <ian.campbell@citrix.com>
+Date:   Thu Jul 29 11:16:35 2010 +0100
+
+    xen: Do not suspend IPI IRQs.
+    
+    commit 4877c737283813bdb4bebfa3168c1585f6e3a8ca upstream.
+    
+    In general the semantics of IPIs are that they are are expected to
+    continue functioning after dpm_suspend_noirq().
+    
+    Specifically I have seen a deadlock between the callfunc IPI and the
+    stop machine used by xen's do_suspend() routine. If one CPU has already
+    called dpm_suspend_noirq() then there is a window where it can be sent
+    a callfunc IPI before all the other CPUs have entered stop_cpu().
+    
+    If this happens then the first CPU ends up spinning in stop_cpu()
+    waiting for the other to rendezvous in state STOPMACHINE_PREPARE while
+    the other is spinning in csd_lock_wait().
+    
+    Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
+    Cc: Jeremy Fitzhardinge <jeremy@goop.org>
+    Cc: xen-devel@lists.xensource.com
+    LKML-Reference: <1280398595-29708-4-git-send-email-ian.campbell@citrix.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 75cb5fdce29c77ec54db45f0c6be7cc5715f8e15
+Merge: ce06ea8339de b2691085d1f3 9f242dc10e0c 68f202e4e87c 5bbd4a336c81 8e221b6db447 be783a47214a
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Aug 6 16:22:59 2010 -0700
+
+    Merge branches 'x86-cleanups-for-linus', 'x86-vmware-for-linus', 'x86-mtrr-for-linus', 'x86-apic-for-linus', 'x86-fpu-for-linus' and 'x86-vdso-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip
+    
+    * 'x86-cleanups-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86: Clean up arch/x86/kernel/cpu/mtrr/cleanup.c: use ";" not "," to terminate statements
+    
+    * 'x86-vmware-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86, vmware: Preset lpj values when on VMware.
+    
+    * 'x86-mtrr-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86, mtrr: Use stop machine context to rendezvous all the cpu's
+    
+    * 'x86-apic-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86/apic/es7000_32: Remove unused variable
+    
+    * 'x86-fpu-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86: Avoid unnecessary __clear_user() and xrstor in signal handling
+    
+    * 'x86-vdso-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/linux-2.6-tip:
+      x86, vdso: Unmap vdso pages
+
+commit 68f202e4e87cfab4439568bf397fcc5c7cf8d729
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Fri Jul 30 11:46:42 2010 -0700
+
+    x86, mtrr: Use stop machine context to rendezvous all the cpu's
+    
+    Use the stop machine context rather than IPI's to rendezvous all the cpus for
+    MTRR initialization that happens during cpu bringup or for MTRR modifications
+    during runtime.
+    
+    This avoids deadlock scenario (reported by Prarit) like:
+    
+    cpu A holds a read_lock (tasklist_lock for example) with irqs enabled
+    cpu B waits for the same lock with irqs disabled using write_lock_irq
+    cpu C doing set_mtrr() (during AP bringup for example), which will try to
+    rendezvous all the cpus using IPI's
+    
+    This will result in C and A come to the rendezvous point and waiting
+    for B. B is stuck forever waiting for the lock and thus not
+    reaching the rendezvous point.
+    
+    Using stop cpu (run in the process context of per cpu based keventd) to do
+    this rendezvous, avoids this deadlock scenario.
+    
+    Also make sure all the cpu's are in the rendezvous handler before we proceed
+    with the local_irq_save() on each cpu. This lock step disabling irqs on all
+    the cpus will avoid other deadlock scenarios (for example involving
+    with the blocking smp_call_function's etc).
+    
+       [ This problem is very old. Marking -stable only for 2.6.35 as the
+         stop_one_cpu_nowait() API is present only in 2.6.35. Any older
+         kernel interested in this fix need to do some more work in backporting
+         this patch. ]
+    
+    Reported-by: Prarit Bhargava <prarit@redhat.com>
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    LKML-Reference: <1280515602.2682.10.camel@sbsiddha-MOBL3.sc.intel.com>
+    Acked-by: Prarit Bhargava <prarit@redhat.com>
+    Cc: stable@kernel.org   [2.6.35]
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 4877c737283813bdb4bebfa3168c1585f6e3a8ca
+Author: Ian Campbell <ian.campbell@citrix.com>
+Date:   Thu Jul 29 11:16:35 2010 +0100
+
+    xen: Do not suspend IPI IRQs.
+    
+    In general the semantics of IPIs are that they are are expected to
+    continue functioning after dpm_suspend_noirq().
+    
+    Specifically I have seen a deadlock between the callfunc IPI and the
+    stop machine used by xen's do_suspend() routine. If one CPU has already
+    called dpm_suspend_noirq() then there is a window where it can be sent
+    a callfunc IPI before all the other CPUs have entered stop_cpu().
+    
+    If this happens then the first CPU ends up spinning in stop_cpu()
+    waiting for the other to rendezvous in state STOPMACHINE_PREPARE while
+    the other is spinning in csd_lock_wait().
+    
+    Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
+    Cc: Jeremy Fitzhardinge <jeremy@goop.org>
+    Cc: xen-devel@lists.xensource.com
+    LKML-Reference: <1280398595-29708-4-git-send-email-ian.campbell@citrix.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
+commit 843447c62b771a9ad12f0e7f4a791804b4cc99f5
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Thu Apr 22 11:47:51 2010 +0200
+
+    clockevent: Prevent dead lock on clockevents_lock
+    
+    This is a merge of two mainline commits, intended
+    for stable@kernel.org submission for 2.6.27 kernel.
+    
+    commit f833bab87fca5c3ce13778421b1365845843b976
+    and
+    
+    commit 918aae42aa9b611a3663b16ae849fdedc67c2292
+    Changelog of both:
+    
+        Currently clockevents_notify() is called with interrupts enabled at
+        some places and interrupts disabled at some other places.
+    
+        This results in a deadlock in this scenario.
+    
+        cpu A holds clockevents_lock in clockevents_notify() with irqs enabled
+        cpu B waits for clockevents_lock in clockevents_notify() with irqs disabled
+        cpu C doing set_mtrr() which will try to rendezvous of all the cpus.
+    
+        This will result in C and A come to the rendezvous point and waiting
+        for B. B is stuck forever waiting for the spinlock and thus not
+        reaching the rendezvous point.
+    
+        Fix the clockevents code so that clockevents_lock is taken with
+        interrupts disabled and thus avoid the above deadlock.
+    
+        Also call lapic_timer_propagate_broadcast() on the destination cpu so
+        that we avoid calling smp_call_function() in the clockevents notifier
+        chain.
+    
+        This issue left us wondering if we need to change the MTRR rendezvous
+        logic to use stop machine logic (instead of smp_call_function) or add
+        a check in spinlock debug code to see if there are other spinlocks
+        which gets taken under both interrupts enabled/disabled conditions.
+    
+        Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+        Cc: "Brown Len" <len.brown@intel.com>
+        Cc: stable@kernel.org
+        LKML-Reference: <1250544899.2709.210.camel@sbs-t61.sc.intel.com>
+        Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    
+        I got following warning on ia64 box:
+          In function 'acpi_processor_power_verify':
+          642: warning: passing argument 2 of 'smp_call_function_single' from
+          incompatible pointer type
+    
+        This smp_call_function_single() was introduced by a commit
+        f833bab87fca5c3ce13778421b1365845843b976:
+    
+        The problem is that the lapic_timer_propagate_broadcast() has 2 versions:
+        One is real code that modified in the above commit, and the other is NOP
+        code that used when !ARCH_APICTIMER_STOPS_ON_C3:
+    
+          static void lapic_timer_propagate_broadcast(struct acpi_processor *pr) { }
+    
+        So I got warning because of !ARCH_APICTIMER_STOPS_ON_C3.
+    
+        We really want to do nothing here on !ARCH_APICTIMER_STOPS_ON_C3, so
+        modify lapic_timer_propagate_broadcast() of real version to use
+        smp_call_function_single() in it.
+    
+        Signed-off-by: Hidetoshi Seto <seto.hidetoshi@jp.fujitsu.com>
+        Acked-by: Suresh Siddha <suresh.b.siddha@intel.com>
+        Signed-off-by: Len Brown <len.brown@intel.com>
+    
+    Signed-off-by: Thomas Renninger <trenn@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 0cced40e7c58b1105aef3ca446da7b158a18a9a6
+Author: Hidetoshi Seto <[seto.hidetoshi@jp.fujitsu.com]>
+Date:   Thu Aug 6 14:51:58 2009 -0700
+
+    [IA64] kdump: Short path to freeze CPUs
+    
+    Setting monarch_cpu = -1 to let slaves frozen might not work, because
+    there might be slaves being late, not entered the rendezvous yet.
+    Such slaves might be caught in while (monarch_cpu == -1) loop.
+    
+    Use kdump_in_progress instead of monarch_cpus to break INIT rendezvous
+    and let all slaves enter DIE_INIT_SLAVE_LEAVE smoothly.
+    
+    And monarch no longer need to manage rendezvous if once kdump_in_progress
+    is set, catch the monarch in DIE_INIT_MONARCH_ENTER then.
+    
+    Signed-off-by: Hidetoshi Seto <seto.hidetoshi@jp.fujitsu.com>
+    Cc: Vivek Goyal <vgoyal@redhat.com>
+    Cc: Haren Myneni <hbabu@us.ibm.com>
+    Cc: kexec@lists.infradead.org
+    Acked-by: Fenghua Yu <fenghua.yu@intel.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit 1726b0883dd08636705ea55d577eb0ec314ba427
+Author: Hidetoshi Seto <[seto.hidetoshi@jp.fujitsu.com]>
+Date:   Thu Aug 6 14:51:57 2009 -0700
+
+    [IA64] kdump: Mask INIT first in panic-kdump path
+    
+    Summary:
+    
+      Asserting INIT might block kdump if the system is already going to
+      start kdump via panic.
+    
+    Description:
+    
+      INIT can interrupt anywhere in panic path, so it can interrupt in
+      middle of kdump kicked by panic.  Therefore there is a race if kdump
+      is kicked concurrently, via Panic and via INIT.
+    
+      INIT could fail to invoke kdump if the system is already going to
+      start kdump via panic.  It could not restart kdump from INIT handler
+      if some of cpus are already playing dead with INIT masked.  It also
+      means that INIT could block kdump's progress if no monarch is entered
+      in the INIT rendezvous.
+    
+      Panic+INIT is a rare, but possible situation since it can be assumed
+      that the kernel or an internal agent decides to panic the unstable
+      system while another external agent decides to send an INIT to the
+      system at same time.
+    
+    How to reproduce:
+    
+      Assert INIT just after panic, before all other cpus have frozen
+    
+    Expected results:
+    
+      continue kdump invoked by panic, or restart kdump from INIT
+    
+    Actual results:
+    
+      might be hang, crashdump not retrieved
+    
+    Proposed Fix:
+    
+      This patch masks INIT first in panic path to take the initiative on
+      kdump, and reuse atomic value kdump_in_progress to make sure there is
+      only one initiator of kdump.  All INITs asserted later should be used
+      only for freezing all other cpus.
+    
+      This mask will be removed soon by rfi in relocate_kernel.S, before jump
+      into kdump kernel, after all cpus are frozen and no-op INIT handler is
+      registered.  So if INIT was in the interval while it is masked, it will
+      pend on the system and will received just after the rfi, and handled by
+      the no-op handler.
+    
+      If there was a MCA event while psr.mc is 1, in theory the event will
+      pend on the system and will received just after the rfi same as above.
+      MCA handler is unregistered here at the time, so received MCA will not
+      reach to OS_MCA and will result in warmboot by SAL.
+    
+      Note that codes in this masked interval are relatively simpler than
+      that in MCA/INIT handler which also executed with the mask.  So it can
+      be said that probability of error in this interval is supposed not so
+      higher than that in MCA/INIT handler.
+    
+    Signed-off-by: Hidetoshi Seto <seto.hidetoshi@jp.fujitsu.com>
+    Cc: Vivek Goyal <vgoyal@redhat.com>
+    Cc: Haren Myneni <hbabu@us.ibm.com>
+    Cc: kexec@lists.infradead.org
+    Acked-by: Fenghua Yu <fenghua.yu@intel.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit 4295ab34883d2070b1145e14f4619478e9788807
+Author: Hidetoshi Seto <[seto.hidetoshi@jp.fujitsu.com]>
+Date:   Thu Aug 6 14:51:56 2009 -0700
+
+    [IA64] kdump: Mask MCA/INIT on frozen cpus
+    
+    Summary:
+    
+      INIT asserted on kdump kernel invokes INIT handler not only on a
+      cpu that running on the kdump kernel, but also BSP of the panicked
+      kernel, because the (badly) frozen BSP can be thawed by INIT.
+    
+    Description:
+    
+      The kdump_cpu_freeze() is called on cpus except one that initiates
+      panic and/or kdump, to stop/offline the cpu (on ia64, it means we
+      pass control of cpus to SAL, or put them in spinloop).  Note that
+      CPU0(BSP) always go to spinloop, so if panic was happened on an AP,
+      there are at least 2cpus (= the AP and BSP) which not back to SAL.
+    
+      On the spinning cpus, interrupts are disabled (rsm psr.i), but INIT
+      is still interruptible because psr.mc for mask them is not set unless
+      kdump_cpu_freeze() is not called from MCA/INIT context.
+    
+      Therefore, assume that a panic was happened on an AP, kdump was
+      invoked, new INIT handlers for kdump kernel was registered and then
+      an INIT is asserted.  From the viewpoint of SAL, there are 2 online
+      cpus, so INIT will be delivered to both of them.  It likely means
+      that not only the AP (= a cpu executing kdump) enters INIT handler
+      which is newly registered, but also BSP (= another cpu spinning in
+      panicked kernel) enters the same INIT handler.  Of course setting of
+      registers in BSP are still old (for panicked kernel), so what happen
+      with running handler with wrong setting will be extremely unexpected.
+      I believe this is not desirable behavior.
+    
+    How to Reproduce:
+    
+      Start kdump on one of APs (e.g. cpu1)
+        # taskset 0x2 echo c > /proc/sysrq-trigger
+      Then assert INIT after kdump kernel is booted, after new INIT handler
+      for kdump kernel is registered.
+    
+    Expected results:
+    
+      An INIT handler is invoked only on the AP.
+    
+    Actual results:
+    
+      An INIT handler is invoked on the AP and BSP.
+    
+    Sample of results:
+    
+      I got following console log by asserting INIT after prompt "root:/>".
+      It seems that two monarchs appeared by one INIT, and one panicked at
+      last.  And it also seems that the panicked one supposed there were
+      4 online cpus and no one did rendezvous:
+    
+        :
+        [  0 %]dropping to initramfs shell
+        exiting this shell will reboot your system
+        root:/> Entered OS INIT handler. PSP=fff301a0 cpu=0 monarch=0
+        ia64_init_handler: Promoting cpu 0 to monarch.
+        Delaying for 5 seconds...
+        All OS INIT slaves have reached rendezvous
+        Processes interrupted by INIT - 0 (cpu 0 task 0xa000000100af0000)
+        :
+        <<snip>>
+        :
+        Entered OS INIT handler. PSP=fff301a0 cpu=0 monarch=1
+        Delaying for 5 seconds...
+        mlogbuf_finish: printing switched to urgent mode, MCA/INIT might be dodgy or fail.
+        OS INIT slave did not rendezvous on cpu 1 2 3
+        INIT swapper 0[0]: bugcheck! 0 [1]
+        :
+        <<snip>>
+        :
+        Kernel panic - not syncing: Attempted to kill the idle task!
+    
+    Proposed fix:
+    
+      To avoid this problem, this patch inserts ia64_set_psr_mc() to mask
+      INIT on cpus going to be frozen.  This masking have no effect if the
+      kdump_cpu_freeze() is called from INIT handler when kdump_on_init == 1,
+      because psr.mc is already turned on to 1 before entering OS_INIT.
+      I confirmed that weird log like above are disappeared after applying
+      this patch.
+    
+    Signed-off-by: Hidetoshi Seto <seto.hidetoshi@jp.fujitsu.com>
+    Cc: Vivek Goyal <vgoyal@redhat.com>
+    Cc: Haren Myneni <hbabu@us.ibm.com>
+    Cc: kexec@lists.infradead.org
+    Acked-by: Fenghua Yu <fenghua.yu@intel.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit d0af9eed5aa91b6b7b5049cae69e5ea956fd85c3
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Wed Aug 19 18:05:36 2009 -0700
+
+    x86, pat/mtrr: Rendezvous all the cpus for MTRR/PAT init
+    
+    SDM Vol 3a section titled "MTRR considerations in MP systems" specifies
+    the need for synchronizing the logical cpu's while initializing/updating
+    MTRR.
+    
+    Currently Linux kernel does the synchronization of all cpu's only when
+    a single MTRR register is programmed/updated. During an AP online
+    (during boot/cpu-online/resume)  where we initialize all the MTRR/PAT registers,
+    we don't follow this synchronization algorithm.
+    
+    This can lead to scenarios where during a dynamic cpu online, that logical cpu
+    is initializing MTRR/PAT with cache disabled (cr0.cd=1) etc while other logical
+    HT sibling continue to run (also with cache disabled because of cr0.cd=1
+    on its sibling).
+    
+    Starting from Westmere, VMX transitions with cr0.cd=1 don't work properly
+    (because of some VMX performance optimizations) and the above scenario
+    (with one logical cpu doing VMX activity and another logical cpu coming online)
+    can result in system crash.
+    
+    Fix the MTRR initialization by doing rendezvous of all the cpus. During
+    boot and resume, we delay the MTRR/PAT init for APs till all the
+    logical cpu's come online and the rendezvous process at the end of AP's bringup,
+    will initialize the MTRR/PAT for all AP's.
+    
+    For dynamic single cpu online, we synchronize all the logical cpus and
+    do the MTRR/PAT init on the AP that is coming online.
+    
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Signed-off-by: H. Peter Anvin <hpa@zytor.com>
+
+commit f833bab87fca5c3ce13778421b1365845843b976
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Mon Aug 17 14:34:59 2009 -0700
+
+    clockevent: Prevent dead lock on clockevents_lock
+    
+    Currently clockevents_notify() is called with interrupts enabled at
+    some places and interrupts disabled at some other places.
+    
+    This results in a deadlock in this scenario.
+    
+    cpu A holds clockevents_lock in clockevents_notify() with irqs enabled
+    cpu B waits for clockevents_lock in clockevents_notify() with irqs disabled
+    cpu C doing set_mtrr() which will try to rendezvous of all the cpus.
+    
+    This will result in C and A come to the rendezvous point and waiting
+    for B. B is stuck forever waiting for the spinlock and thus not
+    reaching the rendezvous point.
+    
+    Fix the clockevents code so that clockevents_lock is taken with
+    interrupts disabled and thus avoid the above deadlock.
+    
+    Also call lapic_timer_propagate_broadcast() on the destination cpu so
+    that we avoid calling smp_call_function() in the clockevents notifier
+    chain.
+    
+    This issue left us wondering if we need to change the MTRR rendezvous
+    logic to use stop machine logic (instead of smp_call_function) or add
+    a check in spinlock debug code to see if there are other spinlocks
+    which gets taken under both interrupts enabled/disabled conditions.
+    
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Signed-off-by: Venkatesh Pallipadi <venkatesh.pallipadi@intel.com>
+    Cc: "Pallipadi Venkatesh" <venkatesh.pallipadi@intel.com>
+    Cc: "Brown Len" <len.brown@intel.com>
+    LKML-Reference: <1250544899.2709.210.camel@sbs-t61.sc.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
+commit 4937ce87959629d31e9b09cf5bdf1e12a305c805
+Merge: 4271e0f7e12b 432a7d6587fc
+Author: Linus Torvalds <torvalds@woody.linux-foundation.org>
+Date:   Mon Oct 15 09:57:54 2007 -0700
+
+    Merge branch 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/aegl/linux-2.6
+    
+    * 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/aegl/linux-2.6:
+      [IA64] update sn2_defconfig
+      [IA64] Fix kernel hangup in kdump on INIT
+      [IA64] Fix kernel panic in kdump on INIT
+      [IA64] Remove vector from ia64_machine_kexec()
+      [IA64] Fix race when multiple cpus go through MCA
+      [IA64] Remove needless delay in MCA rendezvous
+      [IA64] add driver for ACPI methods to call native firmware
+      [IA64] abstract SAL_CALL wrapper to allow other firmware entry points
+      [IA64] perfmon: Remove exit_pfm_fs()
+      [IA64] tree-wide: Misc __cpu{initdata, init, exit} annotations
+
+commit e1b1eb011e15190eb859bad0bcae67679bda7d50
+Author: Russ Anderson <rja@sgi.com>
+Date:   Wed Sep 19 16:58:31 2007 -0500
+
+    [IA64] Fix race when multiple cpus go through MCA
+    
+    Additional testing uncovered a situation where the MCA recovery code could
+    hang due to a race condition.
+    
+    According to the SAL spec, SAL sends a rendezvous interrupt to all but the first
+    CPU that goes into MCA.  This includes other CPUs that go into MCA at the same
+    time.  Those other CPUs will go into the linux MCA handler (rather than the
+    slave loop) with the rendezvous interrupt pending.  When all the CPUs have
+    completed MCA processing and the last monarch completes, freeing all the CPUs,
+    the CPUs with the pended rendezvous interrupt then go into the
+    ia64_mca_rendez_int_handler().  In ia64_mca_rendez_int_handler() the CPUs
+    get marked as rendezvoused, but then leave the handler (due to no MCA).
+    That leaves the CPUs marked as rendezvoused _before_ the next MCA event.
+    
+    When the next MCA hits, the monarch will mistakenly believe that all the CPUs
+    are rendezvoused when they are not, opening up a window where a CPU can get
+    stuck in the slave loop.
+    
+    This patch avoids leaving CPUs marked as rendezvoused when they are not.
+    
+    Signed-off-by: Russ Anderson <rja@sgi.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit 2bc5c282999af41042c2b703bf3a58ca1d7e3ee2
+Author: Russ Anderson <rja@sgi.com>
+Date:   Thu Sep 20 13:59:12 2007 -0500
+
+    [IA64] Remove needless delay in MCA rendezvous
+    
+    While testing the MCA recovery code, noticed that some machines would have a
+    five second delay rendezvousing cpus.  What was happening is that
+    ia64_wait_for_slaves() would check to see if all the slave CPUs had
+    rendezvoused.  If any had not, it would wait 1 millisecond then check again.
+    If any CPUs had still not rendezvoused, it would wait 5 seconds before
+    checking again.
+    
+    On some configs the rendezvous takes more than 1 millisecond, causing the code
+    to wait the full 5 seconds, even though the last CPU rendezvoused after only
+    a few milliseconds.
+    
+    The fix is to check every 1 millisecond to see if all the cpus have
+    rendezvoused.  After 5 seconds the code concludes the CPUs will never
+    rendezvous (same as before).
+    
+    The MCA code is, by definition, not performance critical, but a needless
+    delay of 5 seconds is senseless.  The 5 seconds also adds up quickly
+    when running the error injection code in a loop.
+    
+    This patch both simplifies the code and removes the needless delay.
+    
+    Signed-off-by: Russ Anderson <rja@sgi.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit 1612b18ccb2318563ba51268289dc3271a6052f7
+Author: Russ Anderson <rja@sgi.com>
+Date:   Fri May 18 17:17:17 2007 -0500
+
+    [IA64] Support multiple CPUs going through OS_MCA
+    
+    Linux does not gracefully deal with multiple processors going
+    through OS_MCA aa part of the same MCA event.  The first cpu
+    into OS_MCA grabs the ia64_mca_serialize lock.  Subsequent
+    cpus wait for that lock, preventing them from reporting in as
+    rendezvoused.  The first cpu waits 5 seconds then complains
+    that all the cpus have not rendezvoused.  The first cpu then
+    handles its MCA and frees up all the rendezvoused cpus and
+    releases the ia64_mca_serialize lock.  One of the subsequent
+    cpus going thought OS_MCA then gets the ia64_mca_serialize
+    lock, waits another 5 seconds and then complains that none of
+    the other cpus have rendezvoused.
+    
+    This patch allows multiple CPUs to gracefully go through OS_MCA.
+    
+    The first CPU into ia64_mca_handler() grabs a mca_count lock.
+    Subsequent CPUs into ia64_mca_handler() are added to a list of cpus
+    that need to go through OS_MCA (a bit set in mca_cpu), and report
+    in as rendezvoused, and but spin waiting their turn.
+    
+    The first CPU sees everyone rendezvous, handles his MCA, wakes up
+    one of the other CPUs waiting to process their MCA (by clearing
+    one mca_cpu bit), and then waits for the other cpus to complete
+    their MCA handling.  The next CPU handles his MCA and the process
+    repeats until all the CPUs have handled their MCA.  When the last
+    CPU has handled it's MCA, it sets monarch_cpu to -1, releasing all
+    the CPUs.
+    
+    In testing this works more reliably and faster.
+    
+    Thanks to Keith Owens for suggesting numerous improvements
+    to this code.
+    
+    Signed-off-by: Russ Anderson <rja@sgi.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>

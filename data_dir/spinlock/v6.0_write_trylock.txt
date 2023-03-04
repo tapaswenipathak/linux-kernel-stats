@@ -1,0 +1,2833 @@
+commit 3e71f0167b3db4e4b3d0d8353c375f6587323052
+Merge: 3871d93b82a4 76e64c73db95
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Oct 10 09:44:12 2022 -0700
+
+    Merge tag 'locking-core-2022-10-07' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull locking updates from Ingo Molnar:
+    
+     - Disable preemption in rwsem_write_trylock()'s attempt to take the
+       rwsem, to avoid RT tasks hogging the CPU, which managed to preempt
+       this function after the owner has been cleared but before a new owner
+       is set. Also add debug checks to enforce this.
+    
+     - Add __lockfunc to more slow path functions and add __sched to
+       semaphore functions.
+    
+     - Mark spinlock APIs noinline when the respective CONFIG_INLINE_SPIN_*
+       toggles are disabled, to reduce LTO text size.
+    
+     - Print more debug information when lockdep gets confused in
+       look_up_lock_class().
+    
+     - Improve header file abuse checks.
+    
+     - Misc cleanups
+    
+    * tag 'locking-core-2022-10-07' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:
+      locking/lockdep: Print more debug information - report name and key when look_up_lock_class() got confused
+      locking: Add __sched to semaphore functions
+      locking/rwsem: Disable preemption while trying for rwsem lock
+      locking: Detect includes rwlock.h outside of spinlock.h
+      locking: Add __lockfunc to slow path functions
+      locking/spinlocks: Mark spinlocks noinline when inline spinlocks are disabled
+      selftests: futex: Fix 'the the' typo in comment
+
+commit 48dfb5d2560d36fb16c7d430c229d1604ea7d185
+Author: Gokul krishna Krishnakumar <quic_gokukris@quicinc.com>
+Date:   Thu Sep 8 23:54:27 2022 +0530
+
+    locking/rwsem: Disable preemption while trying for rwsem lock
+    
+    Make the region inside the rwsem_write_trylock non preemptible.
+    
+    We observe RT task is hogging CPU when trying to acquire rwsem lock
+    which was acquired by a kworker task but before the rwsem owner was set.
+    
+    Here is the scenario:
+    1. CFS task (affined to a particular CPU) takes rwsem lock.
+    
+    2. CFS task gets preempted by a RT task before setting owner.
+    
+    3. RT task (FIFO) is trying to acquire the lock, but spinning until
+    RT throttling happens for the lock as the lock was taken by CFS task.
+    
+    This patch attempts to fix the above issue by disabling preemption
+    until owner is set for the lock. While at it also fix the issues
+    at the places where rwsem_{set,clear}_owner() are called.
+    
+    This also adds lockdep annotation of preemption disable in
+    rwsem_{set,clear}_owner() on Peter Z. suggestion.
+    
+    Signed-off-by: Gokul krishna Krishnakumar <quic_gokukris@quicinc.com>
+    Signed-off-by: Mukesh Ojha <quic_mojha@quicinc.com>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Reviewed-by: Waiman Long <longman@redhat.com>
+    Link: https://lore.kernel.org/r/1662661467-24203-1-git-send-email-quic_mojha@quicinc.com
+
+commit fa4a427d84f9b797970a3d5139d7645403e4e989
+Author: Victor Skvortsov <victor.skvortsov@amd.com>
+Date:   Mon Dec 13 21:38:20 2021 +0000
+
+    drm/amdgpu: SRIOV flr_work should use down_write
+    
+    Host initiated VF FLR may fail if someone else is
+    already holding a read_lock. Change from down_write_trylock
+    to down_write to guarantee the reset goes through.
+    
+    Signed-off-by: Victor Skvortsov <victor.skvortsov@amd.com>
+    Reviewed by: Shaoyun.liu <Shaoyun.liu@amd.com>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+
+commit f5e29a26c42b2c1b149118319a03bf937f168298
+Merge: 62453a460a00 81121524f1c7
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Sep 19 13:11:19 2021 -0700
+
+    Merge tag 'locking-urgent-2021-09-19' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull locking fixes from Thomas Gleixner:
+     "A set of updates for the RT specific reader/writer locking base code:
+    
+       - Make the fast path reader ordering guarantees correct.
+    
+       - Code reshuffling to make the fix simpler"
+    
+    [ This plays ugly games with atomic_add_return_release() because we
+      don't have a plain atomic_add_release(), and should really be cleaned
+      up, I think    - Linus ]
+    
+    * tag 'locking-urgent-2021-09-19' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:
+      locking/rwbase: Take care of ordering guarantee for fastpath reader
+      locking/rwbase: Extract __rwbase_write_trylock()
+      locking/rwbase: Properly match set_and_save_state() to restore_state()
+
+commit 616be87eac9fa2ab2dca1069712f7236e50f3bf6
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Thu Sep 9 12:59:18 2021 +0200
+
+    locking/rwbase: Extract __rwbase_write_trylock()
+    
+    The code in rwbase_write_lock() is a little non-obvious vs the
+    read+set 'trylock', extract the sequence into a helper function to
+    clarify the code.
+    
+    This also provides a single site to fix fast-path ordering.
+    
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+    Link: https://lkml.kernel.org/r/YUCq3L+u44NDieEJ@hirez.programming.kicks-ass.net
+
+commit c71845655436e16267e20f23cb70f2c6b905957d
+Author: Feng Tang <feng.tang@intel.com>
+Date:   Fri Jun 11 09:54:42 2021 +0800
+
+    mm: relocate 'write_protect_seq' in struct mm_struct
+    
+    [ Upstream commit 2e3025434a6ba090c85871a1d4080ff784109e1f ]
+    
+    0day robot reported a 9.2% regression for will-it-scale mmap1 test
+    case[1], caused by commit 57efa1fe5957 ("mm/gup: prevent gup_fast from
+    racing with COW during fork").
+    
+    Further debug shows the regression is due to that commit changes the
+    offset of hot fields 'mmap_lock' inside structure 'mm_struct', thus some
+    cache alignment changes.
+    
+    From the perf data, the contention for 'mmap_lock' is very severe and
+    takes around 95% cpu cycles, and it is a rw_semaphore
+    
+            struct rw_semaphore {
+                    atomic_long_t count;    /* 8 bytes */
+                    atomic_long_t owner;    /* 8 bytes */
+                    struct optimistic_spin_queue osq; /* spinner MCS lock */
+                    ...
+    
+    Before commit 57efa1fe5957 adds the 'write_protect_seq', it happens to
+    have a very optimal cache alignment layout, as Linus explained:
+    
+     "and before the addition of the 'write_protect_seq' field, the
+      mmap_sem was at offset 120 in 'struct mm_struct'.
+    
+      Which meant that count and owner were in two different cachelines,
+      and then when you have contention and spend time in
+      rwsem_down_write_slowpath(), this is probably *exactly* the kind
+      of layout you want.
+    
+      Because first the rwsem_write_trylock() will do a cmpxchg on the
+      first cacheline (for the optimistic fast-path), and then in the
+      case of contention, rwsem_down_write_slowpath() will just access
+      the second cacheline.
+    
+      Which is probably just optimal for a load that spends a lot of
+      time contended - new waiters touch that first cacheline, and then
+      they queue themselves up on the second cacheline."
+    
+    After the commit, the rw_semaphore is at offset 128, which means the
+    'count' and 'owner' fields are now in the same cacheline, and causes
+    more cache bouncing.
+    
+    Currently there are 3 "#ifdef CONFIG_XXX" before 'mmap_lock' which will
+    affect its offset:
+    
+      CONFIG_MMU
+      CONFIG_MEMBARRIER
+      CONFIG_HAVE_ARCH_COMPAT_MMAP_BASES
+    
+    The layout above is on 64 bits system with 0day's default kernel config
+    (similar to RHEL-8.3's config), in which all these 3 options are 'y'.
+    And the layout can vary with different kernel configs.
+    
+    Relayouting a structure is usually a double-edged sword, as sometimes it
+    can helps one case, but hurt other cases.  For this case, one solution
+    is, as the newly added 'write_protect_seq' is a 4 bytes long seqcount_t
+    (when CONFIG_DEBUG_LOCK_ALLOC=n), placing it into an existing 4 bytes
+    hole in 'mm_struct' will not change other fields' alignment, while
+    restoring the regression.
+    
+    Link: https://lore.kernel.org/lkml/20210525031636.GB7744@xsang-OptiPlex-9020/ [1]
+    Reported-by: kernel test robot <oliver.sang@intel.com>
+    Signed-off-by: Feng Tang <feng.tang@intel.com>
+    Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+    Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+    Cc: Peter Xu <peterx@redhat.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 103c4a08baec6723cf2d4999c873a1634f8d6bc0
+Author: Feng Tang <feng.tang@intel.com>
+Date:   Fri Jun 11 09:54:42 2021 +0800
+
+    mm: relocate 'write_protect_seq' in struct mm_struct
+    
+    [ Upstream commit 2e3025434a6ba090c85871a1d4080ff784109e1f ]
+    
+    0day robot reported a 9.2% regression for will-it-scale mmap1 test
+    case[1], caused by commit 57efa1fe5957 ("mm/gup: prevent gup_fast from
+    racing with COW during fork").
+    
+    Further debug shows the regression is due to that commit changes the
+    offset of hot fields 'mmap_lock' inside structure 'mm_struct', thus some
+    cache alignment changes.
+    
+    From the perf data, the contention for 'mmap_lock' is very severe and
+    takes around 95% cpu cycles, and it is a rw_semaphore
+    
+            struct rw_semaphore {
+                    atomic_long_t count;    /* 8 bytes */
+                    atomic_long_t owner;    /* 8 bytes */
+                    struct optimistic_spin_queue osq; /* spinner MCS lock */
+                    ...
+    
+    Before commit 57efa1fe5957 adds the 'write_protect_seq', it happens to
+    have a very optimal cache alignment layout, as Linus explained:
+    
+     "and before the addition of the 'write_protect_seq' field, the
+      mmap_sem was at offset 120 in 'struct mm_struct'.
+    
+      Which meant that count and owner were in two different cachelines,
+      and then when you have contention and spend time in
+      rwsem_down_write_slowpath(), this is probably *exactly* the kind
+      of layout you want.
+    
+      Because first the rwsem_write_trylock() will do a cmpxchg on the
+      first cacheline (for the optimistic fast-path), and then in the
+      case of contention, rwsem_down_write_slowpath() will just access
+      the second cacheline.
+    
+      Which is probably just optimal for a load that spends a lot of
+      time contended - new waiters touch that first cacheline, and then
+      they queue themselves up on the second cacheline."
+    
+    After the commit, the rw_semaphore is at offset 128, which means the
+    'count' and 'owner' fields are now in the same cacheline, and causes
+    more cache bouncing.
+    
+    Currently there are 3 "#ifdef CONFIG_XXX" before 'mmap_lock' which will
+    affect its offset:
+    
+      CONFIG_MMU
+      CONFIG_MEMBARRIER
+      CONFIG_HAVE_ARCH_COMPAT_MMAP_BASES
+    
+    The layout above is on 64 bits system with 0day's default kernel config
+    (similar to RHEL-8.3's config), in which all these 3 options are 'y'.
+    And the layout can vary with different kernel configs.
+    
+    Relayouting a structure is usually a double-edged sword, as sometimes it
+    can helps one case, but hurt other cases.  For this case, one solution
+    is, as the newly added 'write_protect_seq' is a 4 bytes long seqcount_t
+    (when CONFIG_DEBUG_LOCK_ALLOC=n), placing it into an existing 4 bytes
+    hole in 'mm_struct' will not change other fields' alignment, while
+    restoring the regression.
+    
+    Link: https://lore.kernel.org/lkml/20210525031636.GB7744@xsang-OptiPlex-9020/ [1]
+    Reported-by: kernel test robot <oliver.sang@intel.com>
+    Signed-off-by: Feng Tang <feng.tang@intel.com>
+    Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+    Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+    Cc: Peter Xu <peterx@redhat.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 2e3025434a6ba090c85871a1d4080ff784109e1f
+Author: Feng Tang <feng.tang@intel.com>
+Date:   Fri Jun 11 09:54:42 2021 +0800
+
+    mm: relocate 'write_protect_seq' in struct mm_struct
+    
+    0day robot reported a 9.2% regression for will-it-scale mmap1 test
+    case[1], caused by commit 57efa1fe5957 ("mm/gup: prevent gup_fast from
+    racing with COW during fork").
+    
+    Further debug shows the regression is due to that commit changes the
+    offset of hot fields 'mmap_lock' inside structure 'mm_struct', thus some
+    cache alignment changes.
+    
+    From the perf data, the contention for 'mmap_lock' is very severe and
+    takes around 95% cpu cycles, and it is a rw_semaphore
+    
+            struct rw_semaphore {
+                    atomic_long_t count;    /* 8 bytes */
+                    atomic_long_t owner;    /* 8 bytes */
+                    struct optimistic_spin_queue osq; /* spinner MCS lock */
+                    ...
+    
+    Before commit 57efa1fe5957 adds the 'write_protect_seq', it happens to
+    have a very optimal cache alignment layout, as Linus explained:
+    
+     "and before the addition of the 'write_protect_seq' field, the
+      mmap_sem was at offset 120 in 'struct mm_struct'.
+    
+      Which meant that count and owner were in two different cachelines,
+      and then when you have contention and spend time in
+      rwsem_down_write_slowpath(), this is probably *exactly* the kind
+      of layout you want.
+    
+      Because first the rwsem_write_trylock() will do a cmpxchg on the
+      first cacheline (for the optimistic fast-path), and then in the
+      case of contention, rwsem_down_write_slowpath() will just access
+      the second cacheline.
+    
+      Which is probably just optimal for a load that spends a lot of
+      time contended - new waiters touch that first cacheline, and then
+      they queue themselves up on the second cacheline."
+    
+    After the commit, the rw_semaphore is at offset 128, which means the
+    'count' and 'owner' fields are now in the same cacheline, and causes
+    more cache bouncing.
+    
+    Currently there are 3 "#ifdef CONFIG_XXX" before 'mmap_lock' which will
+    affect its offset:
+    
+      CONFIG_MMU
+      CONFIG_MEMBARRIER
+      CONFIG_HAVE_ARCH_COMPAT_MMAP_BASES
+    
+    The layout above is on 64 bits system with 0day's default kernel config
+    (similar to RHEL-8.3's config), in which all these 3 options are 'y'.
+    And the layout can vary with different kernel configs.
+    
+    Relayouting a structure is usually a double-edged sword, as sometimes it
+    can helps one case, but hurt other cases.  For this case, one solution
+    is, as the newly added 'write_protect_seq' is a 4 bytes long seqcount_t
+    (when CONFIG_DEBUG_LOCK_ALLOC=n), placing it into an existing 4 bytes
+    hole in 'mm_struct' will not change other fields' alignment, while
+    restoring the regression.
+    
+    Link: https://lore.kernel.org/lkml/20210525031636.GB7744@xsang-OptiPlex-9020/ [1]
+    Reported-by: kernel test robot <oliver.sang@intel.com>
+    Signed-off-by: Feng Tang <feng.tang@intel.com>
+    Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+    Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+    Cc: Peter Xu <peterx@redhat.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit e857b6fcc5af0fbe042bec7e56a1533fe78ef594
+Merge: 8c1dccc80380 cb262935a166
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Dec 14 17:27:47 2020 -0800
+
+    Merge tag 'locking-core-2020-12-14' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull locking updates from Thomas Gleixner:
+     "A moderate set of locking updates:
+    
+       - A few extensions to the rwsem API and support for opportunistic
+         spinning and lock stealing
+    
+       - lockdep selftest improvements
+    
+       - Documentation updates
+    
+       - Cleanups and small fixes all over the place"
+    
+    * tag 'locking-core-2020-12-14' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip: (21 commits)
+      seqlock: kernel-doc: Specify when preemption is automatically altered
+      seqlock: Prefix internal seqcount_t-only macros with a "do_"
+      Documentation: seqlock: s/LOCKTYPE/LOCKNAME/g
+      locking/rwsem: Remove reader optimistic spinning
+      locking/rwsem: Enable reader optimistic lock stealing
+      locking/rwsem: Prevent potential lock starvation
+      locking/rwsem: Pass the current atomic count to rwsem_down_read_slowpath()
+      locking/rwsem: Fold __down_{read,write}*()
+      locking/rwsem: Introduce rwsem_write_trylock()
+      locking/rwsem: Better collate rwsem_read_trylock()
+      rwsem: Implement down_read_interruptible
+      rwsem: Implement down_read_killable_nested
+      refcount: Fix a kernel-doc markup
+      completion: Drop init_completion define
+      atomic: Update MAINTAINERS
+      atomic: Delete obsolete documentation
+      seqlock: Rename __seqprop() users
+      lockdep/selftest: Add spin_nest_lock test
+      lockdep/selftests: Fix PROVE_RAW_LOCK_NESTING
+      seqlock: avoid -Wshadow warnings
+      ...
+
+commit 285c61aedf6bc5d81b37e4dc48c19012e8ff9836
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Tue Dec 8 10:25:06 2020 +0100
+
+    locking/rwsem: Introduce rwsem_write_trylock()
+    
+    One copy of this logic is better than three.
+    
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Link: https://lkml.kernel.org/r/20201207090243.GE3040@hirez.programming.kicks-ass.net
+
+commit b77baa470e77108ccc76fc1e146eb61ff71ac91b
+Author: Hugh Dickins <hughd@google.com>
+Date:   Thu Aug 6 23:26:18 2020 -0700
+
+    khugepaged: collapse_pte_mapped_thp() protect the pmd lock
+    
+    commit 119a5fc16105b2b9383a6e2a7800b2ef861b2975 upstream.
+    
+    When retract_page_tables() removes a page table to make way for a huge
+    pmd, it holds huge page lock, i_mmap_lock_write, mmap_write_trylock and
+    pmd lock; but when collapse_pte_mapped_thp() does the same (to handle the
+    case when the original mmap_write_trylock had failed), only
+    mmap_write_trylock and pmd lock are held.
+    
+    That's not enough.  One machine has twice crashed under load, with "BUG:
+    spinlock bad magic" and GPF on 6b6b6b6b6b6b6b6b.  Examining the second
+    crash, page_vma_mapped_walk_done()'s spin_unlock of pvmw->ptl (serving
+    page_referenced() on a file THP, that had found a page table at *pmd)
+    discovers that the page table page and its lock have already been freed by
+    the time it comes to unlock.
+    
+    Follow the example of retract_page_tables(), but we only need one of huge
+    page lock or i_mmap_lock_write to secure against this: because it's the
+    narrower lock, and because it simplifies collapse_pte_mapped_thp() to know
+    the hpage earlier, choose to rely on huge page lock here.
+    
+    Fixes: 27e1f8273113 ("khugepaged: enable collapse pmd for pte-mapped THP")
+    Signed-off-by: Hugh Dickins <hughd@google.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Cc: Andrea Arcangeli <aarcange@redhat.com>
+    Cc: Mike Kravetz <mike.kravetz@oracle.com>
+    Cc: Song Liu <songliubraving@fb.com>
+    Cc: <stable@vger.kernel.org>    [5.4+]
+    Link: http://lkml.kernel.org/r/alpine.LSU.2.11.2008021213070.27773@eggly.anvils
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0c9e2cfb548da7e9e5d14fe463d2a87004726425
+Author: Hugh Dickins <hughd@google.com>
+Date:   Thu Aug 6 23:26:18 2020 -0700
+
+    khugepaged: collapse_pte_mapped_thp() protect the pmd lock
+    
+    commit 119a5fc16105b2b9383a6e2a7800b2ef861b2975 upstream.
+    
+    When retract_page_tables() removes a page table to make way for a huge
+    pmd, it holds huge page lock, i_mmap_lock_write, mmap_write_trylock and
+    pmd lock; but when collapse_pte_mapped_thp() does the same (to handle the
+    case when the original mmap_write_trylock had failed), only
+    mmap_write_trylock and pmd lock are held.
+    
+    That's not enough.  One machine has twice crashed under load, with "BUG:
+    spinlock bad magic" and GPF on 6b6b6b6b6b6b6b6b.  Examining the second
+    crash, page_vma_mapped_walk_done()'s spin_unlock of pvmw->ptl (serving
+    page_referenced() on a file THP, that had found a page table at *pmd)
+    discovers that the page table page and its lock have already been freed by
+    the time it comes to unlock.
+    
+    Follow the example of retract_page_tables(), but we only need one of huge
+    page lock or i_mmap_lock_write to secure against this: because it's the
+    narrower lock, and because it simplifies collapse_pte_mapped_thp() to know
+    the hpage earlier, choose to rely on huge page lock here.
+    
+    Fixes: 27e1f8273113 ("khugepaged: enable collapse pmd for pte-mapped THP")
+    Signed-off-by: Hugh Dickins <hughd@google.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Cc: Andrea Arcangeli <aarcange@redhat.com>
+    Cc: Mike Kravetz <mike.kravetz@oracle.com>
+    Cc: Song Liu <songliubraving@fb.com>
+    Cc: <stable@vger.kernel.org>    [5.4+]
+    Link: http://lkml.kernel.org/r/alpine.LSU.2.11.2008021213070.27773@eggly.anvils
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a6b238cac6d30ae6821912466ec225569873d2a4
+Author: Hugh Dickins <hughd@google.com>
+Date:   Thu Aug 6 23:26:18 2020 -0700
+
+    khugepaged: collapse_pte_mapped_thp() protect the pmd lock
+    
+    commit 119a5fc16105b2b9383a6e2a7800b2ef861b2975 upstream.
+    
+    When retract_page_tables() removes a page table to make way for a huge
+    pmd, it holds huge page lock, i_mmap_lock_write, mmap_write_trylock and
+    pmd lock; but when collapse_pte_mapped_thp() does the same (to handle the
+    case when the original mmap_write_trylock had failed), only
+    mmap_write_trylock and pmd lock are held.
+    
+    That's not enough.  One machine has twice crashed under load, with "BUG:
+    spinlock bad magic" and GPF on 6b6b6b6b6b6b6b6b.  Examining the second
+    crash, page_vma_mapped_walk_done()'s spin_unlock of pvmw->ptl (serving
+    page_referenced() on a file THP, that had found a page table at *pmd)
+    discovers that the page table page and its lock have already been freed by
+    the time it comes to unlock.
+    
+    Follow the example of retract_page_tables(), but we only need one of huge
+    page lock or i_mmap_lock_write to secure against this: because it's the
+    narrower lock, and because it simplifies collapse_pte_mapped_thp() to know
+    the hpage earlier, choose to rely on huge page lock here.
+    
+    Fixes: 27e1f8273113 ("khugepaged: enable collapse pmd for pte-mapped THP")
+    Signed-off-by: Hugh Dickins <hughd@google.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Cc: Andrea Arcangeli <aarcange@redhat.com>
+    Cc: Mike Kravetz <mike.kravetz@oracle.com>
+    Cc: Song Liu <songliubraving@fb.com>
+    Cc: <stable@vger.kernel.org>    [5.4+]
+    Link: http://lkml.kernel.org/r/alpine.LSU.2.11.2008021213070.27773@eggly.anvils
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 22ca8cb2a5b9b34034ae19d0e4c1c969d5576051
+Author: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Date:   Thu Jul 30 20:25:17 2020 +0900
+
+    block: don't do revalidate zones on invalid devices
+    
+    [ Upstream commit 1a1206dc4cf02cee4b5cbce583ee4c22368b4c28 ]
+    
+    When we loose a device for whatever reason while (re)scanning zones, we
+    trip over a NULL pointer in blk_revalidate_zone_cb, like in the following
+    log:
+    
+    sd 0:0:0:0: [sda] 3418095616 4096-byte logical blocks: (14.0 TB/12.7 TiB)
+    sd 0:0:0:0: [sda] 52156 zones of 65536 logical blocks
+    sd 0:0:0:0: [sda] Write Protect is off
+    sd 0:0:0:0: [sda] Mode Sense: 37 00 00 08
+    sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+    sd 0:0:0:0: [sda] REPORT ZONES start lba 1065287680 failed
+    sd 0:0:0:0: [sda] REPORT ZONES: Result: hostbyte=0x00 driverbyte=0x08
+    sd 0:0:0:0: [sda] Sense Key : 0xb [current]
+    sd 0:0:0:0: [sda] ASC=0x0 ASCQ=0x6
+    sda: failed to revalidate zones
+    sd 0:0:0:0: [sda] 0 4096-byte logical blocks: (0 B/0 B)
+    sda: detected capacity change from 14000519643136 to 0
+    ==================================================================
+    BUG: KASAN: null-ptr-deref in blk_revalidate_zone_cb+0x1b7/0x550
+    Write of size 8 at addr 0000000000000010 by task kworker/u4:1/58
+    
+    CPU: 1 PID: 58 Comm: kworker/u4:1 Not tainted 5.8.0-rc1 #692
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
+    Workqueue: events_unbound async_run_entry_fn
+    Call Trace:
+     dump_stack+0x7d/0xb0
+     ? blk_revalidate_zone_cb+0x1b7/0x550
+     kasan_report.cold+0x5/0x37
+     ? blk_revalidate_zone_cb+0x1b7/0x550
+     check_memory_region+0x145/0x1a0
+     blk_revalidate_zone_cb+0x1b7/0x550
+     sd_zbc_parse_report+0x1f1/0x370
+     ? blk_req_zone_write_trylock+0x200/0x200
+     ? sectors_to_logical+0x60/0x60
+     ? blk_req_zone_write_trylock+0x200/0x200
+     ? blk_req_zone_write_trylock+0x200/0x200
+     sd_zbc_report_zones+0x3c4/0x5e0
+     ? sd_dif_config_host+0x500/0x500
+     blk_revalidate_disk_zones+0x231/0x44d
+     ? _raw_write_lock_irqsave+0xb0/0xb0
+     ? blk_queue_free_zone_bitmaps+0xd0/0xd0
+     sd_zbc_read_zones+0x8cf/0x11a0
+     sd_revalidate_disk+0x305c/0x64e0
+     ? __device_add_disk+0x776/0xf20
+     ? read_capacity_16.part.0+0x1080/0x1080
+     ? blk_alloc_devt+0x250/0x250
+     ? create_object.isra.0+0x595/0xa20
+     ? kasan_unpoison_shadow+0x33/0x40
+     sd_probe+0x8dc/0xcd2
+     really_probe+0x20e/0xaf0
+     __driver_attach_async_helper+0x249/0x2d0
+     async_run_entry_fn+0xbe/0x560
+     process_one_work+0x764/0x1290
+     ? _raw_read_unlock_irqrestore+0x30/0x30
+     worker_thread+0x598/0x12f0
+     ? __kthread_parkme+0xc6/0x1b0
+     ? schedule+0xed/0x2c0
+     ? process_one_work+0x1290/0x1290
+     kthread+0x36b/0x440
+     ? kthread_create_worker_on_cpu+0xa0/0xa0
+     ret_from_fork+0x22/0x30
+    ==================================================================
+    
+    When the device is already gone we end up with the following scenario:
+    The device's capacity is 0 and thus the number of zones will be 0 as well. When
+    allocating the bitmap for the conventional zones, we then trip over a NULL
+    pointer.
+    
+    So if we encounter a zoned block device with a 0 capacity, don't dare to
+    revalidate the zones sizes.
+    
+    Fixes: 6c6b35491422 ("block: set the zone size in blk_revalidate_disk_zones atomically")
+    Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+    Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8904c89418a5a691b16be9d862e8bda5f0332803
+Author: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Date:   Thu Jul 30 20:25:17 2020 +0900
+
+    block: don't do revalidate zones on invalid devices
+    
+    [ Upstream commit 1a1206dc4cf02cee4b5cbce583ee4c22368b4c28 ]
+    
+    When we loose a device for whatever reason while (re)scanning zones, we
+    trip over a NULL pointer in blk_revalidate_zone_cb, like in the following
+    log:
+    
+    sd 0:0:0:0: [sda] 3418095616 4096-byte logical blocks: (14.0 TB/12.7 TiB)
+    sd 0:0:0:0: [sda] 52156 zones of 65536 logical blocks
+    sd 0:0:0:0: [sda] Write Protect is off
+    sd 0:0:0:0: [sda] Mode Sense: 37 00 00 08
+    sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+    sd 0:0:0:0: [sda] REPORT ZONES start lba 1065287680 failed
+    sd 0:0:0:0: [sda] REPORT ZONES: Result: hostbyte=0x00 driverbyte=0x08
+    sd 0:0:0:0: [sda] Sense Key : 0xb [current]
+    sd 0:0:0:0: [sda] ASC=0x0 ASCQ=0x6
+    sda: failed to revalidate zones
+    sd 0:0:0:0: [sda] 0 4096-byte logical blocks: (0 B/0 B)
+    sda: detected capacity change from 14000519643136 to 0
+    ==================================================================
+    BUG: KASAN: null-ptr-deref in blk_revalidate_zone_cb+0x1b7/0x550
+    Write of size 8 at addr 0000000000000010 by task kworker/u4:1/58
+    
+    CPU: 1 PID: 58 Comm: kworker/u4:1 Not tainted 5.8.0-rc1 #692
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
+    Workqueue: events_unbound async_run_entry_fn
+    Call Trace:
+     dump_stack+0x7d/0xb0
+     ? blk_revalidate_zone_cb+0x1b7/0x550
+     kasan_report.cold+0x5/0x37
+     ? blk_revalidate_zone_cb+0x1b7/0x550
+     check_memory_region+0x145/0x1a0
+     blk_revalidate_zone_cb+0x1b7/0x550
+     sd_zbc_parse_report+0x1f1/0x370
+     ? blk_req_zone_write_trylock+0x200/0x200
+     ? sectors_to_logical+0x60/0x60
+     ? blk_req_zone_write_trylock+0x200/0x200
+     ? blk_req_zone_write_trylock+0x200/0x200
+     sd_zbc_report_zones+0x3c4/0x5e0
+     ? sd_dif_config_host+0x500/0x500
+     blk_revalidate_disk_zones+0x231/0x44d
+     ? _raw_write_lock_irqsave+0xb0/0xb0
+     ? blk_queue_free_zone_bitmaps+0xd0/0xd0
+     sd_zbc_read_zones+0x8cf/0x11a0
+     sd_revalidate_disk+0x305c/0x64e0
+     ? __device_add_disk+0x776/0xf20
+     ? read_capacity_16.part.0+0x1080/0x1080
+     ? blk_alloc_devt+0x250/0x250
+     ? create_object.isra.0+0x595/0xa20
+     ? kasan_unpoison_shadow+0x33/0x40
+     sd_probe+0x8dc/0xcd2
+     really_probe+0x20e/0xaf0
+     __driver_attach_async_helper+0x249/0x2d0
+     async_run_entry_fn+0xbe/0x560
+     process_one_work+0x764/0x1290
+     ? _raw_read_unlock_irqrestore+0x30/0x30
+     worker_thread+0x598/0x12f0
+     ? __kthread_parkme+0xc6/0x1b0
+     ? schedule+0xed/0x2c0
+     ? process_one_work+0x1290/0x1290
+     kthread+0x36b/0x440
+     ? kthread_create_worker_on_cpu+0xa0/0xa0
+     ret_from_fork+0x22/0x30
+    ==================================================================
+    
+    When the device is already gone we end up with the following scenario:
+    The device's capacity is 0 and thus the number of zones will be 0 as well. When
+    allocating the bitmap for the conventional zones, we then trip over a NULL
+    pointer.
+    
+    So if we encounter a zoned block device with a 0 capacity, don't dare to
+    revalidate the zones sizes.
+    
+    Fixes: 6c6b35491422 ("block: set the zone size in blk_revalidate_disk_zones atomically")
+    Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+    Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 119a5fc16105b2b9383a6e2a7800b2ef861b2975
+Author: Hugh Dickins <hughd@google.com>
+Date:   Thu Aug 6 23:26:18 2020 -0700
+
+    khugepaged: collapse_pte_mapped_thp() protect the pmd lock
+    
+    When retract_page_tables() removes a page table to make way for a huge
+    pmd, it holds huge page lock, i_mmap_lock_write, mmap_write_trylock and
+    pmd lock; but when collapse_pte_mapped_thp() does the same (to handle the
+    case when the original mmap_write_trylock had failed), only
+    mmap_write_trylock and pmd lock are held.
+    
+    That's not enough.  One machine has twice crashed under load, with "BUG:
+    spinlock bad magic" and GPF on 6b6b6b6b6b6b6b6b.  Examining the second
+    crash, page_vma_mapped_walk_done()'s spin_unlock of pvmw->ptl (serving
+    page_referenced() on a file THP, that had found a page table at *pmd)
+    discovers that the page table page and its lock have already been freed by
+    the time it comes to unlock.
+    
+    Follow the example of retract_page_tables(), but we only need one of huge
+    page lock or i_mmap_lock_write to secure against this: because it's the
+    narrower lock, and because it simplifies collapse_pte_mapped_thp() to know
+    the hpage earlier, choose to rely on huge page lock here.
+    
+    Fixes: 27e1f8273113 ("khugepaged: enable collapse pmd for pte-mapped THP")
+    Signed-off-by: Hugh Dickins <hughd@google.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Cc: Andrea Arcangeli <aarcange@redhat.com>
+    Cc: Mike Kravetz <mike.kravetz@oracle.com>
+    Cc: Song Liu <songliubraving@fb.com>
+    Cc: <stable@vger.kernel.org>    [5.4+]
+    Link: http://lkml.kernel.org/r/alpine.LSU.2.11.2008021213070.27773@eggly.anvils
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 1a1206dc4cf02cee4b5cbce583ee4c22368b4c28
+Author: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Date:   Thu Jul 30 20:25:17 2020 +0900
+
+    block: don't do revalidate zones on invalid devices
+    
+    When we loose a device for whatever reason while (re)scanning zones, we
+    trip over a NULL pointer in blk_revalidate_zone_cb, like in the following
+    log:
+    
+    sd 0:0:0:0: [sda] 3418095616 4096-byte logical blocks: (14.0 TB/12.7 TiB)
+    sd 0:0:0:0: [sda] 52156 zones of 65536 logical blocks
+    sd 0:0:0:0: [sda] Write Protect is off
+    sd 0:0:0:0: [sda] Mode Sense: 37 00 00 08
+    sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+    sd 0:0:0:0: [sda] REPORT ZONES start lba 1065287680 failed
+    sd 0:0:0:0: [sda] REPORT ZONES: Result: hostbyte=0x00 driverbyte=0x08
+    sd 0:0:0:0: [sda] Sense Key : 0xb [current]
+    sd 0:0:0:0: [sda] ASC=0x0 ASCQ=0x6
+    sda: failed to revalidate zones
+    sd 0:0:0:0: [sda] 0 4096-byte logical blocks: (0 B/0 B)
+    sda: detected capacity change from 14000519643136 to 0
+    ==================================================================
+    BUG: KASAN: null-ptr-deref in blk_revalidate_zone_cb+0x1b7/0x550
+    Write of size 8 at addr 0000000000000010 by task kworker/u4:1/58
+    
+    CPU: 1 PID: 58 Comm: kworker/u4:1 Not tainted 5.8.0-rc1 #692
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
+    Workqueue: events_unbound async_run_entry_fn
+    Call Trace:
+     dump_stack+0x7d/0xb0
+     ? blk_revalidate_zone_cb+0x1b7/0x550
+     kasan_report.cold+0x5/0x37
+     ? blk_revalidate_zone_cb+0x1b7/0x550
+     check_memory_region+0x145/0x1a0
+     blk_revalidate_zone_cb+0x1b7/0x550
+     sd_zbc_parse_report+0x1f1/0x370
+     ? blk_req_zone_write_trylock+0x200/0x200
+     ? sectors_to_logical+0x60/0x60
+     ? blk_req_zone_write_trylock+0x200/0x200
+     ? blk_req_zone_write_trylock+0x200/0x200
+     sd_zbc_report_zones+0x3c4/0x5e0
+     ? sd_dif_config_host+0x500/0x500
+     blk_revalidate_disk_zones+0x231/0x44d
+     ? _raw_write_lock_irqsave+0xb0/0xb0
+     ? blk_queue_free_zone_bitmaps+0xd0/0xd0
+     sd_zbc_read_zones+0x8cf/0x11a0
+     sd_revalidate_disk+0x305c/0x64e0
+     ? __device_add_disk+0x776/0xf20
+     ? read_capacity_16.part.0+0x1080/0x1080
+     ? blk_alloc_devt+0x250/0x250
+     ? create_object.isra.0+0x595/0xa20
+     ? kasan_unpoison_shadow+0x33/0x40
+     sd_probe+0x8dc/0xcd2
+     really_probe+0x20e/0xaf0
+     __driver_attach_async_helper+0x249/0x2d0
+     async_run_entry_fn+0xbe/0x560
+     process_one_work+0x764/0x1290
+     ? _raw_read_unlock_irqrestore+0x30/0x30
+     worker_thread+0x598/0x12f0
+     ? __kthread_parkme+0xc6/0x1b0
+     ? schedule+0xed/0x2c0
+     ? process_one_work+0x1290/0x1290
+     kthread+0x36b/0x440
+     ? kthread_create_worker_on_cpu+0xa0/0xa0
+     ret_from_fork+0x22/0x30
+    ==================================================================
+    
+    When the device is already gone we end up with the following scenario:
+    The device's capacity is 0 and thus the number of zones will be 0 as well. When
+    allocating the bitmap for the conventional zones, we then trip over a NULL
+    pointer.
+    
+    So if we encounter a zoned block device with a 0 capacity, don't dare to
+    revalidate the zones sizes.
+    
+    Fixes: 6c6b35491422 ("block: set the zone size in blk_revalidate_disk_zones atomically")
+    Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+    Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+commit d8ed45c5dcd455fc5848d47f86883a1b872ac0d0
+Author: Michel Lespinasse <michel@lespinasse.org>
+Date:   Mon Jun 8 21:33:25 2020 -0700
+
+    mmap locking API: use coccinelle to convert mmap_sem rwsem call sites
+    
+    This change converts the existing mmap_sem rwsem calls to use the new mmap
+    locking API instead.
+    
+    The change is generated using coccinelle with the following rule:
+    
+    // spatch --sp-file mmap_lock_api.cocci --in-place --include-headers --dir .
+    
+    @@
+    expression mm;
+    @@
+    (
+    -init_rwsem
+    +mmap_init_lock
+    |
+    -down_write
+    +mmap_write_lock
+    |
+    -down_write_killable
+    +mmap_write_lock_killable
+    |
+    -down_write_trylock
+    +mmap_write_trylock
+    |
+    -up_write
+    +mmap_write_unlock
+    |
+    -downgrade_write
+    +mmap_write_downgrade
+    |
+    -down_read
+    +mmap_read_lock
+    |
+    -down_read_killable
+    +mmap_read_lock_killable
+    |
+    -down_read_trylock
+    +mmap_read_trylock
+    |
+    -up_read
+    +mmap_read_unlock
+    )
+    -(&mm->mmap_sem)
+    +(mm)
+    
+    Signed-off-by: Michel Lespinasse <walken@google.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Reviewed-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+    Reviewed-by: Laurent Dufour <ldufour@linux.ibm.com>
+    Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: Davidlohr Bueso <dbueso@suse.de>
+    Cc: David Rientjes <rientjes@google.com>
+    Cc: Hugh Dickins <hughd@google.com>
+    Cc: Jason Gunthorpe <jgg@ziepe.ca>
+    Cc: Jerome Glisse <jglisse@redhat.com>
+    Cc: John Hubbard <jhubbard@nvidia.com>
+    Cc: Liam Howlett <Liam.Howlett@oracle.com>
+    Cc: Matthew Wilcox <willy@infradead.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Ying Han <yinghan@google.com>
+    Link: http://lkml.kernel.org/r/20200520052908.204642-5-walken@google.com
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 1392d37018d4f68c5bb2c98dae9a018b73926865
+Author: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Date:   Tue May 12 17:55:48 2020 +0900
+
+    block: introduce blk_req_zone_write_trylock
+    
+    Introduce blk_req_zone_write_trylock(), which either grabs the write-lock
+    for a sequential zone or returns false, if the zone is already locked.
+    
+    Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Reviewed-by: Hannes Reinecke <hare@suse.de>
+    Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+commit bc36dfffd5f3f19edcf85954d93eb0bc45875c37
+Author: Jan Kara <jack@suse.cz>
+Date:   Mon Feb 24 12:52:17 2020 +0100
+
+    ext2: Silence lockdep warning about reclaim under xattr_sem
+    
+    Lockdep complains about a chain:
+      sb_internal#2 --> &ei->xattr_sem#2 --> fs_reclaim
+    
+    and shrink_dentry_list -> ext2_evict_inode -> ext2_xattr_delete_inode ->
+    down_write(ei->xattr_sem) creating a locking cycle in the reclaim path.
+    This is however a false positive because when we are in
+    ext2_evict_inode() we are the only holder of the inode reference and
+    nobody else should touch xattr_sem of that inode. So we cannot ever
+    block on acquiring the xattr_sem in the reclaim path.
+    
+    Silence the lockdep warning by using down_write_trylock() in
+    ext2_xattr_delete_inode() to not create false locking dependency.
+    
+    Reported-by: "J. R. Okajima" <hooanon05g@gmail.com>
+    Reviewed-by: Ritesh Harjani <riteshh@linux.ibm.com>
+    Signed-off-by: Jan Kara <jack@suse.cz>
+
+commit 8b4f0b955c41356c8e22464c9a2a7086fda46cdd
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    commit d46b0da7a33dd8c99d969834f682267a45444ab3 upstream.
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 65660617526fb406e0e36a959a2e672a527b1f70
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    [ Upstream commit d46b0da7a33dd8c99d969834f682267a45444ab3 ]
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 80b42f4381c25021cf6d3ca73eb0540c265018b7
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    [ Upstream commit d46b0da7a33dd8c99d969834f682267a45444ab3 ]
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 3bb65a1a407f6ac364aa10111be788a1313225a7
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    [ Upstream commit d46b0da7a33dd8c99d969834f682267a45444ab3 ]
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit fa25e11258cccd7b35082c50c7dd5c5db4455980
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    [ Upstream commit d46b0da7a33dd8c99d969834f682267a45444ab3 ]
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit ad56882f0cbaa8af92d022d1958c8c3bee56e59c
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    [ Upstream commit d46b0da7a33dd8c99d969834f682267a45444ab3 ]
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit d46b0da7a33dd8c99d969834f682267a45444ab3
+Author: Dave Wysochanski <dwysocha@redhat.com>
+Date:   Wed Oct 23 05:02:33 2019 -0400
+
+    cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+    
+    There's a deadlock that is possible and can easily be seen with
+    a test where multiple readers open/read/close of the same file
+    and a disruption occurs causing reconnect.  The deadlock is due
+    a reader thread inside cifs_strict_readv calling down_read and
+    obtaining lock_sem, and then after reconnect inside
+    cifs_reopen_file calling down_read a second time.  If in
+    between the two down_read calls, a down_write comes from
+    another process, deadlock occurs.
+    
+            CPU0                    CPU1
+            ----                    ----
+    cifs_strict_readv()
+     down_read(&cifsi->lock_sem);
+                                   _cifsFileInfo_put
+                                      OR
+                                   cifs_new_fileinfo
+                                    down_write(&cifsi->lock_sem);
+    cifs_reopen_file()
+     down_read(&cifsi->lock_sem);
+    
+    Fix the above by changing all down_write(lock_sem) calls to
+    down_write_trylock(lock_sem)/msleep() loop, which in turn
+    makes the second down_read call benign since it will never
+    block behind the writer while holding lock_sem.
+    
+    Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+    Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed--by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+
+commit 157ec0a3f834ba449a2fa1c1c9075862a614ed52
+Author: Selvin Xavier <selvin.xavier@broadcom.com>
+Date:   Thu Aug 22 03:02:50 2019 -0700
+
+    RDMA/bnxt_re: Fix stack-out-of-bounds in bnxt_qplib_rcfw_send_message
+    
+    [ Upstream commit d37b1e534071ab1983e7c85273234b132c77591a ]
+    
+    Driver copies FW commands to the HW queue as  units of 16 bytes. Some
+    of the command structures are not exact multiple of 16. So while copying
+    the data from those structures, the stack out of bounds messages are
+    reported by KASAN. The following error is reported.
+    
+    [ 1337.530155] ==================================================================
+    [ 1337.530277] BUG: KASAN: stack-out-of-bounds in bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530413] Read of size 16 at addr ffff888725477a48 by task rmmod/2785
+    
+    [ 1337.530540] CPU: 5 PID: 2785 Comm: rmmod Tainted: G           OE     5.2.0-rc6+ #75
+    [ 1337.530541] Hardware name: Dell Inc. PowerEdge R730/0599V5, BIOS 1.0.4 08/28/2014
+    [ 1337.530542] Call Trace:
+    [ 1337.530548]  dump_stack+0x5b/0x90
+    [ 1337.530556]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530560]  print_address_description+0x65/0x22e
+    [ 1337.530568]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530575]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530577]  __kasan_report.cold.3+0x37/0x77
+    [ 1337.530581]  ? _raw_write_trylock+0x10/0xe0
+    [ 1337.530588]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530590]  kasan_report+0xe/0x20
+    [ 1337.530592]  memcpy+0x1f/0x50
+    [ 1337.530600]  bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530608]  ? bnxt_qplib_creq_irq+0xa0/0xa0 [bnxt_re]
+    [ 1337.530611]  ? xas_create+0x3aa/0x5f0
+    [ 1337.530613]  ? xas_start+0x77/0x110
+    [ 1337.530615]  ? xas_clear_mark+0x34/0xd0
+    [ 1337.530623]  bnxt_qplib_free_mrw+0x104/0x1a0 [bnxt_re]
+    [ 1337.530631]  ? bnxt_qplib_destroy_ah+0x110/0x110 [bnxt_re]
+    [ 1337.530633]  ? bit_wait_io_timeout+0xc0/0xc0
+    [ 1337.530641]  bnxt_re_dealloc_mw+0x2c/0x60 [bnxt_re]
+    [ 1337.530648]  bnxt_re_destroy_fence_mr+0x77/0x1d0 [bnxt_re]
+    [ 1337.530655]  bnxt_re_dealloc_pd+0x25/0x60 [bnxt_re]
+    [ 1337.530677]  ib_dealloc_pd_user+0xbe/0xe0 [ib_core]
+    [ 1337.530683]  srpt_remove_one+0x5de/0x690 [ib_srpt]
+    [ 1337.530689]  ? __srpt_close_all_ch+0xc0/0xc0 [ib_srpt]
+    [ 1337.530692]  ? xa_load+0x87/0xe0
+    ...
+    [ 1337.530840]  do_syscall_64+0x6d/0x1f0
+    [ 1337.530843]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+    [ 1337.530845] RIP: 0033:0x7ff5b389035b
+    [ 1337.530848] Code: 73 01 c3 48 8b 0d 2d 0b 2c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d fd 0a 2c 00 f7 d8 64 89 01 48
+    [ 1337.530849] RSP: 002b:00007fff83425c28 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+    [ 1337.530852] RAX: ffffffffffffffda RBX: 00005596443e6750 RCX: 00007ff5b389035b
+    [ 1337.530853] RDX: 000000000000000a RSI: 0000000000000800 RDI: 00005596443e67b8
+    [ 1337.530854] RBP: 0000000000000000 R08: 00007fff83424ba1 R09: 0000000000000000
+    [ 1337.530856] R10: 00007ff5b3902960 R11: 0000000000000206 R12: 00007fff83425e50
+    [ 1337.530857] R13: 00007fff8342673c R14: 00005596443e6260 R15: 00005596443e6750
+    
+    [ 1337.530885] The buggy address belongs to the page:
+    [ 1337.530962] page:ffffea001c951dc0 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0
+    [ 1337.530964] flags: 0x57ffffc0000000()
+    [ 1337.530967] raw: 0057ffffc0000000 0000000000000000 ffffffff1c950101 0000000000000000
+    [ 1337.530970] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+    [ 1337.530970] page dumped because: kasan: bad access detected
+    
+    [ 1337.530996] Memory state around the buggy address:
+    [ 1337.531072]  ffff888725477900: 00 00 00 00 f1 f1 f1 f1 00 00 00 00 00 f2 f2 f2
+    [ 1337.531180]  ffff888725477980: 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00
+    [ 1337.531288] >ffff888725477a00: 00 f2 f2 f2 f2 f2 f2 00 00 00 f2 00 00 00 00 00
+    [ 1337.531393]                                                  ^
+    [ 1337.531478]  ffff888725477a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    [ 1337.531585]  ffff888725477b00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    [ 1337.531691] ==================================================================
+    
+    Fix this by passing the exact size of each FW command to
+    bnxt_qplib_rcfw_send_message as req->cmd_size. Before sending
+    the command to HW, modify the req->cmd_size to number of 16 byte units.
+    
+    Fixes: 1ac5a4047975 ("RDMA/bnxt_re: Add bnxt_re RoCE driver")
+    Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
+    Link: https://lore.kernel.org/r/1566468170-489-1-git-send-email-selvin.xavier@broadcom.com
+    Signed-off-by: Doug Ledford <dledford@redhat.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit d37b1e534071ab1983e7c85273234b132c77591a
+Author: Selvin Xavier <selvin.xavier@broadcom.com>
+Date:   Thu Aug 22 03:02:50 2019 -0700
+
+    RDMA/bnxt_re: Fix stack-out-of-bounds in bnxt_qplib_rcfw_send_message
+    
+    Driver copies FW commands to the HW queue as  units of 16 bytes. Some
+    of the command structures are not exact multiple of 16. So while copying
+    the data from those structures, the stack out of bounds messages are
+    reported by KASAN. The following error is reported.
+    
+    [ 1337.530155] ==================================================================
+    [ 1337.530277] BUG: KASAN: stack-out-of-bounds in bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530413] Read of size 16 at addr ffff888725477a48 by task rmmod/2785
+    
+    [ 1337.530540] CPU: 5 PID: 2785 Comm: rmmod Tainted: G           OE     5.2.0-rc6+ #75
+    [ 1337.530541] Hardware name: Dell Inc. PowerEdge R730/0599V5, BIOS 1.0.4 08/28/2014
+    [ 1337.530542] Call Trace:
+    [ 1337.530548]  dump_stack+0x5b/0x90
+    [ 1337.530556]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530560]  print_address_description+0x65/0x22e
+    [ 1337.530568]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530575]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530577]  __kasan_report.cold.3+0x37/0x77
+    [ 1337.530581]  ? _raw_write_trylock+0x10/0xe0
+    [ 1337.530588]  ? bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530590]  kasan_report+0xe/0x20
+    [ 1337.530592]  memcpy+0x1f/0x50
+    [ 1337.530600]  bnxt_qplib_rcfw_send_message+0x40a/0x850 [bnxt_re]
+    [ 1337.530608]  ? bnxt_qplib_creq_irq+0xa0/0xa0 [bnxt_re]
+    [ 1337.530611]  ? xas_create+0x3aa/0x5f0
+    [ 1337.530613]  ? xas_start+0x77/0x110
+    [ 1337.530615]  ? xas_clear_mark+0x34/0xd0
+    [ 1337.530623]  bnxt_qplib_free_mrw+0x104/0x1a0 [bnxt_re]
+    [ 1337.530631]  ? bnxt_qplib_destroy_ah+0x110/0x110 [bnxt_re]
+    [ 1337.530633]  ? bit_wait_io_timeout+0xc0/0xc0
+    [ 1337.530641]  bnxt_re_dealloc_mw+0x2c/0x60 [bnxt_re]
+    [ 1337.530648]  bnxt_re_destroy_fence_mr+0x77/0x1d0 [bnxt_re]
+    [ 1337.530655]  bnxt_re_dealloc_pd+0x25/0x60 [bnxt_re]
+    [ 1337.530677]  ib_dealloc_pd_user+0xbe/0xe0 [ib_core]
+    [ 1337.530683]  srpt_remove_one+0x5de/0x690 [ib_srpt]
+    [ 1337.530689]  ? __srpt_close_all_ch+0xc0/0xc0 [ib_srpt]
+    [ 1337.530692]  ? xa_load+0x87/0xe0
+    ...
+    [ 1337.530840]  do_syscall_64+0x6d/0x1f0
+    [ 1337.530843]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+    [ 1337.530845] RIP: 0033:0x7ff5b389035b
+    [ 1337.530848] Code: 73 01 c3 48 8b 0d 2d 0b 2c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d fd 0a 2c 00 f7 d8 64 89 01 48
+    [ 1337.530849] RSP: 002b:00007fff83425c28 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+    [ 1337.530852] RAX: ffffffffffffffda RBX: 00005596443e6750 RCX: 00007ff5b389035b
+    [ 1337.530853] RDX: 000000000000000a RSI: 0000000000000800 RDI: 00005596443e67b8
+    [ 1337.530854] RBP: 0000000000000000 R08: 00007fff83424ba1 R09: 0000000000000000
+    [ 1337.530856] R10: 00007ff5b3902960 R11: 0000000000000206 R12: 00007fff83425e50
+    [ 1337.530857] R13: 00007fff8342673c R14: 00005596443e6260 R15: 00005596443e6750
+    
+    [ 1337.530885] The buggy address belongs to the page:
+    [ 1337.530962] page:ffffea001c951dc0 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0
+    [ 1337.530964] flags: 0x57ffffc0000000()
+    [ 1337.530967] raw: 0057ffffc0000000 0000000000000000 ffffffff1c950101 0000000000000000
+    [ 1337.530970] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+    [ 1337.530970] page dumped because: kasan: bad access detected
+    
+    [ 1337.530996] Memory state around the buggy address:
+    [ 1337.531072]  ffff888725477900: 00 00 00 00 f1 f1 f1 f1 00 00 00 00 00 f2 f2 f2
+    [ 1337.531180]  ffff888725477980: 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00
+    [ 1337.531288] >ffff888725477a00: 00 f2 f2 f2 f2 f2 f2 00 00 00 f2 00 00 00 00 00
+    [ 1337.531393]                                                  ^
+    [ 1337.531478]  ffff888725477a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    [ 1337.531585]  ffff888725477b00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    [ 1337.531691] ==================================================================
+    
+    Fix this by passing the exact size of each FW command to
+    bnxt_qplib_rcfw_send_message as req->cmd_size. Before sending
+    the command to HW, modify the req->cmd_size to number of 16 byte units.
+    
+    Fixes: 1ac5a4047975 ("RDMA/bnxt_re: Add bnxt_re RoCE driver")
+    Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
+    Link: https://lore.kernel.org/r/1566468170-489-1-git-send-email-selvin.xavier@broadcom.com
+    Signed-off-by: Doug Ledford <dledford@redhat.com>
+
+commit ad4350ed9d98ea121db4102ae12296b4f66c67e5
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    [ Upstream commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4 ]
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit dddb75a126856843e57f78feff807c4c40389c10
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    [ Upstream commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4 ]
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e95de01edc87e6b0f68c1d24568d98ae776b1531
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    [ Upstream commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4 ]
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit caf4488fc06ecafa0f359ff20d6e4569977a9f9e
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    [ Upstream commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4 ]
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit aa1a26b4d8b68dda13f997b67415632c1d963e45
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    [ Upstream commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4 ]
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 740fb5f8bb6f456f8791c03b4dee02c7eea4b2fb
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    [ Upstream commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4 ]
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e57f61858b7cf478ed6fa23ed4b3876b1c9625c4
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Tue Jul 2 15:00:18 2019 +0300
+
+    net: bridge: mcast: fix stale nsrcs pointer in igmp3/mld2 report handling
+    
+    We take a pointer to grec prior to calling pskb_may_pull and use it
+    afterwards to get nsrcs so record nsrcs before the pull when handling
+    igmp3 and we get a pointer to nsrcs and call pskb_may_pull when handling
+    mld2 which again could lead to reading 2 bytes out-of-bounds.
+    
+     ==================================================================
+     BUG: KASAN: use-after-free in br_multicast_rcv+0x480c/0x4ad0 [bridge]
+     Read of size 2 at addr ffff8880421302b4 by task ksoftirqd/1/16
+    
+     CPU: 1 PID: 16 Comm: ksoftirqd/1 Tainted: G           OE     5.2.0-rc6+ #1
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+     Call Trace:
+      dump_stack+0x71/0xab
+      print_address_description+0x6a/0x280
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      __kasan_report+0x152/0x1aa
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      kasan_report+0xe/0x20
+      br_multicast_rcv+0x480c/0x4ad0 [bridge]
+      ? br_multicast_disable_port+0x150/0x150 [bridge]
+      ? ktime_get_with_offset+0xb4/0x150
+      ? __kasan_kmalloc.constprop.6+0xa6/0xf0
+      ? __netif_receive_skb+0x1b0/0x1b0
+      ? br_fdb_update+0x10e/0x6e0 [bridge]
+      ? br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      br_handle_frame_finish+0x3c6/0x11d0 [bridge]
+      ? br_pass_frame_up+0x3a0/0x3a0 [bridge]
+      ? virtnet_probe+0x1c80/0x1c80 [virtio_net]
+      br_handle_frame+0x731/0xd90 [bridge]
+      ? select_idle_sibling+0x25/0x7d0
+      ? br_handle_frame_finish+0x11d0/0x11d0 [bridge]
+      __netif_receive_skb_core+0xced/0x2d70
+      ? virtqueue_get_buf_ctx+0x230/0x1130 [virtio_ring]
+      ? do_xdp_generic+0x20/0x20
+      ? virtqueue_napi_complete+0x39/0x70 [virtio_net]
+      ? virtnet_poll+0x94d/0xc78 [virtio_net]
+      ? receive_buf+0x5120/0x5120 [virtio_net]
+      ? __netif_receive_skb_one_core+0x97/0x1d0
+      __netif_receive_skb_one_core+0x97/0x1d0
+      ? __netif_receive_skb_core+0x2d70/0x2d70
+      ? _raw_write_trylock+0x100/0x100
+      ? __queue_work+0x41e/0xbe0
+      process_backlog+0x19c/0x650
+      ? _raw_read_lock_irq+0x40/0x40
+      net_rx_action+0x71e/0xbc0
+      ? __switch_to_asm+0x40/0x70
+      ? napi_complete_done+0x360/0x360
+      ? __switch_to_asm+0x34/0x70
+      ? __switch_to_asm+0x40/0x70
+      ? __schedule+0x85e/0x14d0
+      __do_softirq+0x1db/0x5f9
+      ? takeover_tasklets+0x5f0/0x5f0
+      run_ksoftirqd+0x26/0x40
+      smpboot_thread_fn+0x443/0x680
+      ? sort_range+0x20/0x20
+      ? schedule+0x94/0x210
+      ? __kthread_parkme+0x78/0xf0
+      ? sort_range+0x20/0x20
+      kthread+0x2ae/0x3a0
+      ? kthread_create_worker_on_cpu+0xc0/0xc0
+      ret_from_fork+0x35/0x40
+    
+     The buggy address belongs to the page:
+     page:ffffea0001084c00 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x0
+     flags: 0xffffc000000000()
+     raw: 00ffffc000000000 ffffea0000cfca08 ffffea0001098608 0000000000000000
+     raw: 0000000000000000 0000000000000003 00000000ffffff7f 0000000000000000
+     page dumped because: kasan: bad access detected
+    
+     Memory state around the buggy address:
+     ffff888042130180: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     > ffff888042130280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                         ^
+     ffff888042130300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff888042130380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ==================================================================
+     Disabling lock debugging due to kernel taint
+    
+    Fixes: bc8c20acaea1 ("bridge: multicast: treat igmpv3 report with INCLUDE and no sources as a leave")
+    Reported-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Tested-by: Martin Weinelt <martin@linuxlounge.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit c7aeaa4227002d6b24feb4746d6a342ae0c88a17
+Author: Amir Goldstein <amir73il@gmail.com>
+Date:   Sun May 13 22:54:44 2018 -0400
+
+    ext4: do not update s_last_mounted of a frozen fs
+    
+    commit db6516a5e7ddb6dc72d167b920f2f272596ea22d upstream.
+    
+    If fs is frozen after mount and before the first file open, the
+    update of s_last_mounted bypasses freeze protection and prints out
+    a WARNING splat:
+    
+    $ mount /vdf
+    $ fsfreeze -f /vdf
+    $ cat /vdf/foo
+    
+    [   31.578555] WARNING: CPU: 1 PID: 1415 at
+    fs/ext4/ext4_jbd2.c:53 ext4_journal_check_start+0x48/0x82
+    
+    [   31.614016] Call Trace:
+    [   31.614997]  __ext4_journal_start_sb+0xe4/0x1a4
+    [   31.616771]  ? ext4_file_open+0xb6/0x189
+    [   31.618094]  ext4_file_open+0xb6/0x189
+    
+    If fs is frozen, skip s_last_mounted update.
+    
+    [backport hint: to apply to stable tree, need to apply also patches
+     vfs: add the sb_start_intwrite_trylock() helper
+     ext4: factor out helper ext4_sample_last_mounted()]
+    
+    Fixes: bc0b0d6d69ee ("ext4: update the s_last_mounted field in the superblock")
+    Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    [bwh: Backported to 3.16: adjust context]
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 1a1c235b391833f0c2fe0a02592f1b8c3d04eaa8
+Author: Amir Goldstein <amir73il@gmail.com>
+Date:   Sun May 13 22:40:30 2018 -0400
+
+    vfs: add the sb_start_intwrite_trylock() helper
+    
+    commit 0c8e3fe35db9b66ae0030849545030ec7c0fc45c upstream.
+    
+    Needed by ext4 to test frozen fs before updating s_last_mounted.
+    
+    Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 1434763ca5b300ad3b880954bd32dc339d16a833
+Merge: 5037be168f0e 4f2f76f75143
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Jun 5 12:49:17 2018 -0700
+
+    Merge tag 'ext4_for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4
+    
+    Pull ext4 updates from Ted Ts'o:
+     "A lot of cleanups and bug fixes, especially dealing with corrupted
+      file systems"
+    
+    * tag 'ext4_for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4: (23 commits)
+      ext4: fix fencepost error in check for inode count overflow during resize
+      ext4: correctly handle a zero-length xattr with a non-zero e_value_offs
+      ext4: bubble errors from ext4_find_inline_data_nolock() up to ext4_iget()
+      ext4: do not allow external inodes for inline data
+      ext4: report delalloc reserve as non-free in statfs for project quota
+      ext4: remove NULL check before calling kmem_cache_destroy()
+      jbd2: remove NULL check before calling kmem_cache_destroy()
+      jbd2: remove bunch of empty lines with jbd2 debug
+      ext4: handle errors on ext4_commit_super
+      ext4: do not update s_last_mounted of a frozen fs
+      ext4: factor out helper ext4_sample_last_mounted()
+      vfs: add the sb_start_intwrite_trylock() helper
+      ext4: update mtime in ext4_punch_hole even if no blocks are released
+      ext4: add verifier check for symlink with append/immutable flags
+      fs: ext4: add new return type vm_fault_t
+      ext4: fix hole length detection in ext4_ind_map_blocks()
+      ext4: mark block bitmap corrupted when found
+      ext4: mark inode bitmap corrupted when found
+      ext4: add new ext4_mark_group_bitmap_corrupted() helper
+      ext4: fix wrong return value in ext4_read_inode_bitmap()
+      ...
+
+commit db6516a5e7ddb6dc72d167b920f2f272596ea22d
+Author: Amir Goldstein <amir73il@gmail.com>
+Date:   Sun May 13 22:54:44 2018 -0400
+
+    ext4: do not update s_last_mounted of a frozen fs
+    
+    If fs is frozen after mount and before the first file open, the
+    update of s_last_mounted bypasses freeze protection and prints out
+    a WARNING splat:
+    
+    $ mount /vdf
+    $ fsfreeze -f /vdf
+    $ cat /vdf/foo
+    
+    [   31.578555] WARNING: CPU: 1 PID: 1415 at
+    fs/ext4/ext4_jbd2.c:53 ext4_journal_check_start+0x48/0x82
+    
+    [   31.614016] Call Trace:
+    [   31.614997]  __ext4_journal_start_sb+0xe4/0x1a4
+    [   31.616771]  ? ext4_file_open+0xb6/0x189
+    [   31.618094]  ext4_file_open+0xb6/0x189
+    
+    If fs is frozen, skip s_last_mounted update.
+    
+    [backport hint: to apply to stable tree, need to apply also patches
+     vfs: add the sb_start_intwrite_trylock() helper
+     ext4: factor out helper ext4_sample_last_mounted()]
+    
+    Cc: stable@vger.kernel.org
+    Fixes: bc0b0d6d69ee ("ext4: update the s_last_mounted field in the superblock")
+    Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+
+commit 0c8e3fe35db9b66ae0030849545030ec7c0fc45c
+Author: Amir Goldstein <amir73il@gmail.com>
+Date:   Sun May 13 22:40:30 2018 -0400
+
+    vfs: add the sb_start_intwrite_trylock() helper
+    
+    Needed by ext4 to test frozen fs before updating s_last_mounted.
+    
+    Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+
+commit 294975841483c08e84572713f348cd51b8408021
+Author: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Date:   Mon Feb 5 22:18:11 2018 -0500
+
+    tracing: Fix parsing of globs with a wildcard at the beginning
+    
+    commit 07234021410bbc27b7c86c18de98616c29fbe667 upstream.
+    
+    Al Viro reported:
+    
+        For substring - sure, but what about something like "*a*b" and "a*b"?
+        AFAICS, filter_parse_regex() ends up with identical results in both
+        cases - MATCH_GLOB and *search = "a*b".  And no way for the caller
+        to tell one from another.
+    
+    Testing this with the following:
+    
+     # cd /sys/kernel/tracing
+     # echo '*raw*lock' > set_ftrace_filter
+     bash: echo: write error: Invalid argument
+    
+    With this patch:
+    
+     # echo '*raw*lock' > set_ftrace_filter
+     # cat set_ftrace_filter
+    _raw_read_trylock
+    _raw_write_trylock
+    _raw_read_unlock
+    _raw_spin_unlock
+    _raw_write_unlock
+    _raw_spin_trylock
+    _raw_spin_lock
+    _raw_write_lock
+    _raw_read_lock
+    
+    Al recommended not setting the search buffer to skip the first '*' unless we
+    know we are not using MATCH_GLOB. This implements his suggested logic.
+    
+    Link: http://lkml.kernel.org/r/20180127170748.GF13338@ZenIV.linux.org.uk
+    
+    Cc: stable@vger.kernel.org
+    Fixes: 60f1d5e3bac44 ("ftrace: Support full glob matching")
+    Reviewed-by: Masami Hiramatsu <mhiramat@kernel.org>
+    Reported-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Suggsted-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 95f92d0a0ca9dd0f4a92e9eb02b2b7b3d257d46f
+Author: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Date:   Mon Feb 5 22:18:11 2018 -0500
+
+    tracing: Fix parsing of globs with a wildcard at the beginning
+    
+    commit 07234021410bbc27b7c86c18de98616c29fbe667 upstream.
+    
+    Al Viro reported:
+    
+        For substring - sure, but what about something like "*a*b" and "a*b"?
+        AFAICS, filter_parse_regex() ends up with identical results in both
+        cases - MATCH_GLOB and *search = "a*b".  And no way for the caller
+        to tell one from another.
+    
+    Testing this with the following:
+    
+     # cd /sys/kernel/tracing
+     # echo '*raw*lock' > set_ftrace_filter
+     bash: echo: write error: Invalid argument
+    
+    With this patch:
+    
+     # echo '*raw*lock' > set_ftrace_filter
+     # cat set_ftrace_filter
+    _raw_read_trylock
+    _raw_write_trylock
+    _raw_read_unlock
+    _raw_spin_unlock
+    _raw_write_unlock
+    _raw_spin_trylock
+    _raw_spin_lock
+    _raw_write_lock
+    _raw_read_lock
+    
+    Al recommended not setting the search buffer to skip the first '*' unless we
+    know we are not using MATCH_GLOB. This implements his suggested logic.
+    
+    Link: http://lkml.kernel.org/r/20180127170748.GF13338@ZenIV.linux.org.uk
+    
+    Cc: stable@vger.kernel.org
+    Fixes: 60f1d5e3bac44 ("ftrace: Support full glob matching")
+    Reviewed-by: Masami Hiramatsu <mhiramat@kernel.org>
+    Reported-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Suggsted-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 07234021410bbc27b7c86c18de98616c29fbe667
+Author: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Date:   Mon Feb 5 22:18:11 2018 -0500
+
+    tracing: Fix parsing of globs with a wildcard at the beginning
+    
+    Al Viro reported:
+    
+        For substring - sure, but what about something like "*a*b" and "a*b"?
+        AFAICS, filter_parse_regex() ends up with identical results in both
+        cases - MATCH_GLOB and *search = "a*b".  And no way for the caller
+        to tell one from another.
+    
+    Testing this with the following:
+    
+     # cd /sys/kernel/tracing
+     # echo '*raw*lock' > set_ftrace_filter
+     bash: echo: write error: Invalid argument
+    
+    With this patch:
+    
+     # echo '*raw*lock' > set_ftrace_filter
+     # cat set_ftrace_filter
+    _raw_read_trylock
+    _raw_write_trylock
+    _raw_read_unlock
+    _raw_spin_unlock
+    _raw_write_unlock
+    _raw_spin_trylock
+    _raw_spin_lock
+    _raw_write_lock
+    _raw_read_lock
+    
+    Al recommended not setting the search buffer to skip the first '*' unless we
+    know we are not using MATCH_GLOB. This implements his suggested logic.
+    
+    Link: http://lkml.kernel.org/r/20180127170748.GF13338@ZenIV.linux.org.uk
+    
+    Cc: stable@vger.kernel.org
+    Fixes: 60f1d5e3bac44 ("ftrace: Support full glob matching")
+    Reviewed-by: Masami Hiramatsu <mhiramat@kernel.org>
+    Reported-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Suggsted-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+
+commit 01f196945a21b3eec37317e3bc5cf35f95f95063
+Author: Sascha Hauer <s.hauer@pengutronix.de>
+Date:   Fri Nov 24 12:17:14 2017 +0100
+
+    ubi: Fix copy/paste error in function documentation
+    
+    The function documentation of leb_write_trylock is copied from
+    leb_write_lock. Replace the function name with the correct one.
+    
+    Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+    Signed-off-by: Richard Weinberger <richard@nod.at>
+
+commit dc6febb6bcec7ff1b4a4d306411013b5f648f27e
+Author: Chao Yu <chao@kernel.org>
+Date:   Sat Jul 22 08:52:23 2017 +0800
+
+    f2fs: make background threads of f2fs being aware of freezing
+    
+    When ->freeze_fs is called from lvm for doing snapshot, it needs to
+    make sure there will be no more changes in filesystem's data, however,
+    previously, background threads like GC thread wasn't aware of freezing,
+    so in environment with active background threads, data of snapshot
+    becomes unstable.
+    
+    This patch fixes this issue by adding sb_{start,end}_intwrite in
+    below background threads:
+    - GC thread
+    - flush thread
+    - discard thread
+    
+    Note that, don't use sb_start_intwrite() in gc_thread_func() due to:
+    
+    generic/241 reports below bug:
+    
+     ======================================================
+     WARNING: possible circular locking dependency detected
+     4.13.0-rc1+ #32 Tainted: G           O
+     ------------------------------------------------------
+     f2fs_gc-250:0/22186 is trying to acquire lock:
+      (&sbi->gc_mutex){+.+...}, at: [<f8fa7f0b>] f2fs_sync_fs+0x7b/0x1b0 [f2fs]
+    
+     but task is already holding lock:
+      (sb_internal#2){++++.-}, at: [<f8fb5609>] gc_thread_func+0x159/0x4a0 [f2fs]
+    
+     which lock already depends on the new lock.
+    
+     the existing dependency chain (in reverse order) is:
+    
+     -> #2 (sb_internal#2){++++.-}:
+            __lock_acquire+0x405/0x7b0
+            lock_acquire+0xae/0x220
+            __sb_start_write+0x11d/0x1f0
+            f2fs_evict_inode+0x2d6/0x4e0 [f2fs]
+            evict+0xa8/0x170
+            iput+0x1fb/0x2c0
+            f2fs_sync_inode_meta+0x3f/0xf0 [f2fs]
+            write_checkpoint+0x1b1/0x750 [f2fs]
+            f2fs_sync_fs+0x85/0x1b0 [f2fs]
+            f2fs_do_sync_file.isra.24+0x137/0xa30 [f2fs]
+            f2fs_sync_file+0x34/0x40 [f2fs]
+            vfs_fsync_range+0x4a/0xa0
+            do_fsync+0x3c/0x60
+            SyS_fdatasync+0x15/0x20
+            do_fast_syscall_32+0xa1/0x1b0
+            entry_SYSENTER_32+0x4c/0x7b
+    
+     -> #1 (&sbi->cp_mutex){+.+...}:
+            __lock_acquire+0x405/0x7b0
+            lock_acquire+0xae/0x220
+            __mutex_lock+0x4f/0x830
+            mutex_lock_nested+0x25/0x30
+            write_checkpoint+0x2f/0x750 [f2fs]
+            f2fs_sync_fs+0x85/0x1b0 [f2fs]
+            sync_filesystem+0x67/0x80
+            generic_shutdown_super+0x27/0x100
+            kill_block_super+0x22/0x50
+            kill_f2fs_super+0x3a/0x40 [f2fs]
+            deactivate_locked_super+0x3d/0x70
+            deactivate_super+0x40/0x60
+            cleanup_mnt+0x39/0x70
+            __cleanup_mnt+0x10/0x20
+            task_work_run+0x69/0x80
+            exit_to_usermode_loop+0x57/0x92
+            do_fast_syscall_32+0x18c/0x1b0
+            entry_SYSENTER_32+0x4c/0x7b
+    
+     -> #0 (&sbi->gc_mutex){+.+...}:
+            validate_chain.isra.36+0xc50/0xdb0
+            __lock_acquire+0x405/0x7b0
+            lock_acquire+0xae/0x220
+            __mutex_lock+0x4f/0x830
+            mutex_lock_nested+0x25/0x30
+            f2fs_sync_fs+0x7b/0x1b0 [f2fs]
+            f2fs_balance_fs_bg+0xb9/0x200 [f2fs]
+            gc_thread_func+0x302/0x4a0 [f2fs]
+            kthread+0xe9/0x120
+            ret_from_fork+0x19/0x24
+    
+     other info that might help us debug this:
+    
+     Chain exists of:
+       &sbi->gc_mutex --> &sbi->cp_mutex --> sb_internal#2
+    
+      Possible unsafe locking scenario:
+    
+            CPU0                    CPU1
+            ----                    ----
+       lock(sb_internal#2);
+                                    lock(&sbi->cp_mutex);
+                                    lock(sb_internal#2);
+       lock(&sbi->gc_mutex);
+    
+      *** DEADLOCK ***
+    
+     1 lock held by f2fs_gc-250:0/22186:
+      #0:  (sb_internal#2){++++.-}, at: [<f8fb5609>] gc_thread_func+0x159/0x4a0 [f2fs]
+    
+     stack backtrace:
+     CPU: 2 PID: 22186 Comm: f2fs_gc-250:0 Tainted: G           O    4.13.0-rc1+ #32
+     Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
+     Call Trace:
+      dump_stack+0x5f/0x92
+      print_circular_bug+0x1b3/0x1bd
+      validate_chain.isra.36+0xc50/0xdb0
+      ? __this_cpu_preempt_check+0xf/0x20
+      __lock_acquire+0x405/0x7b0
+      lock_acquire+0xae/0x220
+      ? f2fs_sync_fs+0x7b/0x1b0 [f2fs]
+      __mutex_lock+0x4f/0x830
+      ? f2fs_sync_fs+0x7b/0x1b0 [f2fs]
+      mutex_lock_nested+0x25/0x30
+      ? f2fs_sync_fs+0x7b/0x1b0 [f2fs]
+      f2fs_sync_fs+0x7b/0x1b0 [f2fs]
+      f2fs_balance_fs_bg+0xb9/0x200 [f2fs]
+      gc_thread_func+0x302/0x4a0 [f2fs]
+      ? preempt_schedule_common+0x2f/0x4d
+      ? f2fs_gc+0x540/0x540 [f2fs]
+      kthread+0xe9/0x120
+      ? f2fs_gc+0x540/0x540 [f2fs]
+      ? kthread_create_on_node+0x30/0x30
+      ret_from_fork+0x19/0x24
+    
+    The deadlock occurs in below condition:
+    GC Thread                       Thread B
+    - sb_start_intwrite
+                                    - f2fs_sync_file
+                                     - f2fs_sync_fs
+                                      - mutex_lock(&sbi->gc_mutex)
+                                       - write_checkpoint
+                                        - block_operations
+                                         - f2fs_sync_inode_meta
+                                          - iput
+                                           - sb_start_intwrite
+     - mutex_lock(&sbi->gc_mutex)
+    
+    Fix this by altering sb_start_intwrite to sb_start_write_trylock.
+    
+    Signed-off-by: Chao Yu <yuchao0@huawei.com>
+    Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+
+commit c907420fdaec78b17f59a6011cb5f9d6051c6a35
+Author: Jan Beulich <JBeulich@suse.com>
+Date:   Mon Sep 19 07:27:08 2016 -0600
+
+    locking/rwsem, x86: Drop a bogus cc clobber
+    
+    With the addition of uses of GCC's condition code outputs in commit:
+    
+      35ccfb7114 ("x86, asm: Use CC_SET()/CC_OUT() in <asm/rwsem.h>")
+    
+    ... there's now an overlap of outputs and clobbers in __down_write_trylock().
+    
+    Such overlaps are generally getting tagged with an error (occasionally
+    even with an ICE). I can't really tell why plain GCC 6.2 doesn't detect
+    this (judging by the code it is meant to), while the slightly modified
+    one I use does. Since condition code clobbers are never necessary on x86
+    (other than perhaps for documentation purposes, which doesn't really
+    get done consistently), remove it altogether rather than inventing
+    something like CC_CLOBBER (to accompany CC_SET/CC_OUT).
+    
+    Signed-off-by: Jan Beulich <jbeulich@suse.com>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Andy Lutomirski <luto@kernel.org>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Link: http://lkml.kernel.org/r/57E003CC0200007800110102@prv-mh.provo.novell.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit b108c975f4d210be89eacdec93bf8d34e7edbcc6
+Author: Kirill Tkhai <tkhai@yandex.ru>
+Date:   Mon Aug 12 16:02:24 2013 +0400
+
+    sparc64: Remove RWSEM export leftovers
+    
+    [ Upstream commit 61d9b9355b0d427bd1e732bd54628ff9103e496f ]
+    
+    The functions
+    
+                            __down_read
+                            __down_read_trylock
+                            __down_write
+                            __down_write_trylock
+                            __up_read
+                            __up_write
+                            __downgrade_write
+    
+    are implemented inline, so remove corresponding EXPORT_SYMBOLs
+    (They lead to compile errors on RT kernel).
+    
+    Signed-off-by: Kirill Tkhai <tkhai@yandex.ru>
+    CC: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 47da75cd1eccef5e203c326bcf74a70701d4f158
+Author: Kirill Tkhai <tkhai@yandex.ru>
+Date:   Mon Aug 12 16:02:24 2013 +0400
+
+    sparc64: Remove RWSEM export leftovers
+    
+    [ Upstream commit 61d9b9355b0d427bd1e732bd54628ff9103e496f ]
+    
+    The functions
+    
+                            __down_read
+                            __down_read_trylock
+                            __down_write
+                            __down_write_trylock
+                            __up_read
+                            __up_write
+                            __downgrade_write
+    
+    are implemented inline, so remove corresponding EXPORT_SYMBOLs
+    (They lead to compile errors on RT kernel).
+    
+    Signed-off-by: Kirill Tkhai <tkhai@yandex.ru>
+    CC: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 32f0ba8e21166ec3ac11d692852d6d3e768942a4
+Author: Kirill Tkhai <tkhai@yandex.ru>
+Date:   Mon Aug 12 16:02:24 2013 +0400
+
+    sparc64: Remove RWSEM export leftovers
+    
+    [ Upstream commit 61d9b9355b0d427bd1e732bd54628ff9103e496f ]
+    
+    The functions
+    
+                            __down_read
+                            __down_read_trylock
+                            __down_write
+                            __down_write_trylock
+                            __up_read
+                            __up_write
+                            __downgrade_write
+    
+    are implemented inline, so remove corresponding EXPORT_SYMBOLs
+    (They lead to compile errors on RT kernel).
+    
+    Signed-off-by: Kirill Tkhai <tkhai@yandex.ru>
+    CC: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cf818489ca512369e2c6ac57307284e171a1d588
+Author: Kirill Tkhai <tkhai@yandex.ru>
+Date:   Mon Aug 12 16:02:24 2013 +0400
+
+    sparc64: Remove RWSEM export leftovers
+    
+    [ Upstream commit 61d9b9355b0d427bd1e732bd54628ff9103e496f ]
+    
+    The functions
+    
+                            __down_read
+                            __down_read_trylock
+                            __down_write
+                            __down_write_trylock
+                            __up_read
+                            __up_write
+                            __downgrade_write
+    
+    are implemented inline, so remove corresponding EXPORT_SYMBOLs
+    (They lead to compile errors on RT kernel).
+    
+    Signed-off-by: Kirill Tkhai <tkhai@yandex.ru>
+    CC: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ca0bd2082f83ccf6abbb2db2e4475bb81b415118
+Author: Kirill Tkhai <tkhai@yandex.ru>
+Date:   Mon Aug 12 16:02:24 2013 +0400
+
+    sparc64: Remove RWSEM export leftovers
+    
+    [ Upstream commit 61d9b9355b0d427bd1e732bd54628ff9103e496f ]
+    
+    The functions
+    
+                            __down_read
+                            __down_read_trylock
+                            __down_write
+                            __down_write_trylock
+                            __up_read
+                            __up_write
+                            __downgrade_write
+    
+    are implemented inline, so remove corresponding EXPORT_SYMBOLs
+    (They lead to compile errors on RT kernel).
+    
+    Signed-off-by: Kirill Tkhai <tkhai@yandex.ru>
+    CC: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 61d9b9355b0d427bd1e732bd54628ff9103e496f
+Author: Kirill Tkhai <tkhai@yandex.ru>
+Date:   Mon Aug 12 16:02:24 2013 +0400
+
+    sparc64: Remove RWSEM export leftovers
+    
+    The functions
+    
+                            __down_read
+                            __down_read_trylock
+                            __down_write
+                            __down_write_trylock
+                            __up_read
+                            __up_write
+                            __downgrade_write
+    
+    are implemented inline, so remove corresponding EXPORT_SYMBOLs
+    (They lead to compile errors on RT kernel).
+    
+    Signed-off-by: Kirill Tkhai <tkhai@yandex.ru>
+    CC: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit a31a369b07cf306ae1de0b2d4a52c3821a570bf6
+Author: Michel Lespinasse <michel@lespinasse.org>
+Date:   Tue May 7 06:46:01 2013 -0700
+
+    x86 rwsem: avoid taking slow path when stealing write lock
+    
+    modify __down_write[_nested] and __down_write_trylock to grab the write
+    lock whenever the active count is 0, even if there are queued waiters
+    (they must be writers pending wakeup, since the active count is 0).
+    
+    Note that this is an optimization only; architectures without this
+    optimization will still work fine:
+    
+    - __down_write() would take the slow path which would take the wait_lock
+      and then try stealing the lock (as in the spinlocked rwsem implementation)
+    
+    - __down_write_trylock() would fail, but callers must be ready to deal
+      with that - since there are some writers pending wakeup, they could
+      have raced with us and obtained the lock before we steal it.
+    
+    Signed-off-by: Michel Lespinasse <walken@google.com>
+    Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
+    Acked-by: Davidlohr Bueso <davidlohr.bueso@hp.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 00addd1a2de8d83dc3a5d6bb926911268ec716c9
+Author: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Date:   Wed Oct 17 16:54:27 2012 +0200
+
+    CRIS: locking: fix the return value of arch_read_trylock()
+    
+    arch_write_trylock() should return 'ret' instead of always
+    return 1.
+    
+    dpatch engine is used to auto generate this patch.
+    (https://github.com/weiyj/dpatch)
+    
+    Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+    Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
+
+commit 80168676ebfe4af51407d30f336d67f082d45201
+Author: Dave Chinner <dchinner@redhat.com>
+Date:   Fri Sep 24 18:13:44 2010 +1000
+
+    xfs: force background CIL push under sustained load
+    
+    I have been seeing occasional pauses in transaction throughput up to
+    30s long under heavy parallel workloads. The only notable thing was
+    that the xfsaild was trying to be active during the pauses, but
+    making no progress. It was running exactly 20 times a second (on the
+    50ms no-progress backoff), and the number of pushbuf events was
+    constant across this time as well.  IOWs, the xfsaild appeared to be
+    stuck on buffers that it could not push out.
+    
+    Further investigation indicated that it was trying to push out inode
+    buffers that were pinned and/or locked. The xfsbufd was also getting
+    woken at the same frequency (by the xfsaild, no doubt) to push out
+    delayed write buffers. The xfsbufd was not making any progress
+    because all the buffers in the delwri queue were pinned. This scan-
+    and-make-no-progress dance went one in the trace for some seconds,
+    before the xfssyncd came along an issued a log force, and then
+    things started going again.
+    
+    However, I noticed something strange about the log force - there
+    were way too many IO's issued. 516 log buffers were written, to be
+    exact. That added up to 129MB of log IO, which got me very
+    interested because it's almost exactly 25% of the size of the log.
+    He delayed logging code is suppose to aggregate the minimum of 25%
+    of the log or 8MB worth of changes before flushing. That's what
+    really puzzled me - why did a log force write 129MB instead of only
+    8MB?
+    
+    Essentially what has happened is that no CIL pushes had occurred
+    since the previous tail push which cleared out 25% of the log space.
+    That caused all the new transactions to block because there wasn't
+    log space for them, but they kick the xfsaild to push the tail.
+    However, the xfsaild was not making progress because there were
+    buffers it could not lock and flush, and the xfsbufd could not flush
+    them because they were pinned. As a result, both the xfsaild and the
+    xfsbufd could not move the tail of the log forward without the CIL
+    first committing.
+    
+    The cause of the problem was that the background CIL push, which
+    should happen when 8MB of aggregated changes have been committed, is
+    being held off by the concurrent transaction commit load. The
+    background push does a down_write_trylock() which will fail if there
+    is a concurrent transaction commit holding the push lock in read
+    mode. With 8 CPUs all doing transactions as fast as they can, there
+    was enough concurrent transaction commits to hold off the background
+    push until tail-pushing could no longer free log space, and the halt
+    would occur.
+    
+    It should be noted that there is no reason why it would halt at 25%
+    of log space used by a single CIL checkpoint. This bug could
+    definitely violate the "no transaction should be larger than half
+    the log" requirement and hence result in corruption if the system
+    crashed under heavy load. This sort of bug is exactly the reason why
+    delayed logging was tagged as experimental....
+    
+    The fix is to start blocking background pushes once the threshold
+    has been exceeded. Rework the threshold calculations to keep the
+    amount of log space a CIL checkpoint can use to below that of the
+    AIL push threshold to avoid the problem completely.
+    
+    Signed-off-by: Dave Chinner <dchinner@redhat.com>
+    Reviewed-by: Alex Elder <aelder@sgi.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+commit 6175ecfed3c81d388735c75f7a0ad08dc4de02d3
+Author: Sripathi Kodi <sripathik@in.ibm.com>
+Date:   Sun Jul 15 23:39:26 2007 -0700
+
+    Use write_trylock_irqsave in ptrace_attach
+    
+    This patch makes ptrace_attach use write_trylock_irqsave().
+    
+    [akpm@linux-foundation.org: remove unneeded initialisation]
+    Signed-off-by: Sripathi Kodi <sripathik@in.ibm.com>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: Oleg Nesterov <oleg@tv-sign.ru>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit e1f4a88c5a15a86124a95ea712213bb7dab2ad99
+Author: Satyam Sharma <ssatyam@cse.iitk.ac.in>
+Date:   Sun Jul 15 23:39:24 2007 -0700
+
+    introduce write_trylock_irqsave()
+    
+    Introduce a write_trylock_irqsave() implementation.  Similar in style to
+    the implementation of spin_trylock_irqsave() in mainline.
+    
+    Signed-off-by: Satyam Sharma <ssatyam@cse.iitk.ac.in>
+    Cc: Sripathi Kodi <sripathik@in.ibm.com>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 24bce5080306bd5255cbda3d6b09a29d5515b470
+Author: Roland Dreier <rolandd@cisco.com>
+Date:   Thu Jun 21 11:05:58 2007 -0700
+
+    IB/umem: Fix possible hang on process exit
+    
+    If ib_umem_release() is called after ib_uverbs_close() sets context->closing,
+    then a process can get stuck in a D state, because the code boils down to
+    
+            if (down_write_trylock(&mm->mmap_sem))
+                    down_write(&mm->mmap_sem);
+    
+    which is obviously a stupid instant deadlock.  Fix the code so that we
+    only try to take the lock once.
+    
+    This bug was introduced in commit f7c6a7b5 ("IB/uverbs: Export
+    ib_umem_get()/ib_umem_release() to modules") which fortunately never
+    made it into a release, and was reported by Pete Wyckoff <pw@osc.edu>.
+    
+    Signed-off-by: Roland Dreier <rolandd@cisco.com>
+
+commit 428e6ce023c5890cfecc8ad10335da3f28dbf893
+Author: Pavel Emelianov <xemul@sw.ru>
+Date:   Tue May 8 00:29:10 2007 -0700
+
+    Lockdep treats down_write_trylock like regular down_write
+    
+    This causes constructions like
+    
+    down_write(&mm1->mmap_sem);
+    if (down_write_trylock(&mm2->mmap_sem)) {
+           ...
+           up_write(&mm2->mmap_sem);
+    }
+    up_write(&mm1->mmap_sem);
+    
+    generate a lockdep warning about circular locking dependence.
+    
+    Call rwsem_acquire() with trylock set to 1.
+    
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: Arjan van de Ven <arjan@infradead.org>
+    Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit ef6edc9746dc2bfdacf44eefd5f881179971c478
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Sat Sep 30 23:27:43 2006 -0700
+
+    [PATCH] Directed yield: cpu_relax variants for spinlocks and rw-locks
+    
+    On systems running with virtual cpus there is optimization potential in
+    regard to spinlocks and rw-locks.  If the virtual cpu that has taken a lock
+    is known to a cpu that wants to acquire the same lock it is beneficial to
+    yield the timeslice of the virtual cpu in favour of the cpu that has the
+    lock (directed yield).
+    
+    With CONFIG_PREEMPT="n" this can be implemented by the architecture without
+    common code changes.  Powerpc already does this.
+    
+    With CONFIG_PREEMPT="y" the lock loops are coded with _raw_spin_trylock,
+    _raw_read_trylock and _raw_write_trylock in kernel/spinlock.c.  If the lock
+    could not be taken cpu_relax is called.  A directed yield is not possible
+    because cpu_relax doesn't know anything about the lock.  To be able to
+    yield the lock in favour of the current lock holder variants of cpu_relax
+    for spinlocks and rw-locks are needed.  The new _raw_spin_relax,
+    _raw_read_relax and _raw_write_relax primitives differ from cpu_relax
+    insofar that they have an argument: a pointer to the lock structure.
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: Paul Mackerras <paulus@samba.org>
+    Cc: Haavard Skinnemoen <hskinnemoen@atmel.com>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>

@@ -1,0 +1,173 @@
+commit de2070fc4aa7c0205348010f500f5abce012e67b
+Author: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+Date:   Fri Nov 16 18:22:40 2012 +0530
+
+    ath6kl: Fix kernel panic on continuous driver load/unload
+    
+    On continuous loading and unloading of AR6004 ath6kl USB
+    driver it triggers a panic due to NULL pointer dereference of
+    'target' pointer.
+    
+    while true; do sudo modprobe -v ath6kl_core;
+    sudo modprobe -v ath6kl_usb; sudo modprobe -r usb;
+    sudo modprobe -r ath6kl_core; done
+    
+    ar->htc_target can be NULL due to a race condition that can occur
+    during driver initialization(we do 'ath6kl_hif_power_on' before
+    initializing 'ar->htc_target' via 'ath6kl_htc_create').
+    'ath6kl_hif_power_on' assigns 'ath6kl_recv_complete' as
+    usb_complete_t/callback function for 'usb_fill_bulk_urb'.
+    Thus the possibility of ar->htc_target being NULL
+    via ath6kl_recv_complete -> ath6kl_usb_io_comp_work
+    before even 'ath6kl_htc_create' is finished to initialize
+    ar->htc_create.
+    
+    Worth noting is the obvious solution  of doing 'ath6kl_hif_power_on'
+    later(i.e after we are done with 'ath6kl_htc_create', causes a
+    h/w bring up failure in AR6003 SDIO, as 'ath6kl_hif_power_on' is a
+    pre-requisite to get the target version 'ath6kl_bmi_get_target_info'.
+    So simply check for NULL pointer for 'ar->htc_target' and bail out.
+    
+    [23614.518282] BUG: unable to handle kernel NULL pointer dereference at
+    00000904
+    [23614.518463] IP: [<c012e7a6>] __ticket_spin_trylock+0x6/0x30
+    [23614.518570] *pde = 00000000
+    [23614.518664] Oops: 0000 [#1] SMP
+    [23614.518795] Modules linked in: ath6kl_usb(O+) ath6kl_core(O)
+    [23614.520012] EIP: 0060:[<c012e7a6>] EFLAGS: 00010286 CPU: 0
+    [23614.520012] EIP is at __ticket_spin_trylock+0x6/0x30
+    Call Trace:
+            [<c03f2a44>] do_raw_spin_trylock+0x14/0x40
+            [<c06daa12>] _raw_spin_lock_bh+0x52/0x80
+            [<f85464b4>] ? ath6kl_htc_pipe_rx_complete+0x3b4/0x4c0 [ath6kl_core]
+            [<f85464b4>] ath6kl_htc_pipe_rx_complete+0x3b4/0x4c0 [ath6kl_core]
+            [<c05bc272>] ? skb_dequeue+0x22/0x70
+            [<c05bc272>] ? skb_dequeue+0x22/0x70
+            [<f855bb32>] ath6kl_core_rx_complete+0x12/0x20 [ath6kl_core]
+            [<f848771a>] ath6kl_usb_io_comp_work+0xaa/0xb0 [ath6kl_usb]
+            [<c015b863>] process_one_work+0x1a3/0x5e0
+            [<c015b7e7>] ? process_one_work+0x127/0x5e0
+            [<f8487670>] ? ath6kl_usb_reset_resume+0x30/0x30 [ath6kl_usb]
+            [<c015bfde>] worker_thread+0x11e/0x3f0
+            Kernel panic - not syncing: Fatal exception in interrupt
+    
+    Signed-off-by: Mohammed Shafi Shajakhan <mohammed@qca.qualcomm.com>
+    Signed-off-by: Kalle Valo <kvalo@qca.qualcomm.com>
+
+commit 5fd862f1db941c302a872ed7e67eab593a6a931a
+Merge: 8e6d539e0fd0 695d16f78708
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Oct 28 05:43:29 2011 -0700
+
+    Merge branch 'x86-spinlocks-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    * 'x86-spinlocks-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:
+      x86, ticketlock: remove obsolete comment
+      x86, cmpxchg: Use __compiletime_error() to make usage messages a bit nicer
+      x86, ticketlock: Make __ticket_spin_trylock common
+      x86, ticketlock: Convert __ticket_spin_lock to use xadd()
+      x86, ticketlock: Convert spin loop to C
+      x86, ticketlock: Clean up types and accessors
+      x86: Use xadd helper more widely
+      x86: Add xadd helper macro
+      x86, cmpxchg: Unify cmpxchg into cmpxchg.h
+      x86, cmpxchg: Move 64-bit set64_bit() to match 32-bit
+      x86, cmpxchg: Move 32-bit __cmpxchg_wrong_size to match 64 bit.
+      x86, cmpxchg: <linux/alternative.h> has LOCK_PREFIX
+
+commit 229855d6f3b40d01a903120c433d75e483a0b06d
+Author: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+Date:   Tue Jul 13 15:14:26 2010 -0700
+
+    x86, ticketlock: Make __ticket_spin_trylock common
+    
+    Make trylock code common regardless of ticket size.
+    
+    (Also, rename arch_spinlock.slock to head_tail.)
+    
+    Signed-off-by: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+    Link: http://lkml.kernel.org/r/4E5BCC40.3030501@goop.org
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 7fd29aa920273b70be50c14c4b7e2213fb6623ce
+Author: Nicholas Bellinger <nab@linux-iscsi.org>
+Date:   Thu Jun 23 23:48:32 2011 +0000
+
+    target: Fix transport_get_lun_for_tmr failure cases
+    
+    This patch fixes two possible NULL pointer dereferences in target v4.0
+    code where se_tmr release path in core_tmr_release_req() can OOPs upon
+    transport_get_lun_for_tmr() failure by attempting to access se_device or
+    se_tmr->tmr_list without a valid member of se_device->tmr_list during
+    transport_free_se_cmd() release.  This patch moves the se_tmr->tmr_dev
+    pointer assignment in transport_get_lun_for_tmr() until after possible
+    -ENODEV failures during unpacked_lun lookup.
+    
+    This addresses an OOPs originally reported with LIO v4.1 upstream on
+    .39 code here:
+    
+        TARGET_CORE[qla2xxx]: Detected NON_EXISTENT_LUN Access for 0x00000000
+        BUG: unable to handle kernel NULL pointer dereference at 0000000000000550
+        IP: [<ffffffff81035ec4>] __ticket_spin_trylock+0x4/0x20
+        PGD 0
+        Oops: 0000 [#1] SMP
+        last sysfs file: /sys/devices/system/cpu/cpu23/cache/index2/shared_cpu_map
+        CPU 1
+        Modules linked in: netconsole target_core_pscsi target_core_file
+    tcm_qla2xxx target_core_iblock tcm_loop target_core_mod configfs
+    ipmi_devintf ipmi_si ipmi_msghandler serio_raw i7core_edac ioatdma dca
+    edac_core ps_bdrv ses enclosure usbhid usb_storage ahci qla2xxx hid
+    uas e1000e mpt2sas libahci mlx4_core scsi_transport_fc
+    scsi_transport_sas raid_class scsi_tgt [last unloaded: netconsole]
+    
+        Pid: 0, comm: kworker/0:0 Tainted: G        W   2.6.39+ #1 Xyratex Storage Server
+        RIP: 0010:[<ffffffff81035ec4>] [<ffffffff81035ec4>]__ticket_spin_trylock+0x4/0x20
+        RSP: 0018:ffff88063e803c08  EFLAGS: 00010286
+        RAX: ffff880619ab45e0 RBX: 0000000000000550 RCX: 0000000000000000
+        RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000550
+        RBP: ffff88063e803c08 R08: 0000000000000002 R09: 0000000000000000
+        R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000568
+        R13: 0000000000000001 R14: 0000000000000000 R15: ffff88060cd96a20
+        FS:  0000000000000000(0000) GS:ffff88063e800000(0000) knlGS:0000000000000000
+        CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+        CR2: 0000000000000550 CR3: 0000000001a03000 CR4: 00000000000006e0
+        DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+        DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+        Process kworker/0:0 (pid: 0, threadinfo ffff880619ab8000, task ffff880619ab45e0)
+        Stack:
+         ffff88063e803c28 ffffffff812cf039 0000000000000550 0000000000000568
+         ffff88063e803c58 ffffffff8157071e ffffffffa028a1dc ffff88060f7e4600
+         0000000000000550 ffff880616961480 ffff88063e803c78 ffffffffa028a1dc
+        Call Trace:
+    <IRQ>
+         [<ffffffff812cf039>] do_raw_spin_trylock+0x19/0x50
+         [<ffffffff8157071e>] _raw_spin_lock+0x3e/0x70
+         [<ffffffffa028a1dc>] ? core_tmr_release_req+0x2c/0x60 [target_core_mod]
+         [<ffffffffa028a1dc>] core_tmr_release_req+0x2c/0x60 [target_core_mod]
+         [<ffffffffa028d0d2>] transport_free_se_cmd+0x22/0x50 [target_core_mod]
+         [<ffffffffa028d120>] transport_release_cmd_to_pool+0x20/0x40 [target_core_mod]
+         [<ffffffffa028e525>] transport_generic_free_cmd+0xa5/0xb0 [target_core_mod]
+         [<ffffffffa0147cc4>] tcm_qla2xxx_handle_tmr+0xc4/0xd0 [tcm_qla2xxx]
+         [<ffffffffa0191ba3>] __qla24xx_handle_abts+0xd3/0x150 [qla2xxx]
+         [<ffffffffa0197651>] qla_tgt_response_pkt+0x171/0x520 [qla2xxx]
+         [<ffffffffa0197a2d>] qla_tgt_response_pkt_all_vps+0x2d/0x220 [qla2xxx]
+         [<ffffffffa0171dd3>] qla24xx_process_response_queue+0x1a3/0x670 [qla2xxx]
+         [<ffffffffa0196281>] ? qla24xx_atio_pkt+0x81/0x120 [qla2xxx]
+         [<ffffffffa0174025>] ? qla24xx_msix_default+0x45/0x2a0 [qla2xxx]
+         [<ffffffffa0174198>] qla24xx_msix_default+0x1b8/0x2a0 [qla2xxx]
+         [<ffffffff810dadb4>] handle_irq_event_percpu+0x54/0x210
+         [<ffffffff810dafb8>] handle_irq_event+0x48/0x70
+         [<ffffffff810dd5ee>] ? handle_edge_irq+0x1e/0x110
+         [<ffffffff810dd647>] handle_edge_irq+0x77/0x110
+         [<ffffffff8100d362>] handle_irq+0x22/0x40
+         [<ffffffff8157b28d>] do_IRQ+0x5d/0xe0
+         [<ffffffff81571413>] common_interrupt+0x13/0x13
+    <EOI>
+         [<ffffffff813003f7>] ? intel_idle+0xd7/0x130
+         [<ffffffff813003f0>] ? intel_idle+0xd0/0x130
+         [<ffffffff8144832b>] cpuidle_idle_call+0xab/0x1c0
+         [<ffffffff8100a26b>] cpu_idle+0xab/0xf0
+         [<ffffffff81566c59>] start_secondary+0x1cb/0x1d2
+    
+    Reported-by: Roland Dreier <roland@purestorage.com>
+    Signed-off-by: Nicholas Bellinger <nab@linux-iscsi.org>

@@ -1,0 +1,2007 @@
+commit d32c1530c7230b756ca9a6b6cf92ce6e60788594
+Author: Hector Martin <marcan@marcan.st>
+Date:   Tue Feb 15 21:34:10 2022 +0900
+
+    arm64: dts: apple: Add CPU topology & cpufreq nodes for t600x
+    
+    Add the missing CPU topology/capacity information and the cpufreq nodes,
+    so we can have CPU frequency scaling and the scheduler has the
+    information it needs to make the correct decisions.
+    
+    As with t8103, boost states are commented out pending PSCI/etc support
+    for deep sleep states.
+    
+    Reviewed-by: Sven Peter <sven@svenpeter.dev>
+    Signed-off-by: Hector Martin <marcan@marcan.st>
+
+commit 3e895a6460ec38edca956a5202c252bbbd37576b
+Author: Hector Martin <marcan@marcan.st>
+Date:   Tue May 3 00:08:56 2022 +0900
+
+    arm64: dts: apple: Add CPU topology & cpufreq nodes for t8103
+    
+    Add the missing CPU topology/capacity information and the cpufreq nodes,
+    so we can have CPU frequency scaling and the scheduler has the
+    information it needs to make the correct decisions.
+    
+    Boost states are commented out, as they are not yet available (that
+    requires CPU deep sleep support, to be eventually done via PSCI).
+    The driver supports them fine; the hardware will just refuse to ever
+    go into them at this time, so don't expose them to users until that's
+    done.
+    
+    Acked-by: Marc Zyngier <maz@kernel.org>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Hector Martin <marcan@marcan.st>
+
+commit 6286bbb40576ffadfde206c332b61345c19af57f
+Author: Hector Martin <marcan@marcan.st>
+Date:   Mon Nov 28 23:29:11 2022 +0900
+
+    cpufreq: apple-soc: Add new driver to control Apple SoC CPU P-states
+    
+    This driver implements CPU frequency scaling for Apple Silicon SoCs,
+    including M1 (t8103), M1 Max/Pro/Ultra (t600x), and M2 (t8112).
+    
+    Each CPU cluster has its own register set, and frequency management is
+    fully automated by the hardware; the driver only has to write one
+    register. There is boost frequency support, but the hardware will only
+    allow their use if only a subset of cores in a cluster are in
+    non-deep-idle. Since we don't support deep idle yet, these frequencies
+    are not achievable, but the driver supports them. They will remain
+    disabled in the device tree until deep idle is implemented, to avoid
+    confusing users.
+    
+    This driver does not yet implement the memory controller performance
+    state tuning that usually accompanies higher CPU p-states. This will be
+    done in a future patch.
+    
+    Acked-by: Marc Zyngier <maz@kernel.org>
+    Signed-off-by: Hector Martin <marcan@marcan.st>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+
+commit 20d7a9fb00ebc53e73d49df0048afb02ef92a635
+Author: Bjorn Andersson <bjorn.andersson@linaro.org>
+Date:   Wed Aug 4 12:30:42 2021 -0700
+
+    arm64: defconfig: Enable Qualcomm MSM8996 CPU clock driver
+    
+    The MSM8996 supports CPU frequency scaling, so enable the clock driver
+    for this.
+    
+    Acked-by: Konrad Dybcio <konrad.dybcio@somainline.org>
+    Link: https://lore.kernel.org/r/20210804193042.1155398-1-bjorn.andersson@linaro.org
+    Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+
+commit f28dec1ab71bddc76fb8931a16d5d42c13a048cc
+Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Date:   Mon Jan 18 09:41:56 2021 +0530
+
+    clk: qcom: Add SDX55 APCS clock controller support
+    
+    Add a driver for the SDX55 APCS clock controller. It is part of the APCS
+    hardware block, which among other things implements also a combined mux
+    and half integer divider functionality. The APCS clock controller has 3
+    parent clocks:
+    
+    1. Board XO
+    2. Fixed rate GPLL0
+    3. A7 PLL
+    
+    This is required for enabling CPU frequency scaling on SDX55-based
+    platforms.
+    
+    Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+    Link: https://lore.kernel.org/r/20210118041156.50016-6-manivannan.sadhasivam@linaro.org
+    [sboyd@kernel.org: Fix unused ret in probe by hardcoding it]
+    Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+
+commit 0f4b0b479b3566a2d61ede6e02c01a81454a0ddf
+Merge: 6f7cdd2fbfff 6a7dc2b3639a
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Tue Dec 8 17:16:46 2020 +0100
+
+    Merge tag 'arm-soc/for-5.11/defconfig-arm64' of https://github.com/Broadcom/stblinux into arm/defconfig
+    
+    This pull request contains ARM64 defconfig changes for 5.11, please pull
+    the following:
+    
+    - Florian enables the ARM SCMI protocol, and the common clock, HWMON and
+      CPU frequency scaling drivers since those are used by ARCH_BRCMSTB
+      platforms
+    
+    * tag 'arm-soc/for-5.11/defconfig-arm64' of https://github.com/Broadcom/stblinux:
+      arm64: defconfig: Enable ARM SCMI protocol and drivers
+    
+    Link: https://lore.kernel.org/r/20201128163410.1691529-2-f.fainelli@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 6f7cdd2fbfffbeb9de3d2bd1855c2ef72f0e7ef0
+Merge: 69f7aeee0667 950be99fccff
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Tue Dec 8 17:15:50 2020 +0100
+
+    Merge tag 'arm-soc/for-5.11/defconfig' of https://github.com/Broadcom/stblinux into arm/defconfig
+    
+    This pull request contains ARM multi_v7_defconfig changes for 5.11,
+    please pull the following:
+    
+    - Florian enables the ARM SCMI protocol, and the common clock, HWMON and
+      CPU frequency scaling drivers since those are used by ARCH_BRCMSTB
+      platforms
+    
+    * tag 'arm-soc/for-5.11/defconfig' of https://github.com/Broadcom/stblinux:
+      ARM: multi_v7_defconfig: Enable ARM SCMI protocol and drivers
+    
+    Link: https://lore.kernel.org/r/20201128163410.1691529-1-f.fainelli@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 6a7dc2b3639adc7f9ff5c148aeaef0ee775f6c3a
+Author: Florian Fainelli <f.fainelli@gmail.com>
+Date:   Sun Nov 8 20:42:28 2020 -0800
+
+    arm64: defconfig: Enable ARM SCMI protocol and drivers
+    
+    Enable the ARM SCMI protocol and the common clock, cpufreq, reset and
+    sensors drivers. Broadcom STB platforms (ARCH_BRCMSTB) implement SCMI to
+    provide support for CPU frequency scaling, clock configuration and
+    temperature and current sensors.
+    
+    Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+    Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+
+commit 950be99fccffa920e148fd46e33db4d509e8af63
+Author: Florian Fainelli <f.fainelli@gmail.com>
+Date:   Sun Nov 8 20:42:27 2020 -0800
+
+    ARM: multi_v7_defconfig: Enable ARM SCMI protocol and drivers
+    
+    Enable the ARM SCMI protocol and the common clock, cpufreq and sensors
+    drivers. Broadcom STB platforms (ARCH_BRCMSTB) implement SCMI to provide
+    support for CPU frequency scaling, clock configuration and temperature
+    and current sensors.
+    
+    Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+    Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+
+commit df320f89359c0cc22ff552da3ffd07171f7754a6
+Author: Sumit Gupta <sumitg@nvidia.com>
+Date:   Thu Jul 16 14:00:01 2020 +0530
+
+    cpufreq: Add Tegra194 cpufreq driver
+    
+    Add support for CPU frequency scaling on Tegra194. The frequency
+    of each core can be adjusted by writing a clock divisor value to
+    a MSR on the core. The range of valid divisors is queried from
+    the BPMP.
+    
+    Signed-off-by: Mikko Perttunen <mperttunen@nvidia.com>
+    Signed-off-by: Sumit Gupta <sumitg@nvidia.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+
+commit bc6b31c53ce895977841598721f8daeabc070ced
+Author: Chen-Yu Tsai <wens@csie.org>
+Date:   Sat Jul 18 00:00:53 2020 +0800
+
+    arm64: dts: allwinner: h5: bananapi-m2-plus-v1.2: Tie in CPU OPPs
+    
+    The Bananapi M2 Plus H5 v1.2 can work with the standard H5 OPPs.
+    Tie them in to enable CPU frequency scaling.
+    
+    The original Bananapi M2 Plus H5 is left out for now, as adding
+    the fixed regulator along with the enable pin seemed to cause some
+    glitching in Linux.
+    
+    Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+    Signed-off-by: Maxime Ripard <maxime@cerno.tech>
+    Link: https://lore.kernel.org/r/20200717160053.31191-9-wens@kernel.org
+
+commit c4118403d1c95bbb4a23526dece7eadcbe96e061
+Author: Chen-Yu Tsai <wens@csie.org>
+Date:   Sat Jul 18 00:00:52 2020 +0800
+
+    arm64: dts: allwinner: h5: libretech-all-h3-cc: Tie in CPU OPPs
+    
+    The Libre Computer ALL-H3-CC H5 variant can work with the standard H5
+    OPPs. Tie them in to enable CPU frequency scaling.
+    
+    Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+    Signed-off-by: Maxime Ripard <maxime@cerno.tech>
+    Link: https://lore.kernel.org/r/20200717160053.31191-8-wens@kernel.org
+
+commit fb31429fa98870914c7de5384e7a9ecfaa00f21f
+Merge: 3502e079c6bc 0f134e39ae65
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Jul 17 20:24:39 2020 +0200
+
+    Merge tag 'tegra-for-5.9-arm64-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/dt
+    
+    arm64: tegra: Device tree changes for v5.9-rc1
+    
+    This contains a slew of fixes in preparation for validating device trees
+    against json-schema bindings. In addition, this enables the CPU complex
+    (for CPU frequency scaling) and GPU on Tegra194.
+    
+    * tag 'tegra-for-5.9-arm64-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux: (56 commits)
+      arm64: tegra: Add the GPU on Tegra194
+      arm64: tegra: Add compatible string for Tegra194 CPU complex
+      arm64: tegra: Add HDMI supplies on Norrin
+      arm64: tegra: Add #{address,size}-cells for VI I2C on Tegra210
+      arm64: tegra: Add missing clocks and power-domains to Tegra210 VI I2C
+      arm64: tegra: Add clocks and resets for ISP on Tegra210
+      arm64: tegra: Fix compatible string for DPAUX on Tegra210
+      arm64: tegra: Add i2c-bus subnode for DPAUX controllers
+      arm64: tegra: Sort aliases alphabetically
+      arm64: tegra: Remove spurious tabs
+      arm64: tegra: Populate VBUS for USB3 on Jetson TX2
+      arm64: tegra: Enable DFLL support on Jetson Nano
+      arm64: tegra: Add support for Jetson Xavier NX
+      arm64: tegra: Re-order PCIe aperture mappings
+      arm64: tegra: Enable Tegra VI CSI support for Jetson Nano
+      arm64: tegra: jetson-tx1: Add camera supplies
+      arm64: tegra: Fix order of XUSB controller clocks
+      arm64: tegra: Rename cbb@0 to bus@0 on Tegra194
+      arm64: tegra: Sort nodes by unit-address on Jetson Nano
+      arm64: tegra: Various fixes for PMICs
+      ...
+    
+    Link: https://lore.kernel.org/r/20200717161300.1661002-7-thierry.reding@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 6f630784cc0d92fb58ea326e2bc01aa056279ecb
+Merge: 3a2a87517421 9ac1eafa885a
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Jun 10 11:42:19 2020 -0700
+
+    Merge tag 'clk-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux
+    
+    Pull clk updates from Stephen Boyd:
+     "This time around we have four lines of diff in the core framework,
+      removing a function that isn't used anymore. Otherwise the main new
+      thing for the common clk framework is that it is selectable in the
+      Kconfig language now. Hopefully this will let clk drivers and clk
+      consumers be testable on more than the architectures that support the
+      clk framework. The goal is to introduce some Kunit tests for the
+      framework.
+    
+      Outside of the core framework we have the usual set of various driver
+      updates and non-critical fixes. The dirstat shows that the new
+      Baikal-T1 driver is the largest addition this time around in terms of
+      lines of code. After that the x86 (Intel), Qualcomm, and Mediatek
+      drivers introduce many lines to support new or upcoming SoCs. After
+      that the dirstat shows the usual suspects working on their SoC support
+      by fixing minor bugs, correcting data and converting some of their DT
+      bindings to YAML.
+    
+      Core:
+       - Allow the COMMON_CLK config to be selectable
+    
+      New Drivers:
+       - Clk driver for Baikal-T1 SoCs
+       - Mediatek MT6765 clock support
+       - Support for Intel Agilex clks
+       - Add support for X1830 and X1000 Ingenic SoC clk controllers
+       - Add support for the new Renesas RZ/G1H (R8A7742) SoC
+       - Add support for Qualcomm's MSM8939 Generic Clock Controller
+    
+      Updates:
+       - Support IDT VersaClock 5P49V5925
+       - Bunch of updates for HSDK clock generation unit (CGU) driver
+       - Start making audio and GPU clks work on Marvell MMP2/MMP3 SoCs
+       - Add some GPU, NPU, and UFS clks to Qualcomm SM8150 driver
+       - Enable supply regulators for GPU gdscs on Qualcomm SoCs
+       - Add support for Si5342, Si5344 and Si5345 chips
+       - Support custom flags in Xilinx zynq firmware
+       - Various small fixes to the Xilinx clk driver
+       - A single minor rounding fix for the legacy Allwinner clock support
+       - A few patches from Abel Vesa as preparation of adding audiomix
+         clock support on i.MX
+       - A couple of cleanups from Anson Huang for i.MX clk-sscg-pll and
+         clk-pllv3 drivers
+       - Drop dependency on ARM64 for i.MX8M clock driver, to support
+         aarch32 mode on aarch64 hardware
+       - A series from Peng Fan to improve i.MX8M clock drivers, using
+         composite clock for core and bus clk slice
+       - Set a better parent clock for flexcan on i.MX6UL to support CiA102
+         defined bit rates
+       - A couple changes for EMC frequency scaling on Tegra210
+       - Support for CPU frequency scaling on Tegra20/Tegra30
+       - New clk gate for CSI test pattern generator on Tegra210
+       - Regression fixes for Samsung exynos542x and exynos5433 SoCs
+       - Use of fallthrough; attribute for Samsung s3c24xx
+       - Updates and fixup HDMI and video clocks on Meson8b
+       - Fixup reset polarity on Meson8b
+       - Fix GPU glitch free mux switch on Meson gx and g12
+       - A minor fix for the currently unused suspend/resume handling on
+         Renesas RZ/A1 and RZ/A2
+       - Two more conversions of Renesas DT bindings to json-schema
+       - Add support for the USB 2.0 clock selector on Renesas R-Car M3-W+"
+    
+    * tag 'clk-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux: (155 commits)
+      clk: mediatek: Remove ifr{0,1}_cfg_regs structures
+      clk: baikal-t1: remove redundant assignment to variable 'divider'
+      clk: baikal-t1: fix spelling mistake "Uncompatible" -> "Incompatible"
+      dt-bindings: clock: Add a missing include to MMP Audio Clock binding
+      dt: Add bindings for IDT VersaClock 5P49V5925
+      clk: vc5: Add support for IDT VersaClock 5P49V6965
+      clk: Add Baikal-T1 CCU Dividers driver
+      clk: Add Baikal-T1 CCU PLLs driver
+      dt-bindings: clk: Add Baikal-T1 CCU Dividers binding
+      dt-bindings: clk: Add Baikal-T1 CCU PLLs binding
+      clk: mediatek: assign the initial value to clk_init_data of mtk_mux
+      clk: mediatek: Add MT6765 clock support
+      clk: mediatek: add mt6765 clock IDs
+      dt-bindings: clock: mediatek: document clk bindings vcodecsys for Mediatek MT6765 SoC
+      dt-bindings: clock: mediatek: document clk bindings mipi0a for Mediatek MT6765 SoC
+      dt-bindings: clock: mediatek: document clk bindings for Mediatek MT6765 SoC
+      CLK: HSDK: CGU: add support for 148.5MHz clock
+      CLK: HSDK: CGU: support PLL bypassing
+      CLK: HSDK: CGU: check if PLL is bypassed first
+      clk: clk-si5341: Add support for the Si5345 series
+      ...
+
+commit c60037f0d78088f2f542ac23fb30a0bb68b68ed1
+Merge: 8f3d9f354286 dec396322d25
+Author: Stephen Boyd <sboyd@kernel.org>
+Date:   Thu May 21 15:52:41 2020 -0700
+
+    Merge tag 'for-5.8-clk' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into clk-tegra
+    
+    Pull Tegra clk driver updates from Thierry Reding:
+    
+    These are a couple of changes to implement EMC frequency scaling on
+    Tegra210, CPU frequency scaling on Tegra20 and Tegra30 as well as a
+    special clock gate for the CSI test pattern generator on Tegra210.
+    
+    * tag 'for-5.8-clk' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      clk: tegra: Add Tegra210 CSI TPG clock gate
+      clk: tegra30: Use custom CCLK implementation
+      clk: tegra20: Use custom CCLK implementation
+      clk: tegra: cclk: Add helpers for handling PLLX rate changes
+      clk: tegra: pll: Add pre/post rate-change hooks
+      clk: tegra: Add custom CCLK implementation
+      clk: tegra: Remove the old emc_mux clock for Tegra210
+      clk: tegra: Implement Tegra210 EMC clock
+      clk: tegra: Export functions for EMC clock scaling
+      clk: tegra: Add PLLP_UD and PLLMB_UD for Tegra210
+      clk: tegra: Rename Tegra124 EMC clock source file
+      dt-bindings: clock: tegra: Add clock ID for CSI TPG clock
+
+commit 9c1acf5174bd094cb6c1d51298ffce0e0f061ffd
+Merge: 22c328b1bc18 94ea9681a9f5
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu May 21 22:34:59 2020 +0200
+
+    Merge tag 'tegra-for-5.8-arm-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/dt
+    
+    ARM: tegra: Device tree changes for v5.8-rc1
+    
+    This contains a bit of cleanup and CPU frequency scaling support for the
+    Tegra30 Beaver board.
+    
+    * tag 'tegra-for-5.8-arm-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      ARM: dts: tegra30: beaver: Add CPU Operating Performance Points
+      ARM: dts: tegra30: beaver: Set up voltage regulators for DVFS
+      ARM: tegra: Kill off "simple-panel" compatibles
+    
+    Link: https://lore.kernel.org/r/20200515145311.1580134-11-thierry.reding@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit a7f6e07724ad43837b38d9350de2d1084f865472
+Merge: efb59c94c8a6 b9bf73aed99e
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri May 15 23:12:28 2020 +0200
+
+    Merge tag 'tegra-for-5.8-arm-core' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/soc
+    
+    ARM: tegra: Core changes for v5.8-rc1
+    
+    This contains core changes needed for the CPU frequency scaling and CPU
+    idle drivers on Tegra20 and Tegra30.
+    
+    * tag 'tegra-for-5.8-arm-core' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      ARM: tegra: Create tegra20-cpufreq platform device on Tegra30
+      ARM: tegra: Don't enable PLLX while resuming from LP1 on Tegra30
+      ARM: tegra: Switch CPU to PLLP on resume from LP1 on Tegra30/114/124
+      ARM: tegra: Correct PL310 Auxiliary Control Register initialization
+      ARM: tegra: Do not fully reinitialize L2 on resume
+      ARM: tegra: Initialize r0 register for firmware wake-up
+      firmware: tf: Different way of L2 cache enabling after LP2 suspend
+      firmware: tegra: Make BPMP a regular driver
+    
+    Link: https://lore.kernel.org/r/20200515145311.1580134-10-thierry.reding@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit ed14fe842e002da07d5981a907a0b2168175c48b
+Author: Niklas Cassel <niklas.cassel@linaro.org>
+Date:   Thu Jan 24 13:45:08 2019 +0100
+
+    arm64: dts: msm8916: remove bogus argument to the cpu clock
+    
+    [ Upstream commit e4f045ef38e61ba37aa4afc916fce4fc1b37aa19 ]
+    
+    The apcs node has #clock-cells = <0>, which means that those who
+    references it should specify 0 arguments.
+    
+    The apcs reference in the cpu node incorrectly specifies an argument,
+    remove this bogus argument.
+    
+    Fixes: 65afdf458360 ("arm64: dts: qcom: msm8916: Add CPU frequency scaling support")
+    Signed-off-by: Niklas Cassel <niklas.cassel@linaro.org>
+    Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+    Reviewed-by: Amit Kucheria <amit.kucheria@linaro.org>
+    Signed-off-by: Andy Gross <andy.gross@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit f666fba17b328e3efd1a23cd28ff89dd9e88a84f
+Author: Jorge Ramirez-Ortiz <jorge.ramirez-ortiz@linaro.org>
+Date:   Mon Nov 25 15:25:10 2019 +0100
+
+    arm64: defconfig: Enable HFPLL
+    
+    The high frequency pll is required on compatible Qualcomm SoCs to
+    support the CPU frequency scaling feature.
+    
+    Co-developed-by: Niklas Cassel <niklas.cassel@linaro.org>
+    Signed-off-by: Niklas Cassel <niklas.cassel@linaro.org>
+    Signed-off-by: Jorge Ramirez-Ortiz <jorge.ramirez-ortiz@linaro.org>
+    Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+    Link: https://lore.kernel.org/r/20191125142511.681149-6-niklas.cassel@linaro.org
+    Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+
+commit 171cfeec987d29f4d6d6fee6feab486180dc8ef4
+Merge: b4067b105023 89e551e83869
+Author: Olof Johansson <olof@lixom.net>
+Date:   Wed Nov 6 07:45:06 2019 -0800
+
+    Merge tag 'samsung-drivers-5.5' of https://git.kernel.org/pub/scm/linux/kernel/git/krzk/linux into arm/drivers
+    
+    Samsung soc drivers changes for v5.5
+    
+    1. Minor fixes to Exynos Chipid driver.
+    2. Add Exynos Adaptive Supply Voltage driver allowing to adjust voltages
+       used during CPU frequency scaling based on revision of SoC.  This
+       also pulls dependency from PM/OPP tree - driver uses newly added
+       dev_pm_opp_adjust_voltage() function.
+    
+    * tag 'samsung-drivers-5.5' of https://git.kernel.org/pub/scm/linux/kernel/git/krzk/linux:
+      soc: samsung: exynos-asv: Potential NULL dereference in exynos_asv_update_opps()
+      soc: samsung: chipid: Drop "syscon" compatible requirement
+      soc: samsung: Add Exynos Adaptive Supply Voltage driver
+      PM / OPP: Support adjusting OPP voltages at runtime
+      soc: samsung: chipid: Make exynos_chipid_early_init() static
+    
+    Link: https://lore.kernel.org/r/20191104175902.12224-1-krzk@kernel.org
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit 2687aa23f5d577ddc40bb575b12b19aab656b405
+Merge: c267d9960cc5 4053aa65c517
+Author: Olof Johansson <olof@lixom.net>
+Date:   Sun Nov 3 17:27:39 2019 -0800
+
+    Merge tag 'tegra-for-5.5-arm-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/dt
+    
+    ARM: tegra: Device tree changes for v5.5-rc1
+    
+    Adds support for CPU frequency scaling on Tegra20 and Tegra30, EMC
+    frequency scaling on Tegra30, SMMU support for VDE on Tegra30, the
+    STMPE ADC found on Toradex T30 modules as well as fixes for eDP
+    support on Venice2.
+    
+    * tag 'tegra-for-5.5-arm-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      ARM: tegra: cardhu-a04: Add CPU Operating Performance Points
+      ARM: tegra: cardhu-a04: Set up voltage regulators for DVFS
+      ARM: tegra: trimslice: Add CPU Operating Performance Points
+      ARM: tegra: paz00: Add CPU Operating Performance Points
+      ARM: tegra: paz00: Set up voltage regulators for DVFS
+      ARM: tegra: Add CPU Operating Performance Points for Tegra30
+      ARM: tegra: Add CPU Operating Performance Points for Tegra20
+      ARM: tegra: Add Tegra30 CPU clock
+      ARM: tegra: Add Tegra20 CPU clock
+      ARM: tegra: Add External Memory Controller node on Tegra30
+      ARM: tegra: nyan-big: Add timings for RAM codes 4 and 6
+      ARM: tegra: Connect SMMU with Video Decoder Engine on Tegra30
+      ARM: tegra: Add eDP power supplies on Venice2
+      ARM: tegra: Add SOR0_OUT clock on Tegra124
+      ARM: tegra: Add stmpe-adc DT node to Toradex T30 modules
+    
+    Link: https://lore.kernel.org/r/20191102144521.3863321-6-thierry.reding@gmail.com
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit f6d50ec5f85c98d191d8dda032557ab297c14401
+Author: Dmitry Osipenko <digetx@gmail.com>
+Date:   Mon Jun 3 21:59:39 2019 +0300
+
+    clocksource/drivers/tegra: Support per-CPU timers on all Tegra's
+    
+    Assign TMR1-4 per-CPU core on 32bit Tegra's in a way it is done for
+    Tegra210. In a result each core can handle its own timer events, less
+    code is unique to ARM64 and Tegra's clock events driver now has higher
+    rating on all Tegra's, replacing the ARM's TWD timer which isn't very
+    accurate due to the clock rate jitter caused by CPU frequency scaling.
+    
+    Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+    Acked-By: Peter De Schrijver <pdeschrijver@nvidia.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit 3b9ea606cda533964985966ad5b30715da7ba097
+Author: Anson Huang <anson.huang@nxp.com>
+Date:   Tue Feb 26 05:17:36 2019 +0000
+
+    clk: imx: scu: add cpu frequency scaling support
+    
+    On NXP's i.MX SoCs with system controller inside, CPU frequency
+    scaling can ONLY be done by system controller firmware, and it
+    can ONLY be requested from secure mode, so Linux kernel has to
+    call ARM SMC to trap to ARM-Trusted-Firmware to request system
+    controller firmware to do CPU frequency scaling.
+    
+    This patch adds i.MX system controller CPU frequency scaling support,
+    it reuses cpufreq-dt driver and implement the CPU frequency scaling
+    inside SCU clock driver.
+    
+    Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+    Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+
+commit f35635a6b769a63cae7e9c1a1f6cff7e1700584a
+Merge: a21c3f1795c1 43c36002b86d
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Feb 15 17:26:16 2019 +0100
+
+    Merge tag 'tegra-for-5.1-cpufreq' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/drivers
+    
+    cpufreq: tegra: Add support for Tegra210
+    
+    This uses the DFLL clock support to enable CPU frequency scaling on
+    Tegra210.
+    
+    * tag 'tegra-for-5.1-cpufreq' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      cpufreq: dt-platdev: add Tegra210 to blacklist
+      cpufreq: tegra124: extend to support Tegra210
+      cpufreq: tegra124: do not handle the CPU rail
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 94e4d309ea724a96a4757db81f6bcc8d3a432afb
+Merge: ae4dbf8ced41 bc72bed682a9
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Feb 15 16:48:30 2019 +0100
+
+    Merge tag 'tegra-for-5.1-arm64-defconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/defconfig
+    
+    arm64: tegra: Default configuration changes for v5.1-rc1
+    
+    Enables the TCU driver to be built into the kernel, so that the TCU can
+    be used as debug serial on Jetson Xavier. This also enables the MAX8973
+    regulator driver that is required for CPU frequency scaling on Tegra210.
+    
+    * tag 'tegra-for-5.1-arm64-defconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      arm64: defconfig: Enable Tegra TCU
+      arm64: defconfig: Enable MAX8973 regulator
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 14ab4f4330a205957a1986d811413f5a292a6d72
+Merge: 550a43b310b0 c79a3ccb1918
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Feb 15 15:49:56 2019 +0100
+
+    Merge tag 'tegra-for-5.1-dt-bindings' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into arm/dt
+    
+    dt-bindings: tegra: Changes for v5.1-rc1
+    
+    This contains device tree binding updates for CPU frequency scaling on
+    Tegra210, BPMP support on Tegra210 and support for NVIDIA Shield TV.
+    
+    * tag 'tegra-for-5.1-dt-bindings' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      dt-bindings: cpufreq: tegra124: remove cpu_lp clock from required properties
+      dt-bindings: cpufreq: tegra124: remove vdd-cpu-supply from required properties
+      dt-bindings: clock: tegra124-dfll: add Tegra210 support
+      dt-bindings: clock: tegra124-dfll: Update DFLL binding for PWM regulator
+      dt-bindings: firmware: tegra186-bpmp: Remove name property
+      dt-bindings: firmware: Add bindings for Tegra210 BPMP
+      dt-bindings: tegra: Add Shield TV device tree binding documentation
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 659614dbd43d8ab9c2d330bc17d5dee8c3f6440b
+Author: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Thu Nov 15 23:40:45 2018 +0100
+
+    clk: meson: meson8b: mark the CPU clock as CLK_IS_CRITICAL
+    
+    [ Upstream commit 0dad1ec65bc30a549aba38d34a727309bbf41bc8 ]
+    
+    We don't want the common clock framework to disable the "cpu_clk" if
+    it's not used by any device. The cpufreq-dt driver does not enable the
+    CPU clocks. However, even if it would we would still want the CPU clock
+    to be enabled at all times because the CPU clock is also required even
+    if we disable CPU frequency scaling on a specific board.
+    
+    The reason why we want the CPU clock to be enabled is a clock further up
+    in the tree:
+    Since commit 6f888e7bc7bd58 ("clk: meson: clk-pll: add enable bit") the
+    sys_pll can be disabled. However, since the CPU clock is derived from
+    sys_pll we don't want sys_pll to get disabled. The common clock
+    framework takes care of that for us by enabling all parent clocks of our
+    CPU clock when we mark the CPU clock with CLK_IS_CRITICAL.
+    
+    Until now this is not a problem yet because all clocks in the CPU
+    clock's tree (including sys_pll) are read-only. However, once we allow
+    modifications to the clocks in that tree we will need this.
+    
+    Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+    Acked-by: Jerome Brunet <jbrunet@baylibre.com>
+    Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+    Link: https://lkml.kernel.org/r/20181115224048.13511-4-martin.blumenstingl@googlemail.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 2dbfc1cdb68a280227c9e90f265ecd1ddf30df1c
+Author: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Thu Nov 15 23:40:45 2018 +0100
+
+    clk: meson: meson8b: mark the CPU clock as CLK_IS_CRITICAL
+    
+    [ Upstream commit 0dad1ec65bc30a549aba38d34a727309bbf41bc8 ]
+    
+    We don't want the common clock framework to disable the "cpu_clk" if
+    it's not used by any device. The cpufreq-dt driver does not enable the
+    CPU clocks. However, even if it would we would still want the CPU clock
+    to be enabled at all times because the CPU clock is also required even
+    if we disable CPU frequency scaling on a specific board.
+    
+    The reason why we want the CPU clock to be enabled is a clock further up
+    in the tree:
+    Since commit 6f888e7bc7bd58 ("clk: meson: clk-pll: add enable bit") the
+    sys_pll can be disabled. However, since the CPU clock is derived from
+    sys_pll we don't want sys_pll to get disabled. The common clock
+    framework takes care of that for us by enabling all parent clocks of our
+    CPU clock when we mark the CPU clock with CLK_IS_CRITICAL.
+    
+    Until now this is not a problem yet because all clocks in the CPU
+    clock's tree (including sys_pll) are read-only. However, once we allow
+    modifications to the clocks in that tree we will need this.
+    
+    Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+    Acked-by: Jerome Brunet <jbrunet@baylibre.com>
+    Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+    Link: https://lkml.kernel.org/r/20181115224048.13511-4-martin.blumenstingl@googlemail.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e4f045ef38e61ba37aa4afc916fce4fc1b37aa19
+Author: Niklas Cassel <niklas.cassel@linaro.org>
+Date:   Thu Jan 24 13:45:08 2019 +0100
+
+    arm64: dts: msm8916: remove bogus argument to the cpu clock
+    
+    The apcs node has #clock-cells = <0>, which means that those who
+    references it should specify 0 arguments.
+    
+    The apcs reference in the cpu node incorrectly specifies an argument,
+    remove this bogus argument.
+    
+    Fixes: 65afdf458360 ("arm64: dts: qcom: msm8916: Add CPU frequency scaling support")
+    Signed-off-by: Niklas Cassel <niklas.cassel@linaro.org>
+    Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+    Reviewed-by: Amit Kucheria <amit.kucheria@linaro.org>
+    Signed-off-by: Andy Gross <andy.gross@linaro.org>
+
+commit 1fbb2dc6f0ce95e73b9bd7e8e899089f5cebc99a
+Merge: 4e4390ad067a b677574bdf29
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Dec 25 14:57:37 2018 -0800
+
+    Merge tag 'clk-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux
+    
+    Pull clk updates from Stephen Boyd:
+     "This round is dominated by NXP's i.MX clk drivers. We gained support
+      for two or three i.MX SoCs in here and that mostly means a lot of
+      driver code and data.
+    
+      Beyond that platform, there are some new Mediatek, Amlogic, and
+      Qualcomm clk drivers added in here, and then we get to the long tail
+      of driver updates and non-critical fixes all around, including code
+      for vendors such as Renesas, Rockchip, Nvidia, and Allwinner. Overall,
+      the driver updates look normal.
+    
+      Apart from the usual driver updates we have an update to make
+      registering OF based clk providers a little simpler when they're
+      devices created as a child of a device backed by a node in DT. Drivers
+      don't have to jump through hoops to unregister the provider upon
+      driver removal anymore because the API does the right thing and uses
+      the parent device DT node.
+    
+      Summary:
+    
+      Core:
+       - Make devm_of_clk_add_hw_provider() use parent dt node if necessary
+       - Various SPDX taggings
+       - Mark clk_ops const when possible
+    
+      New Drivers:
+       - NXP i.MX7ULP SoC clock support
+       - NXP i.MX8QXP SoC clock support
+       - NXP i.MX8MQ SoC clock support
+       - NXP QorIQ T1023 SoC support
+       - Qualcomm SDM845 audio subsystem clks
+       - Qualcomm SDM845 GPU clck controllers
+       - Qualcomm QCS404 RPM clk support
+       - Mediatek MT7629 SoC clk controllers
+       - Allwinner F1c100s SoC clocks
+       - Allwinner H6 display engine clocks
+       - Amlogic GX video clocks
+       - Support for Amlogic meson8b CPU frequency scaling
+       - Amlogic Meson8b CPU post-divider clocks
+    
+      Updates:
+       - Proper suspend/resume on VersaClock5
+       - Shrink code some with DEFINE_SHOW_ATTRIBUTE()
+       - Register fixes for Rockchip rk3188 and rk3328
+       - One new critical clock for Rockchip rk3188 and a fixed clock id
+         (double used number)
+       - New clock id for Rockchip rk3328
+       - Amlogic Meson8/Meson8b video clock support
+       - Amlogic got a clk-input helper and used it for the axg-audio clock
+         driver
+       - Sigma Delta modulation for the Allwinner A33 audio clocks
+       - Support for CPEX (timer) clocks on various Renesas R-Car Gen3 and
+         RZ/G2 SoCs
+       - Support for SDHI HS400 clocks on early revisions of Renesas R-Car
+         H3 and M3-W
+       - Support for SDHI and USB clocks on Renesas RZ/A2
+       - Support for RPC (SPI Multi I/O Bus Controller) clocks on Renesas
+         R-Car V3M
+       - Qualcomm MSM8998 GCC driver improvements (resets, drop unused clks,
+         etc)"
+    
+    * tag 'clk-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux: (172 commits)
+      clk: imx: imx7ulp: add arm hsrun mode clocks support
+      dt-bindings: clock: imx7ulp: add HSRUN mode related clocks
+      clk: Use of_node_name_eq for node name comparisons
+      clk: vc5: Add suspend/resume support
+      clk: qcom: Drop unused 8998 clock
+      clk: qcom: Leave mmss noc on for 8998
+      clk: tegra: Return the exact clock rate from clk_round_rate
+      clk: tegra30: Use Tegra CPU powergate helper function
+      soc/tegra: pmc: Drop SMP dependency from CPU APIs
+      clk: tegra: Fix maximum audio sync clock for Tegra124/210
+      clk: tegra: get rid of duplicate defines
+      clk: imx: add imx8qxp lpcg driver
+      clk: imx: add lpcg clock support
+      clk: imx: add imx8qxp clk driver
+      clk: imx: Make the i.MX8MQ CCM clock driver CLK_IMX8MQ dependant
+      clk: imx: add scu clock common part
+      clk: imx: add configuration option for mmio clks
+      dt-bindings: clock: add imx8qxp lpcg clock binding
+      dt-bindings: clock: imx8qxp: add SCU clock IDs
+      clk: qcom: Add missing msm8998 resets
+      ...
+
+commit 0dad1ec65bc30a549aba38d34a727309bbf41bc8
+Author: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Thu Nov 15 23:40:45 2018 +0100
+
+    clk: meson: meson8b: mark the CPU clock as CLK_IS_CRITICAL
+    
+    We don't want the common clock framework to disable the "cpu_clk" if
+    it's not used by any device. The cpufreq-dt driver does not enable the
+    CPU clocks. However, even if it would we would still want the CPU clock
+    to be enabled at all times because the CPU clock is also required even
+    if we disable CPU frequency scaling on a specific board.
+    
+    The reason why we want the CPU clock to be enabled is a clock further up
+    in the tree:
+    Since commit 6f888e7bc7bd58 ("clk: meson: clk-pll: add enable bit") the
+    sys_pll can be disabled. However, since the CPU clock is derived from
+    sys_pll we don't want sys_pll to get disabled. The common clock
+    framework takes care of that for us by enabling all parent clocks of our
+    CPU clock when we mark the CPU clock with CLK_IS_CRITICAL.
+    
+    Until now this is not a problem yet because all clocks in the CPU
+    clock's tree (including sys_pll) are read-only. However, once we allow
+    modifications to the clocks in that tree we will need this.
+    
+    Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+    Acked-by: Jerome Brunet <jbrunet@baylibre.com>
+    Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+    Link: https://lkml.kernel.org/r/20181115224048.13511-4-martin.blumenstingl@googlemail.com
+
+commit d6e81845b7d900f1f6738bd972bf89dff4bd55a8
+Author: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Thu Nov 15 23:40:43 2018 +0100
+
+    clk: meson: clk-pll: check if the clock is already enabled
+    
+    Since commit 6f888e7bc7bd58 ("clk: meson: clk-pll: add enable bit") our
+    PLLs also support the "enable" bit. Currently meson_clk_pll_enable
+    unconditionally resets the PLL, enables it, takes it out of reset and
+    waits until it is locked.
+    
+    This works fine for our current clock trees. However, there will be a
+    problem once we allow modifications to sys_pll on Meson8, Meson8b and
+    Meson8m2 (which will be required for CPU frequency scaling):
+    the CPU clock is derived from the sys_pll clock. Once clk_enable is
+    called on the CPU clock this will be propagated by the common clock
+    framework up until the sys_pll clock. If we reset the PLL
+    unconditionally in meson_clk_pll_enable the CPU will be stopped (on
+    Meson8, Meson8b and Meson8m2).
+    To prevent this we simply check if the PLL is already enabled and do
+    reset the PLL if it's already enabled and locked.
+    
+    Now that we have a utility function to check whether the PLL is enabled
+    we can also pass that to our clk_ops to let the common clock framework
+    know about the status of the hardware clock.
+    For now this is of limited use since the only common clock framework's
+    internal "disabled unused clocks" mechanism checks for this. Everything
+    else still uses the ref-counting (internal to the common clock
+    framework) when clk_enable is called.
+    
+    Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+    Reviewed-by: Jerome Brunet <jbrunet@baylibre.com>
+    Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+    Link: https://lkml.kernel.org/r/20181115224048.13511-2-martin.blumenstingl@googlemail.com
+
+commit 721afaa2aeb860067decdddadc84ed16f42f2048
+Merge: 7c00e8ae041b 87815dda5593
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Jun 11 17:57:38 2018 -0700
+
+    Merge tag 'armsoc-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc
+    
+    Pull ARM SoC device tree updates from Olof Johansson:
+     "As always, a large number of DT updates. Too many to enumerate them
+      all, but at a glance:
+    
+      New SoCs introduced in this release:
+    
+       - Amlogic:
+          + Meson 8M2 SoC, a.k.a. S812. A quad Cortex-A9 SoC used in some
+            set top boxes and other products.
+    
+       - Mediatek:
+          + MT7623A, which is a flavor of the MT7623 family with other
+            on-chip ethernet options.
+    
+       - Qualcomm:
+          + SDM845, a.k.a Snapdragon 845, an 4+4-core Kryo 385/845
+            (Cortex-A75/A55 derivative) SoC that's one of the current
+            high-end mobile SoCs.
+    
+            It's great to see mainline support for it. So far, you can't do
+            much with it, since a lot of peripherals are not yet in the DTs
+            but driver support for USB, GPU and other pieces are starting to
+            trickle in. This might end up being a well-supported SoC
+            upstream if the momentum keeps up.
+    
+       - Renesas:
+          + R8A77990, a.k.a R-Car E3, a new automotive
+            entertainment-targeted SoC. Currently only one Cortex-A53 CPU is
+            enabled, we are eagerly awaiting more. So far, basic drivers
+            such as serial, gpios, PMU and ethernet are enabled.
+          + R8A77470, a.k.a. RZ/G1C, a new dual Cortex-A7 SoC with PowerVR
+            GPU. Same here, basic set of drivers such as serial, gpios and
+            ethernet enabled, and SMP support is also forthcoming.
+    
+       - STMicroelectronics:
+          + STM32F469, very similar tih STM32F429 but with display support
+    
+      Enhancements to SoCs/platforms (DTS contents, some driver portions
+      might not be in yet):
+       - Allwinner sun8i (h3/a33/a83t) SMP, DVFS tweaks, misc
+       - Amlogic Meson: I2C, UFS, TDM, GPIO external interrupts, MMC resets
+       - Hisilicon hi3660: Thermal cooling, CPU frequency scaling, mailbox interfaces
+       - Marvell Berlin2CD: SMP support, thermal sensors
+       - Mediatek MT7623: Highspeed DMA, audio support
+       - Qualcomm IPQ8074 PCIe support, MSM8996 UFS support
+       - Renesas: Watchdog and PMU support across many platforms
+       - Rockchip RK3399: USB3 OTG support
+       - Samsung Exynos: Audio-over-HDMI on Odroid X/X2/U3
+       - STMicro STM32: Lots of peripherals added to STM32MP175C
+       - Uniphier: Ethernet support
+    
+      New boards:
+       - Allwinner A20: Olimex A20-SOM-EVB-eMMC variant
+       - Allwinner H2+: Libre Computer ALL-H3-CC (h2+ version)
+       - Allwinner A33: Nintendo NES/SuperNES Classic Edition
+       - Aspeed: S2600WF, Inventec Lanyang BMC, Portwell Neptune
+       - Berlin2CD: Valve Steam Link
+       - Broadcom BCM5301X: Luxul XAP-1610 and XWR-3150 V1
+       - Broadcom: Raspberry Pi 3 B+
+       - Mediatek MT7623N and MT7623A: reference boards
+       - Meson 8M2: Tronsmart MXIII Plus
+       - NXP i.MX: Engicam i.CoreM6, DHCOM iMX6 SOM, BTicino i.MX6DL Mamoj
+       - Qualcomm MSM8974: Sony Xperia Z1 Compact support
+       - Qualcomm SDM845: MTP development board
+       - Renesas: Ebisu R8A77990 board
+       - Renesas RZ/G1C: iwg23s: iWave G235-SDB
+       - TI am335x: Pocketbeagle support"
+    
+    * tag 'armsoc-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc: (448 commits)
+      ARM: dts: aspeed: Fix hwrng register address
+      arm64: dts: sprd: whale2: Add the rtc enable clock for watchdog
+      arm64: dts: sprd: Add GPIO and GPIO keys device nodes
+      arm64: dts: sprd: fix typo in 'remote-endpoint'
+      arm64: dts: apq8096-db820c: Removed bt-en-1-8v regulator
+      arm64: dts: fix regulator property name for wlan pcie endpoint
+      arm64: dts: qcom: msm8996: Use UFS_GDSC for UFS
+      ARM: dts: pxa3xx: fix MMC clocks
+      ARM: pxa: dts: add pin definitions for extended GPIOs
+      ARM: pxa: dts: add gpio-ranges to gpio controller
+      ARM: dts: ipq8074: Enable few peripherals for hk01 board
+      ARM: dts: ipq8074: Add pcie nodes
+      ARM: dts: ipq8074: Add peripheral nodes
+      ARM: dts: ipq4019: Add qcom-ipq4019-ap.dk07.1-c2 board file
+      ARM: dts: ipq4019: Add qcom-ipq4019-ap.dk07.1-c1 board file
+      ARM: dts: ipq4019: Add ipq4019-ap.dk07.1 common data
+      ARM: dts: ipq4019: Add qcom-ipq4019-ap.dk04.1-c3 board file
+      ARM: dts: ipq4019: Add ipq4019-ap.dk04.1-c1 board file
+      ARM: dts: ipq4019: Add ipq4019-ap.dk04.dtsi
+      ARM: dts: ipq4019: Change the max opp frequency
+      ...
+
+commit 3c13e601a2e648275749cae5a9e476f82e366929
+Merge: 823927bdb94a bb61c53601b4
+Author: Olof Johansson <olof@lixom.net>
+Date:   Fri May 25 04:47:13 2018 -0700
+
+    Merge tag 'hisi-arm64-dt-for-4.18v2' of git://github.com/hisilicon/linux-hisi into next/dt
+    
+    ARM64: DT: Hisilicon SoC DT updates for 4.18v2
+    
+    - Add mailbox, stub clock, CPU frequency scaling, thermal cooling
+      management and pcie msi interruption support for hi3660
+    - Add LPC support for hip06 and hip07
+    - Add PCIe, usb and emmc support for hi3798cv200
+    
+    * tag 'hisi-arm64-dt-for-4.18v2' of git://github.com/hisilicon/linux-hisi:
+      arm64: dts: hi3798cv200: enable emmc support for poplar board
+      arm64: dts: hi3798cv200: enable usb2 support for poplar board
+      arm64: dts: hi3798cv200: enable PCIe support for poplar board
+      arm64: dts: hisi: Enable Hisi LPC node for hip07
+      arm64: dts: hisi: Enable Hisi LPC node for hip06
+      arm64: dts: hi3660: Add pcie msi interrupt attribute
+      arm64: dts: hi3660: Add thermal cooling management
+      arm64: dts: hi3660: Add CPU frequency scaling support
+      arm64: dts: hi3660: Add stub clock node
+      arm64: dts: hi3660: Add mailbox node
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit 0f861aad4a934135e61459543c85bc5c0d5b3c6f
+Author: Anson Huang <Anson.Huang@nxp.com>
+Date:   Tue May 15 17:18:15 2018 +0800
+
+    ARM: dts: imx7s-warp: remove unnecessary cpu regulator supply
+    
+    i.MX7S does NOT support CPU frequency scaling, so no
+    need to specify the CPU regulator supply.
+    
+    Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+    Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+
+commit dfeae9e5e54a88ad1bf3a1e30faf2640688886ad
+Author: Leo Yan <leo.yan@linaro.org>
+Date:   Tue May 15 10:53:13 2018 +0800
+
+    arm64: dts: hi3660: Add CPU frequency scaling support
+    
+    Add two CPU OPP tables, one table is corresponding to one cluster,
+    which allow CPU frequency scaling on hi3660 platforms.
+    
+    Signed-off-by: Leo Yan <leo.yan@linaro.org>
+    Signed-off-by: Wei Xu <xuwei5@hisilicon.com>
+
+commit 2430bcda3678dc031e442b700f8a694b093a9851
+Merge: b6f67b039c64 e723795c702b
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Tue Mar 27 14:30:49 2018 +0200
+
+    Merge tag 'qcom-arm64-for-4.17' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/agross/linux into next/dt
+    
+    Pull "Qualcomm ARM64 Updates for v4.17" from Andy Gross:
+    
+    * Fix GIC_CPU_MASK_SIMPLE and SPI5 config on MSM8996
+    * Add SDM845 and kryo385 documentation
+    * Add MSM8916 cooling maps, cpu frequency scaling, APCS, and A53 PLL
+    * Switch APCS to use mailbox on MSM8916
+    * Add rmtfs-mem on MSM8996
+    
+    * tag 'qcom-arm64-for-4.17' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/agross/linux:
+      arm64: dts: qcom: Fix SPI5 config on MSM8996
+      dt-bindings: qcom: Add SDM845 bindings
+      dt-bindings: arm: Document kryo385 cpu
+      arm64: dts: msm8916: Add cpu cooling maps
+      arm64: dts: msm8996: Add rmtfs sharedmem node
+      arm64: dts: qcom: msm8916: Add CPU frequency scaling support
+      arm64: dts: qcom: msm8916: Add clock properties to the APCS node
+      arm64: dts: qcom: msm8916: Probe the APCS mailbox driver
+      arm64: dts: qcom: msm8916: Add msm8916 A53 PLL DT node
+      arm64: dts: msm8996: Fix wrong use of GIC_CPU_MASK_SIMPLE()
+
+commit 317ccc727b06b6459fe0dd32b95b5e8c898402f6
+Author: Mikko Perttunen <mperttunen@nvidia.com>
+Date:   Thu Nov 16 13:46:51 2017 +0200
+
+    arm64: defconfig: Enable CONFIG_ARM_TEGRA186_CPUFREQ
+    
+    Enable Tegra186 CPU frequency scaling support by default.
+    
+    Signed-off-by: Mikko Perttunen <mperttunen@nvidia.com>
+    Signed-off-by: Thierry Reding <treding@nvidia.com>
+
+commit 65afdf458360f65cd4ddb7d165b673feece087a3
+Author: Georgi Djakov <georgi.djakov@linaro.org>
+Date:   Mon Feb 5 16:46:51 2018 +0200
+
+    arm64: dts: qcom: msm8916: Add CPU frequency scaling support
+    
+    Add a CPU OPP table to allow CPU frequency scaling on msm8916 platforms.
+    
+    Signed-off-by: Georgi Djakov <georgi.djakov@linaro.org>
+    Reviewed-by: Amit Kucheria <amit.kucheria@linaro.org>
+    Tested-by: Amit Kucheria <amit.kucheria@linaro.org>
+    Signed-off-by: Andy Gross <andy.gross@linaro.org>
+
+commit 81ac38847a1d7fdd74a232cae195ff8f0fb4ab21
+Author: Georgi Djakov <georgi.djakov@linaro.org>
+Date:   Tue Dec 5 17:47:01 2017 +0200
+
+    clk: qcom: Add APCS clock controller support
+    
+    Add a driver for the APCS clock controller. It is part of the APCS
+    hardware block, which among other things implements also a combined
+    mux and half integer divider functionality. It can choose between a
+    fixed-rate clock or the dedicated APCS (A53) PLL. The source and the
+    divider can be set both at the same time.
+    
+    This is required for enabling CPU frequency scaling on MSM8916-based
+    platforms.
+    
+    Signed-off-by: Georgi Djakov <georgi.djakov@linaro.org>
+    Acked-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+    Tested-by: Amit Kucheria <amit.kucheria@linaro.org>
+    [sboyd@codeaurora.org: Include rcg header for parent_map, drop
+    multiple unneeded includes, add COMPILE_TEST to APCS depends,
+    made tristate/modular]
+    Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
+
+commit 66956fdad6e881cae3444a0335c682dbb83b5180
+Author: Jonas Gorski <jonas.gorski@gmail.com>
+Date:   Tue Jul 18 12:17:28 2017 +0200
+
+    MIPS: Loongson 2F: allow NULL clock for clk_get_rate
+    
+    commit 386787b1fcab2dd3d16ca3f46729aaafdef306e3 upstream.
+    
+    Make the behaviour of clk_get_rate consistent with common clk's
+    clk_get_rate by accepting NULL clocks as parameter, as some device
+    drivers rely on this.
+    
+    Make the behaviour of clk_get_rate consistent with common clk's
+    clk_get_rate by accepting NULL clocks as parameter. Some device
+    drivers rely on this, and will cause an OOPS otherwise.
+    
+    Fixes: f8ede0f700f5 ("MIPS: Loongson 2F: Add CPU frequency scaling support")
+    Reported-by: Mathias Kresin <dev@kresin.me>
+    Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+    Cc: linux-mips@linux-mips.org
+    Cc: linux-kernel@vger.kernel.org
+    Patchwork: https://patchwork.linux-mips.org/patch/16777/
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+    [bwh: Backported to 3.16: adjust filename]
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 386787b1fcab2dd3d16ca3f46729aaafdef306e3
+Author: Jonas Gorski <jonas.gorski@gmail.com>
+Date:   Tue Jul 18 12:17:28 2017 +0200
+
+    MIPS: Loongson 2F: allow NULL clock for clk_get_rate
+    
+    Make the behaviour of clk_get_rate consistent with common clk's
+    clk_get_rate by accepting NULL clocks as parameter, as some device
+    drivers rely on this.
+    
+    Make the behaviour of clk_get_rate consistent with common clk's
+    clk_get_rate by accepting NULL clocks as parameter. Some device
+    drivers rely on this, and will cause an OOPS otherwise.
+    
+    Fixes: f8ede0f700f5 ("MIPS: Loongson 2F: Add CPU frequency scaling support")
+    Reported-by: Mathias Kresin <dev@kresin.me>
+    Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+    Cc: linux-mips@linux-mips.org
+    Cc: linux-kernel@vger.kernel.org
+    Patchwork: https://patchwork.linux-mips.org/patch/16777/
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit c587c79f90632df59c61383c6abebb2e07a81911
+Author: Doug Smythies <doug.smythies@gmail.com>
+Date:   Tue Aug 8 14:05:12 2017 -0700
+
+    cpufreq: intel_pstate: report correct CPU frequencies during trace
+    
+    The intel_pstate CPU frequency scaling driver has always
+    calculated CPU frequency incorrectly.  Recent changes have
+    eliminted most of the issues, however the frequency reported
+    in the trace buffer, if used, is incorrect.
+    
+    It remains desireable that cpu->pstate.scaling still be a nice
+    round number for things such as when setting max and min frequencies.
+    So the proposal is to just fix the reported frequency in the trace data.
+    
+    Fixes what remains of [1].
+    
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=96521 # [1]
+    Signed-off-by: Doug Smythies <dsmythies@telus.net>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 4d25ec19669292a65a32498eabdabdd32b1a8747
+Merge: 907afe5923b4 5d72ed35678a
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Jul 14 13:12:32 2017 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux
+    
+    Pull thermal management updates from Zhang Rui:
+    
+     - Improve thermal cpu_cooling interaction with cpufreq core.
+    
+       The cpu_cooling driver is designed to use CPU frequency scaling to
+       avoid high thermal states for a platform. But it wasn't glued really
+       well with cpufreq core.
+    
+       For example clipped-cpus is copied from the policy structure and its
+       much better to use the policy->cpus (or related_cpus) fields directly
+       as they may have got updated. Not that things were broken before this
+       series, but they can be optimized a bit more.
+    
+       This series tries to improve interactions between cpufreq core and
+       cpu_cooling driver and does some fixes/cleanups to the cpu_cooling
+       driver. (Viresh Kumar)
+    
+     - A couple of fixes and cleanups in thermal core and imx, hisilicon,
+       bcm_2835, int340x thermal drivers. (Arvind Yadav, Dan Carpenter,
+       Sumeet Pawnikar, Srinivas Pandruvada, Willy WOLFF)
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux: (24 commits)
+      thermal: bcm2835: fix an error code in probe()
+      thermal: hisilicon: Handle return value of clk_prepare_enable
+      thermal: imx: Handle return value of clk_prepare_enable
+      thermal: int340x: check for sensor when PTYP is missing
+      Thermal/int340x: Fix few typos and kernel-doc style
+      thermal: fix source code documentation for parameters
+      thermal: cpu_cooling: Replace kmalloc with kmalloc_array
+      thermal: cpu_cooling: Rearrange struct cpufreq_cooling_device
+      thermal: cpu_cooling: 'freq' can't be zero in cpufreq_state2power()
+      thermal: cpu_cooling: don't store cpu_dev in cpufreq_cdev
+      thermal: cpu_cooling: get_level() can't fail
+      thermal: cpu_cooling: create structure for idle time stats
+      thermal: cpu_cooling: merge frequency and power tables
+      thermal: cpu_cooling: get rid of 'allowed_cpus'
+      thermal: cpu_cooling: OPPs are registered for all CPUs
+      thermal: cpu_cooling: store cpufreq policy
+      cpufreq: create cpufreq_table_count_valid_entries()
+      thermal: cpu_cooling: use cpufreq_policy to register cooling device
+      thermal: cpu_cooling: get rid of a variable in cpufreq_set_cur_state()
+      thermal: cpu_cooling: remove cpufreq_cooling_get_level()
+      ...
+
+commit 385c98fcc1fb58c3e10157be2203eb37595dac7b
+Author: Linus Walleij <linus.walleij@linaro.org>
+Date:   Sun Jun 11 23:26:17 2017 +0200
+
+    clocksource/drivers/fttmr010: Implement delay timer
+    
+    This timer is often used on the ARM architecture, so as with so
+    many siblings, we can implement delay timers, removing the need
+    for the system to calibrate jiffys at boot, and potentially
+    handling CPU frequency scaling on targets.
+    
+    We cannot just protect the Kconfig with a "depends on ARM" because
+    it is already known that different architectures are using Faraday
+    IP blocks, so it is better to make things open-ended and use
+    
+    Result on boot dmesg:
+    
+    Switching to timer-based delay loop, resolution 40n
+    Calibrating delay loop (skipped), value calculated using
+      timer frequency.. 50.00 BogoMIPS (lpj=250000)
+    
+    This is accurately the timer frequency, 250MHz on the APB
+    bus.
+    
+    Cc: Andrew Jeffery <andrew@aj.id.au>
+    Cc: Joel Stanley <joel@jms.id.au>
+    Cc: Jonas Jensen <jonas.jensen@gmail.com>
+    Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+    Tested-by: Jonas Jensen <jonas.jensen@gmail.com>
+    Tested-by: Andrew Jeffery <andrew@aj.id.au>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit b6f4f1f2c6daaf5a7c856c8a6ad0735f09642257
+Merge: 2d5b520cfec5 0e4504470667
+Author: Stephen Boyd <sboyd@codeaurora.org>
+Date:   Mon Jun 20 18:00:16 2016 -0700
+
+    Merge tag 'clk-samsung-4.8' of git://linuxtv.org/snawrocki/samsung into clk-next
+    
+    Merge changes from Sylwester Nawrocki for samsung clk drivers:
+    
+     - a fix for exynos7 to prevent gating some critical CMU clocks,
+     - addition of CPU clocks for CPU frequency scaling on Exynos5433 SoCs,
+     - additions for exynos5410 SoC required for Odroid XU board support,
+     - register accessors fixes for kernels built for big endian operation
+       (mostly exynos4 SoCs),
+     - Exynos5433 clock definitions fixes required for suspend to RAM and
+       the audio subsystem operation,
+     - many cleanups changing attributes of the clock initializer data
+    
+    * tag 'clk-samsung-4.8' of git://linuxtv.org/snawrocki/samsung: (41 commits)
+      clk: samsung: exynos5433: Add CLK_IGNORE_UNUSED flag to PCIE device
+      clk: samsung: exynos5433: Add CLK_IGNORE_UNUSED flags to avoid hang during S2R
+      clk: samsung: exynos5433: Add CLK_IGNORE_UNUSED flag for AUD UART
+      clk: samsung: exynos4: fixup reg access on be
+      clk: samsung: fixup endian in pll clk
+      clk: samsung: exynos5410: Add WDT, ACLK266 and SSS clocks
+      clk: samsung: exynos5433: add CPU clocks configuration data and instantiate CPU clocks
+      clk: samsung: cpu: prepare for adding Exynos5433 CPU clocks
+      clk: samsung: exynos5433: prepare for adding CPU clocks
+      clk: samsung: Suppress unbinding to prevent theoretical attacks
+      clk: samsung: exynos5420: Set ID for aclk333 gate clock
+      clk: samsung: exynos5410: Add TMU clock
+      clk: samsung: exynos5410: Add I2C, HSI2C and RTC clocks
+      clk: samsung: exynos5410: Add serial3, USB and PWM clocks
+      clk: samsung: exynos3250: Move PLL rates data to init section
+      clk: samsung: Fully constify mux parent names
+      clk: samsung: exynos5250: Move sleep init function to init section
+      clk: samsung: exynos5420: Move sleep init function and PLL data to init section
+      clk: samsung: exynos5433: Move PLL rates data to init section
+      clk: samsung: exynos5433: Constify all clock initializers
+      ...
+
+commit 9bdcb44e391da5c41b98573bf0305a0e0b1c9569
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Sat Apr 2 01:09:12 2016 +0200
+
+    cpufreq: schedutil: New governor based on scheduler utilization data
+    
+    Add a new cpufreq scaling governor, called "schedutil", that uses
+    scheduler-provided CPU utilization information as input for making
+    its decisions.
+    
+    Doing that is possible after commit 34e2c555f3e1 (cpufreq: Add
+    mechanism for registering utilization update callbacks) that
+    introduced cpufreq_update_util() called by the scheduler on
+    utilization changes (from CFS) and RT/DL task status updates.
+    In particular, CPU frequency scaling decisions may be based on
+    the the utilization data passed to cpufreq_update_util() by CFS.
+    
+    The new governor is relatively simple.
+    
+    The frequency selection formula used by it depends on whether or not
+    the utilization is frequency-invariant.  In the frequency-invariant
+    case the new CPU frequency is given by
+    
+            next_freq = 1.25 * max_freq * util / max
+    
+    where util and max are the last two arguments of cpufreq_update_util().
+    In turn, if util is not frequency-invariant, the maximum frequency in
+    the above formula is replaced with the current frequency of the CPU:
+    
+            next_freq = 1.25 * curr_freq * util / max
+    
+    The coefficient 1.25 corresponds to the frequency tipping point at
+    (util / max) = 0.8.
+    
+    All of the computations are carried out in the utilization update
+    handlers provided by the new governor.  One of those handlers is
+    used for cpufreq policies shared between multiple CPUs and the other
+    one is for policies with one CPU only (and therefore it doesn't need
+    to use any extra synchronization means).
+    
+    The governor supports fast frequency switching if that is supported
+    by the cpufreq driver in use and possible for the given policy.
+    In the fast switching case, all operations of the governor take
+    place in its utilization update handlers.  If fast switching cannot
+    be used, the frequency switch operations are carried out with the
+    help of a work item which only calls __cpufreq_driver_target()
+    (under a mutex) to trigger a frequency update (to a value already
+    computed beforehand in one of the utilization update handlers).
+    
+    Currently, the governor treats all of the RT and DL tasks as
+    "unknown utilization" and sets the frequency to the allowed
+    maximum when updated from the RT or DL sched classes.  That
+    heavy-handed approach should be replaced with something more
+    subtle and specifically targeted at RT and DL tasks.
+    
+    The governor shares some tunables management code with the
+    "ondemand" and "conservative" governors and uses some common
+    definitions from cpufreq_governor.h, but apart from that it
+    is stand-alone.
+    
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+commit e3526f004a35e5f324b1c835bca056f4df05bff0
+Author: Bai Ping <b51503@freescale.com>
+Date:   Tue Nov 24 18:25:16 2015 +0800
+
+    ARM: imx: enable cpufreq device on i.mx7d
+    
+    Add a cpufreq-dt device on i.MX7D, using the
+    generic cpufreq-dt for CPU frequency scaling.
+    
+    Signed-off-by: Bai Ping <b51503@freescale.com>
+    Acked-by: Lucas Stach <l.stach@pengutronix.de>
+    Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+
+commit a7c602bf42f943e717eed92165ebfa6dbaba3029
+Merge: 1c4b4b0eb190 79cf95c763a1
+Author: Stephen Boyd <sboyd@codeaurora.org>
+Date:   Tue Aug 25 15:55:28 2015 -0700
+
+    Merge tag 'tegra-for-4.3-clk' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into clk-next
+    
+    clk: tegra: Changes for v4.3-rc1
+    
+    This contains the DFLL driver needed to implement CPU frequency scaling
+    on Tegra.
+
+commit f4be3c67ed5829462f53e225edd95029bb0793c4
+Merge: 99650c258a4b 17cdddf0fb68
+Author: Olof Johansson <olof@lixom.net>
+Date:   Fri Aug 21 10:15:29 2015 -0700
+
+    Merge tag 'tegra-for-4.3-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into next/dt
+    
+    ARM: tegra: Devicetree changes for v4.3-rc1
+    
+    Enables CPU frequency scaling on Jetson TK1 and enables the GK20A GPU on
+    Venice2 and Jetson TK1. This also enables support for the PMU hardware
+    found on Tegra124, which among other things, can be used for performance
+    measurements.
+    
+    * tag 'tegra-for-4.3-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      ARM: tegra: Add gpio-ranges property
+      ARM: tegra: Fix AHB base address on Tegra20, Tegra30 and Tegra114
+      ARM: tegra: Add Tegra124 PMU support
+      ARM: tegra: jetson-tk1: Add GK20A GPU DT node
+      ARM: tegra: venice2: Add GK20A GPU DT node
+      ARM: tegra: Add IOMMU node to GK20A
+      ARM: tegra: Add CPU regulator to the Jetson TK1 device tree
+      ARM: tegra: Add entries for cpufreq on Tegra124
+      ARM: tegra: Enable the DFLL on the Jetson TK1
+      ARM: tegra: Add the DFLL to Tegra124 device tree
+      pinctrl: tegra: Only set the gpio range if needed
+      clk: tegra: Add the DFLL as a possible parent of the cclk_g clock
+      clk: tegra: Save/restore CCLKG_BURST_POLICY on suspend
+      clk: tegra: Add Tegra124 DFLL clocksource platform driver
+      clk: tegra: Add DFLL DVCO reset control for Tegra124
+      clk: tegra: Introduce ability for SoC-specific reset control callbacks
+      clk: tegra: Add functions for parsing CVB tables
+      clk: tegra: Add closed loop support for the DFLL
+      clk: tegra: Add library for the DFLL clock source (open-loop mode)
+      clk: tegra: Add binding for the Tegra124 DFLL clocksource
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit ba5d183bced6cb60b2838a0bf04665c1c1e4bff1
+Merge: ff2d92066429 258d9bc5e77f
+Author: Olof Johansson <olof@lixom.net>
+Date:   Thu Aug 20 18:59:45 2015 -0700
+
+    Merge tag 'tegra-for-4.3-defconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into next/defconfig
+    
+    ARM: tegra: Default configuration updates for v4.3-rc1
+    
+    Enable the GK20A GPU (via the Nouveau driver) and CPU frequency scaling
+    on Tegra124.
+    
+    * tag 'tegra-for-4.3-defconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      ARM: tegra: Update multi_v7_defconfig
+      ARM: tegra: Update default configuration
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit 420f2629fa041ed92f7e687b3bc8020d80b209bb
+Merge: 5378e4665f22 9eb15dbbfa1a
+Author: Olof Johansson <olof@lixom.net>
+Date:   Thu Aug 20 18:47:04 2015 -0700
+
+    Merge tag 'tegra-for-4.3-cpufreq' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux into next/drivers
+    
+    ARM: tegra: CPU frequency scaling for v4.3-rc1
+    
+    This adds CPU frequency scaling support for Tegra124.
+    
+    * tag 'tegra-for-4.3-cpufreq' of git://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux:
+      cpufreq: Add cpufreq driver for Tegra124
+      cpufreq: tegra: Rename tegra-cpufreq to tegra20-cpufreq
+      cpufreq: tegra124: Add device tree bindings
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit 461cfe4e2f5d000f76a38fb7cefd2fedf42c9026
+Author: Tuomas Tynkkynen <ttynkkynen@nvidia.com>
+Date:   Wed May 13 17:58:51 2015 +0300
+
+    ARM: tegra: Update default configuration
+    
+      * CPU frequency scaling for Tegra124
+      * Nouveau (for GK20A GPU) support
+    
+    Signed-off-by: Thierry Reding <treding@nvidia.com>
+
+commit c1eed8d2ff67b18f3892016f40ad6899ac6cf477
+Author: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Date:   Wed Jul 9 17:45:14 2014 +0200
+
+    ARM: mvebu: update mvebu_v7_defconfig with cpufreq support
+    
+    Now that the Armada XP supports dynamic CPU frequency scaling, it
+    makes sense to enable the cpufreq subsystem in mvebu_v7_defconfig, as
+    well as the cpufreq-generic driver used on Armada XP.
+    
+    Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+    Link: https://lkml.kernel.org/r/1404920715-19834-7-git-send-email-thomas.petazzoni@free-electrons.com
+    Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+
+commit 7c0acf868d2e470c9d6a40091acf8d6444c01b57
+Author: Vladimir Kondratiev <qca_vkondrat@qca.qualcomm.com>
+Date:   Mon Jun 16 19:37:05 2014 +0300
+
+    wil6210: Tx performance monitoring
+    
+    For performance monitoring, trace time intervals when Tx vring
+    is idle/not idle. Use CPU cycle counter for this, because jiffies is
+    too rough, and other precise time measurement methods involve
+    overhead while get_cycles() should be fast.
+    This used to provide some estimation for percentage when Tx vring
+    was idle, i.e. when hardware is under-utilized.
+    Estimation is not precise because of many reasons - CPU frequency scaling,
+    grt_cycles() may be per core etc. But still, it is good estimation
+    
+    Signed-off-by: Vladimir Kondratiev <qca_vkondrat@qca.qualcomm.com>
+    Signed-off-by: John W. Linville <linville@tuxdriver.com>
+
+commit 923a78074bfb799508bea3ca3700ee29da7fc58d
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Tue Apr 8 18:03:54 2014 -0400
+
+    powernow-k6: disable cache when changing frequency
+    
+    commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b upstream
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Willy Tarreau <w@1wt.eu>
+
+commit f5fe5bb9f7091f23f16c8cbcf2e8283fa42a5245
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Wed Dec 11 19:38:32 2013 -0500
+
+    powernow-k6: disable cache when changing frequency
+    
+    commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b upstream.
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    [bwh: Backported to 3.2: adjust context]
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit d6d2e9388f12580deb78a9055f26c1e224fd3761
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Wed Dec 11 19:38:32 2013 -0500
+
+    powernow-k6: disable cache when changing frequency
+    
+    commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b upstream.
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cccd0fd759fa4e1306173f5740cc4ba8566e1d65
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Wed Dec 11 19:38:32 2013 -0500
+
+    powernow-k6: disable cache when changing frequency
+    
+    commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b upstream.
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cfc83ee6948b5f8986222acfd0458a5f2d22edcd
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Wed Dec 11 19:38:32 2013 -0500
+
+    powernow-k6: disable cache when changing frequency
+    
+    commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b upstream.
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3389f243c528afc7c7300c83b8f296290cd3656d
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Sun Apr 13 16:22:20 2014 +0200
+
+    powernow-k6: disable cache when changing frequency
+    
+    commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b upstream.
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit e20e1d0ac02308e2211306fc67abcd0b2668fb8b
+Author: Mikulas Patocka <mpatocka@redhat.com>
+Date:   Wed Dec 11 19:38:32 2013 -0500
+
+    powernow-k6: disable cache when changing frequency
+    
+    I found out that a system with k6-3+ processor is unstable during network
+    server load. The system locks up or the network card stops receiving. The
+    reason for the instability is the CPU frequency scaling.
+    
+    During frequency transition the processor is in "EPM Stop Grant" state.
+    The documentation says that the processor doesn't respond to inquiry
+    requests in this state. Consequently, coherency of processor caches and
+    bus master devices is not maintained, causing the system instability.
+    
+    This patch flushes the cache during frequency transition. It fixes the
+    instability.
+    
+    Other minor changes:
+    * u64 invalue changed to unsigned long because the variable is 32-bit
+    * move the logic to set the multiplier to a separate function
+      powernow_k6_set_cpu_multiplier
+    * preserve lower 5 bits of the powernow port instead of 4 (the voltage
+      field has 5 bits)
+    * mask interrupts when reading the multiplier, so that the port is not
+      open during other activity (running other kernel code with the port open
+      shouldn't cause any misbehavior, but we should better be safe and keep
+      the port closed)
+    
+    This patch should be backported to all stable kernels. If it doesn't
+    apply cleanly, change it, or ask me to change it.
+    
+    Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit e22057c8599373e5caef0bc42bdb95d2a361ab0d
+Merge: 496b919b3bdd df7a3ee29b77
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Mar 24 12:20:25 2012 -0700
+
+    Merge tag 'stable/for-linus-3.4-tag-two' of git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen
+    
+    Pull more xen updates from Konrad Rzeszutek Wilk:
+     "One tiny feature that accidentally got lost in the initial git pull:
+       * Add fast-EOI acking of interrupts (clear a bit instead of
+         hypercall)
+      And bug-fixes:
+       * Fix CPU bring-up code missing a call to notify other subsystems.
+       * Fix reading /sys/hypervisor even if PVonHVM drivers are not loaded.
+       * In Xen ACPI processor driver: remove too verbose WARN messages, fix
+         up the Kconfig dependency to be a module by default, and add
+         dependency on CPU_FREQ.
+       * Disable CPU frequency drivers from loading when booting under Xen
+         (as we want the Xen ACPI processor to be used instead).
+       * Cleanups in tmem code."
+    
+    * tag 'stable/for-linus-3.4-tag-two' of git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen:
+      xen/acpi: Fix Kconfig dependency on CPU_FREQ
+      xen: initialize platform-pci even if xen_emul_unplug=never
+      xen/smp: Fix bringup bug in AP code.
+      xen/acpi: Remove the WARN's as they just create noise.
+      xen/tmem: cleanup
+      xen: support pirq_eoi_map
+      xen/acpi-processor: Do not depend on CPU frequency scaling drivers.
+      xen/cpufreq: Disable the cpu frequency scaling drivers from loading.
+      provide disable_cpufreq() function to disable the API.
+
+commit 102b208e6b3b16d3611b67a7af9a93d30b92c006
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Tue Mar 13 13:28:12 2012 -0400
+
+    xen/acpi-processor: Do not depend on CPU frequency scaling drivers.
+    
+    With patch "xen/cpufreq: Disable the cpu frequency scaling drivers
+    from loading." we do not have to worry about said drivers loading
+    themselves before the xen-acpi-processor driver. Hence we can remove
+    the default selection (=y if CPU frequency drivers were built-in, or
+    =m if CPU frequency drivers were built as modules), and just
+    select =m for the default case.
+    
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+
+commit 59a56802918100c1e39e68c30a2e5ae9f7d837f0
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Fri Feb 3 16:03:20 2012 -0500
+
+    xen/acpi-processor: C and P-state driver that uploads said data to hypervisor.
+    
+    This driver solves three problems:
+     1). Parse and upload ACPI0007 (or PROCESSOR_TYPE) information to the
+         hypervisor - aka P-states (cpufreq data).
+     2). Upload the the Cx state information (cpuidle data).
+     3). Inhibit CPU frequency scaling drivers from loading.
+    
+    The reason for wanting to solve 1) and 2) is such that the Xen hypervisor
+    is the only one that knows the CPU usage of different guests and can
+    make the proper decision of when to put CPUs and packages in proper states.
+    Unfortunately the hypervisor has no support to parse ACPI DSDT tables, hence it
+    needs help from the initial domain to provide this information. The reason
+    for 3) is that we do not want the initial domain to change P-states while the
+    hypervisor is doing it as well - it causes rather some funny cases of P-states
+    transitions.
+    
+    For this to work, the driver parses the Power Management data and uploads said
+    information to the Xen hypervisor. It also calls acpi_processor_notify_smm()
+    to inhibit the other CPU frequency scaling drivers from being loaded.
+    
+    Everything revolves around the 'struct acpi_processor' structure which
+    gets updated during the bootup cycle in different stages. At the startup, when
+    the ACPI parser starts, the C-state information is processed (processor_idle)
+    and saved in said structure as 'power' element. Later on, the CPU frequency
+    scaling driver (powernow-k8 or acpi_cpufreq), would call the the
+    acpi_processor_* (processor_perflib functions) to parse P-states information
+    and populate in the said structure the 'performance' element.
+    
+    Since we do not want the CPU frequency scaling drivers from loading
+    we have to call the acpi_processor_* functions to parse the P-states and
+    call "acpi_processor_notify_smm" to stop them from loading.
+    
+    There is also one oddity in this driver which is that under Xen, the
+    physical online CPU count can be different from the virtual online CPU count.
+    Meaning that the macros 'for_[online|possible]_cpu' would process only
+    up to virtual online CPU count. We on the other hand want to process
+    the full amount of physical CPUs. For that, the driver checks if the ACPI IDs
+    count is different from the APIC ID count - which can happen if the user
+    choose to use dom0_max_vcpu argument. In such a case a backup of the PM
+    structure is used and uploaded to the hypervisor.
+    
+    [v1-v2: Initial RFC implementations that were posted]
+    [v3: Changed the name to passthru suggested by Pasi Kärkkäinen <pasik@iki.fi>]
+    [v4: Added vCPU != pCPU support - aka dom0_max_vcpus support]
+    [v5: Cleaned up the driver, fix bug under Athlon XP]
+    [v6: Changed the driver to a CPU frequency governor]
+    [v7: Jan Beulich <jbeulich@suse.com> suggestion to make it a cpufreq scaling driver
+         made me rework it as driver that inhibits cpufreq scaling driver]
+    [v8: Per Jan's review comments, fixed up the driver]
+    [v9: Allow to continue even if acpi_processor_preregister_perf.. fails]
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+
+commit f8ede0f700f5478851f242f291d203cde54ca6cf
+Author: Wu Zhangjin <wuzhangjin@gmail.com>
+Date:   Tue Nov 17 01:32:59 2009 +0800
+
+    MIPS: Loongson 2F: Add CPU frequency scaling support
+    
+    Loongson 2F supports CPU clock scaling. When put it into wait mode by
+    setting the frequency as ZERO it will stay in this mode until an external
+    interrupt wakes the CPU again.
+    
+    To enable clock scaling support, an external timer of a known stable rate
+    is required.
+    
+    Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+    Cc: linux-mips@linux-mips.org
+    Cc: cpufreq@vger.kernel.org,
+    Cc: Dave Jones <davej@redhat.com>,
+    Cc: Dominik Brodowski <linux@dominikbrodowski.net>,
+    Cc: yanh@lemote.com
+    Cc: huhb@lemote.com,
+    Patchwork: http://patchwork.linux-mips.org/patch/660/
+    Patchwork: http://patchwork.linux-mips.org/patch/751/
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit e02f838eedef1533f7a1bcf21fe724c3c93093f9
+Author: Ben Dooks <ben@simtec.co.uk>
+Date:   Fri Oct 30 00:30:25 2009 +0000
+
+    [WATCHDOG] CPUFREQ: S3C24XX Watchdog frequency scaling support.
+    
+    Add support for CPU frequency scaling to the S3C24XX Watchdog
+    driver.
+    
+    Signed-off-by: Simtec Linux Team <linux@simtec.co.uk>
+    Signed-off-by: Ben Dooks <ben@simtec.co.uk>
+    Signed-off-by: Wim Van Sebroeck <wim@iguana.be>
+
+commit baf6b281cfa7259ab2d1148b879850f699520bc6
+Author: Ben Dooks <ben@simtec.co.uk>
+Date:   Thu Jul 30 23:23:32 2009 +0100
+
+    ARM: OSIRIS: CPUFREQ: Add CPU frequency scaling support
+    
+    Add CPU frequency scalling support to the Simtec Osiris.
+    
+    Signed-off-by: Ben Dooks <ben@simtec.co.uk>
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit 0dac6ecdc056b83ac66e5b5c923fb73268f4332d
+Author: Ben Dooks <ben@simtec.co.uk>
+Date:   Tue Jun 16 15:34:34 2009 -0700
+
+    s3c-fb: CPUFREQ frequency scaling support
+    
+    Add support for CPU frequency scaling in the S3C24XX video driver.
+    
+    Signed-off-by: Simtec Linux Team <linux@simtec.co.uk>
+    Signed-off-by: Ben Dooks <ben@simtec.co.uk>
+    Cc: Dave Jones <davej@codemonkey.org.uk>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit b3748ddd80569ec753f62e709629b8c639143222
+Author: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date:   Mon Jun 15 11:23:20 2009 +0100
+
+    [ARM] S3C64XX: Initial support for DVFS
+    
+    This patch provides initial support for CPU frequency scaling on the
+    Samsung S3C ARM processors. Currently only S3C6410 processors are
+    supported, though addition of another data table with supported clock
+    rates should be sufficient to enable support for further CPUs.
+    
+    Use the regulator framework to provide optional support for DVFS in
+    the S3C cpufreq driver. When a software controllable regulator is
+    configured the driver will use it to lower the supply voltage when
+    running at a lower frequency, giving improved power savings.
+    
+    When regulator support is disabled or no regulator can be obtained
+    for VDDARM the driver will fall back to scaling only the frequency.
+    
+    Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit 305554768011707f33f437b96f999f812ba2a7e4
+Author: Ben Dooks <ben-linux@fluff.org>
+Date:   Tue Oct 21 14:06:36 2008 +0100
+
+    [ARM] CPUFREQ: S3C24XX serial CPU frequency scaling support.
+    
+    Add support for CPU frequency scalling to the S3C24XX serial
+    driver.
+    
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit 61c7cff89224fc5651b5ba5ff2185d19304b2484
+Author: Ben Dooks <ben-linux@fluff.org>
+Date:   Mon Jul 28 12:04:07 2008 +0100
+
+    i2c: S3C24XX I2C frequency scaling support.
+    
+    Add support for CPU frequency scaling to the S3C24XX I2C driver.
+    
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit fbdb5f865b570e34d6e0d17f327f8d9bc2c4ccc6
+Author: Jesper Nilsson <jesper.nilsson@axis.com>
+Date:   Tue Dec 4 17:25:45 2007 +0100
+
+    CRIS v32: Update and improve kernel/time.c
+    
+    - Shorten include paths to machine dependent header files.
+    - Register name for first timer is now regi_timer0.
+    - Remove raw_printk hack, use oops_in_progress instead.
+    - Add handling of CPU frequency scaling for CRIS.
+    - Remove regs parameter to timer_interrupt, get them from get_irq_regs instead.
+    - Whitespace and formatting changes.
+
+commit 5bae7ac9feba925fd0099057f6b23d7be80b7b41
+Merge: 97405fe26b2a 587ca7619a15
+Author: Linus Torvalds <torvalds@woody.linux-foundation.org>
+Date:   Wed Jul 18 12:57:52 2007 -0700
+
+    Merge branch 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/hskinnemoen/avr32-2.6
+    
+    * 'for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/hskinnemoen/avr32-2.6:
+      [AVR32] Initialize phy_mask for both macb devices
+      [AVR32] Fix atomic_add_unless() and atomic_sub_unless()
+      [AVR32] Correct misspelled CONFIG_BLK_DEV_INITRD variable.
+      [AVR32] Fix build error in parse_tag_rdimg()
+      [AVR32] Don't wire up macb0 unless SW6 is in default position
+      [AVR32] Wire up SSC platform device 0 as TX on ATSTK1000 board
+      [AVR32] Add Atmel SSC driver platform device to AT32AP architecture
+      [AVR32] Remove optimization of unaligned word loads
+      [AVR32] Make STK1000 mux settings configurable
+      [AVR32] CPU frequency scaling for AT32AP
+      [AVR32] Split SM device into PM, RTC, WDT and EIC
+      [AVR32] faster avr32 unaligned access
+
+commit 9e58e1855c9815ad4944df90f695a7645c50f463
+Author: Hans-Christian Egtvedt <hcegtvedt@atmel.com>
+Date:   Mon Jun 4 16:10:57 2007 +0200
+
+    [AVR32] CPU frequency scaling for AT32AP
+    
+    This patch enables CPU frequency scaling for AT32AP devices. This will
+    enable the CPU to scale between the speed of the high speed bus and
+    the master clock and thus save some power.
+    
+    The patch also adds a parent to cpu_clk and a cpu_clk_set_rate to
+    enable changing the CPU clock divider in a sane way.
+    
+    The driver does not check if the given rate is 0, thus resulting in a
+    div by 0.  I think this check should be go into the clk_set_rate
+    framework, and not here.
+    
+    Tested on AT32AP7000/ATSTK1000.
+    
+    Hardware documentation can be found in the AT32AP7000 datasheet.
+    
+    Signed-off-by: Hans-Christian Egtvedt <hcegtvedt@atmel.com>
+    Signed-off-by: Haavard Skinnemoen <hskinnemoen@atmel.com>
+
+commit 164a460d467a43e9f403cd4b76cec626dff99779
+Author: Kumar Gala <galak@kernel.crashing.org>
+Date:   Thu Apr 12 15:35:50 2007 -0500
+
+    [POWERPC] Ensure platform CONFIG options have correct dependencies
+    
+    We currently support TAU and CPU frequency scaling only on discrete
+    (non-SOC) processors.
+    
+    Signed-off-by: Kumar Gala <galak@kernel.crashing.org>

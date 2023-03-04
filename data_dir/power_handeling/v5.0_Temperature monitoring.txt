@@ -1,0 +1,96 @@
+commit 67b8ed29e0d472bda2f3afe48d6ff99e127eff0c
+Merge: d004701d1cc5 f3e4f3fc8ee9
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Dec 1 18:24:25 2019 -0800
+
+    Merge tag 'platform-drivers-x86-v5.5-1' of git://git.infradead.org/linux-platform-drivers-x86
+    
+    Pull x86 platform driver updates from Andy Shevchenko:
+    
+     - New bootctl driver for Mellanox BlueField SoC.
+    
+     - New driver to support System76 laptops.
+    
+     - Temperature monitoring and fan control on Acer Aspire 7551 is now
+       supported.
+    
+     - Previously the Huawei driver handled only hotkeys. After the
+       conversion to WMI it has been expanded to support newer laptop
+       models.
+    
+     - Big refactoring of intel-speed-select tools allows to use it on Intel
+       CascadeLake-N systems.
+    
+     - Touchscreen support for ezpad 6 m4 and Schneider SCT101CTM tablets
+    
+     - Miscellaneous clean ups and fixes here and there.
+    
+    * tag 'platform-drivers-x86-v5.5-1' of git://git.infradead.org/linux-platform-drivers-x86: (59 commits)
+      platform/x86: hp-wmi: Fix ACPI errors caused by passing 0 as input size
+      platform/x86: hp-wmi: Fix ACPI errors caused by too small buffer
+      platform/x86: intel_pmc_core: Add Comet Lake (CML) platform support to intel_pmc_core driver
+      platform/x86: intel_pmc_core: Fix the SoC naming inconsistency
+      platform/mellanox: Fix Kconfig indentation
+      tools/power/x86/intel-speed-select: Display TRL buckets for just base config level
+      tools/power/x86/intel-speed-select: Ignore missing config level
+      platform/x86: touchscreen_dmi: Add info for the ezpad 6 m4 tablet
+      tools/power/x86/intel-speed-select: Increment version
+      tools/power/x86/intel-speed-select: Use core count for base-freq mask
+      tools/power/x86/intel-speed-select: Support platform with limited Intel(R) Speed Select
+      tools/power/x86/intel-speed-select: Use Frequency weight for CLOS
+      tools/power/x86/intel-speed-select: Make CLOS frequency in MHz
+      tools/power/x86/intel-speed-select: Use mailbox for CLOS_PM_QOS_CONFIG
+      tools/power/x86/intel-speed-select: Auto mode for CLX
+      tools/power/x86/intel-speed-select: Correct CLX-N frequency units
+      tools/power/x86/intel-speed-select: Change display of "avx" to "avx2"
+      tools/power/x86/intel-speed-select: Extend command set for perf-profile
+      Add touchscreen platform data for the Schneider SCT101CTM tablet
+      platform/x86: intel_int0002_vgpio: Pass irqchip when adding gpiochip
+      ...
+
+commit d71f5be276bf79eda14c40f3cafcf827326f10cb
+Merge: 92b5abbb44e0 76ffe8a3f766
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Jan 18 12:35:17 2012 -0800
+
+    Merge tag 'scsi-misc' of git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi-misc-2.6
+    
+    SCSI updates on 20120118
+    
+    * tag 'scsi-misc' of git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi-misc-2.6: (49 commits)
+      [SCSI] libfc: remove redundant timer init for fcp
+      [SCSI] fcoe: Move fcoe_debug_logging from fcoe.h to fcoe.c
+      [SCSI] libfc: Declare local functions static
+      [SCSI] fcoe: fix regression on offload em matching function for initiator/target
+      [SCSI] qla4xxx: Update driver version to 5.02.00-k12
+      [SCSI] qla4xxx: Cleanup modinfo display
+      [SCSI] qla4xxx: Update license
+      [SCSI] qla4xxx: Clear the RISC interrupt bit during FW init
+      [SCSI] qla4xxx: Added error logging for firmware abort
+      [SCSI] qla4xxx: Disable generating pause frames in case of FW hung
+      [SCSI] qla4xxx: Temperature monitoring for ISP82XX core.
+      [SCSI] megaraid: fix sparse warnings
+      [SCSI] sg: convert to kstrtoul_from_user()
+      [SCSI] don't change sdev starvation list order without request dispatched
+      [SCSI] isci: fix, prevent port from getting stuck in the 'configuring' state
+      [SCSI] isci: fix start OOB
+      [SCSI] isci: fix io failures while wide port links are coming up
+      [SCSI] isci: allow more time for wide port targets
+      [SCSI] isci: enable wide port targets
+      [SCSI] isci: Fix IO fails when pull cable from phy in x4 wideport in MPC mode.
+      ...
+
+commit 4f77083ed0325ceb9cd5701c0f335583df3dded2
+Author: Mike Hernandez <michael.hernandez@qlogic.com>
+Date:   Wed Jan 11 02:44:15 2012 -0800
+
+    [SCSI] qla4xxx: Temperature monitoring for ISP82XX core.
+    
+    During watchdog, need to monitor temperature of ISP82XX core
+    and set device state to FAILED when temperature reaches
+    "Panic" level.
+    
+    Signed-off-by: Mike Hernandez <michael.hernandez@qlogic.com>
+    Signed-off-by: Vikas Chaudhary <vikas.chaudhary@qlogic.com>
+    Reviewed-by: Mike Christie <michaelc@cs.wisc.edu>
+    Signed-off-by: James Bottomley <JBottomley@Parallels.com>
