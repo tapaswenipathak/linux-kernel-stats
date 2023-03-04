@@ -1,0 +1,501 @@
+commit ed264e8a7d18c5fec2587ed750c87b75d5348210
+Author: Joaquín Ignacio Aramendía <samsagax@gmail.com>
+Date:   Fri Nov 4 11:07:00 2022 -0300
+
+    hwmon: add OneXPlayer mini AMD sensors driver
+    
+    Sensors driver for OXP Handhelds from One-Netbook that expose fan reading
+    and control via hwmon sysfs.
+    
+    As far as I could gather all OXP boards have the same DMI strings and
+    they can be told appart only by the boot cpu vendor (Intel/AMD).
+    Currently only AMD boards are supported since Intel have different EC
+    registers and values to read/write.
+    
+    Fan control is provided via pwm interface in the range [0-255]. AMD
+    boards have [0-100] as range in the EC, the written value is scaled to
+    accommodate for that.
+    
+    Signed-off-by: Joaquín Ignacio Aramendía <samsagax@gmail.com>
+    Link: https://lore.kernel.org/r/20221104140659.593608-1-samsagax@gmail.com
+    [groeck: Removed misleading comment about module_platform_driver()]
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit e8ac01e5db329cf4ac2b36ef66b9d877330a990c
+Author: Arun Saravanan Balachandran <Arun_Saravanan_Balac@dell.com>
+Date:   Mon Sep 13 13:40:15 2021 +0000
+
+    hwmon: Add Maxim MAX6620 hardware monitoring driver
+    
+    Add hardware monitoring driver for Maxim MAX6620 Fan controller
+    
+    Originally-from: L. Grunenberg <contact@lgrunenberg.de>
+    Originally-from: Cumulus Networks <support@cumulusnetworks.com>
+    Originally-from: Shuotian Cheng <shuche@microsoft.com>
+    Signed-off-by: Arun Saravanan Balachandran <Arun_Saravanan_Balac@dell.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit d5d76329a97c06b3950849e5fbdcb13461066e29
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed May 26 08:40:18 2021 -0700
+
+    hwmon: (max31790) Fix pwmX_enable attributes
+    
+    [ Upstream commit 148c847c9e5a54b99850617bf9c143af9a344f92 ]
+    
+    pwmX_enable supports three possible values:
+    
+    0: Fan control disabled. Duty cycle is fixed to 0%
+    1: Fan control enabled, pwm mode. Duty cycle is determined by
+       values written into Target Duty Cycle registers.
+    2: Fan control enabled, rpm mode
+       Duty cycle is adjusted such that fan speed matches
+       the values in Target Count registers
+    
+    The current code does not do this; instead, it mixes pwm control
+    configuration with fan speed monitoring configuration. Worse, it
+    reports that pwm control would be disabled (pwmX_enable==0) when
+    it is in fact enabled in pwm mode. Part of the problem may be that
+    the chip sets the "TACH input enable" bit on its own whenever the
+    mode bit is set to RPM mode, but that doesn't mean that "TACH input
+    enable" accurately reflects the pwm mode.
+    
+    Fix it up and only handle pwm control with the pwmX_enable attributes.
+    In the documentation, clarify that disabling pwm control (pwmX_enable=0)
+    sets the pwm duty cycle to 0%. In the code, explain why TACH_INPUT_EN
+    is set together with RPM_MODE.
+    
+    While at it, only update the configuration register if the configuration
+    has changed, and only update the cached configuration if updating the
+    chip configuration was successful.
+    
+    Cc: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Cc: Václav Kubernát <kubernat@cesnet.cz>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Tested-by: Václav Kubernát <kubernat@cesnet.cz>
+    Reviewed-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Link: https://lore.kernel.org/r/20210526154022.3223012-4-linux@roeck-us.net
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 09b355e15faa4a92a577f20d8494606440ded8ed
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed May 26 08:40:18 2021 -0700
+
+    hwmon: (max31790) Fix pwmX_enable attributes
+    
+    [ Upstream commit 148c847c9e5a54b99850617bf9c143af9a344f92 ]
+    
+    pwmX_enable supports three possible values:
+    
+    0: Fan control disabled. Duty cycle is fixed to 0%
+    1: Fan control enabled, pwm mode. Duty cycle is determined by
+       values written into Target Duty Cycle registers.
+    2: Fan control enabled, rpm mode
+       Duty cycle is adjusted such that fan speed matches
+       the values in Target Count registers
+    
+    The current code does not do this; instead, it mixes pwm control
+    configuration with fan speed monitoring configuration. Worse, it
+    reports that pwm control would be disabled (pwmX_enable==0) when
+    it is in fact enabled in pwm mode. Part of the problem may be that
+    the chip sets the "TACH input enable" bit on its own whenever the
+    mode bit is set to RPM mode, but that doesn't mean that "TACH input
+    enable" accurately reflects the pwm mode.
+    
+    Fix it up and only handle pwm control with the pwmX_enable attributes.
+    In the documentation, clarify that disabling pwm control (pwmX_enable=0)
+    sets the pwm duty cycle to 0%. In the code, explain why TACH_INPUT_EN
+    is set together with RPM_MODE.
+    
+    While at it, only update the configuration register if the configuration
+    has changed, and only update the cached configuration if updating the
+    chip configuration was successful.
+    
+    Cc: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Cc: Václav Kubernát <kubernat@cesnet.cz>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Tested-by: Václav Kubernát <kubernat@cesnet.cz>
+    Reviewed-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Link: https://lore.kernel.org/r/20210526154022.3223012-4-linux@roeck-us.net
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 625ee7d26799a8219a684d295070bbbc911ed7f4
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed May 26 08:40:18 2021 -0700
+
+    hwmon: (max31790) Fix pwmX_enable attributes
+    
+    [ Upstream commit 148c847c9e5a54b99850617bf9c143af9a344f92 ]
+    
+    pwmX_enable supports three possible values:
+    
+    0: Fan control disabled. Duty cycle is fixed to 0%
+    1: Fan control enabled, pwm mode. Duty cycle is determined by
+       values written into Target Duty Cycle registers.
+    2: Fan control enabled, rpm mode
+       Duty cycle is adjusted such that fan speed matches
+       the values in Target Count registers
+    
+    The current code does not do this; instead, it mixes pwm control
+    configuration with fan speed monitoring configuration. Worse, it
+    reports that pwm control would be disabled (pwmX_enable==0) when
+    it is in fact enabled in pwm mode. Part of the problem may be that
+    the chip sets the "TACH input enable" bit on its own whenever the
+    mode bit is set to RPM mode, but that doesn't mean that "TACH input
+    enable" accurately reflects the pwm mode.
+    
+    Fix it up and only handle pwm control with the pwmX_enable attributes.
+    In the documentation, clarify that disabling pwm control (pwmX_enable=0)
+    sets the pwm duty cycle to 0%. In the code, explain why TACH_INPUT_EN
+    is set together with RPM_MODE.
+    
+    While at it, only update the configuration register if the configuration
+    has changed, and only update the cached configuration if updating the
+    chip configuration was successful.
+    
+    Cc: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Cc: Václav Kubernát <kubernat@cesnet.cz>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Tested-by: Václav Kubernát <kubernat@cesnet.cz>
+    Reviewed-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Link: https://lore.kernel.org/r/20210526154022.3223012-4-linux@roeck-us.net
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 2e23607e65dc13446a8f65ee22080e0dcb815d59
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed May 26 08:40:18 2021 -0700
+
+    hwmon: (max31790) Fix pwmX_enable attributes
+    
+    [ Upstream commit 148c847c9e5a54b99850617bf9c143af9a344f92 ]
+    
+    pwmX_enable supports three possible values:
+    
+    0: Fan control disabled. Duty cycle is fixed to 0%
+    1: Fan control enabled, pwm mode. Duty cycle is determined by
+       values written into Target Duty Cycle registers.
+    2: Fan control enabled, rpm mode
+       Duty cycle is adjusted such that fan speed matches
+       the values in Target Count registers
+    
+    The current code does not do this; instead, it mixes pwm control
+    configuration with fan speed monitoring configuration. Worse, it
+    reports that pwm control would be disabled (pwmX_enable==0) when
+    it is in fact enabled in pwm mode. Part of the problem may be that
+    the chip sets the "TACH input enable" bit on its own whenever the
+    mode bit is set to RPM mode, but that doesn't mean that "TACH input
+    enable" accurately reflects the pwm mode.
+    
+    Fix it up and only handle pwm control with the pwmX_enable attributes.
+    In the documentation, clarify that disabling pwm control (pwmX_enable=0)
+    sets the pwm duty cycle to 0%. In the code, explain why TACH_INPUT_EN
+    is set together with RPM_MODE.
+    
+    While at it, only update the configuration register if the configuration
+    has changed, and only update the cached configuration if updating the
+    chip configuration was successful.
+    
+    Cc: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Cc: Václav Kubernát <kubernat@cesnet.cz>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Tested-by: Václav Kubernát <kubernat@cesnet.cz>
+    Reviewed-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Link: https://lore.kernel.org/r/20210526154022.3223012-4-linux@roeck-us.net
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 148c847c9e5a54b99850617bf9c143af9a344f92
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed May 26 08:40:18 2021 -0700
+
+    hwmon: (max31790) Fix pwmX_enable attributes
+    
+    pwmX_enable supports three possible values:
+    
+    0: Fan control disabled. Duty cycle is fixed to 0%
+    1: Fan control enabled, pwm mode. Duty cycle is determined by
+       values written into Target Duty Cycle registers.
+    2: Fan control enabled, rpm mode
+       Duty cycle is adjusted such that fan speed matches
+       the values in Target Count registers
+    
+    The current code does not do this; instead, it mixes pwm control
+    configuration with fan speed monitoring configuration. Worse, it
+    reports that pwm control would be disabled (pwmX_enable==0) when
+    it is in fact enabled in pwm mode. Part of the problem may be that
+    the chip sets the "TACH input enable" bit on its own whenever the
+    mode bit is set to RPM mode, but that doesn't mean that "TACH input
+    enable" accurately reflects the pwm mode.
+    
+    Fix it up and only handle pwm control with the pwmX_enable attributes.
+    In the documentation, clarify that disabling pwm control (pwmX_enable=0)
+    sets the pwm duty cycle to 0%. In the code, explain why TACH_INPUT_EN
+    is set together with RPM_MODE.
+    
+    While at it, only update the configuration register if the configuration
+    has changed, and only update the cached configuration if updating the
+    chip configuration was successful.
+    
+    Cc: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Cc: Václav Kubernát <kubernat@cesnet.cz>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Tested-by: Václav Kubernát <kubernat@cesnet.cz>
+    Reviewed-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+    Link: https://lore.kernel.org/r/20210526154022.3223012-4-linux@roeck-us.net
+
+commit 1c58d4295be6a9f2983fa2b8ac770bcca7eef66f
+Author: Likun Gao <Likun.Gao@amd.com>
+Date:   Fri Mar 13 13:06:49 2020 +0800
+
+    drm/amd/powerplay: enable Fan control for sienna_cichlid
+    
+    Support for Advanced Fan Control (AFC+) for sienna_cichlid.
+    
+    Signed-off-by: Likun Gao <Likun.Gao@amd.com>
+    Reviewed-by: Kenneth Feng <kenneth.feng@amd.com>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+
+commit dbf55205118e5d46cddf65a1d1e7ea16879a7c72
+Author: Jean Delvare <jdelvare@suse.de>
+Date:   Tue Aug 6 10:21:23 2019 +0200
+
+    hwmon: w83795: Fan control option isn't that dangerous
+    
+    I have been using SENSORS_W83795_FANCTRL for several years and never
+    had any problem. When the driver was added, I had not tested that
+    part of the driver yet so I wanted to be super cautious, but time has
+    shown that it works just fine.
+    
+    In the long run I even believe that we should drop the option and
+    enable the feature unconditionally. It doesn't do anything until the
+    user explicitly starts twiddling with sysfs attributes anyway.
+    
+    Signed-off-by: Jean Delvare <jdelvare@suse.de>
+    Link: https://lore.kernel.org/r/20190806102123.3118bcc5@endymion
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit b16528466786a540cb00148acb124e0149d62710
+Merge: e5a32b5b21a1 4afec79f652b
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Aug 13 19:53:26 2018 -0700
+
+    Merge tag 'hwmon-for-linus-v4.19-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging
+    
+    Pull hwmon updates from Guenter Roeck:
+    
+     - new driver for NPCM7xx PWM and Fan controller
+    
+     - new driver for Mellanox FAN controller
+    
+     - add support for MAX34451 to max34440 driver
+    
+     - add support for new Threadripper variants to k10temp driver
+    
+     - add error handling to adt7475 driver
+    
+     - cleanup nct6775 and nct7904 drivers
+    
+     - document sensor enable ABI attributes
+    
+    * tag 'hwmon-for-linus-v4.19-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging:
+      hwmon: (adt7475) Change show functions to return error data correctly
+      hwmon: (adt7475) Change update functions to add error handling
+      hwmon: (adt7475) Change valid parameter to bool type
+      hwmon: (adt7475) Split device update function to measure and limits
+      hwmon: k10temp: Support Threadripper 2920X, 2970WX; simplify offset table
+      hwmon: (k10temp) 27C Offset needed for Threadripper2
+      hwmon: (iio_hwmon) Use devm functions
+      hwmon: Add NPCM7xx PWM and Fan driver
+      dt-binding: hwmon: Add NPCM7xx PWM and Fan controller documentation
+      hwmon: (pmbus/max34440) Add support for MAX34451.
+      hwmon: Document the sensor enable attribute
+      hwmon: (mlxreg-fan) Add support for Mellanox FAN driver
+      hwmon: Mark expected switch fall-throughs
+      hwmon: (nct6775) Fix comment in the description of pwm_mode
+      hwmon: (nct7904) Fix UNSPECIFIED_INT warning
+      hwmon: (nct7904) Fix CODE_INDENT error
+      hwmon: (nct7904) Fix SPACING errors
+
+commit f1fd4a4db777030a2542701fb0d3a261d4472d6d
+Author: Tomer Maimon <tmaimon77@gmail.com>
+Date:   Wed Jul 4 02:23:26 2018 +0300
+
+    hwmon: Add NPCM7xx PWM and Fan driver
+    
+    Add Nuvoton BMC NPCM750/730/715/705 Pulse Width Modulation (PWM)
+    and Fan tacho driver.
+    
+    The Nuvoton BMC NPCM750/730/715/705 supports 8 PWM controller outputs
+    and 16 Fan controller inputs.
+    
+    The driver provides a sysfs entries through which the user can
+    configure the duty-cycle value from 0(off) and 255(full speed)
+    and read the fan tacho rpm value.
+    
+    Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit 68dde6cae6e523dfec8ec097af2c41680fb766c6
+Author: Tomer Maimon <tmaimon77@gmail.com>
+Date:   Wed Jul 4 02:23:25 2018 +0300
+
+    dt-binding: hwmon: Add NPCM7xx PWM and Fan controller documentation
+    
+    Added device tree binding documentation for Nuvoton BMC
+    NPCM7xx Pulse Width Modulation (PWM)  and Fan tach controller.
+    The Nuvoton BMC NPCM7XX supports 8 PWM controller outputs
+    and 16 Fan tachometer controller inputs.
+    
+    Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    [groeck: Fixed whitespace errors noticed by git]
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit 47d5cc5be396eca67cc89572957ff16f10fd768e
+Merge: 0fc7e7466344 6fbc4232a5ac
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Jan 29 11:20:45 2018 -0800
+
+    Merge tag 'hwmon-for-linus-v4.16' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging
+    
+    Pull hwmon updates from Guenter Roeck:
+    
+     - New driver for W83773G
+    
+     - Fan control support for PMBus drivers
+    
+     - Improvements and minor fixes in several drivers
+    
+    * tag 'hwmon-for-linus-v4.16' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging: (32 commits)
+      hwmon: (dell-smm) Disable fan support for Dell Vostro 3360
+      hwmon: (dell-smm) Disable fan support for Dell Inspiron 7720
+      hwmon: (dell-smm) Enable broken functionality via "force" module param
+      hwmon: (k10temp) Add temperature offset for Ryzen 1900X
+      hwmon: (lm75) Fix trailing semicolon
+      hwmon: (ina2xx) Fix access to uninitialized mutex
+      hwmon: (pmbus/ir35221) Remove unnecessary scaling
+      hwmon: (sht3x) wait predefined limits loading complete before access
+      hwmon: (pmbus/ibm-cffps) Add dependency on LEDS_CLASS
+      hwmon: (pmbus/cffps) Add led class device for power supply fault led
+      hwmon: (pmbus) cffps: Add PMBUS_SKIP_STATUS_CHECK
+      hwmon: (aspeed-pwm-tacho) Deassert reset in probe
+      dt-bindings: hwmon: aspeed-pwm-tacho: Add reset node
+      hwmon: (pmbus) cffps: Add debugfs entries
+      hwmon: (pmbus) Export pmbus device debugfs directory entry
+      hwmon: (w83773g) Fix fault detection and reporting
+      hwmon: (hih6130) Fix documentation of struct hih6130
+      hwmon: (iio_hwmon) Fix documentation of struct iio_hwmon_state
+      hwmon: (sht15) Fix parameter documentation of sht15_crc8()
+      hwmon: (sht21) Fix documentation of struct sht21
+      ...
+
+commit 7ec27233e62b5efe795563896577de5340dc7473
+Merge: bab1e2fe4b82 afa31879f0a6
+Author: Dave Airlie <airlied@redhat.com>
+Date:   Fri May 12 13:58:29 2017 +1000
+
+    Merge branch 'drm-next-4.12' of git://people.freedesktop.org/~agd5f/linux into drm-next
+    
+    Fixes for 4.12.  This is a bit bigger than usual since it's 3 weeks
+    worth of fixes and most of these changes are for vega10 which is
+    new for 4.12 and still in a fair amount of flux.  It looks like
+    you missed my last pull request, so those patches are included here
+    as well.  Highlights:
+    - Lots of vega10 fixes
+    - Fix interruptable wait mixup
+    - Fan control method fixes
+    - Misc display fixes for radeon and amdgpu
+    - Misc bug fixes
+    
+    * 'drm-next-4.12' of git://people.freedesktop.org/~agd5f/linux: (132 commits)
+      drm/amd/powerplay: refine pwm1_enable callback functions for CI.
+      drm/amd/powerplay: refine pwm1_enable callback functions for vi.
+      drm/amd/powerplay: refine pwm1_enable callback functions for Vega10.
+      drm/amdgpu: refine amdgpu pwm1_enable sysfs interface.
+      drm/amdgpu: add amd fan ctrl mode enums.
+      drm/amd/powerplay: add more smu message on Vega10.
+      drm/amdgpu: fix dependency issue
+      drm/amd: fix init order of sched job
+      drm/amdgpu: add some additional vega10 pci ids
+      drm/amdgpu/soc15: use atomfirmware for setting bios scratch for reset
+      drm/amdgpu/atomfirmware: add function to update engine hang status
+      drm/radeon: only warn once in radeon_ttm_bo_destroy if va list not empty
+      drm/amdgpu: fix mutex list null pointer reference
+      drm/amd/powerplay: fix bug sclk/mclk level can't be set on vega10.
+      drm/amd/powerplay: Setup sw CTF to allow graceful exit when temperature exceeds maximum.
+      drm/amd/powerplay: delete dead code in powerplay.
+      drm/amdgpu: Use less generic enum definitions
+      drm/amdgpu/gfx9: derive tile pipes from golden settings
+      drm/amdgpu/gfx: drop max_gs_waves_per_vgt
+      drm/amd/powerplay: disable engine spread spectrum feature on Vega10.
+      ...
+
+commit 6586b14c7bdec22f59dc749ead1d01d542d793b6
+Author: Guenter Roeck <guenter.roeck@ericsson.com>
+Date:   Wed Mar 9 07:23:54 2011 -0800
+
+    hwmon: (pmbus) Use device specific function to read fan configuration
+    
+    Fan control implementation tends to be device specific, so start using
+    the device specific function call to read fan configuration registers.
+    
+    Signed-off-by: Guenter Roeck <guenter.roeck@ericsson.com>
+    Reviewed-by: Tom Grennan <tom.grennan@ericsson.com>
+
+commit ae51cd9bcd9ca841bf45c0ba33823c56ac1ce81e
+Author: Jean Delvare <khali@linux-fr.org>
+Date:   Mon Nov 15 21:38:56 2010 +0100
+
+    hwmon: (w83795) Fix fan control mode attributes
+    
+    There were two bugs:
+    * Speed cruise mode was improperly reported for all fans but fan1.
+    * Fan control method (PWM vs. DC) was mixed with the control mode.
+      It will be added back as a separate attribute, as per the standard
+      sysfs interface.
+    
+    Signed-off-by: Jean Delvare <khali@linux-fr.org>
+    Acked-by: Guenter Roeck <guenter.roeck@ericsson.com>
+
+commit d73772474f6ebbacbe820c31c0fa1cffa7160246
+Author: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+Date:   Thu Jun 18 00:40:17 2009 -0300
+
+    thinkpad-acpi: support the second fan on the X61
+    
+    Support reading the tachometer of the auxiliary fan of a X60/X61.
+    
+    It was found out by sheer luck, that bit 0 of EC register 0x31
+    (formely HBRV) selects which fan is active for tachometer readings
+    through EC 0x84/0x085: 0 for fan1, 1 for fan2.
+    
+    Many thanks to Christoph Kl??nter, to Whoopie, and to weasel, who
+    helped confirm that behaviour.
+    
+    Fan control through EC HFSP applies to both fans equally, regardless
+    of the state of bit 0 of EC 0x31.  That matches the way the DSDT uses
+    HFSP.
+    
+    In order to better support the secondary fan, export a second
+    tachometer over hwmon, and add defensive measures to make sure we are
+    reading the correct tachometer.
+    
+    Support for the second fan is whitelist-based, as I have not found
+    anything obvious to look for in the DSDT to detect the presence of
+    the second fan.
+    
+    Signed-off-by: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit e62b8b2bc73b2433239a2ac394c2fafd50c43d9e
+Author: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date:   Wed Aug 10 11:12:09 2005 +0200
+
+    [PATCH] ppc64: Fix Fan control for new PowerMac G5 2.7GHz machines
+    
+    The workaround for broken device-tree that prevents fan control from
+    working on recent G5 models need to be "enabled" for machines with
+    revision 0x37 of the bridge in addition to machines with revision 0x35.
+    
+    Signed-off-by: Geoff Levand <geoffrey.levand@am.sony.com>
+    Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>

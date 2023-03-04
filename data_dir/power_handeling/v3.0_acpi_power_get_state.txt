@@ -1,0 +1,123 @@
+commit 587024b8210d4eeeab457323141c92e134cd3dbf
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Mon May 24 17:24:16 2021 +0200
+
+    ACPI: power: Use u8 as the power resource state data type
+    
+    Use u8 as the data type for representing the state of an ACPI
+    power resource.
+    
+    It is s not necessary to use int for that and because subsequent
+    changes are going to use ACPI_POWER_RESOURCE_STATE_UNKNOWN, it is
+    better to adjust the data type so that the "unknown" state is
+    represented by the "all ones" value.
+    
+    While at it, clean up acpi_power_get_state() somewhat.
+    
+    No intentional functional impact.
+    
+    Tested-by: Dave Olsthoorn <dave@bewaar.me>
+    Tested-by: Shujun Wang <wsj20369@163.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 797afdf70844c719d229174c460687fb17af9762
+Merge: 9219cec5f235 981984cbd09e
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Oct 18 14:26:51 2013 -0700
+
+    Merge tag 'pm+acpi-3.12-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull ACPI and power management fixes from Rafael Wysocki:
+    
+     - intel_pstate fix for misbehavior after system resume if sysfs
+       attributes are set in a specific way before the corresponding suspend
+       from Dirk Brandewie.
+    
+     - A recent intel_pstate fix has no effect if unsigned long is 32-bit,
+       so fix it up to cover that case as well.
+    
+     - The s3c64xx cpufreq driver was not updated when the index field of
+       struct cpufreq_frequency_table was replaced with driver_data, so
+       update it now.  From Charles Keepax.
+    
+     - The Kconfig help text for ACPI_BUTTON still refers to
+       /proc/acpi/event that has been dropped recently, so modify it to
+       remove that reference.  From Krzysztof Mazur.
+    
+     - A Lan Tianyu's change adds a missing mutex unlock to an error code
+       path in acpi_resume_power_resources().
+    
+     - Some code related to ACPI power resources, whose very purpose is
+       questionable to put it lightly, turns out to cause problems to happen
+       during testing on real systems, so remove it completely (we may
+       revisit that in the future if there's a compelling enough reason).
+       From Rafael J Wysocki and Aaron Lu.
+    
+    * tag 'pm+acpi-3.12-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm:
+      ACPI / PM: Drop two functions that are not used any more
+      ATA / ACPI: remove power dependent device handling
+      cpufreq: s3c64xx: Rename index to driver_data
+      ACPI / power: Drop automaitc resume of power resource dependent devices
+      intel_pstate: Fix type mismatch warning
+      cpufreq / intel_pstate: Fix max_perf_pct on resume
+      ACPI: remove /proc/acpi/event from ACPI_BUTTON help
+      ACPI / power: Release resource_lock after acpi_power_get_state() return error
+
+commit 981984cbd09e41c05b4ec6260e3f68591354cd54
+Merge: bdbff71653db 2421ad48f4ae
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Fri Oct 18 13:42:10 2013 +0200
+
+    Merge branch 'acpi-fixes'
+    
+    * acpi-fixes:
+      ACPI / PM: Drop two functions that are not used any more
+      ATA / ACPI: remove power dependent device handling
+      ACPI / power: Drop automaitc resume of power resource dependent devices
+      ACPI: remove /proc/acpi/event from ACPI_BUTTON help
+      ACPI / power: Release resource_lock after acpi_power_get_state() return error
+
+commit d7d49012b917647794b6df33f4e7a61a2c818ccf
+Author: Lan Tianyu <tianyu.lan@intel.com>
+Date:   Tue Oct 15 19:48:11 2013 +0800
+
+    ACPI / power: Release resource_lock after acpi_power_get_state() return error
+    
+    In acpi_resume_power_resources() resource_lock should be released
+    when acpi_power_get_state() fails and before passing to next power
+    resource on the list.
+    
+    Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit b1b57fbe9bb10d94682a975456de7a727d1dbc84
+Author: Zhao Yakui <yakui.zhao@intel.com>
+Date:   Mon Oct 27 16:04:53 2008 +0800
+
+    ACPI: fix de-reference bug in power resource driver
+    
+    change state to *state in the function of acpi_power_get_state()
+    
+    Signed-off-by: yakui.zhao@intel.com
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit a51e145f379ae48003129610922595893e8efde0
+Author: Zhao Yakui <yakui.zhao@intel.com>
+Date:   Mon Aug 11 14:55:05 2008 +0800
+
+    ACPI: Get the device power state in the course of scanning device
+    
+    Get the device power state in the course of scanning device if the device
+    power flag is power_managable. i.e. The device has the _PSx/_PRx object.
+    
+    At the same time before the drivers/acpi/power module is loaded, there is no
+    relation between acpi_power_resource and acpi device. So the first parameter
+    of acpi_power_get_state is changed to acpi_handle.
+    
+    http://bugzilla.kernel.org/show_bug.cgi?id=8049
+    http://bugzilla.kernel.org/show_bug.cgi?id=11000
+    
+    Signed-off-by: Zhao Yakui <yakui.zhao@intel.com>
+    Signed-off-by: Li Shaohua <shaohua.li@intel.com>
+    Signed-off-by: Andi Kleen <ak@linux.intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>

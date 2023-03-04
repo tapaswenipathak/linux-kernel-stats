@@ -1,0 +1,428 @@
+commit 369aea84595189200a2e6b028f556a7efa0ec489
+Author: Alexander Usyskin <alexander.usyskin@intel.com>
+Date:   Sat Feb 6 16:43:24 2021 +0200
+
+    mei: implement client dma setup.
+    
+    Implement HBM message protocol to setup and tear down
+    DMA buffer on behalf of an client. On top there DMA
+    buffer allocation and its life time management.
+    
+    Signed-off-by: Alexander Usyskin <alexander.usyskin@intel.com>
+    Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+    Link: https://lore.kernel.org/r/20210206144325.25682-5-tomas.winkler@intel.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1021dcf19db1387bc0db26d14bbcba719923a466
+Author: Anson Huang <Anson.Huang@nxp.com>
+Date:   Fri Dec 13 14:02:30 2019 -0800
+
+    Input: imx_sc_key - only take the valid data from SCU firmware as key state
+    
+    When reading key state from SCU, the response data from SCU firmware
+    is 4 bytes due to MU message protocol, but ONLY the first byte is the
+    key state, other 3 bytes could be some dirty data, so we should ONLY
+    take the first byte as key state to avoid reporting incorrect state.
+    
+    Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+    Fixes: 688f1dfb69b4 ("Input: keyboard - imx_sc: Add i.MX system controller key support")
+    Link: https://lore.kernel.org/r/1576202909-1661-1-git-send-email-Anson.Huang@nxp.com
+    Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+
+commit 4752544a447b52b9949eb648a3b7719357853f91
+Author: Sudeep Holla <sudeep.holla@arm.com>
+Date:   Tue Jul 23 14:00:09 2019 +0100
+
+    firmware: arm_scmi: Use the correct style for SPDX License Identifier
+    
+    Fix to correct the SPDX License Identifier style in header file related
+    to firmware frivers for ARM SCMI message protocol.
+    
+    For C header files Documentation/process/license-rules.rst mandates
+    C-like comments(opposed to C source files where C++ style should be
+    used).
+    
+    While at it, change GPL-2.0 to GPL-2.0-only similar to the ones in
+    psci.h and scpi_protocol.h
+    
+    Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+commit 4ecbd88bf9949cc705e49fde3db450ad2f81fae3
+Author: Quentin Perret <quentin.perret@arm.com>
+Date:   Wed Jan 9 10:42:36 2019 +0000
+
+    cpufreq: scmi: Fix frequency invariance in slow path
+    
+    commit 0e141d1c65c1dd31c914eb2e11651adcc1a15912 upstream.
+    
+    The scmi-cpufreq driver calls the arch_set_freq_scale() callback on
+    frequency changes to provide scale-invariant load-tracking signals to
+    the scheduler. However, in the slow path, it does so while specifying
+    the current and max frequencies in different units, hence resulting in a
+    broken freq_scale factor.
+    
+    Fix this by passing all frequencies in KHz, as stored in the CPUFreq
+    frequency table.
+    
+    Fixes: 99d6bdf33877 (cpufreq: add support for CPU DVFS based on SCMI message protocol)
+    Signed-off-by: Quentin Perret <quentin.perret@arm.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+    Cc: 4.17+ <stable@vger.kernel.org> # v4.17+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit d677ef8f6ce03713688ebb6fb8854b9decedb4bc
+Author: Quentin Perret <quentin.perret@arm.com>
+Date:   Wed Jan 9 10:42:36 2019 +0000
+
+    cpufreq: scmi: Fix frequency invariance in slow path
+    
+    commit 0e141d1c65c1dd31c914eb2e11651adcc1a15912 upstream.
+    
+    The scmi-cpufreq driver calls the arch_set_freq_scale() callback on
+    frequency changes to provide scale-invariant load-tracking signals to
+    the scheduler. However, in the slow path, it does so while specifying
+    the current and max frequencies in different units, hence resulting in a
+    broken freq_scale factor.
+    
+    Fix this by passing all frequencies in KHz, as stored in the CPUFreq
+    frequency table.
+    
+    Fixes: 99d6bdf33877 (cpufreq: add support for CPU DVFS based on SCMI message protocol)
+    Signed-off-by: Quentin Perret <quentin.perret@arm.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+    Cc: 4.17+ <stable@vger.kernel.org> # v4.17+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0e141d1c65c1dd31c914eb2e11651adcc1a15912
+Author: Quentin Perret <quentin.perret@arm.com>
+Date:   Wed Jan 9 10:42:36 2019 +0000
+
+    cpufreq: scmi: Fix frequency invariance in slow path
+    
+    The scmi-cpufreq driver calls the arch_set_freq_scale() callback on
+    frequency changes to provide scale-invariant load-tracking signals to
+    the scheduler. However, in the slow path, it does so while specifying
+    the current and max frequencies in different units, hence resulting in a
+    broken freq_scale factor.
+    
+    Fix this by passing all frequencies in KHz, as stored in the CPUFreq
+    frequency table.
+    
+    Fixes: 99d6bdf33877 (cpufreq: add support for CPU DVFS based on SCMI message protocol)
+    Signed-off-by: Quentin Perret <quentin.perret@arm.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+    Cc: 4.17+ <stable@vger.kernel.org> # v4.17+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 7ca5ce896524f5292e610b27d168269e5ab74951
+Author: Richard Gong <richard.gong@intel.com>
+Date:   Tue Nov 13 12:14:01 2018 -0600
+
+    firmware: add Intel Stratix10 service layer driver
+    
+    Some features of the Intel Stratix10 SoC require a level of privilege
+    higher than the kernel is granted. Such secure features include
+    FPGA programming. In terms of the ARMv8 architecture, the kernel runs
+    at Exception Level 1 (EL1), access to the features requires
+    Exception Level 3 (EL3).
+    
+    The Intel Stratix10 SoC service layer provides an in kernel API for
+    drivers to request access to the secure features. The requests are queued
+    and processed one by one. ARM’s SMCCC is used to pass the execution
+    of the requests on to a secure monitor (EL3).
+    
+    The header file stratix10-sve-client.h defines the interface between
+    service providers (FPGA manager is one of them) and service layer.
+    
+    The header file stratix10-smc.h defines the secure monitor call (SMC)
+    message protocols used for service layer driver in normal world
+    (EL1) to communicate with secure monitor SW in secure monitor exception
+    level 3 (EL3).
+    
+    Signed-off-by: Richard Gong <richard.gong@intel.com>
+    Signed-off-by: Alan Tull <atull@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f46f11dc1e86270935041fbc3920ba71a050a5fd
+Merge: 819d38e95f8a 02f208c5c605
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Mar 7 16:45:07 2018 +0100
+
+    Merge tag 'scmi-updates-4.17' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/sudeep.holla/linux into next/drivers
+    
+    Pull "ARM SCMI support for v4.17" from Sudeep Holla:
+    
+    ARM System Control and Management Interface(SCMI)[1] is more flexible and
+    easily extensible than any of the existing interfaces.
+    
+    Few existing as well as future ARM platforms provide micro-controllers
+    to abstract various power and other system management tasks which have
+    similar interfaces, both in terms of the functions that are provided by
+    them, and in terms of how requests are communicated to them.
+    
+    There are quite a few protocols like ARM SCPI, TI SCI, QCOM RPM, Nvidia Tegra
+    BPMP, and so on already. This specification is to standardize and avoid any
+    further fragmentation in the design of such interface by various vendors.
+    
+    The current SCMI driver implementation is very basic and initial support.
+    It lacks support for notifications, asynchronous/delayed response, perf/power
+    statistics region and sensor register region.
+    
+    Mailbox is the only form of transport supported currently in the driver.
+    SCMI supports interrupt based mailbox communication, where, on completion
+    of the processing of a message, the caller receives an interrupt as well as
+    polling for completion.
+    
+    SCMI is designed to minimize the dependency on the mailbox/transport
+    hardware. So in terms of SCMI, each channel in the mailbox includes
+    memory area, doorbell and completion interrupt.
+    
+    However the doorbell and completion interrupt is highly mailbox dependent
+    which was bit of controversial as part of SCMI/mailbox discussions.
+    
+    Arnd and me discussed about the few aspects of SCMI and the mailbox framework:
+    
+    1. Use of mailbox framework for doorbell type mailbox controller:
+       - Such hardware may not require any data to be sent to signal the remote
+         about the presence of a message. The channel will have in-built
+         information on how to trigger the signal to the remote.
+         There are few mailbox controller drivers which are purely doorbell based.
+         e.g.QCOM IPC, STM, Tegra, ACPI PCC,..etc
+    
+    2. Supporting other mailbox controller:
+       - SCMI just needs a mechanism to signal the remote firmware. Such
+         controller may need fixed message to be sent to trigger a doorbell.
+         In such case we may need to get that data from DT and pass the same
+         to the controller. It's not covered in the current DT binding, but
+         can be extended as optional property in future.
+    
+         However handling notifications may be interesting on such mailbox, but
+         again there is no way to interpret what the data field(remote message)
+         means, it could be a bit mask or a number or don't-care.
+    
+    Arnd mentioned that he doesn't like the way the mailbox binding deals
+    with doorbell-type hardware, but we do have quite a few precedent drivers
+    already and changing the binding to add a data field would not make it any
+    better, but could cause other problems. So he is happy with the status quo
+    of SCMI implementation.
+    
+    [1] http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.den0056a/index.html
+    
+    * tag 'scmi-updates-4.17' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/sudeep.holla/linux:
+      cpufreq: scmi: add support for fast frequency switching
+      cpufreq: add support for CPU DVFS based on SCMI message protocol
+      hwmon: add support for sensors exported via ARM SCMI
+      hwmon: (core) Add hwmon_max to hwmon_sensor_types enumeration
+      clk: add support for clocks provided by SCMI
+      firmware: arm_scmi: add device power domain support using genpd
+      firmware: arm_scmi: add per-protocol channels support using idr objects
+      firmware: arm_scmi: refactor in preparation to support per-protocol channels
+      firmware: arm_scmi: add option for polling based performance domain operations
+      firmware: arm_scmi: add support for polling based SCMI transfers
+      firmware: arm_scmi: probe and initialise all the supported protocols
+      firmware: arm_scmi: add initial support for sensor protocol
+      firmware: arm_scmi: add initial support for power protocol
+      firmware: arm_scmi: add initial support for clock protocol
+      firmware: arm_scmi: add initial support for performance protocol
+      firmware: arm_scmi: add scmi protocol bus to enumerate protocol devices
+      firmware: arm_scmi: add common infrastructure and support for base protocol
+      firmware: arm_scmi: add basic driver infrastructure for SCMI
+      dt-bindings: arm: add support for ARM System Control and Management Interface(SCMI) protocol
+      dt-bindings: mailbox: add support for mailbox client shared memory
+
+commit 99d6bdf3387734d75e3e34e94a58b8a355b7a9c8
+Author: Sudeep Holla <sudeep.holla@arm.com>
+Date:   Sun Jun 18 09:38:11 2017 +0100
+
+    cpufreq: add support for CPU DVFS based on SCMI message protocol
+    
+    On some ARM based systems, a separate Cortex-M based System Control
+    Processor(SCP) provides the overall power, clock, reset and system
+    control including CPU DVFS. SCMI Message Protocol is used to
+    communicate with the SCP.
+    
+    This patch adds a cpufreq driver for such systems using SCMI interface
+    to drive CPU DVFS.
+    
+    Cc: linux-pm@vger.kernel.org
+    Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+commit 4fb0a5eb364d239722e745c02aef0dbd4e0f1ad2
+Author: Jens Wiklander <jens.wiklander@linaro.org>
+Date:   Tue Apr 14 14:33:20 2015 +0200
+
+    tee: add OP-TEE driver
+    
+    Adds a OP-TEE driver which also can be compiled as a loadable module.
+    
+    * Targets ARM and ARM64
+    * Supports using reserved memory from OP-TEE as shared memory
+    * Probes OP-TEE version using SMCs
+    * Accepts requests on privileged and unprivileged device
+    * Uses OPTEE message protocol version 2 to communicate with secure world
+    
+    Acked-by: Andreas Dannenberg <dannenberg@ti.com>
+    Tested-by: Jerome Forissier <jerome.forissier@linaro.org> (HiKey)
+    Tested-by: Volodymyr Babchuk <vlad.babchuk@gmail.com> (RCAR H3)
+    Tested-by: Scott Branden <scott.branden@broadcom.com>
+    Reviewed-by: Javier González <javier@javigon.com>
+    Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+commit 9f72322050e4762adde66619f048b7317ad12d77
+Author: Nishanth Menon <nm@ti.com>
+Date:   Tue Oct 18 18:08:36 2016 -0500
+
+    firmware: ti_sci: Add support for Clock control
+    
+    Texas Instrument's System Control Interface (TI-SCI) Message Protocol
+    is used in Texas Instrument's System on Chip (SoC) such as those
+    in keystone family K2G SoC to communicate between various compute
+    processors with a central system controller entity.
+    
+    TI-SCI message protocol provides support for management of various
+    hardware entities within the SoC. Add support driver to allow
+    communication with system controller entity within the SoC using the
+    mailbox client.
+    
+    In general, we expect to function at a device level of abstraction,
+    however, for proper operation of hardware blocks, many clocks directly
+    supplying the hardware block needs to be queried or configured.
+    
+    Introduce support for the set of SCI message protocol support that
+    provide us with this capability.
+    
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Signed-off-by: Tero Kristo <t-kristo@ti.com>
+
+commit 9e7d756da7a5b0cc756d1f512f3eaf261834180a
+Author: Nishanth Menon <nm@ti.com>
+Date:   Tue Oct 18 18:08:35 2016 -0500
+
+    firmware: ti_sci: Add support for Device control
+    
+    Texas Instrument's System Control Interface (TI-SCI) Message Protocol
+    is used in Texas Instrument's System on Chip (SoC) such as those
+    in keystone family K2G SoC to communicate between various compute
+    processors with a central system controller entity.
+    
+    TI-SCI message protocol provides support for management of various
+    hardware entitites within the SoC. Add support driver to allow
+    communication with system controller entity within the SoC using the
+    mailbox client.
+    
+    We introduce the fundamental device management capability support to
+    the driver protocol as part of this change.
+    
+    [d-gerlach@ti.com: Contributed device reset handling]
+    Signed-off-by: Dave Gerlach <d-gerlach@ti.com>
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Signed-off-by: Tero Kristo <t-kristo@ti.com>
+
+commit aa276781a64a5f15ecc21e920960c5b1f84e5fee
+Author: Nishanth Menon <nm@ti.com>
+Date:   Tue Oct 18 18:08:34 2016 -0500
+
+    firmware: Add basic support for TI System Control Interface (TI-SCI) protocol
+    
+    Texas Instrument's System Control Interface (TI-SCI) Message Protocol
+    is used in Texas Instrument's System on Chip (SoC) such as those
+    in keystone family K2G SoC to communicate between various compute
+    processors with a central system controller entity.
+    
+    TI-SCI message protocol provides support for management of various
+    hardware entities within the SoC. Add support driver to allow
+    communication with system controller entity within the SoC using the
+    mailbox client.
+    
+    We introduce the basic registration and query capability for the
+    driver protocol as part of this change. Subsequent patches add in
+    functionality specific to the TI-SCI features.
+    
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Signed-off-by: Tero Kristo <t-kristo@ti.com>
+
+commit 04f1024e1df5eae18e36ce41bed3ddfec7f2477d
+Author: Nishanth Menon <nm@ti.com>
+Date:   Tue Oct 18 18:08:33 2016 -0500
+
+    Documentation: Add support for TI System Control Interface (TI-SCI) protocol
+    
+    Texas Instrument's System Control Interface (TI-SCI) Message Protocol
+    is used in Texas Instrument's System on Chip (SoC) such as those in
+    newer SoCs in the keystone processor family starting with K2G.
+    
+    This message protocol is used to communicate between various compute
+    or processing entities (such as ARM, DSP etc.) with a central system
+    controller entity.
+    
+    TI-SCI message protocol provides support for management of various
+    hardware entities within the SoC.
+    
+    The message protocol can be found here:
+    http://processors.wiki.ti.com/index.php/TISCI
+    
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Acked-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Tero Kristo <t-kristo@ti.com>
+
+commit 765eaa0f70eaa274ec8b815d8c210c20cf7b6dbc
+Author: Andrey Smetanin <asmetanin@virtuozzo.com>
+Date:   Mon Nov 30 19:22:20 2015 +0300
+
+    kvm/x86: Hyper-V SynIC message slot pending clearing at SINT ack
+    
+    The SynIC message protocol mandates that the message slot is claimed
+    by atomically setting message type to something other than HVMSG_NONE.
+    If another message is to be delivered while the slot is still busy,
+    message pending flag is asserted to indicate to the guest that the
+    hypervisor wants to be notified when the slot is released.
+    
+    To make sure the protocol works regardless of where the message
+    sources are (kernel or userspace), clear the pending flag on SINT ACK
+    notification, and let the message sources compete for the slot again.
+    
+    Signed-off-by: Andrey Smetanin <asmetanin@virtuozzo.com>
+    Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+    CC: Gleb Natapov <gleb@kernel.org>
+    CC: Paolo Bonzini <pbonzini@redhat.com>
+    CC: "K. Y. Srinivasan" <kys@microsoft.com>
+    CC: Haiyang Zhang <haiyangz@microsoft.com>
+    CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+    CC: Roman Kagan <rkagan@virtuozzo.com>
+    CC: Denis V. Lunev <den@openvz.org>
+    CC: qemu-devel@nongnu.org
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+commit ff9a6262b9b87204146427a3abefc73ab990c21f
+Author: Sudeep Holla <sudeep.holla@arm.com>
+Date:   Wed Jun 3 14:18:21 2015 +0100
+
+    arm64: dts: add SRAM, MHU mailbox and SCPI support on Juno
+    
+    This patch adds support for the MHU mailbox peripheral used on Juno by
+    application processors to communicate with remote SCP handling most of
+    the CPU/system power management. It also adds the SRAM reserving the
+    shared memory and SCPI message protocol using that shared memory.
+    
+    Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+    Acked-by: Liviu Dudau <Liviu.Dudau@arm.com>
+    Cc: Jon Medhurst (Tixy) <tixy@linaro.org>
+
+commit 9e971b715dcc3cd5f4383f2815aaa7e5853d1f7b
+Author: David Teigland <teigland@redhat.com>
+Date:   Wed Dec 13 10:37:55 2006 -0600
+
+    [DLM] add version check
+    
+    Check if we receive a message from another lockspace member running a
+    version of the dlm with an incompatible inter-node message protocol.
+    
+    Signed-off-by: David Teigland <teigland@redhat.com>
+    Signed-off-by: Steven Whitehouse <swhiteho@redhat.com>

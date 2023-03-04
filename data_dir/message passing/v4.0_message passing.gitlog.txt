@@ -1,0 +1,734 @@
+commit 72d1e611082eda18689106a0c192f2827072713c
+Author: Jiebin Sun <jiebin.sun@intel.com>
+Date:   Wed Sep 14 03:25:38 2022 +0800
+
+    ipc/msg: mitigate the lock contention with percpu counter
+    
+    The msg_bytes and msg_hdrs atomic counters are frequently updated when IPC
+    msg queue is in heavy use, causing heavy cache bounce and overhead.
+    Change them to percpu_counter greatly improve the performance.  Since
+    there is one percpu struct per namespace, additional memory cost is
+    minimal.  Reading of the count done in msgctl call, which is infrequent.
+    So the need to sum up the counts in each CPU is infrequent.
+    
+    Apply the patch and test the pts/stress-ng-1.4.0
+    -- system v message passing (160 threads).
+    
+    Score gain: 3.99x
+    
+    CPU: ICX 8380 x 2 sockets
+    Core number: 40 x 2 physical cores
+    Benchmark: pts/stress-ng-1.4.0
+    -- system v message passing (160 threads)
+    
+    [akpm@linux-foundation.org: coding-style cleanups]
+    [jiebin.sun@intel.com: avoid negative value by overflow in msginfo]
+      Link: https://lkml.kernel.org/r/20220920150809.4014944-1-jiebin.sun@intel.com
+    [akpm@linux-foundation.org: fix min() warnings]
+    Link: https://lkml.kernel.org/r/20220913192538.3023708-3-jiebin.sun@intel.com
+    Signed-off-by: Jiebin Sun <jiebin.sun@intel.com>
+    Reviewed-by: Tim Chen <tim.c.chen@linux.intel.com>
+    Cc: Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com>
+    Cc: Alexey Gladkov <legion@kernel.org>
+    Cc: Christoph Lameter <cl@linux.com>
+    Cc: Davidlohr Bueso <dave@stgolabs.net>
+    Cc: Dennis Zhou <dennis@kernel.org>
+    Cc: "Eric W . Biederman" <ebiederm@xmission.com>
+    Cc: Manfred Spraul <manfred@colorfullife.com>
+    Cc: Shakeel Butt <shakeelb@google.com>
+    Cc: Tejun Heo <tj@kernel.org>
+    Cc: Vasily Averin <vasily.averin@linux.dev>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+
+commit 9db69df4bdd37eb1f65b6931ee067fb15b9a4d5c
+Author: TingHan Shen <tinghan.shen@mediatek.com>
+Date:   Thu May 12 16:22:13 2022 +0800
+
+    firmware: mediatek: Add adsp ipc protocol interface
+    
+    Some of mediatek processors contain
+    the Tensilica HiFix DSP for audio processing.
+    
+    The communication between Host CPU and DSP firmware is
+    taking place using a shared memory area for message passing.
+    
+    ADSP IPC protocol offers (send/recv) interfaces using
+    mediatek-mailbox APIs.
+    
+    We use two mbox channels to implement a request-reply protocol.
+    
+    Signed-off-by: Allen-KH Cheng <allen-kh.cheng@mediatek.com>
+    Signed-off-by: TingHan Shen <tinghan.shen@mediatek.com>
+    Reviewed-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Reviewed-by: Curtis Malainey <cujomalainey@chromium.org>
+    Reviewed-by: Tzung-Bi Shih <tzungbi@google.com>
+    Reviewed-by: YC Hung <yc.hung@mediatek.com>
+    Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+    Link: https://lore.kernel.org/r/20220512082215.3018-2-tinghan.shen@mediatek.com
+    Signed-off-by: Mark Brown <broonie@kernel.org>
+
+commit 1bb24be00c8c360e5e3072301d5f49eac86b384f
+Merge: 866e1691ed5b c0397c85b53d
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Aug 12 22:38:31 2021 +0200
+
+    Merge tag 'scmi-updates-5.15' of git://git.kernel.org/pub/scm/linux/kernel/git/sudeep.holla/linux into arm/drivers
+    
+    SCMI Updates for v5.15
+    
+    The bulk of the addition this time is mainly refactoring to add support
+    for Virtio transport for SCMI and the addition of the support itself.
+    The refactoring includes allowing transport specific init/exit calls,
+    making each transport as compile time configurable, supporting
+    monotonically increasing tokens instead of using the next available
+    free buffer index as the token for scmi messages which eases handling
+    concurrent and out-of-order messages which is a must have for virtio
+    transport.
+    
+    Virtio support itself is conformant to the virtio SCMI device spec [1].
+    Virtio device id 32 has been reserved for the SCMI device [2].
+    
+    Other than the virtio support, there is one bug fix in the probe failure
+    clean up path.
+    
+    [1] https://github.com/oasis-tcs/virtio-spec/blob/master/virtio-scmi.tex
+    [2] https://www.oasis-open.org/committees/ballot.php?id=3496
+    
+    * tag 'scmi-updates-5.15' of git://git.kernel.org/pub/scm/linux/kernel/git/sudeep.holla/linux:
+      firmware: arm_scmi: Use WARN_ON() to check configured transports
+      firmware: arm_scmi: Fix boolconv.cocci warnings
+      firmware: arm_scmi: Free mailbox channels if probe fails
+      firmware: arm_scmi: Add virtio transport
+      firmware: arm_scmi: Add priv parameter to scmi_rx_callback
+      dt-bindings: arm: Add virtio transport for SCMI
+      firmware: arm_scmi: Add optional link_supplier() transport op
+      firmware: arm_scmi: Add message passing abstractions for transports
+      firmware: arm_scmi: Add method to override max message number
+      firmware: arm_scmi: Make shmem support optional for transports
+      firmware: arm_scmi: Make SCMI transports configurable
+      firmware: arm_scmi: Make polling mode optional
+      firmware: arm_scmi: Make .clear_channel optional
+      firmware: arm_scmi: Handle concurrent and out-of-order messages
+      firmware: arm_scmi: Introduce monotonically increasing tokens
+      firmware: arm_scmi: Add optional transport_init/exit support
+      firmware: arm_scmi: Remove scmi_dump_header_dbg() helper
+      firmware: arm_scmi: Add support for type handling in common functions
+    
+    Link: https://lore.kernel.org/r/20210811075743.707961-1-sudeep.holla@arm.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit f301bba0ca7392d16a6ea4f1d264a91f1fadea1a
+Author: Peter Hilber <peter.hilber@opensynergy.com>
+Date:   Tue Aug 3 14:10:20 2021 +0100
+
+    firmware: arm_scmi: Add message passing abstractions for transports
+    
+    Add abstractions for future transports using message passing, such as
+    virtio. Derive the abstractions from the shared memory abstractions.
+    
+    Abstract the transport SDU through the opaque struct scmi_msg_payld.
+    Also enable the transport to determine all other required information
+    about the transport SDU.
+    
+    Link: https://lore.kernel.org/r/20210803131024.40280-12-cristian.marussi@arm.com
+    Signed-off-by: Peter Hilber <peter.hilber@opensynergy.com>
+    [ Cristian: Adapted to new SCMI Kconfig layout, updated Copyrights ]
+    Signed-off-by: Cristian Marussi <cristian.marussi@arm.com>
+    Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+commit 527630fbf4f194c5d71e75b2d3cb3d2f406bc5d0
+Merge: 7bf8df68cba0 8400ab889632
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Mar 27 09:33:48 2020 -0700
+
+    Merge tag 'clk-fixes-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux
+    
+    Pull clk fixes from Stephen Boyd:
+     "A handful of clk driver fixes.
+    
+      Mostly they're around the i.MX drivers fixing the parents of a few
+      clks and making KASAN happy with how the message passing code works.
+    
+      Besides that we have a TI driver fix for the RTC parent and a fix for
+      the basic gate type registration functions introduced this release
+      where they didn't actually pass the arguments in the right places to
+      the multiplexer function down below"
+    
+    * tag 'clk-fixes-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux:
+      clk: imx: Align imx sc clock parent msg structs to 4
+      clk: imx: Align imx sc clock msg structs to 4
+      clk: Pass correct arguments to __clk_hw_register_gate()
+      clk: ti: am43xx: Fix clock parent for RTC clock
+      clk: imx8mp: Correct the enet_qos parent clock
+      clk: imx8mp: Correct IMX8MP_CLK_HDMI_AXI clock parent
+
+commit ffbf23d50353915dc2622a3b7b4ddc678165f92d
+Author: Daniel Baluta <daniel.baluta@nxp.com>
+Date:   Thu Aug 1 12:56:36 2019 +0300
+
+    firmware: imx: Add DSP IPC protocol interface
+    
+    Some of i.MX8 processors (e.g i.MX8QM, i.MX8QXP) contain
+    the Tensilica HiFi4 DSP for advanced pre- and post-audio
+    processing.
+    
+    The communication between Host CPU and DSP firmware is
+    taking place using a shared memory area for message passing
+    and a dedicated Messaging Unit for notifications.
+    
+    DSP IPC protocol offers a doorbell interface using
+    imx-mailbox API.
+    
+    We use 4 MU channels (2 x TXDB, 2 x RXDB) to implement a
+    request-reply protocol.
+    
+    Connection 0 (txdb0, rxdb0):
+            - Host writes messasge to shared memory [SHMEM]
+            - Host sends a request [MU]
+            - DSP handles request [SHMEM]
+            - DSP sends reply [MU]
+    
+    Connection 1 (txdb1, rxdb1):
+            - DSP writes a message to shared memory [SHMEM]
+            - DSP sends a request [MU]
+            - Host handles request [SHMEM]
+            - Host sends reply [MU]
+    
+    The protocol interface will be used by a Host client to
+    communicate with the DSP. First client will be the i.MX8
+    part from Sound Open Firmware infrastructure.
+    
+    The protocol offers the following interface:
+    
+    On Tx:
+       - imx_dsp_ring_doorbell, will be called to notify the DSP
+       that it needs to handle a request.
+    
+    On Rx:
+       - clients need to provide two callbacks:
+            .handle_reply
+            .handle_request
+      - the callbacks will be used by the protocol on
+        notification arrival from DSP.
+    
+    Signed-off-by: Daniel Baluta <daniel.baluta@nxp.com>
+    Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+    Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+
+commit 1166494891da88af25c444e65cd4f32c3e026b46
+Author: John Hurley <john.hurley@netronome.com>
+Date:   Tue Nov 27 14:04:11 2018 -0800
+
+    nfp: flower: release metadata on offload failure
+    
+    Calling nfp_compile_flow_metadata both assigns a stats context and
+    increments a ref counter on (or allocates) a mask id table entry. These
+    are released by the nfp_modify_flow_metadata call on flow deletion,
+    however, if a flow add fails after metadata is set then the flow entry
+    will be deleted but the metadata assignments leaked.
+    
+    Add an error path to the flow add offload function to ensure allocated
+    metadata is released in the event of an offload fail.
+    
+    Fixes: 81f3ddf2547d ("nfp: add control message passing capabilities to flower offloads")
+    Signed-off-by: John Hurley <john.hurley@netronome.com>
+    Reviewed-by: Pieter Jansen van Vuuren <pieter.jansenvanvuuren@netronome.com>
+    Reviewed-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 0307363a4fbf301d0b25df6aa7827c30f11e220d
+Author: Takashi Iwai <tiwai@suse.de>
+Date:   Tue Sep 4 17:58:48 2018 +0200
+
+    staging: bcm2835-audio: Code refactoring of vchiq accessor codes
+    
+    This is a cleanup and code refactoring in bcm2835-vchiq.c.
+    
+    The major code changes are to provide local helpers for easier use of
+    lock / unlock, and message passing with/without response wait.  This
+    allows us to reduce lots of open codes.
+    
+    Also, the max packet is set at opening the stream, not at each time
+    when the write gets called.
+    
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Tested-by: Stefan Wahren <stefan.wahren@i2se.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 81f3ddf2547d40c3d4878aa66ce837177665ce3c
+Author: Pieter Jansen van Vuuren <pieter.jansenvanvuuren@netronome.com>
+Date:   Thu Jun 29 22:08:19 2017 +0200
+
+    nfp: add control message passing capabilities to flower offloads
+    
+    Previously the flower offloads never sends messages to the hardware,
+    and never registers a handler for receiving messages from hardware.
+    This patch enables the flower offloads to send control messages to
+    hardware when adding and removing flow rules. Additionally it
+    registers a control message rx handler for receiving stats updates
+    from hardware for each offloaded flow.
+    
+    Additionally this patch adds 4 control message types; Add, modify and
+    delete flow, as well as flow stats. It also allows
+    nfp_flower_cmsg_get_data() to be used outside of cmsg.c.
+    
+    Signed-off-by: Pieter Jansen van Vuuren <pieter.jansenvanvuuren@netronome.com>
+    Signed-off-by: Simon Horman <simon.horman@netronome.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 77162022ab26a1f99d3af30c03760a76f86e193d
+Author: John Fastabend <john.r.fastabend@intel.com>
+Date:   Sun Apr 15 06:43:56 2012 +0000
+
+    net: add generic PF_BRIDGE:RTM_ FDB hooks
+    
+    This adds two new flags NTF_MASTER and NTF_SELF that can
+    now be used to specify where PF_BRIDGE netlink commands should
+    be sent. NTF_MASTER sends the commands to the 'dev->master'
+    device for parsing. Typically this will be the linux net/bridge,
+    or open-vswitch devices. Also without any flags set the command
+    will be handled by the master device as well so that current user
+    space tools continue to work as expected.
+    
+    The NTF_SELF flag will push the PF_BRIDGE commands to the
+    device. In the basic example below the commands are then parsed
+    and programmed in the embedded bridge.
+    
+    Note if both NTF_SELF and NTF_MASTER bits are set then the
+    command will be sent to both 'dev->master' and 'dev' this allows
+    user space to easily keep the embedded bridge and software bridge
+    in sync.
+    
+    There is a slight complication in the case with both flags set
+    when an error occurs. To resolve this the rtnl handler clears
+    the NTF_ flag in the netlink ack to indicate which sets completed
+    successfully. The add/del handlers will abort as soon as any
+    error occurs.
+    
+    To support this new net device ops were added to call into
+    the device and the existing bridging code was refactored
+    to use these. There should be no required changes in user space
+    to support the current bridge behavior.
+    
+    A basic setup with a SR-IOV enabled NIC looks like this,
+    
+              veth0  veth2
+                |      |
+              ------------
+              |  bridge0 |   <---- software bridging
+              ------------
+                   /
+                   /
+      ethx.y      ethx
+        VF         PF
+         \         \          <---- propagate FDB entries to HW
+         \         \
+      --------------------
+      |  Embedded Bridge |    <---- hardware offloaded switching
+      --------------------
+    
+    In this case the embedded bridge must be managed to allow 'veth0'
+    to communicate with 'ethx.y' correctly. At present drivers managing
+    the embedded bridge either send frames onto the network which
+    then get dropped by the switch OR the embedded bridge will flood
+    these frames. With this patch we have a mechanism to manage the
+    embedded bridge correctly from user space. This example is specific
+    to SR-IOV but replacing the VF with another PF or dropping this
+    into the DSA framework generates similar management issues.
+    
+    Examples session using the 'br'[1] tool to add, dump and then
+    delete a mac address with a new "embedded" option and enabled
+    ixgbe driver:
+    
+    # br fdb add 22:35:19:ac:60:59 dev eth3
+    # br fdb
+    port    mac addr                flags
+    veth0   22:35:19:ac:60:58       static
+    veth0   9a:5f:81:f7:f6:ec       local
+    eth3    00:1b:21:55:23:59       local
+    eth3    22:35:19:ac:60:59       static
+    veth0   22:35:19:ac:60:57       static
+    #br fdb add 22:35:19:ac:60:59 embedded dev eth3
+    #br fdb
+    port    mac addr                flags
+    veth0   22:35:19:ac:60:58       static
+    veth0   9a:5f:81:f7:f6:ec       local
+    eth3    00:1b:21:55:23:59       local
+    eth3    22:35:19:ac:60:59       static
+    veth0   22:35:19:ac:60:57       static
+    eth3    22:35:19:ac:60:59       local embedded
+    #br fdb del 22:35:19:ac:60:59 embedded dev eth3
+    
+    I added a couple lines to 'br' to set the flags correctly is all. It
+    is my opinion that the merit of this patch is now embedded and SW
+    bridges can both be modeled correctly in user space using very nearly
+    the same message passing.
+    
+    [1] 'br' tool was published as an RFC here and will be renamed 'bridge'
+        http://patchwork.ozlabs.org/patch/117664/
+    
+    Thanks to Jamal Hadi Salim, Stephen Hemminger and Ben Hutchings for
+    valuable feedback, suggestions, and review.
+    
+    v2: fixed api descriptions and error case with both NTF_SELF and
+        NTF_MASTER set plus updated patch description.
+    
+    Signed-off-by: John Fastabend <john.r.fastabend@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit a1722e9acd8083e85d0ba54409c630ac61dec985
+Author: Tim Chen <tim.c.chen@linux.intel.com>
+Date:   Fri Feb 11 12:49:04 2011 -0800
+
+    idle governor: Avoid lock acquisition to read pm_qos before entering idle
+    
+    commit 333c5ae9948194428fe6c5ef5c088304fc98263b upstream.
+    
+    Thanks to the reviews and comments by Rafael, James, Mark and Andi.
+    Here's version 2 of the patch incorporating your comments and also some
+    update to my previous patch comments.
+    
+    I noticed that before entering idle state, the menu idle governor will
+    look up the current pm_qos target value according to the list of qos
+    requests received.  This look up currently needs the acquisition of a
+    lock to access the list of qos requests to find the qos target value,
+    slowing down the entrance into idle state due to contention by multiple
+    cpus to access this list.  The contention is severe when there are a lot
+    of cpus waking and going into idle.  For example, for a simple workload
+    that has 32 pair of processes ping ponging messages to each other, where
+    64 cpu cores are active in test system, I see the following profile with
+    37.82% of cpu cycles spent in contention of pm_qos_lock:
+    
+    -     37.82%          swapper  [kernel.kallsyms]          [k]
+    _raw_spin_lock_irqsave
+       - _raw_spin_lock_irqsave
+          - 95.65% pm_qos_request
+               menu_select
+               cpuidle_idle_call
+             - cpu_idle
+                  99.98% start_secondary
+    
+    A better approach will be to cache the updated pm_qos target value so
+    reading it does not require lock acquisition as in the patch below.
+    With this patch the contention for pm_qos_lock is removed and I saw a
+    2.2X increase in throughput for my message passing workload.
+    
+    Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: James Bottomley <James.Bottomley@suse.de>
+    Acked-by: mark gross <markgross@thegnar.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 3378432e8db20345aa68e9a795f93689f1378956
+Author: Tim Chen <tim.c.chen@linux.intel.com>
+Date:   Fri Feb 11 12:49:04 2011 -0800
+
+    idle governor: Avoid lock acquisition to read pm_qos before entering idle
+    
+    commit 333c5ae9948194428fe6c5ef5c088304fc98263b upstream.
+    
+    Thanks to the reviews and comments by Rafael, James, Mark and Andi.
+    Here's version 2 of the patch incorporating your comments and also some
+    update to my previous patch comments.
+    
+    I noticed that before entering idle state, the menu idle governor will
+    look up the current pm_qos target value according to the list of qos
+    requests received.  This look up currently needs the acquisition of a
+    lock to access the list of qos requests to find the qos target value,
+    slowing down the entrance into idle state due to contention by multiple
+    cpus to access this list.  The contention is severe when there are a lot
+    of cpus waking and going into idle.  For example, for a simple workload
+    that has 32 pair of processes ping ponging messages to each other, where
+    64 cpu cores are active in test system, I see the following profile with
+    37.82% of cpu cycles spent in contention of pm_qos_lock:
+    
+    -     37.82%          swapper  [kernel.kallsyms]          [k]
+    _raw_spin_lock_irqsave
+       - _raw_spin_lock_irqsave
+          - 95.65% pm_qos_request
+               menu_select
+               cpuidle_idle_call
+             - cpu_idle
+                  99.98% start_secondary
+    
+    A better approach will be to cache the updated pm_qos target value so
+    reading it does not require lock acquisition as in the patch below.
+    With this patch the contention for pm_qos_lock is removed and I saw a
+    2.2X increase in throughput for my message passing workload.
+    
+    Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: James Bottomley <James.Bottomley@suse.de>
+    Acked-by: mark gross <markgross@thegnar.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 333c5ae9948194428fe6c5ef5c088304fc98263b
+Author: Tim Chen <tim.c.chen@linux.intel.com>
+Date:   Fri Feb 11 12:49:04 2011 -0800
+
+    idle governor: Avoid lock acquisition to read pm_qos before entering idle
+    
+    Thanks to the reviews and comments by Rafael, James, Mark and Andi.
+    Here's version 2 of the patch incorporating your comments and also some
+    update to my previous patch comments.
+    
+    I noticed that before entering idle state, the menu idle governor will
+    look up the current pm_qos target value according to the list of qos
+    requests received.  This look up currently needs the acquisition of a
+    lock to access the list of qos requests to find the qos target value,
+    slowing down the entrance into idle state due to contention by multiple
+    cpus to access this list.  The contention is severe when there are a lot
+    of cpus waking and going into idle.  For example, for a simple workload
+    that has 32 pair of processes ping ponging messages to each other, where
+    64 cpu cores are active in test system, I see the following profile with
+    37.82% of cpu cycles spent in contention of pm_qos_lock:
+    
+    -     37.82%          swapper  [kernel.kallsyms]          [k]
+    _raw_spin_lock_irqsave
+       - _raw_spin_lock_irqsave
+          - 95.65% pm_qos_request
+               menu_select
+               cpuidle_idle_call
+             - cpu_idle
+                  99.98% start_secondary
+    
+    A better approach will be to cache the updated pm_qos target value so
+    reading it does not require lock acquisition as in the patch below.
+    With this patch the contention for pm_qos_lock is removed and I saw a
+    2.2X increase in throughput for my message passing workload.
+    
+    cc: stable@kernel.org
+    Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: James Bottomley <James.Bottomley@suse.de>
+    Acked-by: mark gross <markgross@thegnar.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit d5a1c1937090d72c08c72e8abaa906b26459608e
+Author: Milton Miller <miltonm@bga.com>
+Date:   Tue May 24 20:34:18 2011 +0000
+
+    powerpc/cell: Rename ipi functions to match current abstractions
+    
+    Rename functions and arguments to reflect current usage.  iic_cause_ipi
+    becomes iic_message_pass and iic_ipi_to_irq becomes iic_msg_to_irq,
+    and iic_request_ipi now takes a message (msg) instead of an ipi number.
+    Also mesg is renamed to msg.
+    
+    Commit f1072939b6 (powerpc: Remove checks for MSG_ALL and
+    MSG_ALL_BUT_SELF) connected the smp_message_pass hook for cell to the
+    underlying iic_cause_IPI, a platform unique name.  Later 23d72bfd8f
+    (powerpc: Consolidate ipi message mux and demux) added a cause_ipi
+    hook to the smp_ops, also used in message passing, but for controllers
+    that can not send 4 unique messages and require multiplexing.  It is
+    even more confusing that the both take two arguments, but one is the
+    small message ordinal and the other is an opaque long data associated
+    with the cpu.
+    
+    Since cell iic maps messages one to one to ipi irqs, rename the
+    function and argument to translate from ipi to message.  Also make it
+    clear that iic_request_ipi takes a message number as the argument
+    for which ipi to create and request.
+    
+    No functionional change, just renames to avoid future confusion.
+    
+    Signed-off-by: Milton Miller <miltonm@bga.com>
+    Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+
+commit d4fc8fe1f66f46493d3c56436685eef3b5b32b07
+Author: Milton Miller <miltonm@bga.com>
+Date:   Tue May 10 19:29:28 2011 +0000
+
+    powerpc: Remove stubbed beat smp support
+    
+    I have no idea if the beat hypervisor supports multiple cpus in
+    a partition, but the code has not been touched since these stubs
+    were added in February of 2007 except to move them in April of 2008.
+    These are stubs: start_cpu always returns fail (which is dropped),
+    the message passing and reciving are empty functions, and the top
+    of file comment says "Incomplete".
+    
+    Signed-off-by: Milton Miller <miltonm@bga.com>
+    Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+
+commit 81eb669b9516b85a2acf4c342db2322bed37d70c
+Author: David Cross <david.cross@cypress.com>
+Date:   Fri Aug 6 17:29:03 2010 -0700
+
+    Staging: add West Bridge Astoria Driver
+    
+    This is a driver for the Cypress West Bridge companion chip. Its
+    function is analogous to the North/South Bridges of PC environments
+    applied to embedded devices, in that it expands I/O and storage
+    capabilities of an embedded processor. The Astoria version, which this
+    driver applies to, functions as a USB, embedded memory and SDIO
+    controller. The kernel that this patch was applied to is linux-2.6.35,
+    although it was tested using the android kernel 2.6.29 running on the
+    Zoom 2 platform. In this system, it was used primarily as a sideloading
+    accelerator enabling direct data transfers between a USB host PC and
+    embedded memory without system overheads.  Minor modifications were also
+    made to the kernel for this patch. These include changes such as
+    EXPORTing of fat_get_block in the kernel code. Another function,
+    mpage_cleardirty was also added to the memory management code. This
+    function is used to clear the dirty pages from a specific inode. This
+    allows for direct, file based DMA. None of these changes are believed to
+    have any negative impact on the kernel and may provide additional
+    benefit for other developers and drivers.
+    
+    The driver, as submitted, was placed into the drivers/staging/westbridge
+    folder as the directory structure it will eventually reside in is not yet
+    defined. The driver, as placed in staging is divided into four parts:
+    1) gadget - this implements a gadget peripheral controller and includes IOCTLs
+    for MTP transfers
+    2) block -this implements a generic block device driver to enable access to
+    embedded memory
+    3) api -this is the Cypress SDK, and includes USB and Storage specific
+    functions. In addition, it includes common code for low level routines such as
+    message passing and common data transfer routines
+    4) hal - this should likely be included in the arch directory as it needs to
+    be modified for a given platform. The directory structure in the staging area
+    is meant to reflect the eventual location of where this code likely should be.
+    It is platform specific. In this case, the HAL included is for the Android
+    Zoom 2 platform. Here, West Bridge is connected to the GPMC (general purpose
+    memory controller) of the OMAP3. Specific timing needs to be enabled to ensure
+    reliable communication.
+    Many thanks to Greg KH for conducting initial reviews and providing pointers.
+    Please contact david.cross@cypress.com for questions, concerns or feedback.
+    
+    Signed-off-by: David Cross <david.cross@cypress.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 31b8006e1d79e127a776c9414e3e0b5f9508047e
+Author: Sage Weil <sage@newdream.net>
+Date:   Tue Oct 6 11:31:13 2009 -0700
+
+    ceph: messenger library
+    
+    A generic message passing library is used to communicate with all
+    other components in the Ceph file system.  The messenger library
+    provides ordered, reliable delivery of messages between two nodes in
+    the system.
+    
+    This implementation is based on TCP.
+    
+    Signed-off-by: Sage Weil <sage@newdream.net>
+
+commit 6ce9e7b5fe3195d1ae6e3a0753d4ddcac5cd699e
+Author: Eric Dumazet <eric.dumazet@gmail.com>
+Date:   Wed Sep 2 18:05:33 2009 -0700
+
+    ip: Report qdisc packet drops
+    
+    Christoph Lameter pointed out that packet drops at qdisc level where not
+    accounted in SNMP counters. Only if application sets IP_RECVERR, drops
+    are reported to user (-ENOBUFS errors) and SNMP counters updated.
+    
+    IP_RECVERR is used to enable extended reliable error message passing,
+    but these are not needed to update system wide SNMP stats.
+    
+    This patch changes things a bit to allow SNMP counters to be updated,
+    regardless of IP_RECVERR being set or not on the socket.
+    
+    Example after an UDP tx flood
+    # netstat -s
+    ...
+    IP:
+        1487048 outgoing packets dropped
+    ...
+    Udp:
+    ...
+        SndbufErrors: 1487048
+    
+    
+    send() syscalls, do however still return an OK status, to not
+    break applications.
+    
+    Note : send() manual page explicitly says for -ENOBUFS error :
+    
+     "The output queue for a network interface was full.
+      This generally indicates that the interface has stopped sending,
+      but may be caused by transient congestion.
+      (Normally, this does not occur in Linux. Packets are just silently
+      dropped when a device queue overflows.) "
+    
+    This is not true for IP_RECVERR enabled sockets : a send() syscall
+    that hit a qdisc drop returns an ENOBUFS error.
+    
+    Many thanks to Christoph, David, and last but not least, Alexey !
+    
+    Signed-off-by: Eric Dumazet <eric.dumazet@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 6fa382af61338908e5713234bcee598423f661c3
+Author: Yi Zou <yi.zou@intel.com>
+Date:   Mon Aug 31 12:33:20 2009 +0000
+
+    dcbnl: Add netlink attributes for setapp/getapp to dcbnl
+    
+    Add defines for dcbnl netlink attributes to support netlink message passing of
+    setapp/getapp in dcbnl.
+    
+    Signed-off-by: Yi Zou <yi.zou@intel.com>
+    Acked-by: Peter P Waskiewicz Jr <peter.p.waskiewicz.jr@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 7c7758f99d39d529a64d4f60d22129bbf2f16d74
+Merge: 67acd8b4b7a3 8a70da82edc5
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Jan 7 15:37:24 2009 -0800
+
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb-2.6
+    
+    * git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb-2.6: (123 commits)
+      wimax/i2400m: add CREDITS and MAINTAINERS entries
+      wimax: export linux/wimax.h and linux/wimax/i2400m.h with headers_install
+      i2400m: Makefile and Kconfig
+      i2400m/SDIO: TX and RX path backends
+      i2400m/SDIO: firmware upload backend
+      i2400m/SDIO: probe/disconnect, dev init/shutdown and reset backends
+      i2400m/SDIO: header for the SDIO subdriver
+      i2400m/USB: TX and RX path backends
+      i2400m/USB: firmware upload backend
+      i2400m/USB: probe/disconnect, dev init/shutdown and reset backends
+      i2400m/USB: header for the USB bus driver
+      i2400m: debugfs controls
+      i2400m: various functions for device management
+      i2400m: RX and TX data/control paths
+      i2400m: firmware loading and bootrom initialization
+      i2400m: linkage to the networking stack
+      i2400m: Generic probe/disconnect, reset and message passing
+      i2400m: host/device procotol and core driver definitions
+      i2400m: documentation and instructions for usage
+      wimax: Makefile, Kconfig and docbook linkage for the stack
+      ...
+
+commit 024f7f31ed15c471f80408d8b5045497e27e1135
+Author: Inaky Perez-Gonzalez <inaky@linux.intel.com>
+Date:   Sat Dec 20 16:57:44 2008 -0800
+
+    i2400m: Generic probe/disconnect, reset and message passing
+    
+    Implements the generic probe and disconnect functions that will be
+    called by the USB and SDIO driver's probe/disconnect functions.
+    
+    Implements the backends for the WiMAX stack's basic operations:
+    message passing, rfkill control and reset.
+    
+    Signed-off-by: Inaky Perez-Gonzalez <inaky@linux.intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 05474106a41f44d16d649bc8c7687fc24ce4370a
+Author: Steve Grubb <sgrubb@redhat.com>
+Date:   Sat May 21 00:18:37 2005 +0100
+
+    AUDIT: Fix AVC_USER message passing.
+    
+    The original AVC_USER message wasn't consolidated with the new range of
+    user messages. The attached patch fixes the kernel so the old messages
+    work again.
+    
+    Signed-off-by: Steve Grubb <sgrubb@redhat.com>
+    Signed-off-by: David Woodhouse <dwmw2@infradead.org>

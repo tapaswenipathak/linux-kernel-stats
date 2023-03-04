@@ -1,0 +1,107 @@
+commit 8da81cc66585e3b43def04da2ed23c53d65630f9
+Author: Vitezslav Crhonek <vcrhonek@redhat.com>
+Date:   Thu May 27 10:05:46 2021 +0200
+
+    libkbdfile: make sure there is space for terminating null byte
+
+commit ef2893f51e2f22d8ab03636a22e5cf5094b2eeca
+Author: Vitezslav Crhonek <vcrhonek@redhat.com>
+Date:   Thu May 27 10:03:16 2021 +0200
+
+    libkbdfile: fix memory leak
+
+commit 7e27102b6fc6991a6a4eca422b513781a26b1639
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Aug 21 13:29:16 2019 +0200
+
+    libkbdfile: Check compression suffix even if the suffix is part of filename
+    
+    Link: https://github.com/legionus/kbd/issues/32
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit acf93e44f6d036303f95555069031f6fb12ce9d1
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Aug 6 13:59:34 2019 +0200
+
+    libkbdfile: Do not stop on the first error
+    
+    The kbdfile_find() gets a list of directories in which the filename. If
+    we could not find the filename in the first directory, you do not need
+    to return an error.
+    
+    Link: https://github.com/legionus/kbd/issues/31
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 9da7ed8df9aaa8b948723c23100271d801eaccbd
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jul 26 15:33:02 2019 +0200
+
+    setfont: Do not close kbdfile until the end of processing
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 504b1df79fd01383620c8f5946575ccfdbac5861
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jul 26 14:56:04 2019 +0200
+
+    loadkeys: Close kbdfile pointer after processing
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 0667bb2b46d0ef17db926300b02604a9e6355248
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Fri Jul 26 10:52:58 2019 +0200
+
+    libkbdfile: Improve log messages
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit e25dbc5aeffa48f668e951179f62c60276b0cffd
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Jun 26 10:09:03 2019 +0200
+
+    Initialize the kbdfile context internally if necessary
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit ed70908359c3edb121bc8f5310ea477a0340399c
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Feb 12 20:37:36 2019 +0100
+
+    libkbdfile: free namelist
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 5d64ba8151cb6bacabf6d168c5ec1b261aa6b247
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Thu Feb 14 14:48:38 2019 +0100
+
+    libkbdfile: Check pathname variable size when it is filled
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit d40541ddbeb18701fc53974cec6de776a004ba00
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Tue Feb 12 20:37:36 2019 +0100
+
+    libkbdfile: free namelist
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 976867c3a842562c775368a9827d2ed791dcba84
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Mon Jun 11 16:46:40 2018 +0200
+
+    Rewrite libkbdfile library
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+
+commit 1b93ed6b5d2673c20ba6143a178e7c070ab2552e
+Author: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date:   Wed Aug 30 14:06:50 2017 +0200
+
+    Rename libfindfile -> src/libkbdfile
+    
+    Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>

@@ -1,0 +1,531 @@
+commit 63e7959c4b9bd6f791061c460a22d9ee32ae2240
+Author: Jarno Rajahalme <jrajahalme@nicira.com>
+Date:   Thu Mar 27 12:42:54 2014 -0700
+
+    openvswitch: Per NUMA node flow stats.
+    
+    Keep kernel flow stats for each NUMA node rather than each (logical)
+    CPU.  This avoids using the per-CPU allocator and removes most of the
+    kernel-side OVS locking overhead otherwise on the top of perf reports
+    and allows OVS to scale better with higher number of threads.
+    
+    With 9 handlers and 4 revalidators netperf TCP_CRR test flow setup
+    rate doubles on a server with two hyper-threaded physical CPUs (16
+    logical cores each) compared to the current OVS master.  Tested with
+    non-trivial flow table with a TCP port match rule forcing all new
+    connections with unique port numbers to OVS userspace.  The IP
+    addresses are still wildcarded, so the kernel flows are not considered
+    as exact match 5-tuple flows.  This type of flows can be expected to
+    appear in large numbers as the result of more effective wildcarding
+    made possible by improvements in OVS userspace flow classifier.
+    
+    Perf results for this test (master):
+    
+    Events: 305K cycles
+    +   8.43%     ovs-vswitchd  [kernel.kallsyms]   [k] mutex_spin_on_owner
+    +   5.64%     ovs-vswitchd  [kernel.kallsyms]   [k] __ticket_spin_lock
+    +   4.75%     ovs-vswitchd  ovs-vswitchd        [.] find_match_wc
+    +   3.32%     ovs-vswitchd  libpthread-2.15.so  [.] pthread_mutex_lock
+    +   2.61%     ovs-vswitchd  [kernel.kallsyms]   [k] pcpu_alloc_area
+    +   2.19%     ovs-vswitchd  ovs-vswitchd        [.] flow_hash_in_minimask_range
+    +   2.03%          swapper  [kernel.kallsyms]   [k] intel_idle
+    +   1.84%     ovs-vswitchd  libpthread-2.15.so  [.] pthread_mutex_unlock
+    +   1.64%     ovs-vswitchd  ovs-vswitchd        [.] classifier_lookup
+    +   1.58%     ovs-vswitchd  libc-2.15.so        [.] 0x7f4e6
+    +   1.07%     ovs-vswitchd  [kernel.kallsyms]   [k] memset
+    +   1.03%          netperf  [kernel.kallsyms]   [k] __ticket_spin_lock
+    +   0.92%          swapper  [kernel.kallsyms]   [k] __ticket_spin_lock
+    ...
+    
+    And after this patch:
+    
+    Events: 356K cycles
+    +   6.85%     ovs-vswitchd  ovs-vswitchd        [.] find_match_wc
+    +   4.63%     ovs-vswitchd  libpthread-2.15.so  [.] pthread_mutex_lock
+    +   3.06%     ovs-vswitchd  [kernel.kallsyms]   [k] __ticket_spin_lock
+    +   2.81%     ovs-vswitchd  ovs-vswitchd        [.] flow_hash_in_minimask_range
+    +   2.51%     ovs-vswitchd  libpthread-2.15.so  [.] pthread_mutex_unlock
+    +   2.27%     ovs-vswitchd  ovs-vswitchd        [.] classifier_lookup
+    +   1.84%     ovs-vswitchd  libc-2.15.so        [.] 0x15d30f
+    +   1.74%     ovs-vswitchd  [kernel.kallsyms]   [k] mutex_spin_on_owner
+    +   1.47%          swapper  [kernel.kallsyms]   [k] intel_idle
+    +   1.34%     ovs-vswitchd  ovs-vswitchd        [.] flow_hash_in_minimask
+    +   1.33%     ovs-vswitchd  ovs-vswitchd        [.] rule_actions_unref
+    +   1.16%     ovs-vswitchd  ovs-vswitchd        [.] hindex_node_with_hash
+    +   1.16%     ovs-vswitchd  ovs-vswitchd        [.] do_xlate_actions
+    +   1.09%     ovs-vswitchd  ovs-vswitchd        [.] ofproto_rule_ref
+    +   1.01%          netperf  [kernel.kallsyms]   [k] __ticket_spin_lock
+    ...
+    
+    There is a small increase in kernel spinlock overhead due to the same
+    spinlock being shared between multiple cores of the same physical CPU,
+    but that is barely visible in the netperf TCP_CRR test performance
+    (maybe ~1% performance drop, hard to tell exactly due to variance in
+    the test results), when testing for kernel module throughput (with no
+    userspace activity, handful of kernel flows).
+    
+    On flow setup, a single stats instance is allocated (for the NUMA node
+    0).  As CPUs from multiple NUMA nodes start updating stats, new
+    NUMA-node specific stats instances are allocated.  This allocation on
+    the packet processing code path is made to never block or look for
+    emergency memory pools, minimizing the allocation latency.  If the
+    allocation fails, the existing preallocated stats instance is used.
+    Also, if only CPUs from one NUMA-node are updating the preallocated
+    stats instance, no additional stats instances are allocated.  This
+    eliminates the need to pre-allocate stats instances that will not be
+    used, also relieving the stats reader from the burden of reading stats
+    that are never used.
+    
+    Signed-off-by: Jarno Rajahalme <jrajahalme@nicira.com>
+    Acked-by: Pravin B Shelar <pshelar@nicira.com>
+    Signed-off-by: Jesse Gross <jesse@nicira.com>
+
+commit 545ac13892ab391049a92108cf59a0d05de7e28c
+Author: Jeremy Fitzhardinge <jeremy@goop.org>
+Date:   Fri Aug 9 19:51:49 2013 +0530
+
+    x86, spinlock: Replace pv spinlocks with pv ticketlocks
+    
+    Rather than outright replacing the entire spinlock implementation in
+    order to paravirtualize it, keep the ticket lock implementation but add
+    a couple of pvops hooks on the slow patch (long spin on lock, unlocking
+    a contended lock).
+    
+    Ticket locks have a number of nice properties, but they also have some
+    surprising behaviours in virtual environments.  They enforce a strict
+    FIFO ordering on cpus trying to take a lock; however, if the hypervisor
+    scheduler does not schedule the cpus in the correct order, the system can
+    waste a huge amount of time spinning until the next cpu can take the lock.
+    
+    (See Thomas Friebel's talk "Prevent Guests from Spinning Around"
+    http://www.xen.org/files/xensummitboston08/LHP.pdf for more details.)
+    
+    To address this, we add two hooks:
+     - __ticket_spin_lock which is called after the cpu has been
+       spinning on the lock for a significant number of iterations but has
+       failed to take the lock (presumably because the cpu holding the lock
+       has been descheduled).  The lock_spinning pvop is expected to block
+       the cpu until it has been kicked by the current lock holder.
+     - __ticket_spin_unlock, which on releasing a contended lock
+       (there are more cpus with tail tickets), it looks to see if the next
+       cpu is blocked and wakes it if so.
+    
+    When compiled with CONFIG_PARAVIRT_SPINLOCKS disabled, a set of stub
+    functions causes all the extra code to go away.
+    
+    Results:
+    =======
+    setup: 32 core machine with 32 vcpu KVM guest (HT off)  with 8GB RAM
+    base = 3.11-rc
+    patched = base + pvspinlock V12
+    
+    +-----------------+----------------+--------+
+     dbench (Throughput in MB/sec. Higher is better)
+    +-----------------+----------------+--------+
+    |   base (stdev %)|patched(stdev%) | %gain  |
+    +-----------------+----------------+--------+
+    | 15035.3   (0.3) |15150.0   (0.6) |   0.8  |
+    |  1470.0   (2.2) | 1713.7   (1.9) |  16.6  |
+    |   848.6   (4.3) |  967.8   (4.3) |  14.0  |
+    |   652.9   (3.5) |  685.3   (3.7) |   5.0  |
+    +-----------------+----------------+--------+
+    
+    pvspinlock shows benefits for overcommit ratio > 1 for PLE enabled cases,
+    and undercommits results are flat
+    
+    Signed-off-by: Jeremy Fitzhardinge <jeremy@goop.org>
+    Link: http://lkml.kernel.org/r/1376058122-8248-2-git-send-email-raghavendra.kt@linux.vnet.ibm.com
+    Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Tested-by: Attilio Rao <attilio.rao@citrix.com>
+    [ Raghavendra: Changed SPIN_THRESHOLD, fixed redefinition of arch_spinlock_t]
+    Signed-off-by: Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>
+    Acked-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 5fd862f1db941c302a872ed7e67eab593a6a931a
+Merge: 8e6d539e0fd0 695d16f78708
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Oct 28 05:43:29 2011 -0700
+
+    Merge branch 'x86-spinlocks-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    * 'x86-spinlocks-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:
+      x86, ticketlock: remove obsolete comment
+      x86, cmpxchg: Use __compiletime_error() to make usage messages a bit nicer
+      x86, ticketlock: Make __ticket_spin_trylock common
+      x86, ticketlock: Convert __ticket_spin_lock to use xadd()
+      x86, ticketlock: Convert spin loop to C
+      x86, ticketlock: Clean up types and accessors
+      x86: Use xadd helper more widely
+      x86: Add xadd helper macro
+      x86, cmpxchg: Unify cmpxchg into cmpxchg.h
+      x86, cmpxchg: Move 64-bit set64_bit() to match 32-bit
+      x86, cmpxchg: Move 32-bit __cmpxchg_wrong_size to match 64 bit.
+      x86, cmpxchg: <linux/alternative.h> has LOCK_PREFIX
+
+commit 3815832a2aa4df9815d15dac05227e0c8551833f
+Author: Dave Chinner <dchinner@redhat.com>
+Date:   Fri Sep 30 04:45:02 2011 +0000
+
+    xfs: Don't allocate new buffers on every call to _xfs_buf_find
+    
+    Stats show that for an 8-way unlink @ ~80,000 unlinks/s we are doing
+    ~1 million cache hit lookups to ~3000 buffer creates. That's almost
+    3 orders of magnitude more cahce hits than misses, so optimising for
+    cache hits is quite important. In the cache hit case, we do not need
+    to allocate a new buffer in case of a cache miss, so we are
+    effectively hitting the allocator for no good reason for vast the
+    majority of calls to _xfs_buf_find. 8-way create workloads are
+    showing similar cache hit/miss ratios.
+    
+    The result is profiles that look like this:
+    
+         samples  pcnt function                        DSO
+         _______ _____ _______________________________ _________________
+    
+         1036.00 10.0% _xfs_buf_find                   [kernel.kallsyms]
+          582.00  5.6% kmem_cache_alloc                [kernel.kallsyms]
+          519.00  5.0% __memcpy                        [kernel.kallsyms]
+          468.00  4.5% __ticket_spin_lock              [kernel.kallsyms]
+          388.00  3.7% kmem_cache_free                 [kernel.kallsyms]
+          331.00  3.2% xfs_log_commit_cil              [kernel.kallsyms]
+    
+    
+    Further, there is a fair bit of work involved in initialising a new
+    buffer once a cache miss has occurred and we currently do that under
+    the rbtree spinlock. That increases spinlock hold time on what are
+    heavily used trees.
+    
+    To fix this, remove the initialisation of the buffer from
+    _xfs_buf_find() and only allocate the new buffer once we've had a
+    cache miss. Initialise the buffer immediately after allocating it in
+    xfs_buf_get, too, so that is it ready for insert if we get another
+    cache miss after allocation. This minimises lock hold time and
+    avoids unnecessary allocator churn. The resulting profiles look
+    like:
+    
+         samples  pcnt function                    DSO
+         _______ _____ ___________________________ _________________
+    
+         8111.00  9.1% _xfs_buf_find               [kernel.kallsyms]
+         4380.00  4.9% __memcpy                    [kernel.kallsyms]
+         4341.00  4.8% __ticket_spin_lock          [kernel.kallsyms]
+         3401.00  3.8% kmem_cache_alloc            [kernel.kallsyms]
+         2856.00  3.2% xfs_log_commit_cil          [kernel.kallsyms]
+         2625.00  2.9% __kmalloc                   [kernel.kallsyms]
+         2380.00  2.7% kfree                       [kernel.kallsyms]
+         2016.00  2.3% kmem_cache_free             [kernel.kallsyms]
+    
+    Showing a significant reduction in time spent doing allocation and
+    freeing from slabs (kmem_cache_alloc and kmem_cache_free).
+    
+    Signed-off-by: Dave Chinner <dchinner@redhat.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Signed-off-by: Alex Elder <aelder@sgi.com>
+
+commit f10cd522c5fbfec9ae3cc01967868c9c2401ed23
+Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+Date:   Tue Sep 6 17:41:47 2011 +0100
+
+    xen: disable PV spinlocks on HVM
+    
+    PV spinlocks cannot possibly work with the current code because they are
+    enabled after pvops patching has already been done, and because PV
+    spinlocks use a different data structure than native spinlocks so we
+    cannot switch between them dynamically. A spinlock that has been taken
+    once by the native code (__ticket_spin_lock) cannot be taken by
+    __xen_spin_lock even after it has been released.
+    
+    Reported-and-Tested-by: Stefan Bader <stefan.bader@canonical.com>
+    Signed-off-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+
+commit 2994488fe5bb721de1ded53af1a2fc41f47f6ddc
+Author: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+Date:   Tue Jul 13 14:07:45 2010 -0700
+
+    x86, ticketlock: Convert __ticket_spin_lock to use xadd()
+    
+    Convert the two variants of __ticket_spin_lock() to use xadd(), which
+    has the effect of making them identical, so remove the duplicate function.
+    
+    Signed-off-by: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+    Link: http://lkml.kernel.org/r/4E5BCC40.3030501@goop.org
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit c576a3ea905c25d50339503e0e5c7fef724e0147
+Author: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+Date:   Sat Jul 3 01:06:04 2010 +0100
+
+    x86, ticketlock: Convert spin loop to C
+    
+    The inner loop of __ticket_spin_lock isn't doing anything very special,
+    so reimplement it in C.
+    
+    For the 8 bit ticket lock variant, we use a register union to get direct
+    access to the lower and upper bytes in the tickets, but unfortunately gcc
+    won't generate a direct comparison between the two halves of the register,
+    so the generated asm isn't quite as pretty as the hand-coded version.
+    However benchmarking shows that this is actually a small improvement in
+    runtime performance on some benchmarks, and never a slowdown.
+    
+    We also need to make sure there's a barrier at the end of the lock loop
+    to make sure that the compiler doesn't move any instructions from within
+    the locked region into the region where we don't yet own the lock.
+    
+    Signed-off-by: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+    Link: http://lkml.kernel.org/r/4E5BCC40.3030501@goop.org
+    Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+
+commit 8af088710d1eb3c980e0ef3779c8d47f3f217b48
+Author: Eric Dumazet <eric.dumazet@gmail.com>
+Date:   Tue May 24 11:12:58 2011 +0200
+
+    posix-timers: RCU conversion
+    
+    Ben Nagy reported a scalability problem with KVM/QEMU that hit very hard
+    a single spinlock (idr_lock) in posix-timers code, on its 48 core
+    machine.
+    
+    Even on a 16 cpu machine (2x4x2), a single test can show 98% of cpu time
+    used in ticket_spin_lock, from lock_timer
+    
+    Ref: http://www.spinics.net/lists/kvm/msg51526.html
+    
+    Switching to RCU is quite easy, IDR being already RCU ready. idr_lock
+    should be locked only for an insert/delete, not a lookup.
+    
+    Benchmark on a 2x4x2 machine, 16 processes calling timer_gettime().
+    
+    Before :
+    
+    real    1m18.669s
+    user    0m1.346s
+    sys     1m17.180s
+    
+    After :
+    
+    real    0m3.296s
+    user    0m1.366s
+    sys     0m1.926s
+    
+    Reported-by: Ben Nagy <ben@iagu.net>
+    Signed-off-by: Eric Dumazet <eric.dumazet@gmail.com>
+    Tested-by: Ben Nagy <ben@iagu.net>
+    Cc: Oleg Nesterov <oleg@redhat.com>
+    Cc: Avi Kivity <avi@redhat.com>
+    Cc: John Stultz <johnstul@us.ibm.com>
+    Cc: Richard Cochran <richard.cochran@omicron.at>
+    Cc: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
+commit 9bc08a45fb117c696e4940cfa1208cb1cc7a2f25
+Author: Dave Chinner <david@fromorbit.com>
+Date:   Thu Sep 2 15:14:38 2010 +1000
+
+    xfs: improve buffer cache hash scalability
+    
+    When doing large parallel file creates on a 16p machines, large amounts of
+    time is being spent in _xfs_buf_find(). A system wide profile with perf top
+    shows this:
+    
+              1134740.00 19.3% _xfs_buf_find
+               733142.00 12.5% __ticket_spin_lock
+    
+    The problem is that the hash contains 45,000 buffers, and the hash table width
+    is only 256 buffers. That means we've got around 200 buffers per chain, and
+    searching it is quite expensive. The hash table size needs to increase.
+    
+    Secondly, every time we do a lookup, we promote the buffer we find to the head
+    of the hash chain. This is causing cachelines to be dirtied and causes
+    invalidation of cachelines across all CPUs that may have walked the hash chain
+    recently. hence every walk of the hash chain is effectively a cold cache walk.
+    Remove the promotion to avoid this invalidation.
+    
+    The results are:
+    
+              1045043.00 21.2% __ticket_spin_lock
+               326184.00  6.6% _xfs_buf_find
+    
+    A 70% drop in the CPU usage when looking up buffers. Unfortunately that does
+    not result in an increase in performance underthis workload as contention on
+    the inode_lock soaks up most of the reduction in CPU usage.
+    
+    Signed-off-by: Dave Chinner <dchinner@redhat.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+commit 6f7edb4881bf51300060e89915926e070ace8c4d
+Author: Catalin(ux) M. BOIE <catab@embedromix.ro>
+Date:   Tue Jan 5 05:50:24 2010 +0100
+
+    IPVS: Allow boot time change of hash size
+    
+    I was very frustrated about the fact that I have to recompile the kernel
+    to change the hash size. So, I created this patch.
+    
+    If IPVS is built-in you can append ip_vs.conn_tab_bits=?? to kernel
+    command line, or, if you built IPVS as modules, you can add
+    options ip_vs conn_tab_bits=??.
+    
+    To keep everything backward compatible, you still can select the size at
+    compile time, and that will be used as default.
+    
+    It has been about a year since this patch was originally posted
+    and subsequently dropped on the basis of insufficient test data.
+    
+    Mark Bergsma has provided the following test results which seem
+    to strongly support the need for larger hash table sizes:
+    
+    We do however run into the same problem with the default setting (212 =
+    4096 entries), as most of our LVS balancers handle around a million
+    connections/SLAB entries at any point in time (around 100-150 kpps
+    load). With only 4096 hash table entries this implies that each entry
+    consists of a linked list of 256 connections *on average*.
+    
+    To provide some statistics, I did an oprofile run on an 2.6.31 kernel,
+    with both the default 4096 table size, and the same kernel recompiled
+    with IP_VS_CONN_TAB_BITS set to 18 (218 = 262144 entries). I built a
+    quick test setup with a part of Wikimedia/Wikipedia's live traffic
+    mirrored by the switch to the test host.
+    
+    With the default setting, at ~ 120 kpps packet load we saw a typical %si
+    CPU usage of around 30-35%, and oprofile reported a hot spot in
+    ip_vs_conn_in_get:
+    
+    samples  %        image name               app name
+    symbol name
+    1719761  42.3741  ip_vs.ko                 ip_vs.ko      ip_vs_conn_in_get
+    302577    7.4554  bnx2                     bnx2          /bnx2
+    181984    4.4840  vmlinux                  vmlinux       __ticket_spin_lock
+    128636    3.1695  vmlinux                  vmlinux       ip_route_input
+    74345     1.8318  ip_vs.ko                 ip_vs.ko      ip_vs_conn_out_get
+    68482     1.6874  vmlinux                  vmlinux       mwait_idle
+    
+    After loading the recompiled kernel with 218 entries, %si CPU usage
+    dropped in half to around 12-18%, and oprofile looks much healthier,
+    with only 7% spent in ip_vs_conn_in_get:
+    
+    samples  %        image name               app name
+    symbol name
+    265641   14.4616  bnx2                     bnx2         /bnx2
+    143251    7.7986  vmlinux                  vmlinux      __ticket_spin_lock
+    140661    7.6576  ip_vs.ko                 ip_vs.ko     ip_vs_conn_in_get
+    94364     5.1372  vmlinux                  vmlinux      mwait_idle
+    86267     4.6964  vmlinux                  vmlinux      ip_route_input
+    
+    [ horms@verge.net.au: trivial up-port and minor style fixes ]
+    Signed-off-by: Catalin(ux) M. BOIE <catab@embedromix.ro>
+    Cc: Mark Bergsma <mark@wikimedia.org>
+    Signed-off-by: Simon Horman <horms@verge.net.au>
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+
+commit b4ecc126991b30fe5f9a59dfacda046aeac124b2
+Author: Jeremy Fitzhardinge <jeremy@goop.org>
+Date:   Wed May 13 17:16:55 2009 -0700
+
+    x86: Fix performance regression caused by paravirt_ops on native kernels
+    
+    Xiaohui Xin and some other folks at Intel have been looking into what's
+    behind the performance hit of paravirt_ops when running native.
+    
+    It appears that the hit is entirely due to the paravirtualized
+    spinlocks introduced by:
+    
+     | commit 8efcbab674de2bee45a2e4cdf97de16b8e609ac8
+     | Date:   Mon Jul 7 12:07:51 2008 -0700
+     |
+     |     paravirt: introduce a "lock-byte" spinlock implementation
+    
+    The extra call/return in the spinlock path is somehow
+    causing an increase in the cycles/instruction of somewhere around 2-7%
+    (seems to vary quite a lot from test to test).  The working theory is
+    that the CPU's pipeline is getting upset about the
+    call->call->locked-op->return->return, and seems to be failing to
+    speculate (though I haven't seen anything definitive about the precise
+    reasons).  This doesn't entirely make sense, because the performance
+    hit is also visible on unlock and other operations which don't involve
+    locked instructions.  But spinlock operations clearly swamp all the
+    other pvops operations, even though I can't imagine that they're
+    nearly as common (there's only a .05% increase in instructions
+    executed).
+    
+    If I disable just the pv-spinlock calls, my tests show that pvops is
+    identical to non-pvops performance on native (my measurements show that
+    it is actually about .1% faster, but Xiaohui shows a .05% slowdown).
+    
+    Summary of results, averaging 10 runs of the "mmperf" test, using a
+    no-pvops build as baseline:
+    
+                    nopv            Pv-nospin       Pv-spin
+    CPU cycles      100.00%         99.89%          102.18%
+    instructions    100.00%         100.10%         100.15%
+    CPI             100.00%         99.79%          102.03%
+    cache ref       100.00%         100.84%         100.28%
+    cache miss      100.00%         90.47%          88.56%
+    cache miss rate 100.00%         89.72%          88.31%
+    branches        100.00%         99.93%          100.04%
+    branch miss     100.00%         103.66%         107.72%
+    branch miss rt  100.00%         103.73%         107.67%
+    wallclock       100.00%         99.90%          102.20%
+    
+    The clear effect here is that the 2% increase in CPI is
+    directly reflected in the final wallclock time.
+    
+    (The other interesting effect is that the more ops are
+    out of line calls via pvops, the lower the cache access
+    and miss rates.  Not too surprising, but it suggests that
+    the non-pvops kernel is over-inlined.  On the flipside,
+    the branch misses go up correspondingly...)
+    
+    So, what's the fix?
+    
+    Paravirt patching turns all the pvops calls into direct calls, so
+    _spin_lock etc do end up having direct calls.  For example, the compiler
+    generated code for paravirtualized _spin_lock is:
+    
+    <_spin_lock+0>:         mov    %gs:0xb4c8,%rax
+    <_spin_lock+9>:         incl   0xffffffffffffe044(%rax)
+    <_spin_lock+15>:        callq  *0xffffffff805a5b30
+    <_spin_lock+22>:        retq
+    
+    The indirect call will get patched to:
+    <_spin_lock+0>:         mov    %gs:0xb4c8,%rax
+    <_spin_lock+9>:         incl   0xffffffffffffe044(%rax)
+    <_spin_lock+15>:        callq <__ticket_spin_lock>
+    <_spin_lock+20>:        nop; nop                /* or whatever 2-byte nop */
+    <_spin_lock+22>:        retq
+    
+    One possibility is to inline _spin_lock, etc, when building an
+    optimised kernel (ie, when there's no spinlock/preempt
+    instrumentation/debugging enabled).  That will remove the outer
+    call/return pair, returning the instruction stream to a single
+    call/return, which will presumably execute the same as the non-pvops
+    case.  The downsides arel 1) it will replicate the
+    preempt_disable/enable code at eack lock/unlock callsite; this code is
+    fairly small, but not nothing; and 2) the spinlock definitions are
+    already a very heavily tangled mass of #ifdefs and other preprocessor
+    magic, and making any changes will be non-trivial.
+    
+    The other obvious answer is to disable pv-spinlocks.  Making them a
+    separate config option is fairly easy, and it would be trivial to
+    enable them only when Xen is enabled (as the only non-default user).
+    But it doesn't really address the common case of a distro build which
+    is going to have Xen support enabled, and leaves the open question of
+    whether the native performance cost of pv-spinlocks is worth the
+    performance improvement on a loaded Xen system (10% saving of overall
+    system CPU when guests block rather than spin).  Still it is a
+    reasonable short-term workaround.
+    
+    [ Impact: fix pvops performance regression when running native ]
+    
+    Analysed-by: "Xin Xiaohui" <xiaohui.xin@intel.com>
+    Analysed-by: "Li Xin" <xin.li@intel.com>
+    Analysed-by: "Nakajima Jun" <jun.nakajima@intel.com>
+    Signed-off-by: Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>
+    Acked-by: H. Peter Anvin <hpa@zytor.com>
+    Cc: Nick Piggin <npiggin@suse.de>
+    Cc: Xen-devel <xen-devel@lists.xensource.com>
+    LKML-Reference: <4A0B62F7.5030802@goop.org>
+    [ fixed the help text ]
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>

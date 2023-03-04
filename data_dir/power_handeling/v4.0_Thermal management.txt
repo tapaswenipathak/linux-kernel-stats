@@ -1,0 +1,135 @@
+commit e464fd2ba4d4573445574388b0b5240ae37c1740
+Author: Angus Ainslie (Purism) <angus@akkea.ca>
+Date:   Fri Mar 22 10:09:13 2019 +0800
+
+    arm64: dts: imx8mq: enable the multi sensor TMU
+    
+    Add the imx8mq TMU (Thermal management unit) nodes for CPU,
+    GPU, and VPU.
+    
+    Signed-off-by: Angus Ainslie (Purism) <angus@akkea.ca>
+    Reviewed-by: Lucas Stach <l.stach@pengutronix.de>
+    Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+
+commit 52b3672c135416d8ccc3c92f475b983a201fc6f5
+Author: Zhen Han <zhen.han@intel.com>
+Date:   Wed Jan 10 08:38:23 2018 +0800
+
+    powercap: add suspend and resume mechanism for SOC power limit
+    
+    PL1 and PL2 could be throlled or de-throttled by
+    Thermal management to control SOC temperature.
+    
+    However, currently, their value will be reset to default value
+    after once system suspend and resume.
+    
+    Add pm_notifier to save PL1, PL2 before system suspect and restore
+    PL1, PL2 after system resume.
+    
+    Signed-off-by: Zhen Han <zhen.han@intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 4a15cdffa96bdd19d6233a25d394d0c50ab4d539
+Merge: ec61f5eb5895 aae95ca70814
+Author: Dave Airlie <airlied@redhat.com>
+Date:   Fri Nov 8 16:01:02 2013 +1000
+
+    Merge branch 'drm-nouveau-next' of git://anongit.freedesktop.org/git/nouveau/linux-2.6 into drm-next
+    
+    - Ilia's PMPEG improvements
+    - MSI fixes, and another attempt at enabling by default
+    - Initial GK208 support, just modesetting
+    - "Old" PM code gone, new infrastructure and various different stages of support (depending which chipset / ram type etc) is in its place.  This includes support that goes beyond what the previous code was capable of.  User control has been deliberately sabotaged, it's not safe to use still.
+    - Thermal management / fan control that's been present for a while is turned ON by default now.
+    - Misc other fixes that have accumulated
+    
+    * 'drm-nouveau-next' of git://anongit.freedesktop.org/git/nouveau/linux-2.6: (74 commits)
+      drm/nouveau/fb: implement various bits of work towards memory reclocking
+      drm/nouveau: implement a simple sysfs interface to new pm code
+      drm/nouveau/device: initial control object class, with pstate control methods
+      drm/nouveau/clk: implement power state and engine clock control in core
+      drm/nouveau/volt: implement voltage control in core
+      drm/nouveau/bios: parsing for various tables required for power management
+      drm/nouveau/perfmon: initial infrastructure to expose performance counters
+      drm/nouveau/bus: add interfaces/helpers for sequencer
+      drm/nouveau/bus: make external class definitions pointers
+      drm/nouveau/pwr: initial implementation
+      drm/nouveau/therm: update target fanspeed outside of therm lock
+      drm/nouveau/therm: automatic mode by default
+      drm/nouveau/therm: no toggle fan control either if we can't guarantee no pwm connected
+      drm/nvc0/therm: allow fan control if we've killed the vbios ppwr ucode
+      drm/nouveau/therm: if no bios trip/linear info, default to perf-suggested speed
+      drm/nouveau/therm: add hook for clk to suggest fanspeed to therm
+      drm/nouveau/pwr: assign a subdev id for upcoming implementation
+      drm/nouveau/gpio: return different error code for not found vs invalid
+      drm/nouveau/drm/pm: remove everything except the hwmon interfaces to THERM
+      drm/nouveau/core: make all info-level messages silent for runtime pm
+      ...
+
+commit b9b42eeb88d36cc7400925302f1587aaaa348905
+Merge: 7b7a2f0a31c6 50e66c7ed8a1
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Sep 12 07:42:59 2013 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux
+    
+    Pull thermal management updates from Zhang Rui:
+     "We have a lot of SOC changes and a few thermal core fixes this time.
+    
+      The biggest change is about exynos thermal driver restructure.  The
+      patch set adds TMU (Thermal management Unit) driver support for
+      exynos5440 platform.  There are 3 instances of the TMU controllers so
+      necessary cleanup/re-structure is done to handle multiple thermal
+      zone.
+    
+      The next biggest change is the introduction of the imx thermal driver.
+      It adds the imx thermal support using Temperature Monitor (TEMPMON)
+      block found on some Freescale i.MX SoCs.  The driver uses syscon
+      regmap interface to access TEMPMON control registers and calibration
+      data, and supports cpufreq as the cooling device.
+    
+      Highlights:
+    
+       - restructure exynos thermal driver.
+    
+       - introduce new imx thermal driver.
+    
+       - fix a bug in thermal core, which powers on the fans unexpectedly
+         after resume from suspend"
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux: (46 commits)
+      drivers: thermal: add check when unregistering cpu cooling
+      thermal: thermal_core: allow binding with limits on bind_params
+      drivers: thermal: make usage of CONFIG_THERMAL_HWMON optional
+      drivers: thermal: parent virtual hwmon with thermal zone
+      thermal: hwmon: move hwmon support to single file
+      thermal: exynos: Clean up non-DT remnants
+      thermal: exynos: Fix potential NULL pointer dereference
+      thermal: exynos: Fix typos in Kconfig
+      thermal: ti-soc-thermal: Ensure to compute thermal trend
+      thermal: ti-soc-thermal: Set the bandgap mask counter delay value
+      thermal: ti-soc-thermal: Initialize counter_delay field for TI DRA752 sensors
+      thermal: step_wise: return instance->target by default
+      thermal: step_wise: cdev only needs update on a new target state
+      Thermal/cpu_cooling: Return directly for the cpu out of allowed_cpus in the cpufreq_thermal_notifier()
+      thermal: exynos_tmu: fix wrong error check for mapped memory
+      thermal: imx: implement thermal alarm interrupt handling
+      thermal: imx: dynamic passive and SoC specific critical trip points
+      Documentation: thermal: Explain the exynos thermal driver model
+      ARM: dts: thermal: exynos: Add documentation for Exynos SoC thermal bindings
+      thermal: exynos: Support for TMU regulator defined at device tree
+      ...
+
+commit c4ce9246ca4708482a9a03e76f4177e9f46a13ef
+Author: Martin Peres <martin.peres@labri.fr>
+Date:   Tue Mar 5 10:58:59 2013 +0100
+
+    drm/nouveau/therm: remove some confusion introduced by therm_mode
+    
+    The kernel message "[  PTHERM][0000:01:00.0] Thermal management: disabled"
+    is misleading as it actually means "fan management: disabled".
+    
+    This patch fixes both the source and the message to improve readability.
+    
+    Signed-off-by: Martin Peres <martin.peres@labri.fr>
+    Signed-off-by: Ben Skeggs <bskeggs@redhat.com>

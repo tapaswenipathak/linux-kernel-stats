@@ -1,0 +1,76 @@
+commit 4828f4570873be48c4007634091b3bd8a59bb7ad
+Merge: 262fc784d856 bc6b31c53ce8
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Jul 22 21:50:35 2020 +0200
+
+    Merge tag 'sunxi-dt-for-5.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/sunxi/linux into arm/dt
+    
+    Our usual number of patches to improve the Allwinner Device Tree
+    support, including:
+      - CPUFreq / Thermal throttling support for the H5
+      - Touchscreen support for the Pinephone
+      - New boards: PinePhone v1.2
+    
+    * tag 'sunxi-dt-for-5.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/sunxi/linux:
+      arm64: dts: allwinner: h5: bananapi-m2-plus-v1.2: Tie in CPU OPPs
+      arm64: dts: allwinner: h5: libretech-all-h3-cc: Tie in CPU OPPs
+      arm64: dts: allwinner: h5: Add CPU Operating Performance Points table
+      arm64: dts: allwinner: h5: Add trip and cooling maps to CPU thermal zones
+      arm64: dts: allwinner: h5: Add clock to CPU cores
+      ARM: dts: sunxi: bananapi-m2-plus-v1.2: Fix CPU supply voltages
+      ARM: dts: sunxi: bananapi-m2-plus-v1.2: Add regulator supply to all CPU cores
+      ARM: dts: sunxi: libretech-all-h3-cc: Add regulator supply to all CPU cores
+      arm64: dts: sun50i-pinephone: dldo4 must not be >= 1.8V
+      arm64: dts: allwinner: Add support for PinePhone revision 1.2
+      dt-bindings: arm: sunxi: Add PinePhone 1.2 bindings
+      arm64: dts: sun50i-a64-pinephone: Add touchscreen support
+      arm64: dts: sun50i-a64-pinephone: Enable LCD support on PinePhone
+      ARM: dts: orange-pi-zero-plus2: add leds configuration
+      ARM: dts: orange-pi-zero-plus2: enable USB OTG port
+    
+    Link: https://lore.kernel.org/r/fa48ffcb-3404-41bb-b065-a16717cf5688.lettre@localhost
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 75800d701782e89eecaf712fa141082b6e36f956
+Author: Tim Lewis <elatllat@gmail.com>
+Date:   Sun Apr 26 12:21:19 2020 -0400
+
+    arm64: dts: meson: S922X: extend cpu opp-points
+    
+    Add extra cpu pop points to allow mild overclock on S922X. The opp
+    points are found in Hardkernel N2 sources [1] and testing shows no
+    obvious issues on other S922X devices. Thermal throttling should
+    keep things in-check if needed.
+    
+    [1] https://github.com/hardkernel/linux/commit/f86cd9487c7483b2a05f448b9ebacf6bd5a2ad2f
+    
+    Signed-off-by: Tim Lewis <elatllat@gmail.com>
+    Signed-off-by: Kevin Hilman <khilman@baylibre.com>
+    Tested-by: Christian Hewitt <christianshewitt@gmail.com>
+    Reviewed-by: Neil Armstrong <narmstrong@baylibre.com>
+    Link: https://lore.kernel.org/r/20200426162119.GA23268@imac
+
+commit 8515b5c79a54213f189f142f956eeb43cb8c8058
+Author: Rajkumar Manoharan <rmanohar@qti.qualcomm.com>
+Date:   Sun Mar 15 20:36:22 2015 +0530
+
+    ath10k: configure thermal throttle while powering up
+    
+    Thermal throttling is not handled in software restart and device
+    bootup. Also it needs to be configured whenever quiet period got
+    updated. Fix that.
+    
+    Reported-by: Matthias Kaehlcke <mka@google.com>
+    Signed-off-by: Rajkumar Manoharan <rmanohar@qti.qualcomm.com>
+    Signed-off-by: Kalle Valo <kvalo@qca.qualcomm.com>
+
+commit f42e7662815647c1a6f73e160abcdf812d3057d2
+Author: Wey-Yi Guy <wey-yi.w.guy@intel.com>
+Date:   Mon Apr 18 09:30:09 2011 -0700
+
+    iwlagn: temperature should be measure for all _agn devices
+    
+    Thermal throttling functions are available for all _agn devices, call the
+    functions directly.
+    
+    Signed-off-by: Wey-Yi Guy <wey-yi.w.guy@intel.com>

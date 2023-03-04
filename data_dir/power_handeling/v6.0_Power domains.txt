@@ -1,0 +1,397 @@
+commit 6c013679eb5c7e0b09cbcb64276f6dd97b473d12
+Author: Linus Walleij <linus.walleij@linaro.org>
+Date:   Sat Dec 3 10:15:15 2022 +0100
+
+    dt-bindings: crypto: Let STM32 define Ux500 CRYP
+    
+    This adds device tree bindings for the Ux500 CRYP block
+    as a compatible in the STM32 CRYP bindings.
+    
+    The Ux500 CRYP binding has been used for ages in the kernel
+    device tree for Ux500 but was never documented, so fill in
+    the gap by making it a sibling of the STM32 CRYP block,
+    which is what it is.
+    
+    The relationship to the existing STM32 CRYP block is pretty
+    obvious when looking at the register map, and I have written
+    patches to reuse the STM32 CRYP driver on the Ux500.
+    
+    The two properties added are DMA channels and power domain.
+    Power domains are a generic SoC feature and the STM32 variant
+    also has DMA channels.
+    
+    Cc: devicetree@vger.kernel.org
+    Cc: Rob Herring <robh+dt@kernel.org>
+    Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+    Cc: Lionel Debieve <lionel.debieve@foss.st.com>
+    Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+    Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+    Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+    Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+commit ff6c226953b1bd57c6f4d4e7a37f586426b80e0d
+Merge: 611f6810aac8 4d3ddc9bce4b
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Tue Jul 12 15:01:30 2022 +0200
+
+    Merge tag 'v5.19-next-soc' of git://git.kernel.org/pub/scm/linux/kernel/git/matthias.bgg/linux into arm/drivers
+    
+    pmic wrapper:
+    - code style improvements
+    
+    devapc:
+    - add support for MT8186
+    
+    Smart Voltage Scaling (SVS)
+    - add support for MT8183 and MT8192
+    
+    MMSYS:
+    - Add more display paths for MT8365
+    
+    Mutex:
+    - Add common interface for MOD and SOF table
+    - Add support for MDP on MT8183
+    - Move binding to soc folder
+    - Add support to use CMDQ to enable the mutex, needed by MDP3
+    
+    Power domains:
+    - Add support for MT6795
+    
+    * tag 'v5.19-next-soc' of git://git.kernel.org/pub/scm/linux/kernel/git/matthias.bgg/linux: (29 commits)
+      soc: mediatek: mutex: Simplify with devm_platform_get_and_ioremap_resource()
+      soc: mediatek: pm-domains: Add support for Helio X10 MT6795
+      dt-bindings: power: Add MediaTek Helio X10 MT6795 power domains
+      soc: mediatek: SVS: Use DEFINE_SIMPLE_DEV_PM_OPS for svs_pm_ops
+      soc: mediatek: mtk-pm-domains: Allow probing vreg supply on two MFGs
+      soc: mediatek: fix missing clk_disable_unprepare() on err in svs_resume()
+      soc: mediatek: mutex: Use DDP_COMPONENT_DITHER0 mod index for MT8365
+      soc: mediatek: mutex: add functions that operate registers by CMDQ
+      dt-bindings: soc: mediatek: add gce-client-reg for MUTEX
+      dt-bindings: soc: mediatek: move out common module from display folder
+      soc: mediatek: mutex: add 8183 MUTEX MOD settings for MDP
+      soc: mediatek: mutex: add common interface for modules setting
+      soc: mediatek: pm-domains: Add support always on flag
+      soc: mediatek: mt8365-mmsys: add DPI/HDMI display path
+      soc: mediatek: mutex: add MT8365 support
+      soc: mediatek: SVS: add mt8192 SVS GPU driver
+      dt-bindings: soc: mediatek: add mt8192 svs dt-bindings
+      soc: mediatek: SVS: add debug commands
+      soc: mediatek: SVS: add monitor mode
+      soc: mediatek: SVS: introduce MTK SVS engine
+      ...
+    
+    Link: https://lore.kernel.org/r/b733bd82-6d99-23ef-0541-98e98eb8d3bc@gmail.com
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+commit 17ee2fb4e8567d01799eb8d777c33d25b1026cf9
+Author: Sibi Sankar <sibis@codeaurora.org>
+Date:   Mon Nov 18 21:43:41 2019 +0000
+
+    remoteproc: qcom: pas: Vote for active/proxy power domains
+    
+    On SM8150 SoCs ADSP, CDSP and MPSS need to proxy vote on multiple
+    rpmh ARC resources and active vote on QMP AOSS Power domains. Add
+    support to vote for multiple active and proxy power domains.
+    
+    Signed-off-by: Sibi Sankar <sibis@codeaurora.org>
+    Link: https://lore.kernel.org/r/0101016e8078a71a-9ae99638-9e15-49a5-b769-85552526ae89-000000@us-west-2.amazonses.com
+    Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+
+commit bbe3a66c3f5a65fb3d702351bac2a6033944d389
+Author: Rajendra Nayak <rnayak@codeaurora.org>
+Date:   Thu Jan 10 09:32:04 2019 +0530
+
+    soc: qcom: rpmpd: Add a Power domain driver to model corners
+    
+    The Power domains for corners just pass the performance state set by the
+    consumers to the RPM (Remote Power manager) which then takes care
+    of setting the appropriate voltage on the corresponding rails to
+    meet the performance needs.
+    
+    We add all power domain data needed on msm8996 here. This driver can easily
+    be extended by adding data for other qualcomm SoCs as well.
+    
+    Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+    Acked-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Stephen Boyd <swboyd@chromium.org>
+    Signed-off-by: Rajendra Nayak <rnayak@codeaurora.org>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+    Signed-off-by: Andy Gross <andy.gross@linaro.org>
+
+commit ab8411483a3e37fd104c9947ead5d687aa1d1ad9
+Author: Madhav Chauhan <madhav.chauhan@intel.com>
+Date:   Thu Nov 29 16:12:24 2018 +0200
+
+    drm/i915/icl: Get HW state for DSI encoder
+    
+    This patch read out the current hw state for DSI and
+    return true if encoder is active.
+    
+    v2 by Jani:
+     - Squash connector get hw state hook here
+     - Squash encode get hw state fix here
+    
+    v3 by Jani:
+     - Add encoder->get_power_domains() (Imre)
+    
+    v4 by Jani:
+     - Make encoder->get_power_domains() sensible... (Imre)
+    
+    v5 by Jani:
+     - Power domains are bit positions, not bits (Stan, Imre)
+    
+    Cc: Imre Deak <imre.deak@intel.com>
+    Signed-off-by: Madhav Chauhan <madhav.chauhan@intel.com>
+    Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+    Link: https://patchwork.freedesktop.org/patch/msgid/ec6da32a55b9fb045527f14e41ed3dce86d46a97.1543500286.git.jani.nikula@intel.com
+
+commit 55697cbb44e4f7ea8369f19fa95115dbf066708c
+Author: Magnus Damm <damm+renesas@opensource.se>
+Date:   Sun Jun 17 19:42:13 2018 +0900
+
+    arm64: dts: renesas: r8a779{65,80,90}: Add IPMMU devices nodes
+    
+    Add IPMMU device nodes for the R-Car M3-N (r8a77965),
+    V3H (r8a77980) and E3 (r8a77990) SoCs.
+    
+    * The r8a77965 IPMMU is quite similar to r8a7796 however VP0
+      has been added and PV1 has been removed. Also the IMSSTR
+      bit assignment has been reworked.
+    
+    * The r8a77980 IPMMU is quite similar to r8a77970 however VC0
+      has been added. The IMSSTR bit assignment has also been
+      reworked. Power domains are also quite different however the
+      the documentation is rather unclear about this topic.
+    
+      Until we know better VC0 gets assigned to R8A77980_PD_ALWAYS_ON.
+    
+    * The r8a77990 IPMMU is similar to r8a77995. Power domains are
+      however different and the public documentation is still unclear.
+    
+      Based on preliminary information from the hardware team the R-Car E3
+      SoC comes with an IPMMU-VP0 device in an Always-on power domain and
+      the IPMMU-VC0 is placed as expected in the A3VC power domain.
+    
+    Signed-off-by: Magnus Damm <damm+renesas@opensource.se>
+    Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+
+commit e4b9a493df45075bf3ae2d41fdc1a29e57fe024b
+Author: Magnus Damm <damm+renesas@opensource.se>
+Date:   Fri Nov 10 14:25:19 2017 +0100
+
+    arm64: dts: renesas: r8a7795-es1: Add IPMMU device nodes
+    
+    Add r8a7795 ES1.x IPMMU nodes and keep all disabled by default.
+    
+    This is a follow-up to a patch that adds IPMMU device nodes that
+    are common to r8a7795 ES1.x and ES2.0
+    
+    Power domains are omitted as they appear to be undocumented.
+    
+    Signed-off-by: Magnus Damm <damm+renesas@opensource.se>
+    Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+    Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+    Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+
+commit ae46654bcff303b33facbbd04a3ad9c21d303f9b
+Merge: 7f1b9be13a7d a48a7b6b5492
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Sep 10 20:40:00 2017 -0700
+
+    Merge tag 'armsoc-drivers' of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc
+    
+    Pull ARM SoC driver updates from Olof Johansson:
+     "This branch contains platform-related driver updates for ARM and ARM64.
+    
+      Among them:
+    
+       - Reset driver updates:
+         + New API for dealing with arrays of resets
+         + Make unimplemented {de,}assert return success on shared resets
+         + MSDKv1 driver
+         + Removal of obsolete Gemini reset driver
+         + Misc updates for sunxi and Uniphier
+    
+       - SoC drivers:
+         + Platform SoC driver registration on Tegra
+         + Shuffle of Qualcomm drivers into a submenu
+         + Allwinner A64 support for SRAM
+         + Renesas R-Car R3 support
+         + Power domains for Rockchip RK3366
+    
+       - Misc updates and smaller fixes for TEE and memory driver
+         subsystems"
+    
+    * tag 'armsoc-drivers' of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc: (54 commits)
+      firmware: arm_scpi: fix endianness of dev_id in struct dev_pstate_set
+      soc/tegra: fuse: Add missing semi-colon
+      soc/tegra: Restrict SoC device registration to Tegra
+      drivers: soc: sunxi: add support for A64 and its SRAM C
+      drivers: soc: sunxi: add support for remapping func value to reg value
+      drivers: soc: sunxi: fix error processing on base address when claiming
+      dt-bindings: add binding for Allwinner A64 SRAM controller and SRAM C
+      bus: sunxi-rsb: Enable by default for ARM64
+      soc/tegra: Register SoC device
+      firmware: tegra: set drvdata earlier
+      memory: Convert to using %pOF instead of full_name
+      soc: Convert to using %pOF instead of full_name
+      bus: Convert to using %pOF instead of full_name
+      firmware: Convert to using %pOF instead of full_name
+      soc: mediatek: add SCPSYS power domain driver for MediaTek MT7622 SoC
+      soc: mediatek: add header files required for MT7622 SCPSYS dt-binding
+      soc: mediatek: reduce code duplication of scpsys_probe across all SoCs
+      dt-bindings: soc: update the binding document for SCPSYS on MediaTek MT7622 SoC
+      reset: uniphier: add analog amplifiers reset control
+      reset: uniphier: add video input subsystem reset control
+      ...
+
+commit 03aa12629fc4f73acf28e519c9ee9cb1f5dd3706
+Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Tue Mar 28 08:19:45 2017 -0700
+
+    soc: imx: Add GPCv2 power gating driver
+    
+    Add code allowing for control of various power domains managed by GPCv2
+    IP block found in i.MX7 series of SoCs. Power domains covered by this
+    patch are:
+    
+        - PCIE PHY
+        - MIPI PHY
+        - USB HSIC PHY
+        - USB OTG1/2 PHY
+    
+    Support for any other power domain controlled by GPC is not present, and
+    can be added at some later point.
+    
+    Testing of this code was done against a PCIe driver.
+    
+    Cc: yurovsky@gmail.com
+    Cc: Lucas Stach <l.stach@pengutronix.de>
+    Cc: Fabio Estevam <fabio.estevam@nxp.com>
+    Cc: Dong Aisheng <dongas86@gmail.com>
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: linux-kernel@vger.kernel.org
+    Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+    Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+
+commit de0b2a545c3e3115ef834c48465b4c1a559ad41c
+Merge: 475142411754 060646a218b3
+Author: Olof Johansson <olof@lixom.net>
+Date:   Fri Oct 23 10:24:44 2015 -0700
+
+    Merge tag 'v4.3-next-dts' of https://github.com/mbgg/linux-mediatek into next/dt
+    
+    Delete regulator-compatible usage in mt8135-evbp1.dts.
+    The regualtor-compatible binding is deprecated, instead the node name
+    is used.
+    
+    Mediatek timer driver supports as well mt8127, mt8135 and mt8173. Add
+    these SOCs to the bindings list.
+    
+    Power domains venc and venc_lt need clocks two extra clocks to access
+    their registers. We update the bindings documentation about this.
+    
+    Update SMP bindings documentation by adding support for mt6589 and mt81xx SOCs.
+    
+    Update mt8127.dtsi and mt8135.dtsi to enable SMP support.
+    
+    * tag 'v4.3-next-dts' of https://github.com/mbgg/linux-mediatek:
+      ARM: dts: mt8127: enable basic SMP bringup for mt8127
+      ARM: dts: mt8135: enable basic SMP bringup for mt8135
+      devicetree: bindings: add new SMP enable method Mediatek SoC
+      dt-bindings: soc: Add clocks for Mediatek SCPSYS unit
+      dt-bindings: add more MediaTek SoC to mtk-timer binding
+      ARM: dts: mt8135-evbp1: remove regulator-compatible usage
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit 9246e7ff24c518ebd0fd2027ab0cd746e6bb6065
+Author: Chanwoo Choi <cw00.choi@samsung.com>
+Date:   Fri Nov 7 08:19:24 2014 +0900
+
+    ARM: dts: Add dts files for exynos4415 SoC
+    
+    This patch adds new exynos4415.dtsi to support Exynos4415 SoC
+    based on Cortex-A9 quad cores and includes following dt nodes:
+    
+    - GIC interrupt controller (GIC-400)
+    - Pinctrl to control three GPIO parts
+    - CMU (Clock Management Unit) for CMU/CMU_DMC/AUDSS
+    - CPU information (Cortex-A9 quad cores)
+    - UART to support serial port
+    - MCT (Multi Core Timer)
+    - ADC (Analog Digital Converter)
+    - RTC (Real Time Clock)
+    - I2C/SPI busses
+    - Power domains (CAM, TV, MFC, G3D, LCD0, ISP0/1)
+    - PMU (Performance Monitoring Unit)
+    - MSHC (Mobile Storage Host Controller)
+    - EHCI (Enhanced Host Controller Interface)
+    - OHIC (Open Host Controller Interface)
+    - USB 2.0 device with hsotg
+    - PWM (Pluse Width Modulation) Timer
+    - AMBA bus for PDMA0/1
+    - SYSRAM node for memory mapping
+    - SYSREG node for memory mapping
+    - PMU (Power Management Unit) node for memory mapping
+    
+    Cc: Ben Dooks <ben-linux@fluff.org>
+    Cc: Russell King <linux@arm.linux.org.uk>
+    Cc: Mark Rutland <mark.rutland@arm.com>
+    Cc: Olof Johansson <olof@lixom.net>
+    Cc: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+    Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
+    [m.szyprowski: Add OHCI node and correct EHCI node]
+    Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+    [yj44.cho: Add mipi-phy node]
+    Signed-off-by: YoungJun Cho <yj44.cho@samsung.com>
+    [jaewon02: Add EHCI and SPI_2 node]
+    Signed-off-by: Jaewon Kim <jaewon02.kim@samsung.com>
+    [ideal.song: Add I2S0 node for audio interface]
+    Signed-off-by: Inha Song <ideal.song@samsung.com>
+    [tomasz.figa: Add L2 cache node]
+    Signed-off-by: Tomasz Figa <tomasz.figa@gmail.com>
+    Acked-by: Kyungmin Park <kyungmin.park@samsung.com>
+    Signed-off-by: Kukjin Kim <kgene.kim@samsung.com>
+
+commit fd0682d1b4f47792cfe668c7979d73f168e9f1aa
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Mon Mar 26 23:24:40 2012 +0200
+
+    PM / Domains: Check domain status during hibernation restore of devices
+    
+    This is a backport of mainline commit
+    18dd2ece3cde14cfd42e95a89eb14016699a5f15.
+    
+    Power domains that were off before hibernation shouldn't be turned on
+    during device restore, so prevent that from happening.
+    
+    This change fixed up mainline commit
+    65533bbf63b4f37723fdfedc73d0653958973323
+    
+        PM / Domains: Fix hibernation restore of devices, v2
+    
+    that didn't include it by mistake.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 18dd2ece3cde14cfd42e95a89eb14016699a5f15
+Author: Rafael J. Wysocki <rjw@rjwysocki.net>
+Date:   Mon Mar 19 10:38:14 2012 +0100
+
+    PM / Domains: Check domain status during hibernation restore of devices
+    
+    Power domains that were off before hibernation shouldn't be turned on
+    during device restore, so prevent that from happening.
+    
+    This change fixes up commit 65533bbf63b4f37723fdfedc73d0653958973323
+    
+        PM / Domains: Fix hibernation restore of devices, v2
+    
+    that didn't include it by mistake.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
