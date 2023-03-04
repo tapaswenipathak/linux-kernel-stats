@@ -1,0 +1,221 @@
+      xprtrdma: Allocate zero pad separately from rpcrdma_buffer
+      xprtrdma: Refactor rpcrdma_buffer_create() and rpcrdma_buffer_destroy()
+      xprtrdma: Simplify synopsis of rpcrdma_buffer_create()
+    xprtrdma: Allocate zero pad separately from rpcrdma_buffer
+    xprtrdma: Refactor rpcrdma_buffer_create() and rpcrdma_buffer_destroy()
+    xprtrdma: Simplify synopsis of rpcrdma_buffer_create()
+    Clean up: There is one call site for rpcrdma_buffer_create(). All of
+    staging: comedi: ni_labpc_isadma: convert 'dma_buffer_size' to a define
+    Currently, `interrupt_pci9118_ai_dma()` calls `defragment_dma_buffer()`
+    `valid_samples_in_act_dma_buf()` to determine the number of valid
+    Eliminate the `next_dma_buf` variable in `interrupt_pci9118_ai_dma()`.
+    arch/blackfin/include/asm/bfin_serial.h:44:18: error: field 'rx_dma_buf' has incomplete type
+    This fixes a bug in load_ao_dma_buffer(). That function was decrementing
+    In block write mode, when encapsulating dma_buffer, first element is
+    Currently rpcrdma_buffer_create() allocates struct rpcrdma_mw's as
+    VALID state. This FRMR can be returned by rpcrdma_buffer_get(), and
+    Instead, capture these in rpcrdma_buffer_get(), and reset them.
+    [ 1455.349350]  [<ffffffffa038a639>] rpcrdma_buffer_destroy+0x69/0x170 [xprtrdma]
+    xilly_get_dma_buffers().
+    - Clarify the BUG() in dma_buf_release some more. (Rob Clark)
+    (dma_buf[offset] - value) >= 0 has been met when WAIT_GEQUAL is used,
+    or (dma_buf[offset] != 0) has been met when WAIT_NONZERO is set.
+        dma_buf *fence_buf = seqno_fence->sync_buf;
+        get_dma_buf(fence_buf);
+    sound/built-in.o: In function `mmp_pcm_free_dma_buffers':
+    sound/built-in.o: In function `mmp_pcm_free_dma_buffers':
+    rpcrdma_buffer_create() allocates and pre-registers a set of RPC
+    RPC buffers pre-allocated by rpcrdma_buffer_create().
+    On my 64-bit system, rpcrdma_buffer_create() requests roughly 7000
+    1. rpcrdma_buffer_create: While allocating RPCRDMA_FRMR's
+    2. rpcrdma_buffer_destroy: While cleaning up, the routine will only free
+    rpcrdma_buffer_create while the rb_mws list is being built if one of the MR
+    the rpcrdma_buffer_destroy routine which will never free the MR's on rb_mws
+    dma-buf: update exp_name when using dma_buf_export()
+    drm/i915: dma_buf_vunmap is presumed not to fail, don't let it
+    Since dma_buf_vunmap() procedes blithely on ignorant of whether the
+    staging: comedi: gsc_hpdi: rename drain_dma_buffers()
+    We need to call dma_buf_end_cpu_access() in case a damage-request.
+    the call from transfer_from_dma_buf().
+    dma_buf_map_attachment and dma_buf_vmap can return NULL or
+            sgt = dma_buf_map_attachment(attach, DMA_BIDIRECTIONAL);
+    This patch converts dma_buf_map_attachment to always return
+    This patch also converts dma_buf_vmap to always return NULL.
+    All the callers to dma_buf_vmap only check for NULL, and would
+    The gpmi_alloc_dma_buffer will be called twice. The first time is to
+    chip when gpmi_alloc_dma_buffer is called the first time, and allocates a
+    buffer of the real NAND page size for the second time gpmi_alloc_dma_buffer
+    ion: add test device for unit tests to interact with dma_bufs
+    is set.  The device accepts a dma_buf fd and allows reading and
+    apis.  Can be used to test the dma_buf mapping ops, including
+    It is possible for a buffer to exist only as a dma_buf file
+    gpu: ion: fix page offset in dma_buf_kmap()
+    If dma_buf_fd fails, the dma_buf needs to be cleaned up by
+    calling dma_buf_put. dma_buf_put will call ion_dma_buf_release
+    reference. Calling ion_buffer_put after dma_buf_put drops the
+    ion_share_dma_buf are missing. Add the argument to
+    This is deprecated in favor of using the dma_buf api which will
+    list discussions regarding dma_buf, cache operations are done implicitly.
+    before dma.  When the buffers are mapped for dma (via the dma_buf apis)
+    gpu: ion: support begin/end and kmap/kunmap dma_buf ops
+    Commit 011c2282c74d changed the way refcounting on imported dma_bufs
+    static inline dma_addr_t snd_sgbuf_get_addr(struct snd_dma_buffer *dmab,
+    Change `transfer_from_dma_buf()` and `interrupt_pcl812_ai_dma()` in the
+    Change the type of the `dma_buffer` member of `struct a2150_private`
+    Also change the type of the `dma_buffer` parameter of
+    - warn on XENMEM_put_dma_buf failures.
+    sound/soc/atmel/atmel-pcm.c: In function 'atmel_pcm_preallocate_dma_buffer':
+    NET_IP_ALIGN size since the h/w buffer size (dma_buf_sz) includes this
+    drm/i915: explicit store base gem object in dma_buf->priv
+    result in an immediate deadlock since we never go through the dma_buf
+    reexported as a dma_buf we won't have it in the handle cache already,
+    creates new dma_buf
+                                    obj->dma_buf is set, but file priv buf
+    with the reworking semantics and locking of the obj->dma_buf pointer
+    around and a dma_buf associated with this gem object.
+    set up obj->dma_buf even for foreign objects) it is no longer required
+    drm/prime: proper locking+refcounting for obj->dma_buf link
+    (i.e. the dma_buf pointer) and its references when the last gem handle
+    touches obj->dma_buf.
+    With the new scheme we also need to reinstate the obj->dma_buf link at
+    obj->dma_buf reference when the last handle disappears we can do that.
+    als rename it from export_dma_buf to dma_buf.
+    v2: Remove the bogus dma_buf_put from the export_and_register_object
+    so that the obj->export_dma_buf cache can be atomically filled in.
+    add more name-like things (like the exported dma_buf) to this scheme,
+    result in an immediate deadlock since we never go through the dma_buf
+    Since I've created this patch cma prime support for dma_buf was added.
+    dma_buf attachments. But a) that's not allowed and b) the current code
+    drm/exynos: explicit store base gem object in dma_buf->priv
+    native objects in dma_buf->priv. But both also embed the base
+    drivers/built-in.o: In function `drm_gem_unmap_dma_buf':
+    drivers/built-in.o: In function `drm_gem_map_dma_buf':
+    staging: comedi: ni_labpc: fix possible double-free of dma_buffer
+    If `labpc_attach()` allocates memory for `devpriv->dma_buffer` but fails
+    to request a DMA channel, it frees `devpriv->dma_buffer` but leaves the
+    pointer set.  Later, `labpc_detach()` frees `devpriv->dma_buffer` again,
+    Fix it by only setting `devpriv->dma_buffer` in `labpc_attach()` if the
+    drivers/built-in.o: In function `sh_eth_free_dma_buffer':
+    drm/cma: remove GEM CMA specific dma_buf functionality
+    Instead of using the dma_buf functionality for GEM CMA, we can use prime
+        drm/prime: add return check for dma_buf_fd
+    drm/prime: add return check for dma_buf_fd
+    The dma_buf_fd() can return error when it fails to prepare fd,
+    so the dma_buf needs to be put.
+    drm/prime: fix to put an exported dma_buf for adding handle failure
+    dma_buf, the dma_buf was already allocated and its refcount was
+    with IS_ERR() macro for drm_gem_map_dma_buf().
+    The dma_map_sg(), in map_dma_buf callback operation of prime helper,
+    pxa2xx_spi_map_dma_buffer() gets called in tasklet context so we can't
+    drivers/built-in.o: In function `ath_rx_edma_buf_link':
+    drivers/built-in.o: In function `ath_rx_edma_buf_link':
+      dma-buf: replace dma_buf_export() with dma_buf_export_named()
+    dma-buf: replace dma_buf_export() with dma_buf_export_named()
+    while exporting buffers. Hence, dma_buf_export() is replaced with
+    dma_buf_export_named(), which additionally takes 'exp_name' as a
+    name themselves, a #define dma_buf_export() is also made available,
+    drm_gem_prime_fd_to_handle() error path we'll call dma_buf_put() for
+    So when we export a dma_buf from a gem object, we keep track of it
+    with the handle, we take a reference to the dma_buf. When we close
+    the reference to the dma_buf, and it gets collected.
+    drivers/base/dma-buf.c: In function 'dma_buf_kunmap':
+     [<ffffffffa0a58baf>] ath_rx_edma_buf_link+0xef/0x140 [ath9k]
+    usb: musb: gadget: do *unmap_dma_buffer* only for valid DMA addr
+    and will result in kernel OOPS if tried to *unmap_dma_buffer* for requests in
+    ep0. Fixed it by doing *unmap_dma_buffer* only for valid DMA addr and
+      CHROMIUM: dma-buf: restore args on failure of dma_buf_mmap
+    CHROMIUM: dma-buf: restore args on failure of dma_buf_mmap
+    Callers to dma_buf_mmap expect to fput() the vma struct's vm_file
+    v2: Check in dma_buf_release that no dangling vmaps are left.
+    Instead of reimplementing all of the dma_buf functionality in every driver,
+    drivers/spi/spi-pxa2xx.c: In function ‘map_dma_buffers’: drivers/spi/spi-pxa2xx.c:384:7: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+    So this patch makes dma_buf_map_attachment ignore dma_map_sg call
+    When exynos_gem_map_dma_buf was called by dma_buf_map_attachmemt(),
+    dma_buf: Cleanup dma_buf_fd
+    So I add dma_buf_put() for imported gem come from its own gem into each drivers
+      dma-buf: might_sleep() in dma_buf_unmap_attachment()
+    dma-buf: might_sleep() in dma_buf_unmap_attachment()
+    With this patch, When dma_buf_unmap_attachment is called,
+    Instead, when dma_buf_detach is called, that would be done.
+    [media] v4l: vb2-dma-contig: add support for dma_buf importing
+    This patch makes changes for adding dma-contig as a dma_buf user. It provides
+    [media] v4l: vb2: add support for shared buffer (dma_buf)
+    APIs of dma_buf for v4l reqbuf / qbuf / dqbuf operations.
+    `set_ai_fifo_size()`, `ai_fifo_size()`, `load_ao_dma_buffer()`, and
+    ALSA: au88x0: Give comment for vortex_wtdma_bufshift() issue
+    The check of the return value from vortex_wtdma_bufshft() in
+    Passing struct snd_dma_buffer pointer instead, so that they work no
+      ASoC: spear: correct the check for NULL dma_buffer pointer
+      . dma_buf export needs this patch
+    - dma_buf->begin/end_cpu_access plus fix for drm/udl (Dave)
+    ASoC: spear: correct the check for NULL dma_buffer pointer
+    - dmar vs. dma_buf imprt fix (Dave Airlie)
+      drm/exynos: check for null in return value of dma_buf_map_attachment()
+    drm/exynos: check for null in return value of dma_buf_map_attachment()
+    dma_buf_map_attachment() can return NULL and valid sg as return
+    and corresponding ioctls on the dma_buf file. The major reason for
+    in a pipeline (without jumping through hoops by importing the dma_buf
+    userspace needs to mmap a different part of the dma_buf, e.g. the
+    range starting at dma_buf->size up to dma_buf->size*2. This works
+    because the size of a dma_buf is invariant over it's lifetime. The
+    - dma_buf pointer initialization goof-up noticed by Rebecca Schultz
+    access rules dma_buf/prime support brings along. And there are quite a
+    to good use by moving the dma_buf_map/unmap_attachment calls in there
+    Warning(drivers/base/dma-buf.c:305): Excess function parameter 'dma_buf' description in 'dma_buf_begin_cpu_access'
+    Warning(drivers/base/dma-buf.c:332): Excess function parameter 'dma_buf' description in 'dma_buf_end_cpu_access'
+    Warning(drivers/base/dma-buf.c:350): Excess function parameter 'dma_buf' description in 'dma_buf_kmap_atomic'
+    Warning(drivers/base/dma-buf.c:367): Excess function parameter 'dma_buf' description in 'dma_buf_kunmap_atomic'
+    Warning(drivers/base/dma-buf.c:385): Excess function parameter 'dma_buf' description in 'dma_buf_kmap'
+    Warning(drivers/base/dma-buf.c:402): Excess function parameter 'dma_buf' description in 'dma_buf_kunmap'
+      the recently introduced dma_buf interface: commit d15bd7ee445d
+       - flag-passing to dma_buf_fd,
+      dma_buf: Add documentation for the new cpu access support
+      dma-buf: add get_dma_buf()
+      dma-buf: pass flags into dma_buf_fd.
+      dma-buf: add dma_data_direction to unmap dma_buf_op
+      dma-buf: Move code out of mutex-protected section in dma_buf_attach()
+      dma-buf: Constify ops argument to dma_buf_export()
+    Also, the introduction of flags in dma_buf_fd  needs to be added to dummy
+    dma_buf: Add documentation for the new cpu access support
+    dma_buf state. Exporters need to properly protect any of their own
+    dma-buf: add get_dma_buf()
+    is later released with a dma_buf_put()), and possibly other similar
+    dma-buf: pass flags into dma_buf_fd.
+    We need to pass the flags into dma_buf_fd at this point,
+    dma-buf: add dma_data_direction to unmap dma_buf_op
+    Thus, the unmap dma_buf_op also needs to have enum dma_data_direction as
+    dma-buf: Move code out of mutex-protected section in dma_buf_attach()
+    Remove an error label in dma_buf_attach() that just returns an error
+    ops, ops->map_dma_buf and ops->unmap_dma_buf are guaranteed to be
+    non-NULL by a check in dma_buf_export(). Remove NULL checks on those
+    dma-buf: Constify ops argument to dma_buf_export()
+    A new buffer object dma_buf is added, with operations and API to allow easy
+      facilitate backing storage negotiation, using dma_buf_attach() API.
+       object using map_dma_buf and unmap_dma_buf operations.
+    map_dma_buf() operation.
+    Couple of building blocks in map_dma_buf() are added to ease introduction
+    The reason is that the single dma buffer (ar_sdio->dma_buffer)
+      TTY: snyclinkmp: forever loop in tx_load_dma_buffer()
+    TTY: snyclinkmp: forever loop in tx_load_dma_buffer()
+      ASoC: Tegra: tegra_pcm_deallocate_dma_buffer: Don't OOPS
+    ASoC: Tegra: tegra_pcm_deallocate_dma_buffer: Don't OOPS
+    buffers in tegra_pcm_deallocate_dma_buffer.
+    Staging: rts_pstor: s/rtsx_alloc_dma_buf/kmalloc/
+    Replace rtsx_alloc_dma_buf() with kfree() back,
+    Staging: rts_pstor: s/rtsx_free_dma_buf/kfree/
+    musb_g_giveback(), even if txstate()/rxstate() has called unmap_dma_buffer()
+    Moreover, check for musb_ep->dma is moved within map_dma_buffer() so where
+        [<c0204148>] (ep93xx_pcm_preallocate_dma_buffer+0x44/0x60)
+    The constant DMA_ACTIVE is defined with the dma_buffparams structure rather
+    2) s3c24xx_pcm_preallocate_dma_buffer -> s3c_preallocate_dma_buffer
+    s3c64xx_dma_buffdone.
+    ARM: S3C64XX: DMA: struct s3c64xx_dma_buff lli fix.
+    Correct the lli structure in struct s3c64xx_dma_buff which should
+    As a result, pxafb_dma_buff.dma_desc[], pxafb_dma_buff.pal_desc[]
+    Also, since we now have introduced the 'struct pxafb_dma_buff' for DMA
+    drivers/spi/pxa2xx_spi.c: In function 'map_dma_buffers':
+    pxafb: introduce "struct pxafb_dma_buff" for palette and dma descriptors
+    drivers/char/synclinkmp.c:3420:5: warning: symbol 'alloc_dma_bufs' was not declared. Should it be static?
+    drivers/char/synclinkmp.c:3570:6: warning: symbol 'free_dma_bufs' was not declared. Should it be static?
+    drivers/char/synclinkmp.c:5040:6: warning: symbol 'tx_load_dma_buffer' was not declared. Should it be static?
+     > Function map_dma_buffers now return 0 for success and -1 for failure.

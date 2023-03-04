@@ -1,0 +1,171 @@
+    when CONFIG_DMA_API_DEBUG is enabled.
+    IOMMU_LEAK feature by using DMA_API_DEBUG"), including the entire
+    Turning on CONFIG_DMA_API_DEBUG_SG results in the following error:
+    Fix warning when running with CONFIG_DMA_API_DEBUG_SG=y by allocating a
+    Fix warning when running with CONFIG_DMA_API_DEBUG_SG=y by allocating a
+    With CONFIG_DMA_API_DEBUG enabled we get DMA unmapping warning in
+    With CONFIG_DMA_API_DEBUG enabled we now get a warning when using the
+    With CONFIG_DMA_API_DEBUG=y, calling sonic_open() produces the
+    needed.  Note that we now also always select it when CONFIG_DMA_API_DEBUG
+    dma-debug: remove CONFIG_HAVE_DMA_API_DEBUG
+       DMA_API_DEBUG warnings that we are unmapping DMA mappings with a
+       DMA_API_DEBUG.
+    This inconsistency is detected by the kernel when DMA_API_DEBUG is
+    the IOMMU or by using CONFIG_DMA_API_DEBUG, CONFIG_IOMMU_DEBUG, and
+      dma-mapping.h: preserve unmap info for CONFIG_DMA_API_DEBUG
+    dma-mapping.h: preserve unmap info for CONFIG_DMA_API_DEBUG
+    When CONFIG_DMA_API_DEBUG is enabled we need to preserve unmapping address
+    unmap sg twice. We can easily see it with CONFIG_DMA_API_DEBUG
+    scsi: ultrastor.c depends on ISA_DMA_API
+    Fix build when CONFIG_ISA_DMA_API is not enabled. Fixes these build
+    on ISA_DMA_API instead (which we have continued to support on x86-64).
+    Fixes: 99dfc3357e98 ("staging: comedi: das1800: remove depends on ISA_DMA_API limitation")
+    if the CONFIG_DMA_API_DEBUG option is enabled.
+    OMAP_BO_MEM_DMA_API code paths. Otherwise it will be mapped through the
+    apparent dma leaks detected by CONFIG_DMA_API_DEBUG.
+    Recently discovered by enabling CONFIG_DMA_API_DEBUG in our CI. By the
+    Fixes the following splat with DMA_API_DEBUG=y:
+    DMA_API_DEBUG option is enabled. This change fixes the issue
+    VIRT_TO_BUS nor ISA_DMA_API but that do have ISA.
+    the kernel prints some warnings when compiled with CONFIG_DMA_API_DEBUG.
+    API.  Otherwise when CONFIG_DMA_API_DEBUG is enabled in the kernel, then it
+    When running a kernel configured with CONFIG_DMA_API_DEBUG=y a warning
+    With CONFIG_DMA_API_DEBUG=y bnx2x triggers the error "DMA-API: device
+      s390/setup: fix DMA_API_DEBUG warnings
+    s390/setup: fix DMA_API_DEBUG warnings
+    positives in DMA_API_DEBUG code (which will complain when an address
+    CONFIG_DMA_API_DEBUG=y.
+            io/ dma-api-debug        :  ok  |                  HAVE_DMA_API_DEBUG #  arch supports DMA debug facilities
+    platforms because it requires the ISA_DMA_API symbol. However
+    there are some ARM platforms that have ISA_DMA_API but no virt_to_bus,
+    platforms because it requires the ISA_DMA_API symbol. However
+    there are some ARM platforms that have ISA_DMA_API but no virt_to_bus,
+    Enable kernel config "CONFIG_HAVE_DMA_API_DEBUG", FEC have kernel warning:
+    The labpc driver has already had the depends on ISA_DMA_API limitation removed
+    staging: comedi: ni_at_a2150: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    staging: comedi: dt282x: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    staging: comedi: das1800: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    staging: comedi: das16: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    staging: comedi: pcl812: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    staging: comedi: pcl816: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    staging: comedi: pcl818: remove depends on ISA_DMA_API limitation
+    all the ISA_DMA_API code from this driver and allows the driver to be used on
+    platforms that don't support the ISA_DMA_API.
+    allow removing the "depends on ISA_DMA_API" from the legacy drivers that can
+      gianfar: Fix dma check map error when DMA_API_DEBUG is enabled
+    gianfar: Fix dma check map error when DMA_API_DEBUG is enabled
+    CONFIG_DMA_API_DEBUG is set.  When the DMA-API debugging facilities are
+    kernel print warning when enable DMA_API_DEBUG.
+    Enabling DMA_API_DEBUG, warnings are reported at runtime
+    With DMA_API_DEBUG set, following warnings are emitted
+    avoid warnings from the DMA_API.
+    as reported by DMA_API_DEBUG=y.
+    Running with DMA_API_DEBUG enabled and not checking for DMA mapping
+    when CONFIG_DMA_API_DEBUG is enabled:
+    With CONFIG_DMA_API_DEBUG enabled the following warning is printed:
+    bnx2x triggers warnings with CONFIG_DMA_API_DEBUG=y:
+    when we enable the CONFIG_DMA_API_DEBUG:
+    This commit removes the following DMA_API_DEBUG warning:
+    the following warning: (with kernel config "CONFIG_DMA_API_DEBUG" enable)
+        1.1) we enable CONFIG_DMA_API_DEBUG, CONFIG_DMADEVICES_DEBUG,
+    dma_unmap when kernel is compiled with CONFIG_DMA_API_DEBUG.
+    If we enable CONFIG_DMA_API_DEBUG, it results in this warning:
+    `VIRT_TO_BUS` and `ISA_DMA_API` options are set.)
+    && ISA_DMA_API && VIRT_TO_BUS, but will be populated by later patches to
+    Without this patch drivers will get blamed (CONFIG_DMA_API_DEBUG=y)
+    is protected by #ifdef CONFIG_ISA_DMA_API. This allows the ISA support
+    enables ISA DMA support if ISA_DMA_API is enabled.
+    the build failure for architectures that enable ISA_DMA_API but do not
+    For architectures that enable ISA_DMA_API but not VIRT_TO_BUS, this
+    staging: comedi: ISA DMA drivers should depend on ISA_DMA_API
+    ISA_DMA_API to fix this.
+    I ran out of free entries when I had CONFIG_DMA_API_DEBUG
+    Otherwise we get a warning in case of CONFIG_DMA_API_DEBUG=y
+    The kernel emits a warning if CONFIG_DMA_API_DEBUG=y:
+            CONFIG_DMA_API_DEBUG enabled and disabled.
+    drivers/net: decouple ISA and ISA_DMA_API
+    On the PandaBoard (omap_hsmmc + wl12xx_sdio) with DMA_API_DEBUG:
+    staging: fix comedi build when ISA_DMA_API is enabled but COMEDI_PCI is not enabled
+    Fix build when CONFIG_ISA_DMA_API is enabled but
+    CONFIG_DMA_API_DEBUG was enabled. Fix up this API usage inconsistency.
+    and CONFIG_COMEDI_PCI_DRIVERS was used where CONFIG_ISA_DMA_API
+    lib/dma-debug.c if the CONFIG_DEBUG_DMA_API option is set.
+      [media] MEDIA: Fix non-ISA_DMA_API link failure of sound code
+    [media] MEDIA: Fix non-ISA_DMA_API link failure of sound code
+    warning: (RADIO_MIROPCM20) selects SND_ISA which has unmet direct dependencies (SOUND && !M68K && SND && ISA && ISA_DMA_API)
+    A build with ISA && ISA_DMA && !ISA_DMA_API results in:
+    Adding a dependency on ISA_DMA_API to RADIO_MIROPCM20 fixes these issues.
+    staging: fix comedi NI labpc driver build when ISA_DMA_API is not enabled
+    Fix ni_labpc.c to build when CONFIG_ISA_DMA_API is not enabled.
+    CONFIG_DMA_API_DEBUG enabled.
+    x86: allow CONFIG_ISA_DMA_API to be disabled
+    kernel/dma.c, so require it only when CONFIG_ISA_DMA_API is enabled.
+    Disabling CONFIG_ISA_DMA_API is dependent on x86_64 since those machines
+    x86: only compile floppy driver if CONFIG_ISA_DMA_API is enabled
+    CONFIG_ISA_DMA_API, specifically claim_dma_lock(), release_dma_lock(),
+    x86: only compile 8237A if CONFIG_ISA_DMA_API is enabled
+    8237A utilizes the interface provided by CONFIG_ISA_DMA_API, specifically
+    pnp: only assign IORESOURCE_DMA if CONFIG_ISA_DMA_API is enabled
+    provided by CONFIG_ISA_DMA_API, specifically request_dma() and
+    happen, and this is trapped CONFIG_DMA_API_DEBUG:
+    and CONFIG_DMA_API_DEBUG=y be assigned to the correct device
+    This fixes warnings when CONFIG_DMA_API_DEBUG=y:
+      MIPS: Enable ISA_DMA_API config to fix build failure
+    MIPS: Enable ISA_DMA_API config to fix build failure
+    Add ISA_DMA_API config item and select it when GENERIC_ISA_DMA enabled.
+    CONFIG_DMA_API_DEBUG is enabled. This should be caused by we didn't
+    ASoC: fix compile breakage if CONFIG_SH_DMA_API=y && CONFIG_SND_SIU_MIGOR!=n
+    Audio on Migo-R cannot work if CONFIG_SH_DMA_API=y, but compilation should not
+      ARM: 5870/1: arch/arm: Fix build failure for defconfigs without CONFIG_ISA_DMA_API set
+    ARM: 5870/1: arch/arm: Fix build failure for defconfigs without CONFIG_ISA_DMA_API set
+    A lot of ARM-defconfigs (those without CONFIG_ISA_DMA_API set) fail to
+    enclosed by the CONFIG_ISA_DMA_API conditional all configs without this
+    If CONFIG_HAVE_DMA_API_DEBUG is defined and "dma_debug=off" is
+    powerpc: Add CONFIG_DMA_API_DEBUG support
+    sparc: Add CONFIG_DMA_API_DEBUG support
+    All we need to do for CONFIG_DMA_API_DEBUG support is call
+    add CONFIG_DMA_API_DEBUG support to IA64 however I forgot to add
+    dma-mapping: ia64: add CONFIG_DMA_API_DEBUG support
+    enables us to easily add CONFIG_DMA_API_DEBUG support, which only x86
+    supports for now.  The 4th patch adds CONFIG_DMA_API_DEBUG support to IA64
+    These functions being meaningless on x86 (if CONFIG_DMA_API_DEBUG is not set).
+    changes when compiling with CONFIG_DMA_API_DEBUG=y :
+    CONFIG_DMA_API_DEBUG spotted an instance of appletouch using
+    [ Impact: reduce the scope of CONFIG_DMA_API_DEBUG=y checks ]
+    x86 gart: reimplement IOMMU_LEAK feature by using DMA_API_DEBUG
+    DMA_API_DEBUG provides the similar feature, debug_dma_dump_mappings,
+    DMA_API_DEBUG.
+    CONFIG_DMA_API_DEBUG. Without an iommu or DMA_API_DEBUG it is a no-op on 32 bit
+      dma-debug: fix dma_debug_add_bus() definition for !CONFIG_DMA_API_DEBUG
+    dma-debug: fix dma_debug_add_bus() definition for !CONFIG_DMA_API_DEBUG
+    [ARM] Hide ISA DMA API when ISA_DMA_API is unset
+    [ARM] Hide ISA DMA API when ISA_DMA_API is unset
+    When ISA_DMA_API is unset, we're not implementing the ISA DMA API,
+    The default setting of CONFIG_ISA_DMA_API is set to match the protection
+      sh: Make dma-isa depend on ISA_DMA_API.
+    sh: Make dma-isa depend on ISA_DMA_API.
+    [PATCH] arch/sh/Kconfig: fix the ISA_DMA_API dependencies
+    which set ISA_DMA_API, we don't need to define MAX_DMA_CHANNELS
+    [ARM] Refine selection of ISA_DMA_API and generic dma.c code
+    ISA_DMA_API tells the rest of the kernel if the ISA DMA API is
+    the driver should depend on ISA_DMA_API to build on all systems, and this
+    [PATCH] Kconfig fix (tms380tr and ISA_DMA_API)
+    ISA_DMA_API.
+    [PATCH] Kconfig fix (ISA_DMA_API and sound/*)
+    fixed kconfig dependencies on ISA_DMA_API for parts of sound/* that rely
+       ISA_DMA_API (it uses helpers in question and irda is usable on
+       ISA_DMA_API
+    CONFIG_ISA_DMA_API.  As the result, driver got usable for boxen that do
+    New symbol added - ISA_DMA_API.  Set when we have functional

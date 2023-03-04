@@ -1,0 +1,1 @@
+    processing simultaneously by means of DMA_VIRTUAL_CHANNELS effort.

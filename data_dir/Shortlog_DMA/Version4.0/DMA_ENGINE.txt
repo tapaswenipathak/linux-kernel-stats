@@ -1,0 +1,30 @@
+    CONFIG_DMA_ENGINE is disabled:
+    dmaengine: Add dma_get_slave_caps() inline stub when !CONFIG_DMA_ENGINE
+    cases where CONFIG_DMA_ENGINE isn't set. This breaks compilation of
+    drivers using the DMA engine API when CONFIG_DMA_ENGINE isn't set.
+    serial: pl011: Fix build breakage with !CONFIG_DMA_ENGINE
+    amba-pl011 driver configured without CONFIG_DMA_ENGINE, flush_buffer()
+      dmaengine: of: kconfig: select DMA_ENGINE when DMA_OF is selected
+    dmaengine: of: kconfig: select DMA_ENGINE when DMA_OF is selected
+    Select DMA_ENGINE when DMA_OF is selected since
+    Select DMA_ENGINE instead of DMAENGINE and delete the default
+    [djbw: add DMA_ENGINE=n support]
+    CONFIG_DMA_ENGINE is enabled, but calling the function without
+    CONFIG_DMA_ENGINE enabled results "undefined reference" errors.
+    functions if CONFIG_DMA_ENGINE is undefined.
+      serial: amba-pl011: fix !CONFIG_DMA_ENGINE case
+    CONFIG_DMA_ENGINE=y, the "config SH_DMAE_BASE" is set as "bool".
+    serial: amba-pl011: fix !CONFIG_DMA_ENGINE case
+    in the section for CONFIG_DMA_ENGINE, not the alternative.
+    amba-pl011: fix build error if CONFIG_DMA_ENGINE is not enabled
+    Following patch will fix build error if CONFIG_DMA_ENGINE is unset.
+    warning: (PATA_ARASAN_CF && VIDEO_TIMBERDALE && SND_SOC_SH4_SIU) selects DMA_ENGINE which has unmet direct dependencies (DMADEVICES)
+      dmaengine: provide dummy functions for DMA_ENGINE=n
+    dmaengine: provide dummy functions for DMA_ENGINE=n
+    This lets drivers, optionally using the dmaengine, build with DMA_ENGINE
+    CONFIG_DMA_ENGINE is enabled, so select/enable that symbol also.
+    net: ks8842 depends on DMA_ENGINE
+    ks8842 uses dma channel functions, so it should depend on DMA_ENGINE.
+      dmaengine: dma_issue_pending_all == nop when CONFIG_DMA_ENGINE=n
+    dmaengine: dma_issue_pending_all == nop when CONFIG_DMA_ENGINE=n
+    * if CONFIG_DMA_ENGINE=n the asynchronous path is compiled away by making

@@ -1,0 +1,262 @@
+    the buffers could be located in stack. This was caught by DMA-API debug
+    ehci-pci 0000:00:1a.0: DMA-API: device driver maps memory from stack
+         that it can be used by other DMA-API implementations too.  The
+         first user will be the ARM64 common DMA-API implementation for
+      sh_eth: Fix DMA-API usage for RX buffers
+    sh_eth: Fix DMA-API usage for RX buffers
+    [    6.650444] fec 2188000.ethernet: DMA-API: device driver tries to free DMA memory it has not allocated
+            - Added reference to DMA-API.txt to explain consistent memory
+    Some platforms may have early callers of the DMA-API, running prior to the
+    CONFIG_DMA_API_DEBUG is set.  When the DMA-API debugging facilities are
+    accommodate early callers of the DMA-API, we will check for more
+    ioatdma 0000:00:04.0: DMA-API: device driver failed to check map error[device address=0x0000000465bad000] [size=4096 bytes] [mapped as page]
+    [  956.730146] pci 0000:07:05.0: DMA-API: device driver has pending DMA allocations while released from device [count=8]
+    The IOMMU-API works on page boundarys, unlike the DMA-API
+    in Documentation/DMA-API-HOWTO.txt just takes one. So correct
+         to DMA-API now
+    caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x000000002eb15068] [size=0 bytes]
+    caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x0000000006513340] [size=28 bytes]
+    caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x300900000000b44d] [size=46158 bytes]
+    caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different direction [device address=0x0000000006271dac] [size=28 bytes] [mapped with DMA_TO_DEVICE] [unmapped with DMA_FROM_DEVICE]
+    caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different direction [device address=0x00000000062ad1ac] [size=28 bytes] [mapped with DMA_FROM_DEVICE] [unmapped with DMA_TO_DEVICE]
+    caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different size [device address=0x000000002eeedac0] [map size=80 bytes] [unmap size=20 bytes]
+    DMA-API: device driver maps memory from kernel text or rodata
+    DMA-API: device driver maps memory from stack
+    xprtrdma: Fix DMA-API-DEBUG warning by checking dma_map result
+    Fix the following warning when DMA-API debug is enabled by checking ib_dma_map_single result:
+    [ 1455.349350] mlx4_core 0000:00:07.0: DMA-API: device driver failed to check map error[device address=0x000000007c9f2090] [size=2656 bytes] [mapped as single]
+    According to Documentation/DMA-API.txt, dma_map_sg() returns 0 on failure.
+    [ 7363.251759] ehci-pci 0000:00:04.1: DMA-API: device driver maps memory fromstack [addr=ffff88006b81bad4]
+      crypto: testmgr - Fix DMA-API warning
+    [ 9848.237678] ehci-pci 0000:00:04.1: DMA-API: device driver maps memory fromstack [addr=ffff88006c80da01]
+      DMA-API: Update dma_pool_create ()and dma_pool_alloc() descriptions
+      DMA-API: Fix duplicated word in DMA-API-HOWTO.txt
+      DMA-API: Capitalize "CPU" consistently
+      DMA-API: Change dma_declare_coherent_memory() CPU address to phys_addr_t
+      DMA-API: Clarify physical/bus address distinction
+    DMA-API: Update dma_pool_create ()and dma_pool_alloc() descriptions
+    DMA-API: Fix duplicated word in DMA-API-HOWTO.txt
+    DMA-API: Capitalize "CPU" consistently
+    crypto: testmgr - Fix DMA-API warning
+    With DMA-API debug enabled testmgr triggers a "DMA-API: device driver maps memory from stack" warning, when tested on a crypto HW accelerator.
+    DMA-API: Change dma_declare_coherent_memory() CPU address to phys_addr_t
+    DMA-API: Clarify physical/bus address distinction
+    The DMA-API documentation sometimes refers to "physical addresses" when it
+    errors triggers a kernel stack trace with "DMA-API: device driver
+    ath5k 0000:02:00.0: DMA-API: device driver failed to check map
+     macb e000b000.ethernet: DMA-API: device driver frees DMA memory with different size [device address=0x000000002d170040] [map size=1536 bytes] [unmap size=60 bytes]
+     macb e000b000.ethernet: DMA-API: device driver failed to check map error[device address=0x000000002d171c02] [size=322 bytes] [mapped as single]
+    Sander's testing shows that the warning message "DMA-API: exceeded 7
+    There's no real benefit from using them. DMA-API
+    already mapped directly with DMA-API since wrapper
+      the code-paths can be used in the DMA-API"
+    As the lock might be used through DMA-API which is allowed
+      bnx2x 0000:28:00.0: DMA-API: device driver frees DMA memory with
+    The PCI-DMA-mapping.txt moved to general docs and became DMA-API-HOWTO.txt
+    DMA-API-HOWTO.txt").  Add new file about PCI Express I/O Virtualization.
+    gpmi-nand 112000.gpmi-nand: DMA-API: device driver maps memory fromstack [addr=dc05be34]
+      ioatdma 0000:00:04.0: DMA-API: device driver failed to check map error[device address=0x000000085191b000] [size=2000 bytes] [mapped as single]
+        ("ARM: DMA-API: better handing of DMA masks for coherent allocations")
+        ("ARM: DMA-API: better handing of DMA masks for coherent allocations")
+    Commit 4dcfa60071b3d23f0181f27d8519f12e37cefbb9 ("ARM: DMA-API: better
+    Commit 4dcfa60071b3d23f0181f27d8519f12e37cefbb9 ("ARM: DMA-API: better
+    Commit 4dcfa60071b3d23f0181f27d8519f12e37cefbb9 ("ARM: DMA-API: better
+    (ARM: DMA-API: better handing of DMA masks for coherent allocations)
+     ioatdma 0000:00:04.0: DMA-API: cpu touching an active dma mapped page [pfn=0x16bcd9]
+    mvneta d0070000.ethernet: DMA-API: device driver frees DMA memory with different size [device address=0x000000002eb80000] [map size=1600 bytes] [unmap size=66 bytes]
+    used since 22d9d8e83 ("DMA-API: usb: use dma_set_coherent_mask()").
+    fec 2188000.ethernet: DMA-API: device driver failed to check map
+      ARM: DMA-API: better handing of DMA masks for coherent allocations
+      DMA-API: firmware/google/gsmi.c: avoid direct access to DMA masks
+      DMA-API: dcdbas: update DMA mask handing
+      DMA-API: dma: edma.c: no need to explicitly initialize DMA masks
+      DMA-API: usb: musb: use platform_device_register_full() to avoid directly messing with dma masks
+      DMA-API: crypto: remove last references to 'static struct device *dev'
+      DMA-API: crypto: fix ixp4xx crypto platform device support
+      DMA-API: others: use dma_set_coherent_mask()
+      DMA-API: staging: use dma_set_coherent_mask()
+      DMA-API: usb: use new dma_coerce_mask_and_coherent()
+      DMA-API: usb: use dma_set_coherent_mask()
+      DMA-API: parport: parport_pc.c: use dma_coerce_mask_and_coherent()
+      DMA-API: net: octeon: use dma_coerce_mask_and_coherent()
+      DMA-API: net: nxp/lpc_eth: use dma_coerce_mask_and_coherent()
+    ARM: DMA-API: better handing of DMA masks for coherent allocations
+    DMA-API: firmware/google/gsmi.c: avoid direct access to DMA masks
+    DMA-API: dcdbas: update DMA mask handing
+    DMA-API: dma: edma.c: no need to explicitly initialize DMA masks
+    DMA-API: usb: musb: use platform_device_register_full() to avoid directly messing with dma masks
+    DMA-API: crypto: remove last references to 'static struct device *dev'
+    DMA-API: crypto: fix ixp4xx crypto platform device support
+    DMA-API: others: use dma_set_coherent_mask()
+    DMA-API: staging: use dma_set_coherent_mask()
+    DMA-API: usb: use new dma_coerce_mask_and_coherent()
+    DMA-API: usb: use dma_set_coherent_mask()
+    DMA-API: parport: parport_pc.c: use dma_coerce_mask_and_coherent()
+    DMA-API: net: octeon: use dma_coerce_mask_and_coherent()
+    DMA-API: net: nxp/lpc_eth: use dma_coerce_mask_and_coherent()
+    DMA-API: mmc: sdhci-acpi: use dma_coerce_mask_and_coherent()
+    DMA-API: media: omap3isp: use dma_coerce_mask_and_coherent()
+    DMA-API: dma: dw_dmac.c: convert to use dma_coerce_mask_and_coherent()
+    DMA-API: ata: pata_octeon_cf: convert to use dma_coerce_mask_and_coherent()
+    DMA-API: sound: fix dma mask handling in a lot of drivers
+    DMA-API: provide a helper to setup DMA masks
+    DMA-API: usb: ohci-sa1111: add a note about DMA masks
+    DMA-API: video: clcd: add dma_set_mask_and_coherent() call
+    DMA-API: dma: pl330: add dma_set_mask_and_coherent() call
+    DMA-API: dma: pl08x: add dma_set_mask_and_coherent() call
+    DMA-API: amba: get rid of separate dma_mask
+    DMA-API: usb: ssb-hcd: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: usb: bcma: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: media: dt3155v4l: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    skge 0000:02:07.0: DMA-API: device driver tries to sync DMA memory it has
+    DMA-API: staging: et131x: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: block: nvme-core: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: ppc: vio.c: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: b43legacy: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: b43: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: sfc/efx.c: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: intel/e1000: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: emulex/benet: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: broadcom/bnx2x: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: broadcom/b44: replace dma_set_mask()+dma_set_coherent_mask() with new helper
+    DMA-API: net: intel/ixgbevf: fix 32-bit DMA mask handling
+    DMA-API: net: intel/ixgbe: fix 32-bit DMA mask handling
+    DMA-API: net: intel/ixgb: fix 32-bit DMA mask handling
+    DMA-API: net: intel/igbvf: fix 32-bit DMA mask handling
+    DMA-API: net: intel/igb: fix 32-bit DMA mask handling
+    DMA-API: net: intel/e1000e: fix 32-bit DMA mask handling
+    DMA-API: net: brocade/bna/bnad.c: fix 32-bit DMA mask handling
+    DMA-API: provide a helper to set both DMA and coherent DMA masks
+    [   28.078533] bcma-pci-bridge 0000:0e:00.0: DMA-API: device driver failed to check map error[device address=0x00000000b5d60d6c] [size=1876 bytes] [mapped as
+            skge 0000:01:09.0: DMA-API: device driver failed to check map
+    via-rhine 0000:00:12.0: DMA-API: device driver failed to check map error[device
+    ATL1E 0000:02:00.0: DMA-API: device driver failed to check map error[device
+    See "Documentation/DMA-API-HOWTO.txt" section "What memory is DMA'able?"
+    See "Documentation/DMA-API-HOWTO.txt" section "What memory is DMA'able?"
+    in Documentation/DMA-API-HOWTO.txt.  Use the recommended code sequence
+    pci 0005:98:00.0: DMA-API: device driver has pending DMA allocations while released from device [count=1]
+    ath9k 0000:02:00.0: DMA-API: device driver tries to sync DMA memory it has not allocated [device address=0x00000000d9012800] [size=48 bytes]
+    [  345.637987] sis900 0000:00:01.1: DMA-API: device driver failed to check map error[device address=0x000000000d4aed02] [si
+    [   46.657004] e100 0000:00:0e.0: DMA-API: device driver failed to check map
+     ahci 0000:00:1f.2: DMA-API: device driver maps memory fromstack [addr=ffff880140469948]
+    kernel: [17539.341012] forcedeth 0000:00:0a.0: DMA-API: device driver failed to
+    ehci-pci 0000:00:04.1: DMA-API: device driver maps memory fromstack
+      Documentation/DMA-API-HOWTO.txt: fix typo
+    Documentation/DMA-API-HOWTO.txt: fix typo
+    Documentation/DMA-API-HOWTO.txt: minor grammar corrections
+    it is reported that code hit DMA-API errors on 3.8-rc6+,
+    Handle pci_map_page() errors. This fixes "DMA-API: device driver failed
+    [   45.782369] dw_dmac dw_dmac.0: DMA-API: device driver failed to check map error[device address=0x00000000356efcc0] [size=28 bytes] [mapped as single]
+    [  226.288951] ioatdma 0000:00:04.0: DMA-API: device driver syncs DMA memory with different direction [device address=0x00000000ffff7000] [size=4096 bytes] [mapped with DMA_FROM_DEVICE] [synced with DMA_TO_DEVICE]
+    forcedeth 0000:00:0a.0: DMA-API: device driver failed to check
+      dw_dmac dw_dmac.0: DMA-API: device driver failed to check map error[device address=0x0000000035698305] [size=14365 bytes] [mapped as single]
+    Without the patch, kind of below warning will be dumped if DMA-API
+    [   11.081420] ehci-omap ehci-omap.0: DMA-API: device driver failed to
+    Documentation DMA-API-HOWTO.txt Add dma mapping error check usage examples
+    Without the patch, kind of below warning will be dumped if DMA-API
+    [   11.081420] ehci-omap ehci-omap.0: DMA-API: device driver failed to
+    ks8851 spi1.0: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x000000009f22]
+    On a system with a logitech wireless keyboard/mouse and DMA-API debugging
+    kernel: uhci_hcd 0000:00:1d.1: DMA-API: device driver maps memory fromstack [addr=ffff8801b0079c29]
+    [ 6427.079865] iwlwifi 0000:02:00.0: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x00000000296d393c] [size=8 bytes]
+    wl12xx: fix DMA-API-related warnings
+     omap_hsmmc omap_hsmmc.4: DMA-API: device driver maps memory fromstack
+    [ 1263.788273] ath9k 0000:06:00.0: DMA-API: device driver frees DMA memory with different size
+    a DMA-API debug backtrace for mapping stack memory in the DMA buffer.  Fix
+    unnecessary -- Documentation/DMA-API-HOWTO.txt
+    brcm80211: smac: use DMA-API calls for descriptor allocations
+    driver is now using the DMA-API to do dma related calls. BCMA
+    provides the device object to use in the DMA-API calls.
+     ehci_hcd 0000:00:12.2: DMA-API: device driver frees DMA sg list with different entry count [map count=4] [unmap count=1]
+    omap_hsmmc omap_hsmmc.0: DMA-API: device driver tries to free DMA memory
+    firewire_ohci 0000:04:00.0: DMA-API: device driver tries to sync DMA memory it has not allocated [device address=0x00000000cedaa400] [size=1024 bytes]
+    [  445.236654] iwlagn 0000:02:00.0: DMA-API: device driver frees DMA memory with different direction [device address=0x0000000126950540] [size=8 bytes] [mapped with DMA_BIDIRECTIONAL] [unmapped with DMA_TO_DEVICE]
+    generic DMA-API, so new code that'd need this iovmm functionality
+    will have to extend the DMA-API instead.
+    with the (upcoming) IOMMU-based DMA-API.
+    cxgb3 0000:01:00.0: DMA-API: device driver tries to sync DMA memory it has not
+    Documentation/DMA-API-HOWTO.txt: fix misleading example
+    See: DMA-API.txt, part Id, DMA_FROM_DEVICE description.
+    natsemi 0000:00:06.0: DMA-API: device driver frees DMA memory with different size [device address=0x0000000007356840] [map size=1538 bytes] [unmap size=1522 bytes]
+    natsemi 0000:00:06.0: DMA-API: device driver frees DMA memory with
+    [  604.680465] isci 0000:03:00.0: DMA-API: device driver tries to free an invalid DMA memory address
+    aligment adjustments given that Documentation/DMA-API-HOWTO.txt sais:
+    isci: have the driver use native SG calls and DMA-API
+    and dma_unmap_sg according to the documentation in DMA-API.txt.
+    DMA-API: device driver has pending DMA allocations while released from device [count=1]
+    DMA-API: device driver has pending DMA allocations while released from device [count=1]
+    [    5.237792] ehci-omap ehci-omap.0: DMA-API: device driver maps memory fromstack [addr=d9c77dec]
+    According to the DMA-API you shall unmap the sglists with the same
+    According to the DMA-API you shall unmap the sglists with the same
+    mmc: atmel-mci: conform to DMA-API
+    pci 0000:80:00.0: DMA-API: device driver has pending DMA allocations while released from device [count=240]
+    Documentation/DMA-API-HOWTO.txt states:
+            NULL NULL: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x000000004781a020] [size=64 bytes]
+            net eth0: DMA-API: device driver frees DMA memory with different size [device address=0x000000004781a020] [map size=2048 bytes] [unmap size=64 bytes]
+    Patch fixes: "DMA-API: device driver tries to free an invalid DMA
+     [   13.305335] hpsa 0000:06:00.0: DMA-API: device driver tries to free
+    The kerneldoc for this function is at odds with the DMA-API
+    NULL NULL: DMA-API: device driver tries to free DMA memory it has not allocated
+    correctness based on the instructions in DMA-API-HOWTO.
+     DMA-API: preallocated 32768 debug entries
+     DMA-API: debugging enabled by kernel config
+    ipw2100 0000:02:02.0: DMA-API: device driver tries to sync DMA memory it has not allocated [device address=0x0000000034e88008] [size=8 bytes]
+    Documentation: DMA-API-HOWTO.txt: rename ARCH_KMALLOC_MINALIGN to ARCH_DMA_MINALIGN
+    Documentation: DMA-API-HOWTO.txt: add multiple types of IOMMUs support
+    misinterpret the definition of API in DMA-API.txt).  So it hasn't been so
+    Documentation/DMA-API-HOWTO: add ARCH_KMALLOC_MINALIGN description
+    Documentation: move the error handling to the better place in DMA-API-HOWTO
+    Documentation: update scatterlist struct description in DMA-API-HOWTO
+    Documentation: add SCSI drivers' mapping error handling to DMA-API-HOWTO
+    Documentation: add networking driver's mapping error handling to DMA-API-HOWTO
+    The reason for this is documented in Documentation/DMA-API-HOWTO.txt
+    [ 1583.107664] pci 0000:04:00.0: DMA-API: device driver has pending DMA
+    Documentation: rename PCI/PCI-DMA-mapping.txt to DMA-API-HOWTO.txt
+    This patch renames PCI/PCI-DMA-mapping.txt to DMA-API-HOWTO.txt.
+    PCI-DMA-mapping.txt to DMA-API-HOWTO.txt" was supposed to do this but it
+    Documentation: rename PCI-DMA-mapping.txt to DMA-API-HOWTO.txt
+    Documentation: remove the PCI DMA API description in DMA-API.txt
+    - remove the PCI DMA API description in DMA-API.txt
+    DMA-API.txt describes).
+    some of the DMA-API (and the same comments are in other files).
+    Documentation/DMA-API.txt have more detailed descriptions.
+    Documentation/DMA-API.txt.
+    some of the DMA-API (and the same comments are in other files).
+    Documentation/DMA-API.txt have more detailed descriptions.
+    describe the DMA API in only Documentation/DMA-API.txt.
+    some of the DMA-API (and frv has the same comments in three files).
+    Documentation/DMA-API.txt have more detailed descriptions.
+    describe the DMA API in only Documentation/DMA-API.txt.
+    DMA-API.txt: remove dma_sync_single_range description
+    DMA-API.txt: add dma_sync_single/sg API description
+    Documentation/DMA-API.txt: remove deprecated function descriptions
+    For more information please look at Documentation/DMA-API.txt
+    hme 0000:01:01.1: DMA-API: device driver frees DMA memory with wrong function [device address=0x00000000c1082000] [size=32 bytes] [mapped as page] [unmapped as single]
+    ehci_hcd 0000:00:02.1: DMA-API: device driver maps memory fromstack
+    The DMA-API debugging facility complains about b43 mapping memory from
+      atl1e: fix 2.6.31-git4 -- ATL1E 0000:03:00.0: DMA-API: device driver frees DMA
+    atl1e: fix 2.6.31-git4 -- ATL1E 0000:03:00.0: DMA-API: device driver frees DMA
+    [  121.781177] e1000 0000:0a:00.0: DMA-API: device driver tries to free DMA
+    This patch addresses three WARN_ON statements from DMA-API debug code
+    3w-xxxx 0000:02:02.0: DMA-API: device driver tries to free DMA memory
+    3w-9xxx 0001:45:00.0: DMA-API: device driver tries to free DMA memory
+    ioatdma 0000:00:08.0: DMA-API: device driver frees DMA memory with
+    > > b44 0000:02:0e.0: DMA-API: device driver tries to sync DMA memory it has not
+    Impact: add documentation about DMA-API debugging to DMA-API.txt
+    Impact: make use of DMA-API debugging code in x86
+    Impact: add debugfs interface for configuring DMA-API debugging
+    Impact: add groundwork for DMA-API debugging
+    Impact: add a Kconfig entry for DMA-API debugging
+    virtual machine domain is different from native DMA-API domain, implement separate allocation and free functions for virtual machine domain.
+    DMA-API.txt: fix description of pci_map_sg/dma_map_sg scatterlists handling
+      ssb: Fix DMA-API compilation for non-PCI systems
+    ssb: Fix DMA-API compilation for non-PCI systems
+    This fixes compilation of the SSB DMA-API code on non-PCI platforms.
+    fix an example of scatterlists handling in DMA-API.txt
+    All the x86 DMA-API functions are defined in asm/dma-mapping.h. This patch
+    This introduces an almost complete SSB-DMA-API that maps to the lowlevel
+    doc: fix DMA-API function parameters
+    DMA-API.txt has wrong argument type for some functions.  It uses struct device
+    Doc: DMA-API update
+    requirements documented in DMA-API.txt.
+       to folk reading _only_ the "new" DMA-API.txt writeup.

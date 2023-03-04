@@ -1,0 +1,6 @@
+    WARNING: unmet direct dependencies detected for DMA_VIRTUAL_CHANNELS
+    The reason is that DMA_RALINK selects DMA_ENGINE and DMA_VIRTUAL_CHANNELS
+    DMA_VIRTUAL_CHANNELS are subordinate to DMADEVICES. This can also fail
+     - Depends on DMA_ENGINE and DMA_VIRTUAL_CHANNELS
+    DMA_VIRTUAL_CHANNELS option too.
+    processing simultaneously by means of DMA_VIRTUAL_CHANNELS effort.
