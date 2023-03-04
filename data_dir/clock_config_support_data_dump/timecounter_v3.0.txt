@@ -1,0 +1,3819 @@
+commit 85036aee1938d65da4be6ae1bc7e5e7e30b567b9
+Author: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date:   Sun Nov 6 19:16:32 2022 -0500
+
+    bnxt_en: Add a non-real time mode to access NIC clock
+    
+    When using a PHC that is shared between multiple hosts,
+    in order to achieve consistent timestamps across all hosts,
+    we need to isolate the PHC from any host making frequency
+    adjustments.
+    
+    This patch adds a non-real time mode for this purpose.
+    The implementation is based on a free running NIC hardware timer
+    which is used as the timestamper time-base. Each host implements
+    individual adjustments to a local timecounter based on the NIC free
+    running timer.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+    Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+    Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+    Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+commit 4dfa5f05fffac3a8fa4f9a68a671b5b7e6d3b411
+Merge: f416bdfb6aa4 6eed756408c6
+Author: Jakub Kicinski <kuba@kernel.org>
+Date:   Fri Sep 23 07:07:54 2022 -0700
+
+    Merge tag 'linux-can-next-for-6.1-20220923' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next
+    
+    Marc Kleine-Budde says:
+    
+    ====================
+    pull-request: can-next 2022-09-23
+    
+    The first 2 patches are by Ziyang Xuan and optimize registration and
+    the sending in the CAN BCM protocol a bit.
+    
+    The next 8 patches target the gs_usb driver. 7 are by me and first fix
+    the time hardware stamping support (added during this net-next cycle),
+    rename a variable, convert the usb_control_msg + manual
+    kmalloc()/kfree() to usb_control_msg_{send,rev}(), clean up the error
+    handling and add switchable termination support. The patch by Rhett
+    Aultman and Vasanth Sadhasivan convert the driver from
+    usb_alloc_coherent()/usb_free_coherent() to kmalloc()/URB_FREE_BUFFER.
+    
+    The last patch is by Shang XiaoJing and removes an unneeded call to
+    dev_err() from the ctucanfd driver.
+    
+    * tag 'linux-can-next-for-6.1-20220923' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next:
+      can: ctucanfd: Remove redundant dev_err call
+      can: gs_usb: remove dma allocations
+      can: gs_usb: add switchable termination support
+      can: gs_usb: gs_make_candev(): clean up error handling
+      can: gs_usb: convert from usb_control_msg() to usb_control_msg_{send,recv}()
+      can: gs_usb: gs_cmd_reset(): rename variable holding struct gs_can pointer to dev
+      can: gs_usb: gs_can_open(): initialize time counter before starting device
+      can: gs_usb: add missing lock to protect struct timecounter::cycle_last
+      can: gs_usb: gs_usb_get_timestamp(): fix endpoint parameter for usb_control_msg_recv()
+      can: bcm: check the result of can_send() in bcm_can_tx()
+      can: bcm: registration process optimization in bcm_module_init()
+    ====================
+    
+    Link: https://lore.kernel.org/r/20220923120859.740577-1-mkl@pengutronix.de
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+commit 103108cb9673814a1f73522dacc79ad28cfc0271
+Author: Marc Kleine-Budde <mkl@pengutronix.de>
+Date:   Tue Sep 20 11:46:12 2022 +0200
+
+    can: gs_usb: gs_can_open(): initialize time counter before starting device
+    
+    On busy networks the CAN controller might receive CAN frames directly
+    after starting it but before the timecounter is setup. This will lead
+    to NULL pointer deref while converting the converting the CAN frame's
+    timestamp with the timecounter.
+    
+    Close the race window by setting up the timecounter before starting
+    the CAN controller.
+    
+    Fixes: 45dfa45f52e6 ("can: gs_usb: add RX and TX hardware timestamp support")
+    Link: https://lore.kernel.org/all/20220921081329.385509-1-mkl@pengutronix.de
+    Cc: John Whittington <git@jbrengineering.co.uk
+    Tested-by: John Whittington <git@jbrengineering.co.uk>
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+commit 29a8c9ec9090b335ece3bd58d779af7f569b5a65
+Author: Marc Kleine-Budde <mkl@pengutronix.de>
+Date:   Mon Sep 19 09:53:45 2022 +0200
+
+    can: gs_usb: add missing lock to protect struct timecounter::cycle_last
+    
+    The struct timecounter::cycle_last is a 64 bit variable, read by
+    timecounter_cyc2time(), and written by timecounter_read(). On 32 bit
+    architectures this is not atomic.
+    
+    Add a spinlock to protect access to struct timecounter::cycle_last. In
+    the gs_usb_timestamp_read() callback the lock is dropped to execute a
+    sleeping synchronous USB transfer. This is safe, as the variable we
+    want to protect is accessed during this call.
+    
+    Fixes: 45dfa45f52e6 ("can: gs_usb: add RX and TX hardware timestamp support")
+    Link: https://lore.kernel.org/all/20220920100416.959226-3-mkl@pengutronix.de
+    Cc: John Whittington <git@jbrengineering.co.uk>
+    Tested-by: John Whittington <git@jbrengineering.co.uk>
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+commit 2958d17a898416c6193431676f6130b68a2cb9fc
+Author: Hariprasad Kelam <hkelam@marvell.com>
+Date:   Sat Sep 10 13:24:14 2022 +0530
+
+    octeontx2-pf: Add support for ptp 1-step mode on CN10K silicon
+    
+    Add support for ptp 1-step mode using timecounter. The seconds and
+    nanoseconds to be updated in PTP header are calculated by adding the
+    timecounter offset to the free running PTP clock counter time. The PF
+    driver periodically gets the PTP clock time using AF mbox. The 1-step
+    support uses HW feature to update correction field rather than
+    OriginTimestamp field in PTP header.
+    
+    Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+    Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+    Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 45dfa45f52e66f8eee30a64b16550a9c47915044
+Author: John Whittington <git@jbrengineering.co.uk>
+Date:   Mon Aug 22 12:01:10 2022 +0200
+
+    can: gs_usb: add RX and TX hardware timestamp support
+    
+    Add support for hardware timestamps, if the firmware includes it as a
+    feature via the GS_CAN_FEATURE_HW_TIMESTAMP flag. Check for this
+    feature during probe, extend the RX expected length if it is and
+    enable it during open.
+    
+    The struct classic_can_ts and struct canfd_ts are extended to include
+    the µs timestamp following data as defined in the firmware. The
+    timestamp is then captured and set using skb_hwtstamps() on each RX
+    and TX.
+    
+    The frame µs timestamp is provided from a 32 bit 1 MHz timer which
+    rolls over every 4294 seconds, so a cyclecounter, timecounter, and
+    delayed worker are used to convert the timer into a proper ns
+    timestamp - same implementation as commit efd8d98dfb900 ("can:
+    mcp251xfd: add HW timestamp infrastructure").
+    
+    Hardware timestamps are added to capabilities as commit
+    b1f6b93e678f ("can: mcp251xfd: advertise timestamping capabilities and
+    add ioctl support").
+    
+    Signed-off-by: John Whittington <git@jbrengineering.co.uk>
+    Link: https://github.com/candle-usb/candleLight_fw/issues/100
+    Link: https://lore.kernel.org/all/20220827221548.3291393-3-mkl@pengutronix.de
+    Co-developed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+commit 571a13b35005f532640571e136cd31f1e4698e0b
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 38a66dc9be858400477ae80fcad1ae950a105e8b
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 5ec9de27bed5179b3a6ff21256725d17fd24e026
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 4e465ee46f457783fc0a6d6f60df14b375fb1ed1
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c2b99b2a249b3506ad7c6ffc55074510a911e506
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit bda3e38924345a759ea68171f94dbf1d09df106a
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c3a6e863d51bd7cacef6c68f92ccfd235c797428
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    [ Upstream commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726 ]
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 25d7a5f5a6bb15a2dae0a3f39ea5dda215024726
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Aug 1 17:24:19 2022 -0700
+
+    ixgbe: stop resetting SYSTIME in ixgbe_ptp_start_cyclecounter
+    
+    The ixgbe_ptp_start_cyclecounter is intended to be called whenever the
+    cyclecounter parameters need to be changed.
+    
+    Since commit a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x
+    devices"), this function has cleared the SYSTIME registers and reset the
+    TSAUXC DISABLE_SYSTIME bit.
+    
+    While these need to be cleared during ixgbe_ptp_reset, it is wrong to clear
+    them during ixgbe_ptp_start_cyclecounter. This function may be called
+    during both reset and link status change. When link changes, the SYSTIME
+    counter is still operating normally, but the cyclecounter should be updated
+    to account for the possibly changed parameters.
+    
+    Clearing SYSTIME when link changes causes the timecounter to jump because
+    the cycle counter now reads zero.
+    
+    Extract the SYSTIME initialization out to a new function and call this
+    during ixgbe_ptp_reset. This prevents the timecounter adjustment and avoids
+    an unnecessary reset of the current time.
+    
+    This also restores the original SYSTIME clearing that occurred during
+    ixgbe_ptp_reset before the commit above.
+    
+    Reported-by: Steve Payne <spayne@aurora.tech>
+    Reported-by: Ilya Evenbach <ievenbach@aurora.tech>
+    Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+commit 9bfe3c16fc23eb826e360c225e8a73556d60d1cb
+Author: Amit Cohen <amcohen@nvidia.com>
+Date:   Sun Jul 24 11:03:27 2022 +0300
+
+    mlxsw: spectrum_ptp: Use 'struct mlxsw_sp_ptp_clock' per ASIC
+    
+    Currently, there is one shared structure that holds the required
+    structures for PTP clock. Most of the existing fields are relevant only
+    for Spectrum-1 (cycles, timecounter, and more). Rename the structure to
+    be specific for Spectrum-1 and align the existing code. Add a common
+    structure which includes the structures which will be used also for
+    Spectrum-2. This structure will be returned from clock_init() operation,
+    as the definition is shared between all ASICs' operations.
+    
+    Signed-off-by: Amit Cohen <amcohen@nvidia.com>
+    Reviewed-by: Petr Machata <petrm@nvidia.com>
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 22d950b79ea70b69386b3b131051fbe22f065bdf
+Author: Amit Cohen <amcohen@nvidia.com>
+Date:   Sun Jul 24 11:03:24 2022 +0300
+
+    mlxsw: spectrum_ptp: Initialize the clock to zero as part of initialization
+    
+    As lately recommended in the mailing list[1], set the clock to zero time as
+    part of initialization.
+    
+    The idea is that when the clock reads 'Jan 1, 1970', then it is clearly
+    wrong and user will not mistakenly think that the clock is set correctly.
+    If as part of initialization, the driver sets the clock, user might see
+    correct date and time (maybe with a small shift) and assume that there
+    is no need to sync the clock.
+    
+    Fix the existing code of Spectrum-1 to set the 'timecounter' to zero.
+    
+    [1]:
+    https://lore.kernel.org/netdev/20220201191041.GB7009@hoboy.vegasvil.org/
+    
+    Signed-off-by: Amit Cohen <amcohen@nvidia.com>
+    Reviewed-by: Petr Machata <petrm@nvidia.com>
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 827634531e344850106c7ac618a3acb5ac40f6e6
+Merge: b3552d6a3b8b 0abb62b68252
+Author: Paolo Abeni <pabeni@redhat.com>
+Date:   Tue May 10 09:48:11 2022 +0200
+
+    Merge branch 'ptp-support-hardware-clocks-with-additional-free-running-cycle-counter'
+    
+    Gerhard Engleder says:
+    
+    ====================
+    ptp: Support hardware clocks with additional free running cycle counter
+    
+    ptp vclocks require a clock with free running time for the timecounter.
+    Currently only a physical clock forced to free running is supported.
+    If vclocks are used, then the physical clock cannot be synchronized
+    anymore. The synchronized time is not available in hardware in this
+    case. As a result, timed transmission with TAPRIO hardware support
+    is not possible anymore.
+    
+    If hardware would support a free running time additionally to the
+    physical clock, then the physical clock does not need to be forced to
+    free running. Thus, the physical clocks can still be synchronized while
+    vclocks are in use.
+    
+    The physical clock could be used to synchronize the time domain of the
+    TSN network and trigger TAPRIO. In parallel vclocks can be used to
+    synchronize other time domains.
+    
+    One year ago I thought for two time domains within a TSN network also
+    two physical clocks are required. This would lead to new kernel
+    interfaces for asking for the second clock, ... . But actually for a
+    time triggered system like TSN there can be only one time domain that
+    controls the system itself. All other time domains belong to other
+    layers, but not to the time triggered system itself. So other time
+    domains can be based on a free running counter if similar mechanisms
+    like 2 step synchroisation are used.
+    
+    Synchronisation was tested with two time domains between two directly
+    connected hosts. Each host run two ptp4l instances, the first used the
+    physical clock and the second used the virtual clock. I used my FPGA
+    based network controller as network device. ptp4l was used in
+    combination with the virtual clock support patches from Miroslav
+    Lichvar.
+    
+    v4:
+    - if_index of 0 is invalid (Jonathan Lemon)
+    - set if_index to 0 in the SOF_TIMESTAMPING_RAW_HARDWARE block (Jonathan
+      Lemon)
+    - add helper function for netdev_get_tstamp() call (Jonathan Lemon)
+    - update SKBTX_ANY_TSTAMP (Paolo Abeni)
+    - use separate bits for new tx_flags (Richard Cochran)
+    
+    v3:
+    - optimize ptp_convert_timestamp (Richard Cochran)
+    - call dev_get_by_napi_id() only if needed (Richard Cochran)
+    - use non-negated logical test (Richard Cochran)
+    - add comment for skipped output (Richard Cochran)
+    - add comment for SKBTX_HW_TSTAMP_USE_CYCLES masking (Richard Cochran)
+    
+    v2:
+    - rename ptp_clock cycles to has_cycles (Richard Cochran)
+    - call it free running cycle counter (Richard Cochran)
+    - update struct skb_shared_hwtstamps kdoc (Richard Cochran)
+    - optimize timestamp address/cookie processing path (Richard Cochran,
+      Vinicius Costa Gomes)
+    
+    v1:
+    - complete rework based on suggestions (Richard Cochran)
+    ====================
+    
+    Link: https://lore.kernel.org/r/20220506200142.3329-1-gerhard@engleder-embedded.com
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+commit 42704b26b0f1d891f6cf4ebc877dbac0d17c690d
+Author: Gerhard Engleder <gerhard@engleder-embedded.com>
+Date:   Fri May 6 22:01:37 2022 +0200
+
+    ptp: Add cycles support for virtual clocks
+    
+    ptp vclocks require a free running time for their timecounter.
+    Currently only a physical clock forced to free running is supported.
+    If vclocks are used, then the physical clock cannot be synchronized
+    anymore. The synchronized time is not available in hardware in this
+    case. As a result, timed transmission with TAPRIO hardware support
+    is not possible anymore.
+    
+    If hardware would support a free running time additionally to the
+    physical clock, then the physical clock does not need to be forced to
+    free running. Thus, the physical clocks can still be synchronized
+    while vclocks are in use.
+    
+    The physical clock could be used to synchronize the time domain of the
+    TSN network and trigger TAPRIO. In parallel vclocks can be used to
+    synchronize other time domains.
+    
+    Introduce support for a free running cycle counter called cycles to
+    physical clocks. Rework ptp vclocks to use this free running cycle
+    counter. Default implementation is based on time of physical clock.
+    Thus, behavior of ptp vclocks based on physical clocks without free
+    running cycle counter is identical to previous behavior.
+    
+    Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+commit b2dea2a696d09163da4cd33cb598ce1f73e86597
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Wed Feb 2 10:33:55 2022 +0100
+
+    ptp: unregister virtual clocks when unregistering physical clock.
+    
+    [ Upstream commit bfcbb76b0f595ea9ede9f7a218086fef85242f10 ]
+    
+    When unregistering a physical clock which has some virtual clocks,
+    unregister the virtual clocks with it.
+    
+    This fixes the following oops, which can be triggered by unloading
+    a driver providing a PTP clock when it has enabled virtual clocks:
+    
+    BUG: unable to handle page fault for address: ffffffffc04fc4d8
+    Oops: 0000 [#1] PREEMPT SMP NOPTI
+    RIP: 0010:ptp_vclock_read+0x31/0xb0
+    Call Trace:
+     timecounter_read+0xf/0x50
+     ptp_vclock_refresh+0x2c/0x50
+     ? ptp_clock_release+0x40/0x40
+     ptp_aux_kworker+0x17/0x30
+     kthread_worker_fn+0x9b/0x240
+     ? kthread_should_park+0x30/0x30
+     kthread+0xe2/0x110
+     ? kthread_complete_and_exit+0x20/0x20
+     ret_from_fork+0x22/0x30
+    
+    Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Cc: Yangbo Lu <yangbo.lu@nxp.com>
+    Cc: Yang Yingliang <yangyingliang@huawei.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 9c796a57cbb5daf124a665689f0b2bc9262e0ced
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Wed Feb 2 10:33:55 2022 +0100
+
+    ptp: unregister virtual clocks when unregistering physical clock.
+    
+    [ Upstream commit bfcbb76b0f595ea9ede9f7a218086fef85242f10 ]
+    
+    When unregistering a physical clock which has some virtual clocks,
+    unregister the virtual clocks with it.
+    
+    This fixes the following oops, which can be triggered by unloading
+    a driver providing a PTP clock when it has enabled virtual clocks:
+    
+    BUG: unable to handle page fault for address: ffffffffc04fc4d8
+    Oops: 0000 [#1] PREEMPT SMP NOPTI
+    RIP: 0010:ptp_vclock_read+0x31/0xb0
+    Call Trace:
+     timecounter_read+0xf/0x50
+     ptp_vclock_refresh+0x2c/0x50
+     ? ptp_clock_release+0x40/0x40
+     ptp_aux_kworker+0x17/0x30
+     kthread_worker_fn+0x9b/0x240
+     ? kthread_should_park+0x30/0x30
+     kthread+0xe2/0x110
+     ? kthread_complete_and_exit+0x20/0x20
+     ret_from_fork+0x22/0x30
+    
+    Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Cc: Yangbo Lu <yangbo.lu@nxp.com>
+    Cc: Yang Yingliang <yangyingliang@huawei.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c49eafe6249f844c26f9866886cc6719d81762df
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Wed Feb 2 10:33:55 2022 +0100
+
+    ptp: unregister virtual clocks when unregistering physical clock.
+    
+    [ Upstream commit bfcbb76b0f595ea9ede9f7a218086fef85242f10 ]
+    
+    When unregistering a physical clock which has some virtual clocks,
+    unregister the virtual clocks with it.
+    
+    This fixes the following oops, which can be triggered by unloading
+    a driver providing a PTP clock when it has enabled virtual clocks:
+    
+    BUG: unable to handle page fault for address: ffffffffc04fc4d8
+    Oops: 0000 [#1] PREEMPT SMP NOPTI
+    RIP: 0010:ptp_vclock_read+0x31/0xb0
+    Call Trace:
+     timecounter_read+0xf/0x50
+     ptp_vclock_refresh+0x2c/0x50
+     ? ptp_clock_release+0x40/0x40
+     ptp_aux_kworker+0x17/0x30
+     kthread_worker_fn+0x9b/0x240
+     ? kthread_should_park+0x30/0x30
+     kthread+0xe2/0x110
+     ? kthread_complete_and_exit+0x20/0x20
+     ret_from_fork+0x22/0x30
+    
+    Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Cc: Yangbo Lu <yangbo.lu@nxp.com>
+    Cc: Yang Yingliang <yangyingliang@huawei.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit bfcbb76b0f595ea9ede9f7a218086fef85242f10
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Wed Feb 2 10:33:55 2022 +0100
+
+    ptp: unregister virtual clocks when unregistering physical clock.
+    
+    When unregistering a physical clock which has some virtual clocks,
+    unregister the virtual clocks with it.
+    
+    This fixes the following oops, which can be triggered by unloading
+    a driver providing a PTP clock when it has enabled virtual clocks:
+    
+    BUG: unable to handle page fault for address: ffffffffc04fc4d8
+    Oops: 0000 [#1] PREEMPT SMP NOPTI
+    RIP: 0010:ptp_vclock_read+0x31/0xb0
+    Call Trace:
+     timecounter_read+0xf/0x50
+     ptp_vclock_refresh+0x2c/0x50
+     ? ptp_clock_release+0x40/0x40
+     ptp_aux_kworker+0x17/0x30
+     kthread_worker_fn+0x9b/0x240
+     ? kthread_should_park+0x30/0x30
+     kthread+0xe2/0x110
+     ? kthread_complete_and_exit+0x20/0x20
+     ret_from_fork+0x22/0x30
+    
+    Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Cc: Yangbo Lu <yangbo.lu@nxp.com>
+    Cc: Yang Yingliang <yangyingliang@huawei.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit a96b8a1ccc59e14c57dc6c5bd8b5be560fc48622
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Wed Nov 24 23:40:01 2021 +0100
+
+    ALSA: hda: Make proper use of timecounter
+    
+    [ Upstream commit 6dd21ad81bf96478db3403b1bbe251c0612d0431 ]
+    
+    HDA uses a timecounter to read a hardware clock running at 24 MHz. The
+    conversion factor is set with a mult value of 125 and a shift value of 0,
+    which is not converting the hardware clock to nanoseconds, it is converting
+    to 1/3 nanoseconds because the conversion factor from 24Mhz to nanoseconds
+    is 125/3. The usage sites divide the "nanoseconds" value returned by
+    timecounter_read() by 3 to get a real nanoseconds value.
+    
+    There is a lengthy comment in azx_timecounter_init() explaining this
+    choice. That comment makes blatantly wrong assumptions about how
+    timecounters work and what can overflow.
+    
+    The comment says:
+    
+         * Applying the 1/3 factor as part of the multiplication
+         * requires at least 20 bits for a decent precision, however
+         * overflows occur after about 4 hours or less, not a option.
+    
+    timecounters operate on time deltas between two readouts of a clock and use
+    the mult/shift pair to calculate a precise nanoseconds value:
+    
+        delta_nsec = (delta_clock * mult) >> shift;
+    
+    The fractional part is also taken into account and preserved to prevent
+    accumulated rounding errors. For details see cyclecounter_cyc2ns().
+    
+    The mult/shift pair has to be chosen so that the multiplication of the
+    maximum expected delta value does not result in a 64bit overflow. As the
+    counter wraps around on 32bit, the maximum observable delta between two
+    reads is (1 << 32) - 1 which is about 178.9 seconds.
+    
+    That in turn means the maximum multiplication factor which fits into an u32
+    will not cause a 64bit overflow ever because it's guaranteed that:
+    
+         ((1 << 32) - 1) ^ 2 < (1 << 64)
+    
+    The resulting correct multiplication factor is 2796202667 and the shift
+    value is 26, i.e. 26 bit precision. The overflow of the multiplication
+    would happen exactly at a clock readout delta of 6597069765 which is way
+    after the wrap around of the hardware clock at around 274.8 seconds which
+    is off from the claimed 4 hours by more than an order of magnitude.
+    
+    If the counter ever wraps around the last read value then the calculation
+    is off by the number of wrap arounds times 178.9 seconds because the
+    overflow cannot be observed.
+    
+    Use clocks_calc_mult_shift(), which calculates the most accurate mult/shift
+    pair based on the given clock frequency, and remove the bogus comment along
+    with the divisions at the readout sites.
+    
+    Fixes: 5d890f591d15 ("ALSA: hda: support for wallclock timestamps")
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Link: https://lore.kernel.org/r/871r35kwji.ffs@tglx
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 9de9858d7bf0d6920e3612bef798fefead9ca10b
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Wed Nov 24 23:40:01 2021 +0100
+
+    ALSA: hda: Make proper use of timecounter
+    
+    [ Upstream commit 6dd21ad81bf96478db3403b1bbe251c0612d0431 ]
+    
+    HDA uses a timecounter to read a hardware clock running at 24 MHz. The
+    conversion factor is set with a mult value of 125 and a shift value of 0,
+    which is not converting the hardware clock to nanoseconds, it is converting
+    to 1/3 nanoseconds because the conversion factor from 24Mhz to nanoseconds
+    is 125/3. The usage sites divide the "nanoseconds" value returned by
+    timecounter_read() by 3 to get a real nanoseconds value.
+    
+    There is a lengthy comment in azx_timecounter_init() explaining this
+    choice. That comment makes blatantly wrong assumptions about how
+    timecounters work and what can overflow.
+    
+    The comment says:
+    
+         * Applying the 1/3 factor as part of the multiplication
+         * requires at least 20 bits for a decent precision, however
+         * overflows occur after about 4 hours or less, not a option.
+    
+    timecounters operate on time deltas between two readouts of a clock and use
+    the mult/shift pair to calculate a precise nanoseconds value:
+    
+        delta_nsec = (delta_clock * mult) >> shift;
+    
+    The fractional part is also taken into account and preserved to prevent
+    accumulated rounding errors. For details see cyclecounter_cyc2ns().
+    
+    The mult/shift pair has to be chosen so that the multiplication of the
+    maximum expected delta value does not result in a 64bit overflow. As the
+    counter wraps around on 32bit, the maximum observable delta between two
+    reads is (1 << 32) - 1 which is about 178.9 seconds.
+    
+    That in turn means the maximum multiplication factor which fits into an u32
+    will not cause a 64bit overflow ever because it's guaranteed that:
+    
+         ((1 << 32) - 1) ^ 2 < (1 << 64)
+    
+    The resulting correct multiplication factor is 2796202667 and the shift
+    value is 26, i.e. 26 bit precision. The overflow of the multiplication
+    would happen exactly at a clock readout delta of 6597069765 which is way
+    after the wrap around of the hardware clock at around 274.8 seconds which
+    is off from the claimed 4 hours by more than an order of magnitude.
+    
+    If the counter ever wraps around the last read value then the calculation
+    is off by the number of wrap arounds times 178.9 seconds because the
+    overflow cannot be observed.
+    
+    Use clocks_calc_mult_shift(), which calculates the most accurate mult/shift
+    pair based on the given clock frequency, and remove the bogus comment along
+    with the divisions at the readout sites.
+    
+    Fixes: 5d890f591d15 ("ALSA: hda: support for wallclock timestamps")
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Link: https://lore.kernel.org/r/871r35kwji.ffs@tglx
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8bcf6f04d4a531d2efd9b51f13d903aa03985ac6
+Author: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date:   Tue Jan 25 23:40:13 2022 -0500
+
+    bnxt_en: Handle async event when the PHC is updated in RTC mode
+    
+    In Multi-host environment, when the PHC is updated by one host,
+    an async message from firmware will be sent to other hosts.
+    Re-initialize the timecounter when the driver receives this
+    async message.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+    Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+    Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 740c342e399981babdd62d0d5beb7c8ec9503a9a
+Author: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date:   Tue Jan 25 23:40:10 2022 -0500
+
+    bnxt_en: PTP: Refactor PTP initialization functions
+    
+    Making the ptp free and timecounter initialization code into separate
+    functions so that later patches can use them.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+    Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 6dd21ad81bf96478db3403b1bbe251c0612d0431
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Wed Nov 24 23:40:01 2021 +0100
+
+    ALSA: hda: Make proper use of timecounter
+    
+    HDA uses a timecounter to read a hardware clock running at 24 MHz. The
+    conversion factor is set with a mult value of 125 and a shift value of 0,
+    which is not converting the hardware clock to nanoseconds, it is converting
+    to 1/3 nanoseconds because the conversion factor from 24Mhz to nanoseconds
+    is 125/3. The usage sites divide the "nanoseconds" value returned by
+    timecounter_read() by 3 to get a real nanoseconds value.
+    
+    There is a lengthy comment in azx_timecounter_init() explaining this
+    choice. That comment makes blatantly wrong assumptions about how
+    timecounters work and what can overflow.
+    
+    The comment says:
+    
+         * Applying the 1/3 factor as part of the multiplication
+         * requires at least 20 bits for a decent precision, however
+         * overflows occur after about 4 hours or less, not a option.
+    
+    timecounters operate on time deltas between two readouts of a clock and use
+    the mult/shift pair to calculate a precise nanoseconds value:
+    
+        delta_nsec = (delta_clock * mult) >> shift;
+    
+    The fractional part is also taken into account and preserved to prevent
+    accumulated rounding errors. For details see cyclecounter_cyc2ns().
+    
+    The mult/shift pair has to be chosen so that the multiplication of the
+    maximum expected delta value does not result in a 64bit overflow. As the
+    counter wraps around on 32bit, the maximum observable delta between two
+    reads is (1 << 32) - 1 which is about 178.9 seconds.
+    
+    That in turn means the maximum multiplication factor which fits into an u32
+    will not cause a 64bit overflow ever because it's guaranteed that:
+    
+         ((1 << 32) - 1) ^ 2 < (1 << 64)
+    
+    The resulting correct multiplication factor is 2796202667 and the shift
+    value is 26, i.e. 26 bit precision. The overflow of the multiplication
+    would happen exactly at a clock readout delta of 6597069765 which is way
+    after the wrap around of the hardware clock at around 274.8 seconds which
+    is off from the claimed 4 hours by more than an order of magnitude.
+    
+    If the counter ever wraps around the last read value then the calculation
+    is off by the number of wrap arounds times 178.9 seconds because the
+    overflow cannot be observed.
+    
+    Use clocks_calc_mult_shift(), which calculates the most accurate mult/shift
+    pair based on the given clock frequency, and remove the bogus comment along
+    with the divisions at the readout sites.
+    
+    Fixes: 5d890f591d15 ("ALSA: hda: support for wallclock timestamps")
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+    Link: https://lore.kernel.org/r/871r35kwji.ffs@tglx
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+commit b2fcc70799368a9bc25509da4c9127583523ec37
+Author: Marc Kleine-Budde <mkl@pengutronix.de>
+Date:   Mon Aug 9 20:31:54 2021 +0200
+
+    can: mcp251xfd: mark some instances of struct mcp251xfd_priv as const
+    
+    With the patch 07ff4aed015c ("time/timecounter: Mark 1st argument of
+    timecounter_cyc2time() as const") some instances of the struct
+    mcp251xfd_priv can be marked as const. This patch marks these as
+    const.
+    
+    Link: https://lore.kernel.org/r/20210813091027.159379-1-mkl@pengutronix.de
+    Cc: Manivannan Sadhasivam <mani@kernel.org>
+    Cc: Thomas Kopp <thomas.kopp@microchip.com>
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+commit 89bc7f456cd40e0be7b94f4fdae9186f22b76a05
+Author: Michael Chan <michael.chan@broadcom.com>
+Date:   Fri Jul 23 17:53:48 2021 -0400
+
+    bnxt_en: Add missing periodic PHC overflow check
+    
+    We use the timecounter APIs for the 48-bit PHC and packet timestamps.
+    We must periodically update the timecounter at roughly half the
+    overflow interval.  The overflow interval is about 78 hours, so
+    update it every 19 hours (1/4 interval) for some extra margins.
+    
+    Fixes: 390862f45c85 ("bnxt_en: Get the full 48-bit hardware timestamp periodically")
+    Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+    Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit b2bc81481750b8457c51c2e48e7af9143663c093
+Merge: 88827353c696 5ce15f278333
+Author: David S. Miller <davem@davemloft.net>
+Date:   Thu Jul 1 13:08:19 2021 -0700
+
+    Merge branch 'ptp-virtual-clocks-and-timestamping'
+    
+    Yangbo Lu says:
+    
+    ====================
+    ptp: support virtual clocks and timestamping
+    
+    Current PTP driver exposes one PTP device to user which binds network
+    interface/interfaces to provide timestamping. Actually we have a way
+    utilizing timecounter/cyclecounter to virtualize any number of PTP
+    clocks based on a same free running physical clock for using.
+    The purpose of having multiple PTP virtual clocks is for user space
+    to directly/easily use them for multiple domains synchronization.
+    
+    user
+    space:     ^                                  ^
+               | SO_TIMESTAMPING new flag:        | Packets with
+               | SOF_TIMESTAMPING_BIND_PHC        | TX/RX HW timestamps
+               v                                  v
+             +--------------------------------------------+
+    sock:    |     sock (new member sk_bind_phc)          |
+             +--------------------------------------------+
+               ^                                  ^
+               | ethtool_get_phc_vclocks          | Convert HW timestamps
+               |                                  | to sk_bind_phc
+               v                                  v
+             +--------------+--------------+--------------+
+    vclock:  | ptp1         | ptp2         | ptpN         |
+             +--------------+--------------+--------------+
+    pclock:  |             ptp0 free running              |
+             +--------------------------------------------+
+    
+    The block diagram may explain how it works. Besides the PTP virtual
+    clocks, the packet HW timestamp converting to the bound PHC is also
+    done in sock driver. For user space, PTP virtual clocks can be
+    created via sysfs, and extended SO_TIMESTAMPING API (new flag
+    SOF_TIMESTAMPING_BIND_PHC) can be used to bind one PTP virtual clock
+    for timestamping.
+    
+    The test tool timestamping.c (together with linuxptp phc_ctl tool) can
+    be used to verify:
+    
+      # echo 4 > /sys/class/ptp/ptp0/n_vclocks
+      [  129.399472] ptp ptp0: new virtual clock ptp2
+      [  129.404234] ptp ptp0: new virtual clock ptp3
+      [  129.409532] ptp ptp0: new virtual clock ptp4
+      [  129.413942] ptp ptp0: new virtual clock ptp5
+      [  129.418257] ptp ptp0: guarantee physical clock free running
+      #
+      # phc_ctl /dev/ptp2 set 10000
+      # phc_ctl /dev/ptp3 set 20000
+      #
+      # timestamping eno0 2 SOF_TIMESTAMPING_TX_HARDWARE SOF_TIMESTAMPING_RAW_HARDWARE SOF_TIMESTAMPING_BIND_PHC
+      # timestamping eno0 2 SOF_TIMESTAMPING_RX_HARDWARE SOF_TIMESTAMPING_RAW_HARDWARE SOF_TIMESTAMPING_BIND_PHC
+      # timestamping eno0 3 SOF_TIMESTAMPING_TX_HARDWARE SOF_TIMESTAMPING_RAW_HARDWARE SOF_TIMESTAMPING_BIND_PHC
+      # timestamping eno0 3 SOF_TIMESTAMPING_RX_HARDWARE SOF_TIMESTAMPING_RAW_HARDWARE SOF_TIMESTAMPING_BIND_PHC
+    
+    Changes for v2:
+            - Converted to num_vclocks for creating virtual clocks.
+            - Guranteed physical clock free running when using virtual
+              clocks.
+            - Fixed build warning.
+            - Updated copyright.
+    Changes for v3:
+            - Supported PTP virtual clock in default in PTP driver.
+            - Protected concurrency of ptp->num_vclocks accessing.
+            - Supported PHC vclocks query via ethtool.
+            - Extended SO_TIMESTAMPING API for PHC binding.
+            - Converted HW timestamps to PHC bound, instead of previous
+              binding domain value to PHC idea.
+            - Other minor fixes.
+    Changes for v4:
+            - Used do_aux_work callback for vclock refreshing instead.
+            - Used unsigned int for vclocks number, and max_vclocks
+              for limitiation.
+            - Fixed mutex locking.
+            - Dynamically allocated memory for vclock index storage.
+            - Removed ethtool ioctl command for vclocks getting.
+            - Updated doc for ethtool phc vclocks get.
+            - Converted to mptcp_setsockopt_sol_socket_timestamping().
+            - Passed so_timestamping for sock_set_timestamping.
+            - Fixed checkpatch/build.
+            - Other minor fixed.
+    Changes for v5:
+            - Fixed checkpatch/build/bug reported by test robot.
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5d43f951b1ac797450bb4d230fdc960b739bea04
+Author: Yangbo Lu <yangbo.lu@nxp.com>
+Date:   Wed Jun 30 16:11:52 2021 +0800
+
+    ptp: add ptp virtual clock driver framework
+    
+    This patch is to add ptp virtual clock driver framework
+    utilizing timecounter/cyclecounter.
+    
+    The patch just exports two essential APIs for PTP driver.
+    
+    - ptp_vclock_register()
+    - ptp_vclock_unregister()
+    
+    Signed-off-by: Yangbo Lu <yangbo.lu@nxp.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit a1b05634e1f0ab11a37906557c8e8eb2aeece222
+Merge: 2eeae3a5cb33 93cb62d98e9c
+Author: David S. Miller <davem@davemloft.net>
+Date:   Mon Jun 28 13:41:06 2021 -0700
+
+    Merge branch 'bnxt_en-ptp'
+    
+    Michael Chan says:
+    
+    ====================
+    bnxt_en: Add hardware PTP timestamping support on 575XX devices
+    
+    Add PTP RX and TX hardware timestamp support on 575XX devices.  These
+    devices use the two-step method to implement the IEEE-1588 timestamping
+    support.
+    
+    v2: Add spinlock to serialize access to the timecounter.
+        Use .do_aux_work() for the periodic timer reading and to get the TX
+        timestamp from the firmware.
+        Propagate error code from ptp_clock_register().
+        Make the 64-bit timer access safe on 32-bit CPUs.
+        Read PHC using direct register access.
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 118612d519d83b98ead11195a5c818f5e8904654
+Author: Michael Chan <michael.chan@broadcom.com>
+Date:   Sun Jun 27 13:19:46 2021 -0400
+
+    bnxt_en: Add PTP clock APIs, ioctls, and ethtool methods
+    
+    Add the clock APIs to set/get/adjust the hw clock, and the related
+    ioctls and ethtool methods.
+    
+    v2: Propagate error code from ptp_clock_register().
+        Add spinlock to serialize access to the timecounter.  The
+        timecounter is accessed in process context and the RX datapath.
+        Read the PHC using direct registers.
+    
+    Reviewed-by: Edwin Peer <edwin.peer@broadcom.com>
+    Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+    Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 87dcebff9262330ceffad8f1732f29fd35feab5a
+Merge: 91552ab8ffb8 2d036dfa5f10
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Apr 26 09:54:03 2021 -0700
+
+    Merge tag 'timers-core-2021-04-26' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull timer updates from Thomas Gleixner:
+     "The time and timers updates contain:
+    
+      Core changes:
+    
+       - Allow runtime power management when the clocksource is changed.
+    
+       - A correctness fix for clock_adjtime32() so that the return value on
+         success is not overwritten by the result of the copy to user.
+    
+       - Allow late installment of broadcast clockevent devices which was
+         broken because nothing switched them over to oneshot mode. This
+         went unnoticed so far because clockevent devices used to be built
+         in, but now people started to make them modular.
+    
+       - Debugfs related simplifications
+    
+       - Small cleanups and improvements here and there
+    
+      Driver changes:
+    
+       - The usual set of device tree binding updates for a wide range of
+         drivers/devices.
+    
+       - The usual updates and improvements for drivers all over the place
+         but nothing outstanding.
+    
+       - No new clocksource/event drivers. They'll come back next time"
+    
+    * tag 'timers-core-2021-04-26' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip: (24 commits)
+      posix-timers: Preserve return value in clock_adjtime32()
+      tick/broadcast: Allow late registered device to enter oneshot mode
+      tick: Use tick_check_replacement() instead of open coding it
+      time/timecounter: Mark 1st argument of timecounter_cyc2time() as const
+      dt-bindings: timer: nuvoton,npcm7xx: Add wpcm450-timer
+      clocksource/drivers/arm_arch_timer: Add __ro_after_init and __init
+      clocksource/drivers/timer-ti-dm: Handle dra7 timer wrap errata i940
+      clocksource/drivers/timer-ti-dm: Prepare to handle dra7 timer wrap issue
+      clocksource/drivers/dw_apb_timer_of: Add handling for potential memory leak
+      clocksource/drivers/npcm: Add support for WPCM450
+      clocksource/drivers/sh_cmt: Don't use CMTOUT_IE with R-Car Gen2/3
+      clocksource/drivers/pistachio: Fix trivial typo
+      clocksource/drivers/ingenic_ost: Fix return value check in ingenic_ost_probe()
+      clocksource/drivers/timer-ti-dm: Add missing set_state_oneshot_stopped
+      clocksource/drivers/timer-ti-dm: Fix posted mode status check order
+      dt-bindings: timer: renesas,cmt: Document R8A77961
+      dt-bindings: timer: renesas,cmt: Add r8a779a0 CMT support
+      clocksource/drivers/ingenic-ost: Add support for the JZ4760B
+      clocksource/drivers/ingenic: Add support for the JZ4760
+      dt-bindings: timer: ingenic: Add compatible strings for JZ4760(B)
+      ...
+
+commit 07ff4aed015c564d03fd518d2fb54e5e6948903c
+Author: Marc Kleine-Budde <mkl@pengutronix.de>
+Date:   Wed Mar 3 11:35:44 2021 +0100
+
+    time/timecounter: Mark 1st argument of timecounter_cyc2time() as const
+    
+    The timecounter is not modified in this function. Mark it as const.
+    
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Link: https://lore.kernel.org/r/20210303103544.994855-1-mkl@pengutronix.de
+
+commit 9b4ab2e13bed61f2adf9db10bcdebb109e18329b
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 9b67dcf5cc6a568d6b2482b3b1835dad45a6b82e
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 7a7c9ced4cb140e42cc9577d35188df85e9b8ee0
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a41213529e020578af404f60e502c1e17259731e
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 45c1ca3e5784f58382e61690b6f39efc63b825f6
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 4a104e4d4d9dbc7422f50be64ebdc8d9a4a030ca
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e5183a716e0c3a14d29c4e312d63822f24d8f4eb
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    [ Upstream commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5 ]
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit efd8d98dfb900f96370cc7722ccb7959e58557c7
+Author: Marc Kleine-Budde <mkl@pengutronix.de>
+Date:   Tue Mar 2 15:58:18 2021 +0100
+
+    can: mcp251xfd: add HW timestamp infrastructure
+    
+    This patch add the HW timestamping infrastructure. The mcp251xfd has a
+    free running timer of 32 bit width, running at max 40MHz, which wraps
+    around every 107 seconds. The current timestamp is latched into RX and
+    TEF objects automatically be the CAN controller.
+    
+    This patch sets up a cyclecounter, timecounter and delayed worker
+    infrastructure (which runs every 45 seconds) to convert the timer into
+    a proper 64 bit based ns timestamp.
+    
+    Link: https://lore.kernel.org/r/20210304160328.2752293-6-mkl@pengutronix.de
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+commit 6a4d7234ae9a3bb31181f348ade9bbdb55aeb5c5
+Author: Heiko Thiery <heiko.thiery@gmail.com>
+Date:   Thu Feb 25 22:15:16 2021 +0100
+
+    net: fec: ptp: avoid register access when ipg clock is disabled
+    
+    When accessing the timecounter register on an i.MX8MQ the kernel hangs.
+    This is only the case when the interface is down. This can be reproduced
+    by reading with 'phc_ctrl eth0 get'.
+    
+    Like described in the change in 91c0d987a9788dcc5fe26baafd73bf9242b68900
+    the igp clock is disabled when the interface is down and leads to a
+    system hang.
+    
+    So we check if the ptp clock status before reading the timecounter
+    register.
+    
+    Signed-off-by: Heiko Thiery <heiko.thiery@gmail.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Link: https://lore.kernel.org/r/20210225211514.9115-1-heiko.thiery@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+commit 432119de33d9013467371fc85238d623f64ff67e
+Author: Aya Levin <ayal@nvidia.com>
+Date:   Fri Feb 12 14:30:42 2021 -0800
+
+    net/mlx5: Add cyc2time HW translation mode support
+    
+    Device timestamp can be in real time mode (cycles to time translation is
+    offloaded into the Hardware). With real time mode, HW provides timestamp
+    which is already translated into nanoseconds.
+    
+    With this mode, driver adjusts both the HW and timecounter (to keep
+    clock_info_page updated) using callbacks: adjfreq, adjtime and settime.
+    HW clock modifications are done via MTUTC access reg commands. Driver is
+    allowed to modify HW real time clock only if MCAM ptpcyc2realtime_modify
+    capability is set.
+    
+    Add MTUTC set function to be used for configuring the HW real time
+    clock. Modify existing code to support both internal timer (with
+    conversion via timecounter_cyc2time() and real time (no conversions).
+    
+    Align the signatures of the helpers converting from timestamp to
+    nanoseconds. With that, when allocating a queue assign the corresponding
+    callback with respect to the capability.
+    
+    Adjust 1PPS timestamp calculation flows based on the timestamp mode.
+    
+    Cyc2time offload brings two major advantages:
+    - Improve MTAE (Max Time Absolute Error) for HW TS by up to 160 ns over a
+      100% loaded CPU.
+    - Faster data-path timestamp to nanoseconds, as translation is
+      lock-less and done in HW.
+    
+    On real time mode, timestamp format is 32 high bits of seconds and 32
+    low bits of nanoseconds. On some flows, driver shall convert this format
+    into nanoseconds wall-clock with REAL_TIME_TO_NS macro.
+    
+    HW supports a single clock, and it is shared by all functions on a
+    device. In case real time clock is used, it is recommended to use
+    a single GM to all device's functions.
+    
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Signed-off-by: Aya Levin <ayal@nvidia.com>
+    Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+
+commit f24c986f0bbbdbfcf29a3ec729b6c5865d71db5e
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Tue Jun 16 12:07:10 2020 +0300
+
+    net/mlx5: Don't call timecounter cyc2time directly from 1PPS flow
+    
+    [ Upstream commit 0d2ffdc8d4002a62de31ff7aa3bef28c843c3cbe ]
+    
+    Before calling timecounter_cyc2time(), clock->lock must be taken.
+    Use mlx5_timecounter_cyc2time instead which guarantees a safe access.
+    
+    Fixes: afc98a0b46d8 ("net/mlx5: Update ptp_clock_event foreach PPS event")
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 3c33f586d09004130e4ca2f1d900cf93704b5ab9
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Tue Jun 16 12:07:10 2020 +0300
+
+    net/mlx5: Don't call timecounter cyc2time directly from 1PPS flow
+    
+    [ Upstream commit 0d2ffdc8d4002a62de31ff7aa3bef28c843c3cbe ]
+    
+    Before calling timecounter_cyc2time(), clock->lock must be taken.
+    Use mlx5_timecounter_cyc2time instead which guarantees a safe access.
+    
+    Fixes: afc98a0b46d8 ("net/mlx5: Update ptp_clock_event foreach PPS event")
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e757a39c2d84246094fcd734e466f9170b5a3ba8
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Tue Jun 16 12:07:10 2020 +0300
+
+    net/mlx5: Don't call timecounter cyc2time directly from 1PPS flow
+    
+    [ Upstream commit 0d2ffdc8d4002a62de31ff7aa3bef28c843c3cbe ]
+    
+    Before calling timecounter_cyc2time(), clock->lock must be taken.
+    Use mlx5_timecounter_cyc2time instead which guarantees a safe access.
+    
+    Fixes: afc98a0b46d8 ("net/mlx5: Update ptp_clock_event foreach PPS event")
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 85c4859b4f54d4469b1dcf411104cc40243c8c05
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Tue Jun 16 12:07:10 2020 +0300
+
+    net/mlx5: Don't call timecounter cyc2time directly from 1PPS flow
+    
+    [ Upstream commit 0d2ffdc8d4002a62de31ff7aa3bef28c843c3cbe ]
+    
+    Before calling timecounter_cyc2time(), clock->lock must be taken.
+    Use mlx5_timecounter_cyc2time instead which guarantees a safe access.
+    
+    Fixes: afc98a0b46d8 ("net/mlx5: Update ptp_clock_event foreach PPS event")
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 0d2ffdc8d4002a62de31ff7aa3bef28c843c3cbe
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Tue Jun 16 12:07:10 2020 +0300
+
+    net/mlx5: Don't call timecounter cyc2time directly from 1PPS flow
+    
+    Before calling timecounter_cyc2time(), clock->lock must be taken.
+    Use mlx5_timecounter_cyc2time instead which guarantees a safe access.
+    
+    Fixes: afc98a0b46d8 ("net/mlx5: Update ptp_clock_event foreach PPS event")
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+
+commit 64d123fc25e1fcdf898324aac5497707bca6b5ab
+Merge: 373c15c2e915 c9c12d339d93
+Author: David S. Miller <davem@davemloft.net>
+Date:   Mon Aug 24 18:15:45 2020 -0700
+
+    Merge branch 'Add-PTP-support-for-Octeontx2'
+    
+    Subbaraya Sundeep says:
+    
+    ====================
+    Add PTP support for Octeontx2
+    
+    This patchset adds PTP support for Octeontx2 platform.
+    PTP is an independent coprocessor block from which
+    CGX block fetches timestamp and prepends it to the
+    packet before sending to NIX block. Patches are as
+    follows:
+    
+    Patch 1: Patch to enable/disable packet timstamping
+             in CGX upon mailbox request. It also adjusts
+             packet parser (NPC) for the 8 bytes timestamp
+             appearing before the packet.
+    
+    Patch 2: Patch adding PTP pci driver which configures
+             the PTP block and hooks up to RVU AF driver.
+             It also exposes a mailbox call to adjust PTP
+             hardware clock.
+    
+    Patch 3: Patch adding PTP clock driver for PF netdev.
+    
+    v8:
+     Added missing header file reported by kernel test robot
+     in patch 2
+    v7:
+     As per Jesse Brandeburg comments:
+     Simplified functions in patch 1
+     Replaced magic numbers with macros
+     Added Copyrights
+     Added code comments wherever required
+     Modified commit description of patch 2
+    v6:
+     Resent after net-next is open
+    v5:
+     As suggested by David separated the fix (adding rtnl lock/unlock)
+     and submitted to net.
+     https://www.spinics.net/lists/netdev/msg669617.html
+    v4:
+     Added rtnl_lock/unlock in otx2_reset to protect against
+     network stack ndo_open and close calls
+     Added NULL check after ptp_clock_register in otx2_ptp.c
+    v3:
+     Fixed sparse error in otx2_txrx.c
+     Removed static inlines in otx2_txrx.c
+    v2:
+     Fixed kernel build robot reported error by
+     adding timecounter.h to otx2_common.h
+    ====================
+    
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit f490e70fa7eb9a237ff112d2ffe100f107e41bb2
+Author: Alexander Lobakin <alobakin@marvell.com>
+Date:   Tue Jun 23 16:51:34 2020 +0300
+
+    net: qede: fix PTP initialization on recovery
+    
+    [ Upstream commit 1c85f394c2206ea3835f43534d5675f0574e1b70 ]
+    
+    Currently PTP cyclecounter and timecounter are initialized only on
+    the first probing and are cleaned up during removal. This means that
+    PTP becomes non-functional after device recovery.
+    Fix this by unconditional PTP initialization on probing and clearing
+    Tx pending bit on exiting.
+    
+    Fixes: ccc67ef50b90 ("qede: Error recovery process")
+    Signed-off-by: Alexander Lobakin <alobakin@marvell.com>
+    Signed-off-by: Igor Russkikh <irusskikh@marvell.com>
+    Signed-off-by: Michal Kalderon <michal.kalderon@marvell.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit d24a3a66b88319ff7d00d8587f3dddf0eb75c0fd
+Author: Alexander Lobakin <alobakin@marvell.com>
+Date:   Tue Jun 23 16:51:34 2020 +0300
+
+    net: qede: fix PTP initialization on recovery
+    
+    [ Upstream commit 1c85f394c2206ea3835f43534d5675f0574e1b70 ]
+    
+    Currently PTP cyclecounter and timecounter are initialized only on
+    the first probing and are cleaned up during removal. This means that
+    PTP becomes non-functional after device recovery.
+    Fix this by unconditional PTP initialization on probing and clearing
+    Tx pending bit on exiting.
+    
+    Fixes: ccc67ef50b90 ("qede: Error recovery process")
+    Signed-off-by: Alexander Lobakin <alobakin@marvell.com>
+    Signed-off-by: Igor Russkikh <irusskikh@marvell.com>
+    Signed-off-by: Michal Kalderon <michal.kalderon@marvell.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 1c85f394c2206ea3835f43534d5675f0574e1b70
+Author: Alexander Lobakin <alobakin@marvell.com>
+Date:   Tue Jun 23 16:51:34 2020 +0300
+
+    net: qede: fix PTP initialization on recovery
+    
+    Currently PTP cyclecounter and timecounter are initialized only on
+    the first probing and are cleaned up during removal. This means that
+    PTP becomes non-functional after device recovery.
+    Fix this by unconditional PTP initialization on probing and clearing
+    Tx pending bit on exiting.
+    
+    Fixes: ccc67ef50b90 ("qede: Error recovery process")
+    Signed-off-by: Alexander Lobakin <alobakin@marvell.com>
+    Signed-off-by: Igor Russkikh <irusskikh@marvell.com>
+    Signed-off-by: Michal Kalderon <michal.kalderon@marvell.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit e66dccced0cfd59a4dc4c16409b713332b882fa6
+Author: Grygorii Strashko <grygorii.strashko@ti.com>
+Date:   Thu Apr 23 17:20:14 2020 +0300
+
+    net: ethernet: ti: cpts: separate hw counter read from timecounter
+    
+    Now CPTS HW time reading code is implemented in timecounter->cyclecounter
+    .read() callback and performs following operations:
+    timecounter_read() ->cc.read() -> cpts_systim_read()
+     - request current CPTS HW time CPTS_TS_PUSH.TS_PUSH = 1
+     - poll CPTS FIFO for CPTS_EV_PUSH event with current HW timestamp
+    
+    This approach need to be changed for the future switch to PTP PHC
+    .gettimex64() callback, which require to separate requesting current CPTS
+    HW time and processing CPTS FIFO. And for the follow up patch, which
+    improves .adjfreq() implementation.
+    
+    This patch moves code accessing CPTS HW out of timecounter code as
+    following:
+    - convert HW timestamp of every CPTS event to PTP time (us) and store it as
+    part struct cpts_event;
+    - add CPTS context field to store current CPTS HW time (counter) value and
+    update it on CPTS_EV_PUSH reception;
+    - move code accessing CPTS HW out of timecounter code and use current CPTS
+    HW time (counter) from CPTS context instead;
+    - ensure timecounter->cycle_last is updated on CPTS_EV_PUSH reception.
+    
+    After this change CPTS timecounter will only perform timekeeper role
+    without actually accessing CPTS HW.
+    
+    Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 2fed73906e97b57804c7e344838e88c1a1cc2b94
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Oct 12 13:13:39 2018 +0200
+
+    igb: shorten maximum PHC timecounter update interval
+    
+    [ Upstream commit 094bf4d0e9657f6ea1ee3d7e07ce3970796949ce ]
+    
+    The timecounter needs to be updated at least once per ~550 seconds in
+    order to avoid a 40-bit SYSTIM timestamp to be misinterpreted as an old
+    timestamp.
+    
+    Since commit 500462a9d ("timers: Switch to a non-cascading wheel"),
+    scheduling of delayed work seems to be less accurate and a requested
+    delay of 540 seconds may actually be longer than 550 seconds. Shorten
+    the delay to 480 seconds to be sure the timecounter is updated in time.
+    
+    This fixes an issue with HW timestamps on 82580/I350/I354 being off by
+    ~1100 seconds for few seconds every ~9 minutes.
+    
+    Cc: Jacob Keller <jacob.e.keller@intel.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8bcacb4e6959d22ca9f54d260e0edcfec9265bac
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Oct 12 13:13:39 2018 +0200
+
+    igb: shorten maximum PHC timecounter update interval
+    
+    [ Upstream commit 094bf4d0e9657f6ea1ee3d7e07ce3970796949ce ]
+    
+    The timecounter needs to be updated at least once per ~550 seconds in
+    order to avoid a 40-bit SYSTIM timestamp to be misinterpreted as an old
+    timestamp.
+    
+    Since commit 500462a9d ("timers: Switch to a non-cascading wheel"),
+    scheduling of delayed work seems to be less accurate and a requested
+    delay of 540 seconds may actually be longer than 550 seconds. Shorten
+    the delay to 480 seconds to be sure the timecounter is updated in time.
+    
+    This fixes an issue with HW timestamps on 82580/I350/I354 being off by
+    ~1100 seconds for few seconds every ~9 minutes.
+    
+    Cc: Jacob Keller <jacob.e.keller@intel.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8f74ac645ab07f2c728c8b147a891febad01e270
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Oct 12 13:13:39 2018 +0200
+
+    igb: shorten maximum PHC timecounter update interval
+    
+    [ Upstream commit 094bf4d0e9657f6ea1ee3d7e07ce3970796949ce ]
+    
+    The timecounter needs to be updated at least once per ~550 seconds in
+    order to avoid a 40-bit SYSTIM timestamp to be misinterpreted as an old
+    timestamp.
+    
+    Since commit 500462a9d ("timers: Switch to a non-cascading wheel"),
+    scheduling of delayed work seems to be less accurate and a requested
+    delay of 540 seconds may actually be longer than 550 seconds. Shorten
+    the delay to 480 seconds to be sure the timecounter is updated in time.
+    
+    This fixes an issue with HW timestamps on 82580/I350/I354 being off by
+    ~1100 seconds for few seconds every ~9 minutes.
+    
+    Cc: Jacob Keller <jacob.e.keller@intel.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit eb517bafc9ecdb9cb753b8605d4077af9e04eb95
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Oct 12 13:13:39 2018 +0200
+
+    igb: shorten maximum PHC timecounter update interval
+    
+    [ Upstream commit 094bf4d0e9657f6ea1ee3d7e07ce3970796949ce ]
+    
+    The timecounter needs to be updated at least once per ~550 seconds in
+    order to avoid a 40-bit SYSTIM timestamp to be misinterpreted as an old
+    timestamp.
+    
+    Since commit 500462a9d ("timers: Switch to a non-cascading wheel"),
+    scheduling of delayed work seems to be less accurate and a requested
+    delay of 540 seconds may actually be longer than 550 seconds. Shorten
+    the delay to 480 seconds to be sure the timecounter is updated in time.
+    
+    This fixes an issue with HW timestamps on 82580/I350/I354 being off by
+    ~1100 seconds for few seconds every ~9 minutes.
+    
+    Cc: Jacob Keller <jacob.e.keller@intel.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 86db36a347b4ea030ee3e6c73ce04e35e4732999
+Author: Vladimir Oltean <olteanv@gmail.com>
+Date:   Tue Nov 12 02:11:54 2019 +0200
+
+    net: dsa: sja1105: Implement state machine for TAS with PTP clock source
+    
+    Tested using the following bash script and the tc from iproute2-next:
+    
+            #!/bin/bash
+    
+            set -e -u -o pipefail
+    
+            NSEC_PER_SEC="1000000000"
+    
+            gatemask() {
+                    local tc_list="$1"
+                    local mask=0
+    
+                    for tc in ${tc_list}; do
+                            mask=$((${mask} | (1 << ${tc})))
+                    done
+    
+                    printf "%02x" ${mask}
+            }
+    
+            if ! systemctl is-active --quiet ptp4l; then
+                    echo "Please start the ptp4l service"
+                    exit
+            fi
+    
+            now=$(phc_ctl /dev/ptp1 get | gawk '/clock time is/ { print $5; }')
+            # Phase-align the base time to the start of the next second.
+            sec=$(echo "${now}" | gawk -F. '{ print $1; }')
+            base_time="$(((${sec} + 1) * ${NSEC_PER_SEC}))"
+    
+            tc qdisc add dev swp5 parent root handle 100 taprio \
+                    num_tc 8 \
+                    map 0 1 2 3 5 6 7 \
+                    queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 \
+                    base-time ${base_time} \
+                    sched-entry S $(gatemask 7) 100000 \
+                    sched-entry S $(gatemask "0 1 2 3 4 5 6") 400000 \
+                    clockid CLOCK_TAI flags 2
+    
+    The "state machine" is a workqueue invoked after each manipulation
+    command on the PTP clock (reset, adjust time, set time, adjust
+    frequency) which checks over the state of the time-aware scheduler.
+    So it is not monitored periodically, only in reaction to a PTP command
+    typically triggered from a userspace daemon (linuxptp). Otherwise there
+    is no reason for things to go wrong.
+    
+    Now that the timecounter/cyclecounter has been replaced with hardware
+    operations on the PTP clock, the TAS Kconfig now depends upon PTP and
+    the standalone clocksource operating mode has been removed.
+    
+    Signed-off-by: Vladimir Oltean <olteanv@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 2fb079a28ae856145e8977d08b77403a3a5d6a70
+Author: Vladimir Oltean <olteanv@gmail.com>
+Date:   Wed Oct 16 21:41:02 2019 +0300
+
+    net: dsa: sja1105: Switch to hardware operations for PTP
+    
+    Adjusting the hardware clock (PTPCLKVAL, PTPCLKADD, PTPCLKRATE) is a
+    requirement for the auxiliary PTP functionality of the switch
+    (TTEthernet, PPS input, PPS output).
+    
+    Therefore we need to switch to using these registers to keep a
+    synchronized time in hardware, instead of the timecounter/cyclecounter
+    implementation, which is reliant on the free-running PTPTSCLK.
+    
+    Signed-off-by: Vladimir Oltean <olteanv@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 29dd908d355f565bc2c1ab475f0322b29e9cf3eb
+Author: Vladimir Oltean <olteanv@gmail.com>
+Date:   Wed Jun 26 02:39:34 2019 +0300
+
+    net: dsa: sja1105: Cancel PTP delayed work on unregister
+    
+    Currently when the driver unloads and PTP is enabled, the delayed work
+    that prevents the timecounter from expiring becomes a ticking time bomb.
+    The kernel will schedule the work thread within 60 seconds of driver
+    removal, but the work handler is no longer there, leading to this
+    strange and inconclusive stack trace:
+    
+    [   64.473112] Unable to handle kernel paging request at virtual address 79746970
+    [   64.480340] pgd = 008c4af9
+    [   64.483042] [79746970] *pgd=00000000
+    [   64.486620] Internal error: Oops: 80000005 [#1] SMP ARM
+    [   64.491820] Modules linked in:
+    [   64.494871] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.2.0-rc5-01634-ge3a2773ba9e5 #1246
+    [   64.503007] Hardware name: Freescale LS1021A
+    [   64.507259] PC is at 0x79746970
+    [   64.510393] LR is at call_timer_fn+0x3c/0x18c
+    [   64.514729] pc : [<79746970>]    lr : [<c03bd734>]    psr: 60010113
+    [   64.520965] sp : c1901de0  ip : 00000000  fp : c1903080
+    [   64.526163] r10: c1901e38  r9 : ffffe000  r8 : c19064ac
+    [   64.531363] r7 : 79746972  r6 : e98dd260  r5 : 00000100  r4 : c1a9e4a0
+    [   64.537859] r3 : c1900000  r2 : ffffa400  r1 : 79746972  r0 : e98dd260
+    [   64.544359] Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+    [   64.551460] Control: 10c5387d  Table: a8a2806a  DAC: 00000051
+    [   64.557176] Process swapper/0 (pid: 0, stack limit = 0x1ddb27f0)
+    [   64.563147] Stack: (0xc1901de0 to 0xc1902000)
+    [   64.567481] 1de0: eb6a4918 3d60d7c3 c1a9e554 e98dd260 eb6a34c0 c1a9e4a0 ffffa400 c19064ac
+    [   64.575616] 1e00: ffffe000 c03bd95c c1901e34 c1901e34 eb6a34c0 c1901e30 c1903d00 c186f4c0
+    [   64.583751] 1e20: c1906488 29e34000 c1903080 c03bdca4 00000000 eaa6f218 00000000 eb6a45c0
+    [   64.591886] 1e40: eb6a45c0 20010193 00000003 c03c0a68 20010193 3f7231be c1903084 00000002
+    [   64.600022] 1e60: 00000082 00000001 ffffe000 c1a9e0a4 00000100 c0302298 02b64722 0000000f
+    [   64.608157] 1e80: c186b3c8 c1877540 c19064ac 0000000a c186b350 ffffa401 c1903d00 c1107348
+    [   64.616292] 1ea0: 00200102 c0d87a14 ea823c00 ffffe000 00000012 00000000 00000000 ea810800
+    [   64.624427] 1ec0: f0803000 c1876ba8 00000000 c034c784 c18774b8 c039fb50 c1906c90 c1978aac
+    [   64.632562] 1ee0: f080200c f0802000 c1901f10 c0709ca8 c03091a0 60010013 ffffffff c1901f44
+    [   64.640697] 1f00: 00000000 c1900000 c1876ba8 c0301a8c 00000000 000070a0 eb6ac1a0 c031da60
+    [   64.648832] 1f20: ffffe000 c19064ac c19064f0 00000001 00000000 c1906488 c1876ba8 00000000
+    [   64.656967] 1f40: ffffffff c1901f60 c030919c c03091a0 60010013 ffffffff 00000051 00000000
+    [   64.665102] 1f60: ffffe000 c0376aa4 c1a9da37 ffffffff 00000037 3f7231be c1ab20c0 000000cc
+    [   64.673238] 1f80: c1906488 c1906480 ffffffff 00000037 c1ab20c0 c1ab20c0 00000001 c0376e1c
+    [   64.681373] 1fa0: c1ab2118 c1700ea8 ffffffff ffffffff 00000000 c1700754 c17dfa40 ebfffd80
+    [   64.689509] 1fc0: 00000000 c17dfa40 3f7733be 00000000 00000000 c1700330 00000051 10c0387d
+    [   64.697644] 1fe0: 00000000 8f000000 410fc075 10c5387d 00000000 00000000 00000000 00000000
+    [   64.705788] [<c03bd734>] (call_timer_fn) from [<c03bd95c>] (expire_timers+0xd8/0x144)
+    [   64.713579] [<c03bd95c>] (expire_timers) from [<c03bdca4>] (run_timer_softirq+0xe4/0x1dc)
+    [   64.721716] [<c03bdca4>] (run_timer_softirq) from [<c0302298>] (__do_softirq+0x130/0x3c8)
+    [   64.729854] [<c0302298>] (__do_softirq) from [<c034c784>] (irq_exit+0xbc/0xd8)
+    [   64.737040] [<c034c784>] (irq_exit) from [<c039fb50>] (__handle_domain_irq+0x60/0xb4)
+    [   64.744833] [<c039fb50>] (__handle_domain_irq) from [<c0709ca8>] (gic_handle_irq+0x58/0x9c)
+    [   64.753143] [<c0709ca8>] (gic_handle_irq) from [<c0301a8c>] (__irq_svc+0x6c/0x90)
+    [   64.760583] Exception stack(0xc1901f10 to 0xc1901f58)
+    [   64.765605] 1f00:                                     00000000 000070a0 eb6ac1a0 c031da60
+    [   64.773740] 1f20: ffffe000 c19064ac c19064f0 00000001 00000000 c1906488 c1876ba8 00000000
+    [   64.781873] 1f40: ffffffff c1901f60 c030919c c03091a0 60010013 ffffffff
+    [   64.788456] [<c0301a8c>] (__irq_svc) from [<c03091a0>] (arch_cpu_idle+0x38/0x3c)
+    [   64.795816] [<c03091a0>] (arch_cpu_idle) from [<c0376aa4>] (do_idle+0x1bc/0x298)
+    [   64.803175] [<c0376aa4>] (do_idle) from [<c0376e1c>] (cpu_startup_entry+0x18/0x1c)
+    [   64.810707] [<c0376e1c>] (cpu_startup_entry) from [<c1700ea8>] (start_kernel+0x480/0x4ac)
+    [   64.818839] Code: bad PC value
+    [   64.821890] ---[ end trace e226ed97b1c584cd ]---
+    [   64.826482] Kernel panic - not syncing: Fatal exception in interrupt
+    [   64.832807] CPU1: stopping
+    [   64.835501] CPU: 1 PID: 0 Comm: swapper/1 Tainted: G      D           5.2.0-rc5-01634-ge3a2773ba9e5 #1246
+    [   64.845013] Hardware name: Freescale LS1021A
+    [   64.849266] [<c0312394>] (unwind_backtrace) from [<c030cc74>] (show_stack+0x10/0x14)
+    [   64.856972] [<c030cc74>] (show_stack) from [<c0ff4138>] (dump_stack+0xb4/0xc8)
+    [   64.864159] [<c0ff4138>] (dump_stack) from [<c0310854>] (handle_IPI+0x3bc/0x3dc)
+    [   64.871519] [<c0310854>] (handle_IPI) from [<c0709ce8>] (gic_handle_irq+0x98/0x9c)
+    [   64.879050] [<c0709ce8>] (gic_handle_irq) from [<c0301a8c>] (__irq_svc+0x6c/0x90)
+    [   64.886489] Exception stack(0xea8cbf60 to 0xea8cbfa8)
+    [   64.891514] bf60: 00000000 0000307c eb6c11a0 c031da60 ffffe000 c19064ac c19064f0 00000002
+    [   64.899649] bf80: 00000000 c1906488 c1876ba8 00000000 00000000 ea8cbfb0 c030919c c03091a0
+    [   64.907780] bfa0: 600d0013 ffffffff
+    [   64.911250] [<c0301a8c>] (__irq_svc) from [<c03091a0>] (arch_cpu_idle+0x38/0x3c)
+    [   64.918609] [<c03091a0>] (arch_cpu_idle) from [<c0376aa4>] (do_idle+0x1bc/0x298)
+    [   64.925967] [<c0376aa4>] (do_idle) from [<c0376e1c>] (cpu_startup_entry+0x18/0x1c)
+    [   64.933496] [<c0376e1c>] (cpu_startup_entry) from [<803025cc>] (0x803025cc)
+    [   64.940422] Rebooting in 3 seconds..
+    
+    In this case, what happened is that the DSA driver failed to probe at
+    boot time due to a PHY issue during phylink_connect_phy:
+    
+    [    2.245607] fsl-gianfar soc:ethernet@2d90000 eth2: error -19 setting up slave phy
+    [    2.258051] sja1105 spi0.1: failed to create slave for port 0.0
+    
+    Fixes: bb77f36ac21d ("net: dsa: sja1105: Add support for the PTP clock")
+    Signed-off-by: Vladimir Oltean <olteanv@gmail.com>
+    Acked-by: Willem de Bruijn <willemb@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 8d94a8733c949ef93d4e530d914dc7953056de3c
+Merge: a6cdeeb16bff a602afd200f5
+Author: David S. Miller <davem@davemloft.net>
+Date:   Sat Jun 8 15:20:40 2019 -0700
+
+    Merge branch 'PTP-support-for-the-SJA1105-DSA-driver'
+    
+    Vladimir Oltean says:
+    
+    ====================
+    PTP support for the SJA1105 DSA driver
+    
+    This patchset adds the following:
+    
+     - A timecounter/cyclecounter based PHC for the free-running
+       timestamping clock of this switch.
+    
+     - A state machine implemented in the DSA tagger for SJA1105, which
+       keeps track of metadata follow-up Ethernet frames (the switch's way
+       of transmitting RX timestamps).
+    
+    Clock manipulations on the actual hardware PTP clock will have to be
+    implemented anyway, for the TTEthernet block and the time-based ingress
+    policer.
+    
+    v3 patchset can be found at:
+    https://lkml.org/lkml/2019/6/4/954
+    
+    Changes from v3:
+    
+    - Made it compile with the SJA1105 DSA driver and PTP driver as modules.
+    
+    - Reworked/simplified/fixed some issues in 03/17
+      (dsa_8021q_remove_header) and added an ASCII image that
+      illustrates the transformation that is taking place.
+    
+    - Removed a useless check for sja1105_is_link_local from 16/17 (RX
+      timestamping) which also made previous 08/17 patch ("Move
+      sja1105_is_link_local to include/linux") useless and therefore dropped.
+    
+    v2 patchset can be found at:
+    https://lkml.org/lkml/2019/6/2/146
+    
+    Changes from v2:
+    
+    - Broke previous 09/10 patch (timestamping) into multiple smaller
+      patches.
+    
+    - Every patch in the series compiles.
+    
+    v1 patchset can be found at:
+    https://lkml.org/lkml/2019/5/28/1093
+    
+    Changes from v1:
+    
+    - Removed the addition of the DSA .can_timestamp callback.
+    
+    - Waiting for meta frames is done completely inside the tagger, and all
+      frames emitted on RX are already partially timestamped.
+    
+    - Added a global data structure for the tagger common to all ports.
+    
+    - Made PTP work with ports in standalone mode, by limiting use of the
+      DMAC-mangling "incl_srcpt" mode only when ports are bridged, aka when
+      the DSA master is already promiscuous and can receive anything.
+      Also changed meta frames to be sent at the 01-80-C2-00-00-0E DMAC.
+    
+    - Made some progress w.r.t. observed negative path delay.  Apparently it
+      only appears when the delay mechanism is the delay request-response
+      (end-to-end) one. If peer delay is used (-P), the path delay is
+      positive and appears reasonable for an 1000Base-T link (485 ns in
+      steady state).
+    
+      SJA1105 as PTP slave (OC) with E2E path delay:
+    
+    ptp4l[55.600]: master offset          8 s2 freq  +83677 path delay     -2390
+    ptp4l[56.600]: master offset         17 s2 freq  +83688 path delay     -2391
+    ptp4l[57.601]: master offset          6 s2 freq  +83682 path delay     -2391
+    ptp4l[58.601]: master offset         -1 s2 freq  +83677 path delay     -2391
+    
+      SJA1105 as PTP slave (OC) with P2P path delay:
+    
+    ptp4l[48.343]: master offset          5 s2 freq  +83715 path delay       484
+    ptp4l[48.468]: master offset         -3 s2 freq  +83705 path delay       485
+    ptp4l[48.593]: master offset          0 s2 freq  +83708 path delay       485
+    ptp4l[48.718]: master offset          1 s2 freq  +83710 path delay       485
+    ptp4l[48.844]: master offset          1 s2 freq  +83710 path delay       485
+    ptp4l[48.969]: master offset         -5 s2 freq  +83702 path delay       485
+    ptp4l[49.094]: master offset          3 s2 freq  +83712 path delay       485
+    ptp4l[49.219]: master offset          4 s2 freq  +83714 path delay       485
+    ptp4l[49.344]: master offset         -5 s2 freq  +83702 path delay       485
+    ptp4l[49.469]: master offset          3 s2 freq  +83713 path delay       487
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit bb77f36ac21d226b8ae4311daceb983be764f746
+Author: Vladimir Oltean <olteanv@gmail.com>
+Date:   Sat Jun 8 15:04:34 2019 +0300
+
+    net: dsa: sja1105: Add support for the PTP clock
+    
+    The design of this PHC driver is influenced by the switch's behavior
+    w.r.t. timestamping.  It exposes two PTP counters, one free-running
+    (PTPTSCLK) and the other offset- and frequency-corrected in hardware
+    through PTPCLKVAL, PTPCLKADD and PTPCLKRATE.  The MACs can sample either
+    of these for frame timestamps.
+    
+    However, the user manual warns that taking timestamps based on the
+    corrected clock is less than useful, as the switch can deliver corrupted
+    timestamps in a variety of circumstances.
+    
+    Therefore, this PHC uses the free-running PTPTSCLK together with a
+    timecounter/cyclecounter structure that translates it into a software
+    time domain.  Thus, the settime/adjtime and adjfine callbacks are
+    hardware no-ops.
+    
+    The timestamps (introduced in a further patch) will also be translated
+    to the correct time domain before being handed over to the userspace PTP
+    stack.
+    
+    The introduction of a second set of PHC operations that operate on the
+    hardware PTPCLKVAL/PTPCLKADD/PTPCLKRATE in the future is somewhat
+    unavoidable, as the TTEthernet core uses the corrected PTP time domain.
+    However, the free-running counter + timecounter structure combination
+    will suffice for now, as the resulting timestamps yield a sub-50 ns
+    synchronization offset in steady state using linuxptp.
+    
+    For this patch, in absence of frame timestamping, the operations of the
+    switch PHC were tested by syncing it to the system time as a local slave
+    clock with:
+    
+    phc2sys -s CLOCK_REALTIME -c swp2 -O 0 -m -S 0.01
+    
+    Signed-off-by: Vladimir Oltean <olteanv@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 68d9676fc04eeb1b7d8a2c1bca56458e4cc74e3f
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Mon Apr 8 16:51:59 2019 -0700
+
+    ixgbe: fix PTP SDP pin setup on X540 hardware
+    
+    The function ixgbe_ptp_setup_sdp_X540 attempts to program a software
+    defined pin, in order to generate a pulse-per-second output on SDP 0.
+    
+    It does work to generate the output, but does not align the output on
+    the full second. Additionally, it does not take into account the
+    cyclecounter multiplier. This leads to somewhat confusing code which is
+    likely to be incorrect if blindly copied to another hardware type.
+    
+    Update this code to account for the cyclecounter multiplier, and to
+    directly use timecounter_read.
+    
+    This change ensures that the SDP output will align properly on a full
+    second, and makes the intent of the calculations a bit more clear.
+    
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Andrew Bowers <andrewx.bowers@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit f8a8291e3f87e4f7df13b438ba2497160032831e
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Mon Dec 3 13:59:41 2018 +0100
+
+    mlx5: update timecounter at least twice per counter overflow
+    
+    [ Upstream commit 5d8678365c90b9ce1fd2243ff5ea562609f6cec1 ]
+    
+    The timecounter needs to be updated at least once in half of the
+    cyclecounter interval to prevent timecounter_cyc2time() interpreting a
+    new timestamp as an old value and causing a backward jump.
+    
+    This would be an issue if the timecounter multiplier was so small that
+    the update interval would not be limited by the 64-bit overflow in
+    multiplication.
+    
+    Shorten the calculated interval to make sure the timecounter is updated
+    in time even when the system clock is slowed down by up to 10%, the
+    multiplier is increased by up to 10%, and the scheduled overflow check
+    is late by 15%.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Ariel Levkovich <lariel@mellanox.com>
+    Cc: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8d317b0aae2527da15629d1e130c44cfeeb19e17
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Mon Dec 3 13:59:41 2018 +0100
+
+    mlx5: update timecounter at least twice per counter overflow
+    
+    [ Upstream commit 5d8678365c90b9ce1fd2243ff5ea562609f6cec1 ]
+    
+    The timecounter needs to be updated at least once in half of the
+    cyclecounter interval to prevent timecounter_cyc2time() interpreting a
+    new timestamp as an old value and causing a backward jump.
+    
+    This would be an issue if the timecounter multiplier was so small that
+    the update interval would not be limited by the 64-bit overflow in
+    multiplication.
+    
+    Shorten the calculated interval to make sure the timecounter is updated
+    in time even when the system clock is slowed down by up to 10%, the
+    multiplier is increased by up to 10%, and the scheduled overflow check
+    is late by 15%.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Ariel Levkovich <lariel@mellanox.com>
+    Cc: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 73bf147f46fbeeb127fd8efe9eed5a76a6a97180
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 23 14:37:39 2018 +0200
+
+    e1000e: allow non-monotonic SYSTIM readings
+    
+    [ Upstream commit e1f65b0d70e9e5c80e15105cd96fa00174d7c436 ]
+    
+    It seems with some NICs supported by the e1000e driver a SYSTIM reading
+    may occasionally be few microseconds before the previous reading and if
+    enabled also pass e1000e_sanitize_systim() without reaching the maximum
+    number of rereads, even if the function is modified to check three
+    consecutive readings (i.e. it doesn't look like a double read error).
+    This causes an underflow in the timecounter and the PHC time jumps hours
+    ahead.
+    
+    This was observed on 82574, I217 and I219. The fastest way to reproduce
+    it is to run a program that continuously calls the PTP_SYS_OFFSET ioctl
+    on the PHC.
+    
+    Modify e1000e_phc_gettime() to use timecounter_cyc2time() instead of
+    timecounter_read() in order to allow non-monotonic SYSTIM readings and
+    prevent the PHC from jumping.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit de390c264e9c31ab3b8c1be0e4db464c3da9a5c5
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 23 14:37:39 2018 +0200
+
+    e1000e: allow non-monotonic SYSTIM readings
+    
+    [ Upstream commit e1f65b0d70e9e5c80e15105cd96fa00174d7c436 ]
+    
+    It seems with some NICs supported by the e1000e driver a SYSTIM reading
+    may occasionally be few microseconds before the previous reading and if
+    enabled also pass e1000e_sanitize_systim() without reaching the maximum
+    number of rereads, even if the function is modified to check three
+    consecutive readings (i.e. it doesn't look like a double read error).
+    This causes an underflow in the timecounter and the PHC time jumps hours
+    ahead.
+    
+    This was observed on 82574, I217 and I219. The fastest way to reproduce
+    it is to run a program that continuously calls the PTP_SYS_OFFSET ioctl
+    on the PHC.
+    
+    Modify e1000e_phc_gettime() to use timecounter_cyc2time() instead of
+    timecounter_read() in order to allow non-monotonic SYSTIM readings and
+    prevent the PHC from jumping.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 18947188046cf1dbe85d4e4f27edb55a025b8a92
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 23 14:37:39 2018 +0200
+
+    e1000e: allow non-monotonic SYSTIM readings
+    
+    [ Upstream commit e1f65b0d70e9e5c80e15105cd96fa00174d7c436 ]
+    
+    It seems with some NICs supported by the e1000e driver a SYSTIM reading
+    may occasionally be few microseconds before the previous reading and if
+    enabled also pass e1000e_sanitize_systim() without reaching the maximum
+    number of rereads, even if the function is modified to check three
+    consecutive readings (i.e. it doesn't look like a double read error).
+    This causes an underflow in the timecounter and the PHC time jumps hours
+    ahead.
+    
+    This was observed on 82574, I217 and I219. The fastest way to reproduce
+    it is to run a program that continuously calls the PTP_SYS_OFFSET ioctl
+    on the PHC.
+    
+    Modify e1000e_phc_gettime() to use timecounter_cyc2time() instead of
+    timecounter_read() in order to allow non-monotonic SYSTIM readings and
+    prevent the PHC from jumping.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 88f3beae583682a992de2429992256666d70a40a
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 23 14:37:39 2018 +0200
+
+    e1000e: allow non-monotonic SYSTIM readings
+    
+    [ Upstream commit e1f65b0d70e9e5c80e15105cd96fa00174d7c436 ]
+    
+    It seems with some NICs supported by the e1000e driver a SYSTIM reading
+    may occasionally be few microseconds before the previous reading and if
+    enabled also pass e1000e_sanitize_systim() without reaching the maximum
+    number of rereads, even if the function is modified to check three
+    consecutive readings (i.e. it doesn't look like a double read error).
+    This causes an underflow in the timecounter and the PHC time jumps hours
+    ahead.
+    
+    This was observed on 82574, I217 and I219. The fastest way to reproduce
+    it is to run a program that continuously calls the PTP_SYS_OFFSET ioctl
+    on the PHC.
+    
+    Modify e1000e_phc_gettime() to use timecounter_cyc2time() instead of
+    timecounter_read() in order to allow non-monotonic SYSTIM readings and
+    prevent the PHC from jumping.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 229c67c796884c22d1641509bcaa2a216d1125a6
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 23 14:37:39 2018 +0200
+
+    e1000e: allow non-monotonic SYSTIM readings
+    
+    [ Upstream commit e1f65b0d70e9e5c80e15105cd96fa00174d7c436 ]
+    
+    It seems with some NICs supported by the e1000e driver a SYSTIM reading
+    may occasionally be few microseconds before the previous reading and if
+    enabled also pass e1000e_sanitize_systim() without reaching the maximum
+    number of rereads, even if the function is modified to check three
+    consecutive readings (i.e. it doesn't look like a double read error).
+    This causes an underflow in the timecounter and the PHC time jumps hours
+    ahead.
+    
+    This was observed on 82574, I217 and I219. The fastest way to reproduce
+    it is to run a program that continuously calls the PTP_SYS_OFFSET ioctl
+    on the PHC.
+    
+    Modify e1000e_phc_gettime() to use timecounter_cyc2time() instead of
+    timecounter_read() in order to allow non-monotonic SYSTIM readings and
+    prevent the PHC from jumping.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e716431356df2bc935f6516b14ebcff9fd3cc0d0
+Merge: c337680fc1f4 a64917446eaf
+Author: David S. Miller <davem@davemloft.net>
+Date:   Thu Dec 20 15:51:55 2018 -0800
+
+    Merge tag 'mlx5-updates-2018-12-19' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
+    
+    Saeed Mahameed says:
+    
+    ====================
+    mlx5-updates-2018-12-19
+    
+    This series adds some misc updates and the support for tunnels over VLAN
+    tc offloads.
+    
+    From Miroslav Lichvar, patches #1,2
+    1) Update timecounter at least twice per counter overflow
+    2) Extend PTP gettime function to read system clock
+    
+    From Gavi Teitz, patch #3
+    3) Increase VF representors' SQ size to 128
+    
+    From Eli Britstein and Or Gerlitz, patches #4-10
+    4) Adds the capability to support tunnels over VLAN device.
+    
+    Patch 4 avoids crash for TC flow with egress upper devices
+    
+    Patch 5 refactors tunnel routing devs into a helper function
+    
+    Patch 6 avoids crash for TC encap flows with vlan on underlay
+    
+    Patches 7-8 refactor encap tunnel header preparing code.
+    
+    Patch 9 adds support for building VLAN tagged ETH header.
+    
+    Patch 10 adds support for tunnel routing to VLAN device.
+    
+    From Aviv, patches 11,12 to fix earlier VF lag series
+    5) Fix query_nic_sys_image_guid() error during init
+    6) Fix LAG requirement when CONFIG_MLX5_ESWITCH is off
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5d8678365c90b9ce1fd2243ff5ea562609f6cec1
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Mon Dec 3 13:59:41 2018 +0100
+
+    mlx5: update timecounter at least twice per counter overflow
+    
+    The timecounter needs to be updated at least once in half of the
+    cyclecounter interval to prevent timecounter_cyc2time() interpreting a
+    new timestamp as an old value and causing a backward jump.
+    
+    This would be an issue if the timecounter multiplier was so small that
+    the update interval would not be limited by the 64-bit overflow in
+    multiplication.
+    
+    Shorten the calculated interval to make sure the timecounter is updated
+    in time even when the system clock is slowed down by up to 10%, the
+    multiplier is increased by up to 10%, and the scheduled overflow check
+    is late by 15%.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Ariel Levkovich <lariel@mellanox.com>
+    Cc: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+
+commit 3f2bba7d681b4bc38a7421940b8c2472f41711e4
+Merge: 70e79832af9f 6fe42e228dc2
+Author: David S. Miller <davem@davemloft.net>
+Date:   Fri Nov 9 19:43:51 2018 -0800
+
+    Merge branch 'ptp-more-accurate-PHC-system-clock-synchronization'
+    
+    Miroslav Lichvar says:
+    
+    ====================
+    More accurate PHC<->system clock synchronization
+    
+    RFC->v1:
+    - added new patches
+    - separated PHC timestamp from ptp_system_timestamp
+    - fixed memory leak in PTP_SYS_OFFSET_EXTENDED
+    - changed PTP_SYS_OFFSET_EXTENDED to work with array of arrays
+    - fixed PTP_SYS_OFFSET_EXTENDED to break correctly from loop
+    - fixed timecounter updates in drivers
+    - split gettimex in igb driver
+    - fixed ptp_read_* functions to be available without
+      CONFIG_PTP_1588_CLOCK
+    
+    This series enables a more accurate synchronization between PTP hardware
+    clocks and the system clock.
+    
+    The first two patches are minor cleanup/bug fixes.
+    
+    The third patch adds an extended version of the PTP_SYS_OFFSET ioctl,
+    which returns three timestamps for each measurement. The idea is to
+    shorten the interval between the system timestamps to contain just the
+    reading of the lowest register of the PHC in order to reduce the error
+    in the measured offset and get a smaller upper bound on the maximum
+    error.
+    
+    The fourth patch deprecates the original gettime function.
+    
+    The remaining patches update the gettime function in order to support
+    the new ioctl in the e1000e, igb, ixgbe, and tg3 drivers.
+    
+    Tests with few different NICs in different machines show that:
+    - with an I219 (e1000e) the measured delay was reduced from 2500 to 1300
+      ns and the error in the measured offset, when compared to the cross
+      timestamping supported by the driver, was reduced by a factor of 5
+    - with an I210 (igb) the delay was reduced from 5100 to 1700 ns
+    - with an I350 (igb) the delay was reduced from 2300 to 750 ns
+    - with an X550 (ixgbe) the delay was reduced from 1950 to 650 ns
+    - with a BCM5720 (tg3) the delay was reduced from 2400 to 1200 ns
+    ====================
+    
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5867b330140518ad73507f0be98d89636b91bf5f
+Merge: be08989c4d90 920664a8f790
+Author: David S. Miller <davem@davemloft.net>
+Date:   Wed Nov 7 23:07:04 2018 -0800
+
+    Merge branch '1GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/jkirsher/next-queue
+    
+    Jeff Kirsher says:
+    
+    ====================
+    Intel Wired LAN Driver Updates 2018-11-07
+    
+    This series contains updates to almost all of the Intel wired LAN
+    drivers.
+    
+    Lance Roy replaces a spin lock with lockdep_assert_held() for igbvf
+    driver in move toward trying to remove spin_is_locked().
+    
+    Colin Ian King fixes a potential null pointer dereference by adding a
+    check in ixgbe.  Also fixed the igc driver by properly assigning the
+    return error code of a function call, so that we can properly check it.
+    
+    Shannon Nelson updates the ixgbe driver to not block IPsec offload when
+    in VEPA mode, in VEB mode, IPsec offload is still blocked because the
+    device drops packets into a black hole.
+    
+    Jake adds support for software timestamping for packets sent over
+    ixgbevf.  Also modifies i40e, iavf, igb, igc, and ixgbe to delay calling
+    skb_tx_timestamp() to the latest point possible, which is just prior to
+    notifying the hardware of the new Tx packet.
+    
+    Todd adds the new WoL filter flag so that we properly report that we do
+    not support this new feature.
+    
+    YueHaibing from Huawei fixes the igc driver by cleaning up variables
+    that are not "really" used.
+    
+    Dan Carpenter cleans up igc whitespace issues.
+    
+    Miroslav Lichvar fixes e1000e for potential underflow issue in the
+    timecounter, so modify the driver to use timecounter_cyc2time() to allow
+    non-monotonic SYSTIM readings.
+    
+    Sasha provides additional igc cleanups based on community feedback.
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 69e362985fcbbb0589fc3e910fab00e6cdcc17e7
+Merge: 042cb5647815 d5596fd46770
+Author: David S. Miller <davem@davemloft.net>
+Date:   Wed Nov 7 17:08:51 2018 -0800
+
+    Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/jkirsher/net-queue
+    
+    Jeff Kirsher says:
+    
+    ====================
+    Intel Wired LAN Driver Updates 2018-11-07
+    
+    This series contains fixes to igb, i40e and ice drivers.
+    
+    Anirudh fixes an issue during rebuild of the ice driver, where we need
+    to set the carrier state, as well as start or stop the queues all based
+    on the link status.  Removed functions that were duplicating current
+    functionality in the VSI rebuild/replay framework.
+    
+    Dave fixes a potential resource collision during the remove path, so add
+    a check to see if we are in the middle of a reset.  Fixed the remove
+    path to ensure we call netif_napi_del() to free vectors before we set
+    vsi->netdev to NULL.
+    
+    Akeem fixes an issue when the receive or transmit pause parameter is
+    set, results in link loss on the interface.  Fixed the spelling of
+    "Enabling" in error message.
+    
+    Victor fixes potential memory leak by also freeing the related VSI
+    contexts in the unload path.
+    
+    Md Fahad fixes a flag during port VLAN insertion, which was not being
+    set properly.
+    
+    Brett fixes a transmit timeout during stress due to the hardware tail
+    and software tail were incorrectly out of sync.
+    
+    Miroslav Lichvar fixes the igb PHC timecounter update interval to be
+    sure the timecounter is updated in time.
+    
+    Chinh fixes the req_speeds variable to be u16 instead of u8 so that it
+    can handle all the link speeds.
+    
+    Jake fixes i40e to add back the missing feature flags, which was causing
+    IP-in-IP offloads to be reported as not supported.
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit e1f65b0d70e9e5c80e15105cd96fa00174d7c436
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 23 14:37:39 2018 +0200
+
+    e1000e: allow non-monotonic SYSTIM readings
+    
+    It seems with some NICs supported by the e1000e driver a SYSTIM reading
+    may occasionally be few microseconds before the previous reading and if
+    enabled also pass e1000e_sanitize_systim() without reaching the maximum
+    number of rereads, even if the function is modified to check three
+    consecutive readings (i.e. it doesn't look like a double read error).
+    This causes an underflow in the timecounter and the PHC time jumps hours
+    ahead.
+    
+    This was observed on 82574, I217 and I219. The fastest way to reproduce
+    it is to run a program that continuously calls the PTP_SYS_OFFSET ioctl
+    on the PHC.
+    
+    Modify e1000e_phc_gettime() to use timecounter_cyc2time() instead of
+    timecounter_read() in order to allow non-monotonic SYSTIM readings and
+    prevent the PHC from jumping.
+    
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit 4c9b658eeaefedd402a59e858d8ac3bfdf6153e3
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Oct 26 19:13:00 2018 +0200
+
+    igb: shorten maximum PHC timecounter update interval
+    
+    The timecounter needs to be updated at least once per ~550 seconds in
+    order to avoid a 40-bit SYSTIM timestamp to be misinterpreted as an old
+    timestamp.
+    
+    Since commit 500462a9de65 ("timers: Switch to a non-cascading wheel"),
+    scheduling of delayed work seems to be less accurate and a requested
+    delay of 540 seconds may actually be longer than 550 seconds. Also, the
+    PHC may be adjusted to run up to 6% faster than real time and the system
+    clock up to 10% slower. Shorten the delay to 360 seconds to be sure the
+    timecounter is updated in time.
+    
+    This fixes an issue with HW timestamps on 82580/I350/I354 being off by
+    ~1100 seconds for few seconds every ~9 minutes.
+    
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Acked-by: Jacob Keller <jacob.e.keller@intel.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit 4d3163cf873f628dc598d5e9a15911b198655a07
+Merge: df975da4e578 6702185c1ffe
+Author: David S. Miller <davem@davemloft.net>
+Date:   Wed Oct 31 18:21:37 2018 -0700
+
+    Merge branch '10GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/jkirsher/net-queue
+    
+    Jeff Kirsher says:
+    
+    ====================
+    Intel Wired LAN Driver Updates 2018-10-31
+    
+    This series contains a various collection of fixes.
+    
+    Miroslav Lichvar from Red Hat or should I say IBM now?  Updates the PHC
+    timecounter interval for igb so that it gets updated at least once
+    every 550 seconds.
+    
+    Ngai-Mint provides a fix for fm10k to prevent a soft lockup or system
+    crash by adding a new condition to determine if the SM mailbox is in the
+    correct state before proceeding.
+    
+    Jake provides several fm10k fixes, first one marks complier aborts as
+    non-fatal since on some platforms trigger machine check errors when the
+    compile aborts.  Added missing device ids to the in-kernel driver.  Due
+    to the recent fixes, bumped the driver version.
+    
+    I (Jeff Kirsher) fixed a XFRM_ALGO dependency for both ixgbe and
+    ixgbevf.  This fix was based on the original work from Arnd Bergmann,
+    which only fixed ixgbe.
+    
+    Mitch provides a fix for i40e/avf to update the status codes, which
+    resolves an issue between a mis-match between i40e and the iavf driver,
+    which also supports the ice LAN driver.
+    
+    Radoslaw fixes the ixgbe where the driver is logging a message about
+    spoofed packets detected when the VF is re-started with a different MAC
+    address.
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 094bf4d0e9657f6ea1ee3d7e07ce3970796949ce
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Oct 12 13:13:39 2018 +0200
+
+    igb: shorten maximum PHC timecounter update interval
+    
+    The timecounter needs to be updated at least once per ~550 seconds in
+    order to avoid a 40-bit SYSTIM timestamp to be misinterpreted as an old
+    timestamp.
+    
+    Since commit 500462a9d ("timers: Switch to a non-cascading wheel"),
+    scheduling of delayed work seems to be less accurate and a requested
+    delay of 540 seconds may actually be longer than 550 seconds. Shorten
+    the delay to 480 seconds to be sure the timecounter is updated in time.
+    
+    This fixes an issue with HW timestamps on 82580/I350/I354 being off by
+    ~1100 seconds for few seconds every ~9 minutes.
+    
+    Cc: Jacob Keller <jacob.e.keller@intel.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit 848f260301d0116a625eb2580956c3119790f29d
+Author: Benjamin Poirier <bpoirier@suse.com>
+Date:   Thu May 10 16:28:35 2018 +0900
+
+    e1000e: Ignore TSYNCRXCTL when getting I219 clock attributes
+    
+    [ Upstream commit fff200caf6f9179dd9a7fc67acd659e614c3f72f ]
+    
+    There have been multiple reports of crashes that look like
+    kernel: RIP: 0010:[<ffffffff8110303f>] timecounter_read+0xf/0x50
+    [...]
+    kernel: Call Trace:
+    kernel:  [<ffffffffa0806b0f>] e1000e_phc_gettime+0x2f/0x60 [e1000e]
+    kernel:  [<ffffffffa0806c5d>] e1000e_systim_overflow_work+0x1d/0x80 [e1000e]
+    kernel:  [<ffffffff810992c5>] process_one_work+0x155/0x440
+    kernel:  [<ffffffff81099e16>] worker_thread+0x116/0x4b0
+    kernel:  [<ffffffff8109f422>] kthread+0xd2/0xf0
+    kernel:  [<ffffffff8163184f>] ret_from_fork+0x3f/0x70
+    
+    These can be traced back to the fact that e1000e_systim_reset() skips the
+    timecounter_init() call if e1000e_get_base_timinca() returns -EINVAL, which
+    leads to a null deref in timecounter_read().
+    
+    Commit 83129b37ef35 ("e1000e: fix systim issues", v4.2-rc1) reworked
+    e1000e_get_base_timinca() in such a way that it can return -EINVAL for
+    e1000_pch_spt if the SYSCFI bit is not set in TSYNCRXCTL.
+    
+    Some experimentation has shown that on I219 (e1000_pch_spt, "MAC: 12")
+    adapters, the E1000_TSYNCRXCTL_SYSCFI flag is unstable; TSYNCRXCTL reads
+    sometimes don't have the SYSCFI bit set. Retrying the read shortly after
+    finds the bit to be set. This was observed at boot (probe) but also link up
+    and link down.
+    
+    Moreover, the phc (PTP Hardware Clock) seems to operate normally even after
+    reads where SYSCFI=0. Therefore, remove this register read and
+    unconditionally set the clock parameters.
+    
+    Reported-by: Achim Mildenberger <admin@fph.physik.uni-karlsruhe.de>
+    Message-Id: <20180425065243.g5mqewg5irkwgwgv@f2>
+    Bugzilla: https://bugzilla.suse.com/show_bug.cgi?id=1075876
+    Fixes: 83129b37ef35 ("e1000e: fix systim issues")
+    Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a1a6cfeea67fffc73589f3195dd7aec7ac2ea583
+Author: Benjamin Poirier <bpoirier@suse.com>
+Date:   Thu May 10 16:28:35 2018 +0900
+
+    e1000e: Ignore TSYNCRXCTL when getting I219 clock attributes
+    
+    [ Upstream commit fff200caf6f9179dd9a7fc67acd659e614c3f72f ]
+    
+    There have been multiple reports of crashes that look like
+    kernel: RIP: 0010:[<ffffffff8110303f>] timecounter_read+0xf/0x50
+    [...]
+    kernel: Call Trace:
+    kernel:  [<ffffffffa0806b0f>] e1000e_phc_gettime+0x2f/0x60 [e1000e]
+    kernel:  [<ffffffffa0806c5d>] e1000e_systim_overflow_work+0x1d/0x80 [e1000e]
+    kernel:  [<ffffffff810992c5>] process_one_work+0x155/0x440
+    kernel:  [<ffffffff81099e16>] worker_thread+0x116/0x4b0
+    kernel:  [<ffffffff8109f422>] kthread+0xd2/0xf0
+    kernel:  [<ffffffff8163184f>] ret_from_fork+0x3f/0x70
+    
+    These can be traced back to the fact that e1000e_systim_reset() skips the
+    timecounter_init() call if e1000e_get_base_timinca() returns -EINVAL, which
+    leads to a null deref in timecounter_read().
+    
+    Commit 83129b37ef35 ("e1000e: fix systim issues", v4.2-rc1) reworked
+    e1000e_get_base_timinca() in such a way that it can return -EINVAL for
+    e1000_pch_spt if the SYSCFI bit is not set in TSYNCRXCTL.
+    
+    Some experimentation has shown that on I219 (e1000_pch_spt, "MAC: 12")
+    adapters, the E1000_TSYNCRXCTL_SYSCFI flag is unstable; TSYNCRXCTL reads
+    sometimes don't have the SYSCFI bit set. Retrying the read shortly after
+    finds the bit to be set. This was observed at boot (probe) but also link up
+    and link down.
+    
+    Moreover, the phc (PTP Hardware Clock) seems to operate normally even after
+    reads where SYSCFI=0. Therefore, remove this register read and
+    unconditionally set the clock parameters.
+    
+    Reported-by: Achim Mildenberger <admin@fph.physik.uni-karlsruhe.de>
+    Message-Id: <20180425065243.g5mqewg5irkwgwgv@f2>
+    Bugzilla: https://bugzilla.suse.com/show_bug.cgi?id=1075876
+    Fixes: 83129b37ef35 ("e1000e: fix systim issues")
+    Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fff200caf6f9179dd9a7fc67acd659e614c3f72f
+Author: Benjamin Poirier <bpoirier@suse.com>
+Date:   Thu May 10 16:28:35 2018 +0900
+
+    e1000e: Ignore TSYNCRXCTL when getting I219 clock attributes
+    
+    There have been multiple reports of crashes that look like
+    kernel: RIP: 0010:[<ffffffff8110303f>] timecounter_read+0xf/0x50
+    [...]
+    kernel: Call Trace:
+    kernel:  [<ffffffffa0806b0f>] e1000e_phc_gettime+0x2f/0x60 [e1000e]
+    kernel:  [<ffffffffa0806c5d>] e1000e_systim_overflow_work+0x1d/0x80 [e1000e]
+    kernel:  [<ffffffff810992c5>] process_one_work+0x155/0x440
+    kernel:  [<ffffffff81099e16>] worker_thread+0x116/0x4b0
+    kernel:  [<ffffffff8109f422>] kthread+0xd2/0xf0
+    kernel:  [<ffffffff8163184f>] ret_from_fork+0x3f/0x70
+    
+    These can be traced back to the fact that e1000e_systim_reset() skips the
+    timecounter_init() call if e1000e_get_base_timinca() returns -EINVAL, which
+    leads to a null deref in timecounter_read().
+    
+    Commit 83129b37ef35 ("e1000e: fix systim issues", v4.2-rc1) reworked
+    e1000e_get_base_timinca() in such a way that it can return -EINVAL for
+    e1000_pch_spt if the SYSCFI bit is not set in TSYNCRXCTL.
+    
+    Some experimentation has shown that on I219 (e1000_pch_spt, "MAC: 12")
+    adapters, the E1000_TSYNCRXCTL_SYSCFI flag is unstable; TSYNCRXCTL reads
+    sometimes don't have the SYSCFI bit set. Retrying the read shortly after
+    finds the bit to be set. This was observed at boot (probe) but also link up
+    and link down.
+    
+    Moreover, the phc (PTP Hardware Clock) seems to operate normally even after
+    reads where SYSCFI=0. Therefore, remove this register read and
+    unconditionally set the clock parameters.
+    
+    Reported-by: Achim Mildenberger <admin@fph.physik.uni-karlsruhe.de>
+    Message-Id: <20180425065243.g5mqewg5irkwgwgv@f2>
+    Bugzilla: https://bugzilla.suse.com/show_bug.cgi?id=1075876
+    Fixes: 83129b37ef35 ("e1000e: fix systim issues")
+    Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit a713e366738922fadfa782fa8eb31b1d4f6cb6f4
+Author: Michal Schmidt <mschmidt@redhat.com>
+Date:   Fri Mar 3 17:08:28 2017 +0100
+
+    bnx2x: prevent crash when accessing PTP with interface down
+    
+    [ Upstream commit 466e8bf10ac104d96e1ea813e8126e11cb72ea20 ]
+    
+    It is possible to crash the kernel by accessing a PTP device while its
+    associated bnx2x interface is down. Before the interface is brought up,
+    the timecounter is not initialized, so accessing it results in NULL
+    dereference.
+    
+    Fix it by checking if the interface is up.
+    
+    Use -ENETDOWN as the error code when the interface is down.
+     -EFAULT in bnx2x_ptp_adjfreq() did not seem right.
+    
+    Tested using phc_ctl get/set/adj/freq commands.
+    
+    Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+
+commit 1aead0538b89f3c69457ea9fa50b7baca5894ef5
+Author: Michal Schmidt <mschmidt@redhat.com>
+Date:   Fri Mar 3 17:08:28 2017 +0100
+
+    bnx2x: prevent crash when accessing PTP with interface down
+    
+    
+    [ Upstream commit 466e8bf10ac104d96e1ea813e8126e11cb72ea20 ]
+    
+    It is possible to crash the kernel by accessing a PTP device while its
+    associated bnx2x interface is down. Before the interface is brought up,
+    the timecounter is not initialized, so accessing it results in NULL
+    dereference.
+    
+    Fix it by checking if the interface is up.
+    
+    Use -ENETDOWN as the error code when the interface is down.
+     -EFAULT in bnx2x_ptp_adjfreq() did not seem right.
+    
+    Tested using phc_ctl get/set/adj/freq commands.
+    
+    Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ae6b3452faf741c4127288c71d6edd0f23d6b0bb
+Author: Michal Schmidt <mschmidt@redhat.com>
+Date:   Fri Mar 3 17:08:28 2017 +0100
+
+    bnx2x: prevent crash when accessing PTP with interface down
+    
+    
+    [ Upstream commit 466e8bf10ac104d96e1ea813e8126e11cb72ea20 ]
+    
+    It is possible to crash the kernel by accessing a PTP device while its
+    associated bnx2x interface is down. Before the interface is brought up,
+    the timecounter is not initialized, so accessing it results in NULL
+    dereference.
+    
+    Fix it by checking if the interface is up.
+    
+    Use -ENETDOWN as the error code when the interface is down.
+     -EFAULT in bnx2x_ptp_adjfreq() did not seem right.
+    
+    Tested using phc_ctl get/set/adj/freq commands.
+    
+    Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 466e8bf10ac104d96e1ea813e8126e11cb72ea20
+Author: Michal Schmidt <mschmidt@redhat.com>
+Date:   Fri Mar 3 17:08:28 2017 +0100
+
+    bnx2x: prevent crash when accessing PTP with interface down
+    
+    It is possible to crash the kernel by accessing a PTP device while its
+    associated bnx2x interface is down. Before the interface is brought up,
+    the timecounter is not initialized, so accessing it results in NULL
+    dereference.
+    
+    Fix it by checking if the interface is up.
+    
+    Use -ENETDOWN as the error code when the interface is down.
+     -EFAULT in bnx2x_ptp_adjfreq() did not seem right.
+    
+    Tested using phc_ctl get/set/adj/freq commands.
+    
+    Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 6c691405bcaf8f1a7413416cc757756cfb060875
+Author: Grygorii Strashko <grygorii.strashko@ti.com>
+Date:   Tue Dec 6 18:00:37 2016 -0600
+
+    net: ethernet: ti: cpts: fix registration order
+    
+    The ptp clock registered before spinlock, which is protecting it, and
+    before timecounter and cyclecounter initialization in cpts_register().
+    
+    So, ensure that ptp clock is registered the last, after everything
+    else is done.
+    
+    Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit fd5ebf99f814fadae0dd50893699ba17e1b4af42
+Author: Longpeng(Mike) <longpeng2@huawei.com>
+Date:   Wed Nov 9 10:50:14 2016 +0800
+
+    arm/arm64: KVM: Clean up useless code in kvm_timer_enable
+    
+    1) Since commit:41a54482 changed timer enabled variable to per-vcpu,
+       the correlative comment in kvm_timer_enable is useless now.
+    
+    2) After the kvm module init successfully, the timecounter is always
+       non-null, so we can remove the checking of timercounter.
+    
+    Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+    Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+    Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+commit aa524b66c5efd1d3220b74168d803e8b2ee1d212
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Wed Apr 20 11:36:42 2016 -0700
+
+    e1000e: don't modify SYSTIM registers during SIOCSHWTSTAMP ioctl
+    
+    The e1000e_config_hwtstamp function was incorrectly resetting the SYSTIM
+    registers every time the ioctl was being run. If you happened to be
+    running ptp4l and lost the PTP connect (removing cable, or blocking the
+    UDP traffic for example), then ptp4l will eventually perform a restart
+    which involves re-requesting timestamp settings. In e1000e this has the
+    unfortunate and incorrect result of resetting SYSTIME to the kernel
+    time. Since kernel time is usually in UTC, and PTP time is in TAI, this
+    results in the leap second being re-applied.
+    
+    Fix this by extracting the SYSTIME reset out into its own function,
+    e1000e_ptp_reset, which we call during reset to restore the hardware
+    registers. This function will (a) restart the timecounter based on the
+    new system time, (b) restore the previous PPB setting, and (c) restore
+    the previous hwtstamp settings.
+    
+    In order to perform (b), I had to modify the adjfreq ptp function
+    pointer to store the old delta each time it is called. This also has the
+    side effect of restoring the correct base timinca register correctly.
+    The driver does not need to explicitly zero the ptp_delta variable since
+    the entire adapter structure comes zero-initialized.
+    
+    Reported-by: Brian Walsh <brian@walsh.ws>
+    Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+    Tested-by: Brian Walsh <brian@walsh.ws>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit a53d892dfb6f14f77c508e1027f5e1bdb400fd23
+Author: Julien Grall <julien.grall@arm.com>
+Date:   Mon Apr 11 16:33:00 2016 +0100
+
+    clocksource: arm_arch_timer: Remove arch_timer_get_timecounter
+    
+    The only call of arch_timer_get_timecounter (in KVM) has been removed.
+    
+    Signed-off-by: Julien Grall <julien.grall@arm.com>
+    Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+    Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+commit b4d6ce9776e0fb773418efe8bc81d8c5ccca3493
+Author: Julien Grall <julien.grall@arm.com>
+Date:   Mon Apr 11 16:32:51 2016 +0100
+
+    clocksource: arm_arch_timer: Gather KVM specific information in a structure
+    
+    Introduce a structure which are filled up by the arch timer driver and
+    used by the virtual timer in KVM.
+    
+    The first member of this structure will be the timecounter. More members
+    will be added later.
+    
+    A stub for the new helper isn't introduced because KVM requires the arch
+    timer for both ARM64 and ARM32.
+    
+    The function arch_timer_get_timecounter is kept for the time being and
+    will be dropped in a subsequent patch.
+    
+    Signed-off-by: Julien Grall <julien.grall@arm.com>
+    Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+    Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+commit 0ad9b20415a461332611666301e7812900a15ad4
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Mon Feb 29 21:17:11 2016 +0200
+
+    net/mlx5e: Fix soft lockup when HW Timestamping is enabled
+    
+    Readers/Writers lock for SW timecounter was acquired without disabling
+    interrupts on local CPU.
+    
+    The problematic scenario:
+    * HW timestamping is enabled
+    * Timestamp overflow periodic service task is running on local CPU and
+      holding write_lock for SW timecounter
+    * Completion arrives, triggers interrupt for local CPU.
+      Interrupt routine calls napi_schedule(), which triggers rx/tx
+      skb process.
+      An attempt to read SW timecounter using read_lock is done, which is
+      already locked by a writer on the same CPU and cause soft lockup.
+    
+    Add irqsave/irqrestore for when using the readers/writers lock for
+    writing.
+    
+    Fixes: ef9814deafd0 ('net/mlx5e: Add HW timestamping (TS) support')
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 3d8c38af149309feb2541b995b3a45df170d6da3
+Author: Eran Ben Elisha <eranbe@mellanox.com>
+Date:   Tue Dec 29 14:58:32 2015 +0200
+
+    net/mlx5e: Add PTP Hardware Clock (PHC) support
+    
+    Add a PHC support to the mlx5_en driver. Use reader/writer spinlocks to
+    protect the timecounter since every packet received needs to call
+    timecounter_cycle2time() when timestamping is enabled.  This can become
+    a performance bottleneck with RSS and multiple receive queues if normal
+    spinlocks are used.
+    
+    The driver has been tested with both Documentation/ptp/testptp and the
+    linuxptp project (http://linuxptp.sourceforge.net/) on a Mellanox
+    ConnectX-4 card.
+    
+    Signed-off-by: Eran Ben Elisha <eranbe@mellanox.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5f26facecb622d07e5444c0b8dc7ace8f03a1339
+Author: Takashi Iwai <tiwai@suse.de>
+Date:   Thu Apr 16 11:31:12 2015 +0200
+
+    ALSA: hda - Add missing inclusion of <linux/clocksource.h>
+    
+    For fixing randconfig build errors like:
+    
+       sound/hda/hdac_stream.c: In function 'azx_timecounter_init':
+       sound/hda/hdac_stream.c:365:2: error: implicit declaration of function 'CLOCKSOURCE_MASK' [-Werror=implicit-function-declaration]
+    
+    Reported-by: kbuild test robot <fengguang.wu@intel.com>
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+commit a5c79c26e168018df201c07e046003a6ab226cdc
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:12:08 2015 +0200
+
+    ptp: cpts: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit e394b80545a005fa9b2eea27036d670641a0c728
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:12:05 2015 +0200
+
+    ptp: mlx4: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 91432d18eddd370f28ea77fd699a947bb893e5fe
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:12:04 2015 +0200
+
+    ptp: ixgbe: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit d4c496fe45de9dc33ace3a5796e4211e2e809231
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:12:03 2015 +0200
+
+    ptp: igb: convert to the 64 bit get/set time methods.
+    
+    For the 82576, the driver's clock is implemented using a timecounter,
+    and so with this patch that device is ready for the year 2038.
+    
+    However, in the case of the i210, the device stores the number of
+    seconds in a 32 bit register.  Therefore, more work is needed on this
+    driver before the year 2038 comes around.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 07c74eb775dd4a58c331529973111166f3683541
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:12:00 2015 +0200
+
+    ptp: e1000e: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 241926bcb4546187363d6140a610e4bb7d12d85e
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:11:58 2015 +0200
+
+    ptp: fec: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5d45186b4772512e6db9f1494735c983518e3a09
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:11:56 2015 +0200
+
+    ptp: bnx2x: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Sony Chacko <sony.chacko@qlogic.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 15dd95ffe424e336b2a2bc7a01603c0e1314901c
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Mar 29 23:11:55 2015 +0200
+
+    ptp: xgbe: convert to the 64 bit get/set time methods.
+    
+    This driver's clock is implemented using a timecounter, and so with
+    this patch the driver is ready for the year 2038.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 7c8f1e78612f3155bfd10c020b38bcb4ca175223
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Tue Jan 6 14:26:13 2015 +0100
+
+    arm_arch_timer: include clocksource.h directly
+    
+    This driver makes use of the clocksource code. Previously it had only
+    included the proper header indirectly, but that chain was inadvertently
+    broken by 74d23cc "time: move the timecounter/cyclecounter code into its
+    own file."
+    
+    This patch fixes the issue by including clocksource.h directly.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit dd9553988879a3ff71a86323b88409e7631c4e5d
+Merge: b422da7c366f 5ce07a5cef50
+Author: David S. Miller <davem@davemloft.net>
+Date:   Fri Jan 2 16:47:51 2015 -0500
+
+    Merge branch 'timecounter-next'
+    
+    Richard Cochran says:
+    
+    ====================
+    Fixing the "Time Counter fixes and improvements"
+    
+    For this series I had only tested the build with ARCH=x86 and arm, but
+    others like sparc64, microblaze, powerpc, and s390 will fail because
+    they somehow don't indirectly include clocksource.h for the drivers in
+    question.
+    
+    This series fixes the build issues reported by:
+     kbuild test robot <fengguang.wu@intel.com>
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5ce07a5cef5094168d25296773681bc287e21e3b
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Fri Jan 2 20:22:09 2015 +0100
+
+    microblaze: include the new timecounter header.
+    
+    The timecounter/cyclecounter code has moved, so users need the new include.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 1891172aa5c32f08ad9931b794edd71e91a4a527
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Fri Jan 2 20:22:03 2015 +0100
+
+    timecounter: provide a macro to initialize the cyclecounter mask field.
+    
+    There is no need for users of the timecounter/cyclecounter code to include
+    clocksource.h just for a single macro.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5115ec9654f87ba0d9508569f91fe1f444ffbf58
+Merge: 2c90331cf5ed 2eebdde6528a
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Dec 30 18:30:00 2014 -0500
+
+    Merge branch 'timecounter'
+    
+    Richard Cochran says:
+    
+    ====================
+    Time Counter fixes and improvements
+    
+    Several PTP Hardware Clock (PHC) drivers implement the clock in
+    software using the timecounter/cyclecounter code. This series adds one
+    simple improvement and one more subtle fix to the shared timecounter
+    facility. Credit for this series goes to Janusz Użycki, who pointed
+    the issues out to me off list.
+    
+    Patch #1 simply move the timecounter code into its own file. When
+    working on this series, it was really annoying to see half the kernel
+    recompile after every tweak to the timecounter stuff. There is no
+    reason to keep this together with the clocksource code.
+    
+    Patch #2 implements an improved adjtime() method, and patches 3-10
+    convert all of the drivers over to the new method.
+    
+    Patch #11 fixes a subtle but important issue with the timecounter WRT
+    frequency adjustment. As it stands now, a timecounter based PHC will
+    exhibit a variable frequency resolution (and variable time error)
+    depending on how often the clock is read.
+    
+    In timecounter_read_delta(), the expression
+    
+       (delta * cc->mult) >> cc->shift;
+    
+    can lose resolution from the adjusted value of 'mult'. If the value
+    of 'delta' is too small, then small changes in 'mult' have no effect.
+    However, if the delta value is large enough, then small changes in
+    'mult' will have an effect.
+    
+    Reading the clock too often means smaller 'delta' values which in turn
+    will spoil the fine adjustments made to 'mult'. Up until now, this
+    effect did not show up in my testing. The following example explains
+    why.
+    
+    The CPTS has an input clock of 250 MHz, and the clock source uses
+    mult=0x80000000 and shift=29, making the ticks to nanoseconds
+    conversion like this:
+    
+       ticks * 2^31
+       ------------
+           2^29
+    
+    Imagine what happens if the clock is read every 10 milliseconds. Ten
+    milliseconds are about 2500000 ticks, which corresponds to about 21
+    bits. The product in the numerator has then 52 bits. After the shift
+    operation, 23 bits are preserved. This results in a frequency
+    adjustment resolution of about 0.1 ppm (not _too_ bad.)
+    
+    A frequency resolution of 1 ppm requires 20 bits.
+    A frequency resolution of 1 ppb requires 30 bits.
+    
+    For the 250 MHz CPTS clock, reading every 4 seconds yields a 1 ppb
+    resolution (which is the finest that our API allows).
+    
+    However, the error can be much higher if the clock is read too often
+    or if time stamps occur close in time to read operations. In general
+    it is really not acceptable to allow the rate of clock readings to
+    influence the clock accuracy.
+    ====================
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 2eebdde6528a722fbf8e2cffcf7aa52cbb4c2de0
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:06 2014 +0100
+
+    timecounter: keep track of accumulated fractional nanoseconds
+    
+    The current timecounter implementation will drop a variable amount
+    of resolution, depending on the magnitude of the time delta. In
+    other words, reading the clock too often or too close to a time
+    stamp conversion will introduce errors into the time values. This
+    patch fixes the issue by introducing a fractional nanosecond field
+    that accumulates the low order bits.
+    
+    Reported-by: Janusz Użycki <j.uzycki@elproma.com.pl>
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit f25a30be359d0535fb1c7c1619cabb0ad17cfbf1
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:05 2014 +0100
+
+    net: cpts: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit ce51ff0937bd5596aeafd67f5a60d36016d5e040
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:04 2014 +0100
+
+    net: mlx4: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 826ef90dc4727c9f9cd999c830023e54d9ea3f58
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:03 2014 +0100
+
+    net: ixgbe: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 5ee698e3677a1af8b731cc891e94be33b6572cfd
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:02 2014 +0100
+
+    net: igb: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit f4de2b95688eba646d677dd2bed8c49540c00f1e
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:01 2014 +0100
+
+    net: e1000e: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 59e16961c688a50d4dae9827cc3e5c69ae98e0cb
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:47:00 2014 +0100
+
+    net: fec: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 2e5601f9aca1a83980a031f9385a95062d12e689
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:46:59 2014 +0100
+
+    net: bnx2x: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 8b976e97772cfb7e0e4eb8682d5017861dbd8796
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:46:58 2014 +0100
+
+    net: xgbe: convert to timecounter adjtime.
+    
+    This patch changes the driver to use the new and improved method
+    for adjusting the offset of a timecounter.
+    
+    Compile tested only.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 796c1efd6fa0ed696d550b68f4410ab1a1749d01
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:46:57 2014 +0100
+
+    timecounter: provide a helper function to shift the time.
+    
+    Some PTP Hardware Clock drivers use a struct timecounter to represent
+    their clock. To adjust the time by a given offset, these drivers all
+    perform a two step read/write of their timecounter. However, it is
+    better and simpler just to adjust the offset in one step. This patch
+    introduces a little routine to help drivers implement the adjtime
+    method.
+    
+    Suggested-by: Janusz Użycki <j.uzycki@elproma.com.pl>
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 74d23cc704d19732e70ef1579a669f7d5f09dd9a
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Sun Dec 21 19:46:56 2014 +0100
+
+    time: move the timecounter/cyclecounter code into its own file.
+    
+    The timecounter code has almost nothing to do with the clocksource
+    code. Let it live in its own file. This will help isolate the
+    timecounter users from the clocksource users in the source tree.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit bfd4ecdd87d350e19457fe0d02fa1e046774c44e
+Author: Russell King <rmk+kernel@arm.linux.org.uk>
+Date:   Tue Jul 8 13:02:09 2014 +0100
+
+    net: fec: consolidate hwtstamp implementation
+    
+    Both transmit and receive use the same infrastructure for calculating
+    the packet timestamp.  Rather than duplicating the code, provide a
+    function to do this common work.  Model this function in the Intel
+    e1000e version which avoids calling ns_to_ktime() within the spinlock;
+    the spinlock is critical for timecounter_cyc2time() but not
+    ns_to_ktime().
+    
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Acked-by: Fugang Duan <B38611@freescale.com>
+    Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit ad7d4eaed995d76fb24a18e202fdf5072197ff0a
+Author: Shawn Bohrer <sbohrer@rgmadvisors.com>
+Date:   Tue Dec 31 11:39:39 2013 -0600
+
+    mlx4_en: Add PTP hardware clock
+    
+    This adds a PHC to the mlx4_en driver. We use reader/writer spinlocks to
+    protect the timecounter since every packet received needs to call
+    timecounter_cycle2time() when timestamping is enabled.  This can become
+    a performance bottleneck with RSS and multiple receive queues if normal
+    spinlocks are used.
+    
+    This driver has been tested with both Documentation/ptp/testptp and the
+    linuxptp project (http://linuxptp.sourceforge.net/) on a Mellanox
+    ConnectX-3 card.
+    
+    Signed-off-by: Shawn Bohrer <sbohrer@rgmadvisors.com>
+    Acked-By: Hadar Hen Zion <hadarh@mellanox.com>
+    Acked-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 99e9489477a4b5c90d64f82a40dbc9680c630b1c
+Author: Amir Vadai <amirv@mellanox.com>
+Date:   Thu Nov 7 11:08:30 2013 +0200
+
+    net/mlx4_en: Fixed crash when port type is changed
+    
+    [ Upstream commit 1ec4864b10171b0691ee196d7006ae56d2c153f2 ]
+    
+    timecounter_init() was was called only after first potential
+    timecounter_read().
+    Moved mlx4_en_init_timestamp() before mlx4_en_init_netdev()
+    
+    Signed-off-by: Amir Vadai <amirv@mellanox.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ef06eb9f5076739ed146d74dcdd307daffcc163a
+Author: Amir Vadai <amirv@mellanox.com>
+Date:   Thu Nov 7 11:08:30 2013 +0200
+
+    net/mlx4_en: Fixed crash when port type is changed
+    
+    [ Upstream commit 1ec4864b10171b0691ee196d7006ae56d2c153f2 ]
+    
+    timecounter_init() was was called only after first potential
+    timecounter_read().
+    Moved mlx4_en_init_timestamp() before mlx4_en_init_netdev()
+    
+    Signed-off-by: Amir Vadai <amirv@mellanox.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1ec4864b10171b0691ee196d7006ae56d2c153f2
+Author: Amir Vadai <amirv@mellanox.com>
+Date:   Thu Nov 7 11:08:30 2013 +0200
+
+    net/mlx4_en: Fixed crash when port type is changed
+    
+    timecounter_init() was was called only after first potential
+    timecounter_read().
+    Moved mlx4_en_init_timestamp() before mlx4_en_init_netdev()
+    
+    Signed-off-by: Amir Vadai <amirv@mellanox.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 0582b05366f39ea1024450f18cc801c7f42bbbbb
+Author: Olof Johansson <olof@lixom.net>
+Date:   Mon Feb 11 15:15:53 2013 -0800
+
+    arm: arch_timer: add missing inline in stub function
+    
+    Fixes:
+    
+    In file included from arch/arm/include/asm/arch_timer.h:10:0,
+                     from arch/arm/mach-shmobile/timer.c:23:
+    include/clocksource/arm_arch_timer.h:56:28: warning: 'arch_timer_get_timecounter' defined but not used [-Wunused-function]
+    
+    Signed-off-by: Olof Johansson <olof@lixom.net>
+
+commit 6605b730c061f67c44113391e5af5125d0672e99
+Author: Frank Li <Frank.Li@freescale.com>
+Date:   Tue Oct 30 18:25:31 2012 +0000
+
+    FEC: Add time stamping code and a PTP hardware clock
+    
+    This patch adds a driver for the FEC(MX6) that offers time
+    stamping and a PTP haderware clock. Because FEC\ENET(MX6)
+    hardware frequency adjustment is complex, we have implemented
+    this in software by changing the multiplication factor of the
+    timecounter.
+    
+    Signed-off-by: Frank Li <Frank.Li@freescale.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 87c0e764d43aca7f8bae8bfa86c50fa715e80050
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Mon Oct 29 08:45:16 2012 +0000
+
+    cpts: introduce time stamping code and a PTP hardware clock.
+    
+    This patch adds a driver for the CPTS that offers time
+    stamping and a PTP hardware clock. Because some of the
+    CPTS hardware variants (like the am335x) do not support
+    frequency adjustment, we have implemented this in software
+    by changing the multiplication factor of the timecounter.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 3a6a4edaa59273fabbc96832ca6f50116b3160fb
+Author: Jacob Keller <jacob.e.keller@intel.com>
+Date:   Tue May 1 05:24:58 2012 +0000
+
+    ixgbe: Hardware Timestamping + PTP Hardware Clock (PHC)
+    
+    This patch enables hardware timestamping for use with PTP software by
+    extracting a ns counter from an arbitrary fixed point cycles counter.
+    The hardware generates SYSTIME registers using the DMA tick which
+    changes based on the current link speed. These SYSTIME registers are
+    converted to ns using the cyclecounter and timecounter structures
+    provided by the kernel. Using the SO_TIMESTAMPING api, software can
+    enable and access timestamps for PTP packets.
+    
+    The SO_TIMESTAMPING API has space for 3 different kinds of timestamps,
+    SYS, RAW, and SOF. SYS hardware timestamps are hardware ns values that
+    are then scaled to the software clock. RAW hardware timestamps are the
+    direct raw value of the ns counter. SOF software timestamps are the
+    software timestamp calculated as close as possible to the software
+    transmit, but are not offloaded to the hardware. This patch only
+    supports the RAW hardware timestamps due to inefficiency of the SYS
+    design.
+    
+    This patch also enables the PHC subsystem features for atomically
+    adjusting the cycle register, and adjusting the clock frequency in
+    parts per billion. This frequency adjustment works by slightly
+    adjusting the value added to the cycle registers each DMA tick. This
+    causes the hardware registers to overflow rapidly (approximately once
+    every 34 seconds, when at 10gig link). To solve this, the timecounter
+    structure is used, along with a timer set for every 25 seconds. This
+    allows for detecting register overflow and converting the cycle
+    counter registers into ns values needed for providing useful
+    timestamps to the network stack.
+    
+    Only the basic required clock functions are supported at this time,
+    although the hardware supports some ancillary features and these could
+    easily be enabled in the future.
+    
+    Note that use of this hardware timestamping requires modifying daemon
+    software to use the SO_TIMESTAMPING API for timestamps, and the
+    ptp_clock PHC framework for accessing the clock. The timestamps have
+    no relation to the system time at all, so software must use the posix
+    clock generated by the PHC framework instead.
+    
+    Signed-off-by: Jacob E Keller <jacob.e.keller@intel.com>
+    Tested-by: Stephen Ko <stephen.s.ko@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit d339b1331616718b414d0ef3df5f2b6bfb2c36d7
+Author: Richard Cochran <richardcochran@gmail.com>
+Date:   Fri Mar 16 10:55:32 2012 +0000
+
+    igb: add PTP Hardware Clock code
+    
+    This patch adds a source file implementing a PHC. Only the basic
+    clock operations have been implemented, although the hardware
+    would offer some ancillary functions. The code is fairly self
+    contained and is not yet used in the main igb driver.
+    
+    Every timestamp and clock read operation must consult the overflow
+    counter to form a correct time value. Access to the counter is
+    protected by a spin lock, and the counter is implemented using the
+    standard cyclecounter/timecounter code.
+    
+    Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+    Tested-by: Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit 673b8b70cfae2cd0428a8ab5647571521348549a
+Author: Anders Berggren <anders@halon.se>
+Date:   Fri Feb 4 07:32:32 2011 +0000
+
+    igb: fix hw timestamping
+    
+    Hardware timestamping for Intel 82580 didn't work in either 2.6.36 or
+    2.6.37. Comparing it to Intel's igb-2.4.12 I found that the
+    timecounter_init clock/counter initialization was done too early.
+    
+    Signed-off-by: Anders Berggren <andfers@halon.se>
+    Tested-by:  Aaron Brown <aaron.f.brown@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit 29e3dbb10f0efff1297026679364dacc2c822145
+Author: Michal Simek <monstr@monstr.eu>
+Date:   Mon Feb 7 11:33:47 2011 +0100
+
+    microblaze: Fix sparse warning - timer.c
+    
+    Variables and init_microblaze_timecounter should be static.
+    
+    Warning log:
+    CHECK   arch/microblaze/kernel/timer.c
+    arch/microblaze/kernel/timer.c:41:14: warning: symbol 'freq_div_hz' was not declared. Should it be static?
+    arch/microblaze/kernel/timer.c:42:14: warning: symbol 'timer_clock_freq' was not declared. Should it be static?
+    arch/microblaze/kernel/timer.c:205:12: warning: symbol 'init_microblaze_timecounter' was not declared. Should it be static?
+    
+    Signed-off-by: Michal Simek <monstr@monstr.eu>
+
+commit 519e9f417388ba055b7604db5f4f492f7c84f427
+Author: Michal Simek <monstr@monstr.eu>
+Date:   Fri Nov 6 12:31:00 2009 +0100
+
+    microblaze: Register timecounter/cyclecounter
+    
+    It is the same counter as we use as free running one.
+    I would like to use it for ftrace.
+    
+    Signed-off-by: Michal Simek <monstr@monstr.eu>
+
+commit a75244c3d519fcb490ca2bf3f123c98017f1e8d0
+Author: Patrick Ohly <patrick.ohly@intel.com>
+Date:   Thu Feb 12 05:03:35 2009 +0000
+
+    timecompare: generic infrastructure to map between two time bases
+    
+    Mapping from a struct timecounter to a time returned by functions like
+    ktime_get_real() is implemented. This is sufficient to use this code
+    in a network device driver which wants to support hardware time
+    stamping and transformation of hardware time stamps to system time.
+    
+    The interface could have been made more versatile by not depending on
+    a time counter, but this wasn't done to avoid writing glue code
+    elsewhere.
+    
+    The method implemented here is the one used and analyzed under the name
+    "assisted PTP" in the LCI PTP paper:
+    http://www.linuxclustersinstitute.org/conferences/archive/2008/PDF/Ohly_92221.pdf
+    
+    Acked-by: John Stultz <johnstul@us.ibm.com>
+    Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit a038a353c3de4040d8445ec568acebdac144436f
+Author: Patrick Ohly <patrick.ohly@intel.com>
+Date:   Thu Feb 12 05:03:34 2009 +0000
+
+    clocksource: allow usage independent of timekeeping.c
+    
+    So far struct clocksource acted as the interface between time/timekeeping.c
+    and hardware. This patch generalizes the concept so that a similar
+    interface can also be used in other contexts. For that it introduces
+    new structures and related functions *without* touching the existing
+    struct clocksource.
+    
+    The reasons for adding these new structures to clocksource.[ch] are
+    * the APIs are clearly related
+    * struct clocksource could be cleaned up to use the new structs
+    * avoids proliferation of files with similar names (timesource.h?
+      timecounter.h?)
+    
+    As outlined in the discussion with John Stultz, this patch adds
+    * struct cyclecounter: stateless API to hardware which counts clock cycles
+    * struct timecounter: stateful utility code built on a cyclecounter which
+      provides a nanosecond counter
+    * only the function to read the nanosecond counter; deltas are used internally
+      and not exposed to users of timecounter
+    
+    The code does no locking of the shared state. It must be called at least
+    as often as the cycle counter wraps around to detect these wrap arounds.
+    Both is the responsibility of the timecounter user.
+    
+    Acked-by: John Stultz <johnstul@us.ibm.com>
+    Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
