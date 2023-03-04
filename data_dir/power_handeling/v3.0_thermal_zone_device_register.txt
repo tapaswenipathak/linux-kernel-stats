@@ -1,0 +1,2839 @@
+commit aa512c115a09d9133dcb09466e39f93f99a82fdb
+Merge: f848b3cda39b e021563fd09e
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Oct 10 13:52:14 2022 -0700
+
+    Merge tag 'thermal-6.1-rc1-2' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull more thermal control updates from Rafael Wysocki:
+     "These fix assorted issues in the thermal core and ARM thermal drivers.
+    
+      Specifics:
+    
+       - Use platform data to get the sensor ID instead of parsing the
+         device in imx_sc thermal driver and remove the dedicated OF
+         function from the core code (Daniel Lezcano).
+    
+       - Fix Kconfig dependency for the QCom tsens thermal driver (Jonathan
+         Cameron).
+    
+       - Add missing const annotation to the RCar ops thermal driver (Lad
+         Prabhakar).
+    
+       - Drop duplicate parameter check from
+         thermal_zone_device_register_with_trips() (Lad Prabhakar).
+    
+       - Fix NULL pointer dereference in trip_point_temp_store() by making
+         it check if the ->set_trip_temp() operation is present (Lad
+         Prabhakar).
+    
+       - Fix the MSM8939 fourth sensor hardware ID in the QCom tsens thermal
+         driver (Vincent Knecht)"
+    
+    * tag 'thermal-6.1-rc1-2' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm:
+      thermal/drivers/qcom/tsens-v0_1: Fix MSM8939 fourth sensor hw_id
+      thermal/core: Add a check before calling set_trip_temp()
+      thermal/core: Drop valid pointer check for type
+      thermal/drivers/rcar_thermal: Constify static thermal_zone_device_ops
+      thermal/drivers/qcom: Drop false build dependency of all QCOM drivers on QCOM_TSENS
+      thermal/of: Remove the thermal_zone_of_get_sensor_id() function
+      thermal/drivers/imx_sc: Rely on the platform data to get the resource id
+
+commit c71d8035f1b77dc8e29e41942ab31900fa79c1ae
+Author: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Date:   Fri Sep 9 19:13:22 2022 +0100
+
+    thermal/core: Drop valid pointer check for type
+    
+    Drop the valid pointer check for type in
+    thermal_zone_device_register_with_trips() as we already have it confirmed
+    for != NULL from the previous if block.
+    
+    Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+    Link: https://lore.kernel.org/r/20220909181322.10933-1-prabhakar.mahadev-lad.rj@bp.renesas.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit 82b1ec794d701478381482264f3bfada3a7bf2d9
+Author: Sumeet Pawnikar <sumeet.r.pawnikar@intel.com>
+Date:   Tue Sep 27 21:17:09 2022 +0530
+
+    thermal: core: Increase maximum number of trip points
+    
+    On one of the Chrome system, if we define more than 12 trip points,
+    probe for thermal sensor fails with
+    "int3403 thermal: probe of INTC1046:03 failed with error -22"
+    and throws an error as
+    "thermal_sys: Error: Incorrect number of thermal trips".
+    
+    The thermal_zone_device_register() interface needs maximum
+    number of trip points supported in a zone as an argument.
+    This number can't exceed THERMAL_MAX_TRIPS, which is currently
+    set to 12. To address this issue, THERMAL_MAX_TRIPS value
+    has to be increased.
+    
+    This interface also has an argument to specify a mask of trips
+    which are writable. This mask is defined as an int.
+    This mask sets the ceiling for increasing maximum number of
+    supported trips. With the current implementation, maximum number
+    of trips can be supported is 31.
+    
+    Also, THERMAL_MAX_TRIPS macro is used in one place only.
+    So, remove THERMAL_MAX_TRIPS macro and compare num_trips
+    directly with using a macro BITS_PER_TYPE(int)-1.
+    
+    Signed-off-by: Sumeet Pawnikar <sumeet.r.pawnikar@intel.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 3bf1b1571224e713f1a186de21b2204c06f1cb5e
+Merge: 7931e28098a4 d92e600f860b
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Sat Aug 27 15:07:58 2022 +0200
+
+    Merge branch 'thermal-core'
+    
+    Merge thermal control core fixes for 6.0-rc3:
+    
+     - Fix missing required property for thermal zone description (Daniel
+       Lezcano).
+    
+     - Add missing export symbol for
+       thermal_zone_device_register_with_trips() (Daniel Lezcano).
+    
+    * thermal-core:
+      dt-bindings: thermal: Fix missing required property
+      thermal/core: Add missing EXPORT_SYMBOL_GPL
+
+commit d92e600f860ba98eac576a976c275106af575c82
+Merge: 568035b01cfb 8c596324232d
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Sat Aug 20 13:49:17 2022 +0200
+
+    Merge tag 'thermal-v6.0-rc2' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/thermal/linux
+    
+    Pull thermal control fixes for 6.0-rc3 from Daniel Lezcano:
+    
+    "- Fix missing required property for thermal zone description (Daniel
+       Lezcano)
+    
+     - Add missing export symbol for
+       thermal_zone_device_register_with_trips() (Daniel Lezcano)"
+    
+    * tag 'thermal-v6.0-rc2' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/thermal/linux:
+      dt-bindings: thermal: Fix missing required property
+      thermal/core: Add missing EXPORT_SYMBOL_GPL
+
+commit 8fb5b71ed37dbe469eaa930e2ddc93ec9e305f3c
+Author: Daniel Lezcano <daniel.lezcano@linaro.org>
+Date:   Tue Aug 9 10:56:29 2022 +0200
+
+    thermal/of: Fix free after use in thermal_of_unregister()
+    
+    The thermal zone is freed after being unregistered. The release method
+    devm_thermal_zone_device_register() calls
+      -> thermal_of_zone_device_unregister()
+    
+    This one calls thermal_zone_device_unregister() which frees the
+    thermal zone. However, thermal_of_zone_device_unregister() does access
+    this freed pointer to free different resources allocated by the
+    thermal_of framework which is invalid.
+    
+    It results in a kernel panic:
+    
+    [    1.915140] thermal_sys: Failed to find thermal zone for tmu id=2
+    [    1.921279] qoriq_thermal 1f80000.tmu: Failed to register sensors
+    [    1.927395] qoriq_thermal: probe of 1f80000.tmu failed with error -22
+    [    1.934189] Unable to handle kernel paging request at virtual address 01adadadadadad88
+    [    1.942146] Mem abort info:
+    [    1.944948]   ESR = 0x0000000096000004
+    [    1.948708]   EC = 0x25: DABT (current EL), IL = 32 bits
+    [    1.954042]   SET = 0, FnV = 0
+    [    1.957107]   EA = 0, S1PTW = 0
+    [    1.960253]   FSC = 0x04: level 0 translation fault
+    [    1.965147] Data abort info:
+    [    1.968030]   ISV = 0, ISS = 0x00000004
+    [    1.971878]   CM = 0, WnR = 0
+    [    1.974852] [01adadadadadad88] address between user and kernel address ranges
+    [    1.982016] Internal error: Oops: 96000004 [#1] SMP
+    [    1.986907] Modules linked in:
+    [    1.989969] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 5.19.0-next-20220808-00080-g1c46f44502e0 #1697
+    [    1.999135] Hardware name: Kontron KBox A-230-LS (DT)
+    [    2.004199] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+    [    2.011185] pc : kfree+0x5c/0x3c0
+    [    2.014516] lr : devm_thermal_of_zone_release+0x38/0x60
+    [    2.019761] sp : ffff80000a22bad0
+    [    2.023081] x29: ffff80000a22bad0 x28: 0000000000000000 x27: ffff800009960464
+    [    2.030245] x26: ffff800009a16960 x25: 0000000000000006 x24: ffff800009f09a40
+    [    2.037407] x23: ffff800009ab9008 x22: ffff800008d0eea8 x21: 01adadadadadad80
+    [    2.044569] x20: 6b6b6b6b6b6b6b6b x19: ffff00200232b800 x18: 00000000fffffffb
+    [    2.051731] x17: ffff800008d0eea0 x16: ffff800008d07d44 x15: ffff800008d0d154
+    [    2.056647] usb 1-1: new high-speed USB device number 2 using xhci-hcd
+    [    2.058893] x14: ffff800008d0cddc x13: ffff8000088d1c2c x12: ffff8000088d5034
+    [    2.072597] x11: ffff8000088d46d4 x10: 0000000000000000 x9 : ffff800008d0eea8
+    [    2.079759] x8 : ffff002000b1a158 x7 : bbbbbbbbbbbbbbbb x6 : ffff80000a0f53b8
+    [    2.086921] x5 : ffff80000a22b960 x4 : 0000000000000000 x3 : 0000000000000000
+    [    2.094082] x2 : fffffc0000000000 x1 : ffff002000838040 x0 : 01adb1adadadad80
+    [    2.101244] Call trace:
+    [    2.103692]  kfree+0x5c/0x3c0
+    [    2.106666]  devm_thermal_of_zone_release+0x38/0x60
+    [    2.111561]  release_nodes+0x64/0xd0
+    [    2.115146]  devres_release_all+0xbc/0x350
+    [    2.119253]  device_unbind_cleanup+0x20/0x70
+    [    2.123536]  really_probe+0x1a0/0x2e4
+    [    2.127208]  __driver_probe_device+0x80/0xec
+    [    2.131490]  driver_probe_device+0x44/0x130
+    [    2.135685]  __driver_attach+0x104/0x1b4
+    [    2.139619]  bus_for_each_dev+0x7c/0xe0
+    [    2.143465]  driver_attach+0x30/0x40
+    [    2.147048]  bus_add_driver+0x160/0x210
+    [    2.150894]  driver_register+0x84/0x140
+    [    2.154741]  __platform_driver_register+0x34/0x40
+    [    2.159461]  qoriq_tmu_init+0x28/0x34
+    [    2.163133]  do_one_initcall+0x50/0x250
+    [    2.166979]  kernel_init_freeable+0x278/0x31c
+    [    2.171349]  kernel_init+0x30/0x140
+    [    2.174847]  ret_from_fork+0x10/0x20
+    [    2.178433] Code: b25657e2 d34cfc00 d37ae400 8b020015 (f94006a1)
+    [    2.184546] ---[ end trace 0000000000000000 ]---
+    
+    Store the allocated resource pointers before the thermal zone is free
+    and use them to release the resource after unregistering the thermal
+    zone.
+    
+    Fixes: 3bd52ac87347 ("thermal/of: Rework the thermal device tree initialization")
+    Reported-by: Michael Walle <michael@walle.cc>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Tested-by: Michael Walle <michael@walle.cc>
+    Reviewed-by: Guenter Roeck <linux@roeck-us.net>
+    Link: https://lore.kernel.org/r/20220809085629.509116-4-daniel.lezcano@linaro.org
+
+commit a921be53b46c393d8d594a62a44f418c97e5504b
+Author: Daniel Lezcano <daniel.lezcano@linaro.org>
+Date:   Wed Aug 10 12:07:31 2022 +0200
+
+    thermal/core: Add missing EXPORT_SYMBOL_GPL
+    
+    The function thermal_zone_device_register_with_trips() is not exported
+    for modules.
+    
+    Add the missing EXPORT_SYMBOL_GPL().
+    
+    Fixes: fae11de507f0e ("thermal/core: Add thermal_trip in thermal_zone")
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20220810100731.749317-1-daniel.lezcano@linaro.org
+
+commit b132abaa6515e14e0db292389c25007d666e1925
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    commit 0a5c26712f963f0500161a23e0ffff8d29f742ab upstream.
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3f25451eae2870b227e29593041f80a7b5322062
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    [ Upstream commit 0a5c26712f963f0500161a23e0ffff8d29f742ab ]
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit bc4555ffd158eda51518e96ab7492078a00b9a96
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    [ Upstream commit 0a5c26712f963f0500161a23e0ffff8d29f742ab ]
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit f73cd9c951a9dc23f0ee1260fef5cc61d2825fb3
+Merge: 833db72142b9 46e9f92f31e6
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Nov 2 16:18:04 2021 -0700
+
+    Merge tag 'thermal-5.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull thermal control updates from Rafael Wysocki:
+     "These extend the thermal trip point crossing notifications sent via
+      netlink to contain the temperature causing the trip point to be
+      crossed, deprecate the user space thermal governor, add new DT
+      bindings to drivers, move ABI documentation to Documentation/ABI, fix
+      assorted issues and clean up code.
+    
+      Specifics:
+    
+       - Constify a variable in thermal MMIO driver (Rikard Falkeborn).
+    
+       - Add the current temperature in the netlink message when crossing a
+         trip point in order to prevent useless back and forth reading from
+         userspace (Daniel Lezcano).
+    
+       - Add support for the 'HC' variant on PM8998 PMIC in order to support
+         VADC channels on recent QCom boards (Bjorn Andersson).
+    
+       - Add support for calibration values from hardware when they are
+         fused (Niklas Söderlund).
+    
+       - Fix NULL pointer dereference in the thermal_release callback when
+         an error occurs in the thermal_zone_device_register() (Yuanzheng
+         Song).
+    
+       - Fix use-after-free in __thermal_cooling_device_register() in the
+         error path (Ziyang Xuan).
+    
+       - Fix compilation of the LMh driver when CONFIG_QCOM_SCM is not set
+         (Jackie Liu).
+    
+       - Add timeout when reading a register that can block forever in
+         certain circumstances in the tsens driver (Ansuel Smith).
+    
+       - Add DT binding for the reset lines and use them in the rockchip
+         sensor driver (Johan Jonker).
+    
+       - Add new uniphier NX1 SoC temperature sensor (Kunihiko Hayashi).
+    
+       - Save and restore the TCC value in the int340x driver (Antoine
+         Tenart).
+    
+       - Deprecate the writability of the cooling device state sysfs file
+         and the user space governor (Daniel Lezcano).
+    
+       - Delete bogus length check in int340x (Dan Carpenter).
+    
+       - Use bitmap_zalloc/bitmap_free when applicable in intel_powerclamp
+         (Christophe JAILLET).
+    
+       - Move thermal ABI documentation to Documentation/ABI (Mauro Carvalho
+         Chehab)"
+    
+    * tag 'thermal-5.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm: (21 commits)
+      thermal/core: Deprecate changing cooling device state from userspace
+      thermal/core: Make the userspace governor deprecated
+      thermal/drivers/int340x: Improve the tcc offset saving for suspend/resume
+      thermal/drivers/uniphier: Add compatible string for NX1 SoC
+      dt-bindings: thermal: uniphier: Add binding for NX1 SoC
+      thermal/drivers/rockchip_thermal: Allow more resets for tsadc node
+      dt-bindings: thermal: remove redundant comments from rockchip-thermal.yaml
+      dt-bindings: thermal: allow more resets for tsadc node in rockchip-thermal.yaml
+      thermal/drivers/tsens: Add timeout to get_temp_tsens_valid
+      thermal/drivers/qcom/lmh: make QCOM_LMH depends on QCOM_SCM
+      thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+      thermal/core: Fix null pointer dereference in thermal_release()
+      thermal: rcar_gen3_thermal: Read calibration from hardware
+      thermal: rcar_gen3_thermal: Store thcode and ptat in priv data
+      thermal/drivers/qcom/spmi-adc-tm5: Add support for HC variant
+      dt-bindings: thermal: qcom: add HC variant of adc-thermal monitor bindings
+      thermal: Move ABI documentation to Documentation/ABI
+      thermal/drivers/netlink: Add the temperature when crossing a trip point
+      thermal/drivers/thermal_mmio: Constify static struct thermal_mmio_ops
+      thermal: int340x: delete bogus length check
+      ...
+
+commit 83e8de89b9e8a66796259f2dbb8f2707e19e7b07
+Merge: 3906fe9bb7f1 a67a46af4ad6
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Tue Oct 26 14:59:13 2021 +0200
+
+    Merge tag 'thermal-v5.16-rc1' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/thermal/linux
+    
+    Pull thermal core and ARM thermal driver updates for v5.16 from
+    Daniel Lezcano:
+    
+     - Constify a variable in thermal mmio driver (Rikard Falkeborn)
+    
+     - Add the current temperature in the netlink message when crossing a
+       trip point in order to prevent useless back and forth reading from
+       userspace (Daniel Lezcano)
+    
+     - Add support for the 'HC' variant on PM8998 pmic in order to support
+       vadc channels on recent QCom boards (Bjorn Andersson)
+    
+     - Add support of calibration values from hardware when they are fused
+       (Niklas Söderlund)
+    
+     - Fix NULL pointer dereference from the thermal_release callback when
+       an error occured in the thermal_zone_device_register() function
+       (Yuanzheng Song)
+    
+     - Fix use after free call in the __thermal_cooling_device_register()
+       function in the error path (Ziyang Xuan)
+    
+     - Fix compilation error for the LMh driver when CONFIG_QCOM_SCM is not
+       set (Jackie Liu)
+    
+     - Add a timeout when reading a register which can block forever under
+       certain circumstances in the tsens driver (Ansuel Smith)
+    
+     - Add DT binding for the reset lines and use them in the rockchip
+       sensor driver (Johan Jonker)
+    
+     - Add new uniphier NX1 SoC temperature sensor (Kunihiko Hayashi)
+    
+     - Save and restore the TCC value in the int340x driver (Antoine
+       Tenart)
+    
+     - Deprecate the cooling device state sysfs file writable and the user
+       space governor (Daniel Lezcano)
+    
+    * tag 'thermal-v5.16-rc1' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/thermal/linux:
+      thermal/core: Deprecate changing cooling device state from userspace
+      thermal/core: Make the userspace governor deprecated
+      thermal/drivers/int340x: Improve the tcc offset saving for suspend/resume
+      thermal/drivers/uniphier: Add compatible string for NX1 SoC
+      dt-bindings: thermal: uniphier: Add binding for NX1 SoC
+      thermal/drivers/rockchip_thermal: Allow more resets for tsadc node
+      dt-bindings: thermal: remove redundant comments from rockchip-thermal.yaml
+      dt-bindings: thermal: allow more resets for tsadc node in rockchip-thermal.yaml
+      thermal/drivers/tsens: Add timeout to get_temp_tsens_valid
+      thermal/drivers/qcom/lmh: make QCOM_LMH depends on QCOM_SCM
+      thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+      thermal/core: Fix null pointer dereference in thermal_release()
+      thermal: rcar_gen3_thermal: Read calibration from hardware
+      thermal: rcar_gen3_thermal: Store thcode and ptat in priv data
+      thermal/drivers/qcom/spmi-adc-tm5: Add support for HC variant
+      dt-bindings: thermal: qcom: add HC variant of adc-thermal monitor bindings
+      thermal/drivers/netlink: Add the temperature when crossing a trip point
+      thermal/drivers/thermal_mmio: Constify static struct thermal_mmio_ops
+
+commit 0a5c26712f963f0500161a23e0ffff8d29f742ab
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit ad079d981db6a4047b60c576df6430bed36bcd7d
+Author: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date:   Mon Jun 28 11:32:32 2021 -0700
+
+    thermal/drivers/int340x/processor_thermal: Fix warning for return value
+    
+    Fix smatch warnings:
+    drivers/thermal/intel/int340x_thermal/processor_thermal_device_pci.c:258 proc_thermal_pci_probe() warn: missing error code 'ret'
+    
+    Use PTR_ERR to return failure of thermal_zone_device_register().
+    
+    Reported-by: kernel test robot <lkp@intel.com>
+    Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210628183232.62877-1-srinivas.pandruvada@linux.intel.com
+
+commit ffc6be4cb86133ddb1c398bc3b3ca5207026d1c0
+Author: Mykola Kostenok <c_mykolak@nvidia.com>
+Date:   Sun Jun 6 11:24:32 2021 +0300
+
+    mlxsw: core: Set thermal zone polling delay argument to real value at init
+    
+    [ Upstream commit 2fd8d84ce3095e8a7b5fe96532c91b1b9e07339c ]
+    
+    Thermal polling delay argument for modules and gearboxes thermal zones
+    used to be initialized with zero value, while actual delay was used to
+    be set by mlxsw_thermal_set_mode() by thermal operation callback
+    set_mode(). After operations set_mode()/get_mode() have been removed by
+    cited commits, modules and gearboxes thermal zones always have polling
+    time set to zero and do not perform temperature monitoring.
+    
+    Set non-zero "polling_delay" in thermal_zone_device_register() routine,
+    thus, the relevant thermal zones will perform thermal monitoring.
+    
+    Cc: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
+    Fixes: 5d7bd8aa7c35 ("thermal: Simplify or eliminate unnecessary set_mode() methods")
+    Fixes: 1ee14820fd8e ("thermal: remove get_mode() operation of drivers")
+    Signed-off-by: Mykola Kostenok <c_mykolak@nvidia.com>
+    Acked-by: Vadim Pasternak <vadimp@nvidia.com>
+    Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 195585ddb76721a62890d82bc9815ad1ffef7f9e
+Author: Mykola Kostenok <c_mykolak@nvidia.com>
+Date:   Sun Jun 6 11:24:32 2021 +0300
+
+    mlxsw: core: Set thermal zone polling delay argument to real value at init
+    
+    [ Upstream commit 2fd8d84ce3095e8a7b5fe96532c91b1b9e07339c ]
+    
+    Thermal polling delay argument for modules and gearboxes thermal zones
+    used to be initialized with zero value, while actual delay was used to
+    be set by mlxsw_thermal_set_mode() by thermal operation callback
+    set_mode(). After operations set_mode()/get_mode() have been removed by
+    cited commits, modules and gearboxes thermal zones always have polling
+    time set to zero and do not perform temperature monitoring.
+    
+    Set non-zero "polling_delay" in thermal_zone_device_register() routine,
+    thus, the relevant thermal zones will perform thermal monitoring.
+    
+    Cc: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
+    Fixes: 5d7bd8aa7c35 ("thermal: Simplify or eliminate unnecessary set_mode() methods")
+    Fixes: 1ee14820fd8e ("thermal: remove get_mode() operation of drivers")
+    Signed-off-by: Mykola Kostenok <c_mykolak@nvidia.com>
+    Acked-by: Vadim Pasternak <vadimp@nvidia.com>
+    Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 2fd8d84ce3095e8a7b5fe96532c91b1b9e07339c
+Author: Mykola Kostenok <c_mykolak@nvidia.com>
+Date:   Sun Jun 6 11:24:32 2021 +0300
+
+    mlxsw: core: Set thermal zone polling delay argument to real value at init
+    
+    Thermal polling delay argument for modules and gearboxes thermal zones
+    used to be initialized with zero value, while actual delay was used to
+    be set by mlxsw_thermal_set_mode() by thermal operation callback
+    set_mode(). After operations set_mode()/get_mode() have been removed by
+    cited commits, modules and gearboxes thermal zones always have polling
+    time set to zero and do not perform temperature monitoring.
+    
+    Set non-zero "polling_delay" in thermal_zone_device_register() routine,
+    thus, the relevant thermal zones will perform thermal monitoring.
+    
+    Cc: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
+    Fixes: 5d7bd8aa7c35 ("thermal: Simplify or eliminate unnecessary set_mode() methods")
+    Fixes: 1ee14820fd8e ("thermal: remove get_mode() operation of drivers")
+    Signed-off-by: Mykola Kostenok <c_mykolak@nvidia.com>
+    Acked-by: Vadim Pasternak <vadimp@nvidia.com>
+    Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 7add012b45bf71d000da734b1960e6faef09fbe7
+Author: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date:   Fri Apr 30 05:23:43 2021 -0700
+
+    thermal/drivers/intel: Initialize RW trip to THERMAL_TEMP_INVALID
+    
+    commit eb8500b874cf295971a6a2a04e14eb0854197a3c upstream.
+    
+    After commit 81ad4276b505 ("Thermal: Ignore invalid trip points") all
+    user_space governor notifications via RW trip point is broken in intel
+    thermal drivers. This commits marks trip_points with value of 0 during
+    call to thermal_zone_device_register() as invalid. RW trip points can be
+    0 as user space will set the correct trip temperature later.
+    
+    During driver init, x86_package_temp and all int340x drivers sets RW trip
+    temperature as 0. This results in all these trips marked as invalid by
+    the thermal core.
+    
+    To fix this initialize RW trips to THERMAL_TEMP_INVALID instead of 0.
+    
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210430122343.1789899-1-srinivas.pandruvada@linux.intel.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a40b07afcb866abe3f6f63d531317523dcd1af00
+Author: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date:   Fri Apr 30 05:23:43 2021 -0700
+
+    thermal/drivers/intel: Initialize RW trip to THERMAL_TEMP_INVALID
+    
+    commit eb8500b874cf295971a6a2a04e14eb0854197a3c upstream.
+    
+    After commit 81ad4276b505 ("Thermal: Ignore invalid trip points") all
+    user_space governor notifications via RW trip point is broken in intel
+    thermal drivers. This commits marks trip_points with value of 0 during
+    call to thermal_zone_device_register() as invalid. RW trip points can be
+    0 as user space will set the correct trip temperature later.
+    
+    During driver init, x86_package_temp and all int340x drivers sets RW trip
+    temperature as 0. This results in all these trips marked as invalid by
+    the thermal core.
+    
+    To fix this initialize RW trips to THERMAL_TEMP_INVALID instead of 0.
+    
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210430122343.1789899-1-srinivas.pandruvada@linux.intel.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 2cd572cc45b55b9220a1dbd0b9ef5539fa97b9fa
+Author: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date:   Fri Apr 30 05:23:43 2021 -0700
+
+    thermal/drivers/intel: Initialize RW trip to THERMAL_TEMP_INVALID
+    
+    commit eb8500b874cf295971a6a2a04e14eb0854197a3c upstream.
+    
+    After commit 81ad4276b505 ("Thermal: Ignore invalid trip points") all
+    user_space governor notifications via RW trip point is broken in intel
+    thermal drivers. This commits marks trip_points with value of 0 during
+    call to thermal_zone_device_register() as invalid. RW trip points can be
+    0 as user space will set the correct trip temperature later.
+    
+    During driver init, x86_package_temp and all int340x drivers sets RW trip
+    temperature as 0. This results in all these trips marked as invalid by
+    the thermal core.
+    
+    To fix this initialize RW trips to THERMAL_TEMP_INVALID instead of 0.
+    
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210430122343.1789899-1-srinivas.pandruvada@linux.intel.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit eb8500b874cf295971a6a2a04e14eb0854197a3c
+Author: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date:   Fri Apr 30 05:23:43 2021 -0700
+
+    thermal/drivers/intel: Initialize RW trip to THERMAL_TEMP_INVALID
+    
+    After commit 81ad4276b505 ("Thermal: Ignore invalid trip points") all
+    user_space governor notifications via RW trip point is broken in intel
+    thermal drivers. This commits marks trip_points with value of 0 during
+    call to thermal_zone_device_register() as invalid. RW trip points can be
+    0 as user space will set the correct trip temperature later.
+    
+    During driver init, x86_package_temp and all int340x drivers sets RW trip
+    temperature as 0. This results in all these trips marked as invalid by
+    the thermal core.
+    
+    To fix this initialize RW trips to THERMAL_TEMP_INVALID instead of 0.
+    
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210430122343.1789899-1-srinivas.pandruvada@linux.intel.com
+
+commit dd47366aaa9b93ac3d97cb4ee7641d38a28a771e
+Author: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Date:   Tue Dec 22 01:23:43 2020 +0800
+
+    thermal: int340x: Fix unexpected shutdown at critical temperature
+    
+    We are seeing thermal shutdown on Intel based mobile workstations, the
+    shutdown happens during the first trip handle in
+    thermal_zone_device_register():
+    kernel: thermal thermal_zone15: critical temperature reached (101 C), shutting down
+    
+    However, we shouldn't do a thermal shutdown here, since
+    1) We may want to use a dedicated daemon, Intel's thermald in this case,
+    to handle thermal shutdown.
+    
+    2) For ACPI based system, _CRT doesn't mean shutdown unless it's inside
+    ThermalZone namespace. ACPI Spec, 11.4.4 _CRT (Critical Temperature):
+    "... If this object it present under a device, the device’s driver
+    evaluates this object to determine the device’s critical cooling
+    temperature trip point. This value may then be used by the device’s
+    driver to program an internal device temperature sensor trip point."
+    
+    So a "critical trip" here merely means we should take a more aggressive
+    cooling method.
+    
+    As int340x device isn't present under ACPI ThermalZone, override the
+    default .critical callback to prevent surprising thermal shutdown.
+    
+    Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20201221172345.36976-1-kai.heng.feng@canonical.com
+
+commit d0df264fbd3c531787dec59c4b3fca854bc7ee49
+Author: Daniel Lezcano <daniel.lezcano@linaro.org>
+Date:   Tue Dec 22 19:11:10 2020 +0100
+
+    thermal/core: Remove pointless thermal_zone_device_reset() function
+    
+    The function thermal_zone_device_reset() is called in the
+    thermal_zone_device_register() which allocates and initialize the
+    structure. The passive field is already zero-ed by the allocation, the
+    function is useless.
+    
+    Call directly thermal_zone_device_init() instead and
+    thermal_zone_device_reset().
+    
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20201222181110.1231977-1-daniel.lezcano@linaro.org
+
+commit 376f90e0eac877d4acfafc1e2eed7cef544bf773
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    commit 1851799e1d2978f68eea5d9dff322e121dcf59c1 upstream.
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 3e5043ad4b49393fa69932ec21b0c7ecc68779ea
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    [ Upstream commit 1851799e1d2978f68eea5d9dff322e121dcf59c1 ]
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit b30c56ee03b688d0ec769eeb14801f8eb9d2bbad
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    [ Upstream commit 1851799e1d2978f68eea5d9dff322e121dcf59c1 ]
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 427cc63503c4bd6cf2ac5b4d1021688a3040fbc9
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    [ Upstream commit 1851799e1d2978f68eea5d9dff322e121dcf59c1 ]
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c01a9dbec18af8dbbe6dc75c033003427de68ed8
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    [ Upstream commit 1851799e1d2978f68eea5d9dff322e121dcf59c1 ]
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 414755a4bf32adef628cc1f5d569f05c968de138
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    [ Upstream commit 1851799e1d2978f68eea5d9dff322e121dcf59c1 ]
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 1851799e1d2978f68eea5d9dff322e121dcf59c1
+Author: Ido Schimmel <idosch@mellanox.com>
+Date:   Wed Jul 10 13:14:52 2019 +0300
+
+    thermal: Fix use-after-free when unregistering thermal zone device
+    
+    thermal_zone_device_unregister() cancels the delayed work that polls the
+    thermal zone, but it does not wait for it to finish. This is racy with
+    respect to the freeing of the thermal zone device, which can result in a
+    use-after-free [1].
+    
+    Fix this by waiting for the delayed work to finish before freeing the
+    thermal zone device. Note that thermal_zone_device_set_polling() is
+    never invoked from an atomic context, so it is safe to call
+    cancel_delayed_work_sync() that can block.
+    
+    [1]
+    [  +0.002221] ==================================================================
+    [  +0.000064] BUG: KASAN: use-after-free in __mutex_lock+0x1076/0x11c0
+    [  +0.000016] Read of size 8 at addr ffff8881e48e0450 by task kworker/1:0/17
+    
+    [  +0.000023] CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.2.0-rc6-custom-02495-g8e73ca3be4af #1701
+    [  +0.000010] Hardware name: Mellanox Technologies Ltd. MSN2100-CB2FO/SA001017, BIOS 5.6.5 06/07/2016
+    [  +0.000016] Workqueue: events_freezable_power_ thermal_zone_device_check
+    [  +0.000012] Call Trace:
+    [  +0.000021]  dump_stack+0xa9/0x10e
+    [  +0.000020]  print_address_description.cold.2+0x9/0x25e
+    [  +0.000018]  __kasan_report.cold.3+0x78/0x9d
+    [  +0.000016]  kasan_report+0xe/0x20
+    [  +0.000016]  __mutex_lock+0x1076/0x11c0
+    [  +0.000014]  step_wise_throttle+0x72/0x150
+    [  +0.000018]  handle_thermal_trip+0x167/0x760
+    [  +0.000019]  thermal_zone_device_update+0x19e/0x5f0
+    [  +0.000019]  process_one_work+0x969/0x16f0
+    [  +0.000017]  worker_thread+0x91/0xc40
+    [  +0.000014]  kthread+0x33d/0x400
+    [  +0.000015]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000020] Allocated by task 1:
+    [  +0.000015]  save_stack+0x19/0x80
+    [  +0.000015]  __kasan_kmalloc.constprop.4+0xc1/0xd0
+    [  +0.000014]  kmem_cache_alloc_trace+0x152/0x320
+    [  +0.000015]  thermal_zone_device_register+0x1b4/0x13a0
+    [  +0.000015]  mlxsw_thermal_init+0xc92/0x23d0
+    [  +0.000014]  __mlxsw_core_bus_device_register+0x659/0x11b0
+    [  +0.000013]  mlxsw_core_bus_device_register+0x3d/0x90
+    [  +0.000013]  mlxsw_pci_probe+0x355/0x4b0
+    [  +0.000014]  local_pci_probe+0xc3/0x150
+    [  +0.000013]  pci_device_probe+0x280/0x410
+    [  +0.000013]  really_probe+0x26a/0xbb0
+    [  +0.000013]  driver_probe_device+0x208/0x2e0
+    [  +0.000013]  device_driver_attach+0xfe/0x140
+    [  +0.000013]  __driver_attach+0x110/0x310
+    [  +0.000013]  bus_for_each_dev+0x14b/0x1d0
+    [  +0.000013]  driver_register+0x1c0/0x400
+    [  +0.000015]  mlxsw_sp_module_init+0x5d/0xd3
+    [  +0.000014]  do_one_initcall+0x239/0x4dd
+    [  +0.000013]  kernel_init_freeable+0x42b/0x4e8
+    [  +0.000012]  kernel_init+0x11/0x18b
+    [  +0.000013]  ret_from_fork+0x3a/0x50
+    
+    [  +0.000015] Freed by task 581:
+    [  +0.000013]  save_stack+0x19/0x80
+    [  +0.000014]  __kasan_slab_free+0x125/0x170
+    [  +0.000013]  kfree+0xf3/0x310
+    [  +0.000013]  thermal_release+0xc7/0xf0
+    [  +0.000014]  device_release+0x77/0x200
+    [  +0.000014]  kobject_put+0x1a8/0x4c0
+    [  +0.000014]  device_unregister+0x38/0xc0
+    [  +0.000014]  thermal_zone_device_unregister+0x54e/0x6a0
+    [  +0.000014]  mlxsw_thermal_fini+0x184/0x35a
+    [  +0.000014]  mlxsw_core_bus_device_unregister+0x10a/0x640
+    [  +0.000013]  mlxsw_devlink_core_bus_device_reload+0x92/0x210
+    [  +0.000015]  devlink_nl_cmd_reload+0x113/0x1f0
+    [  +0.000014]  genl_family_rcv_msg+0x700/0xee0
+    [  +0.000013]  genl_rcv_msg+0xca/0x170
+    [  +0.000013]  netlink_rcv_skb+0x137/0x3a0
+    [  +0.000012]  genl_rcv+0x29/0x40
+    [  +0.000013]  netlink_unicast+0x49b/0x660
+    [  +0.000013]  netlink_sendmsg+0x755/0xc90
+    [  +0.000013]  __sys_sendto+0x3de/0x430
+    [  +0.000013]  __x64_sys_sendto+0xe2/0x1b0
+    [  +0.000013]  do_syscall_64+0xa4/0x4d0
+    [  +0.000013]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    [  +0.000017] The buggy address belongs to the object at ffff8881e48e0008
+                   which belongs to the cache kmalloc-2k of size 2048
+    [  +0.000012] The buggy address is located 1096 bytes inside of
+                   2048-byte region [ffff8881e48e0008, ffff8881e48e0808)
+    [  +0.000007] The buggy address belongs to the page:
+    [  +0.000012] page:ffffea0007923800 refcount:1 mapcount:0 mapping:ffff88823680d0c0 index:0x0 compound_mapcount: 0
+    [  +0.000020] flags: 0x200000000010200(slab|head)
+    [  +0.000019] raw: 0200000000010200 ffffea0007682008 ffffea00076ab808 ffff88823680d0c0
+    [  +0.000016] raw: 0000000000000000 00000000000d000d 00000001ffffffff 0000000000000000
+    [  +0.000007] page dumped because: kasan: bad access detected
+    
+    [  +0.000012] Memory state around the buggy address:
+    [  +0.000012]  ffff8881e48e0300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012] >ffff8881e48e0400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000008]                                                  ^
+    [  +0.000012]  ffff8881e48e0480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000012]  ffff8881e48e0500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    [  +0.000007] ==================================================================
+    
+    Fixes: b1569e99c795 ("ACPI: move thermal trip handling to generic thermal layer")
+    Reported-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Ido Schimmel <idosch@mellanox.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 77635e73424a6f940d62f559858715ddc0e40d2a
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Nov 2 16:35:23 2018 +0100
+
+    scsi: cxgb4i: fix thermal configuration dependencies
+    
+    [ Upstream commit 8d0bb86e2cf6c96d88c3de56a2a29329872c454d ]
+    
+    I fixed a bug by adding a dependency in the network driver, but that fix
+    caused a related bug in the SCSI driver:
+    
+    WARNING: unmet direct dependencies detected for CHELSIO_T4
+      Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_CHELSIO [=y] && PCI [=y] && (IPV6 [=y] || IPV6 [=y]=n) && (THERMAL [=m] || !THERMAL [=m])
+      Selected by [y]:
+      - SCSI_CXGB4_ISCSI [=y] && SCSI_LOWLEVEL [=y] && SCSI [=y] && PCI [=y] && INET [=y] && (IPV6 [=y] || IPV6 [=y]=n)
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.o: In function `cxgb4_thermal_init':
+    cxgb4_thermal.c:(.text+0x158): undefined reference to `thermal_zone_device_register'
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.o: In function `cxgb4_thermal_remove':
+    cxgb4_thermal.c:(.text+0x1d8): undefined reference to `thermal_zone_device_unregister'
+    /git/arm-soc/Makefile:1042: recipe for target 'vmlinux' failed
+    
+    The same dependency needs to be propagated here to make it work correctly
+    with CONFIG_THERMAL=m and SCSI_CXGB4_ISCSI=y. That change by itself causes
+    another problem with a circular dependency, as we use 'select NETDEVICES'.
+    This is something we really should not do anyway, as a driver symbol should
+    never select another major subsystem, so let's turn that into a 'depends
+    on'. I don't see any downsides of that, as NETDEVICES is only disabled in
+    rather obscure cases that are not relevant to the users of cxgb4i.
+    
+    Fixes: e70a57fa59bb ("cxgb4: fix thermal configuration dependencies")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 8d0bb86e2cf6c96d88c3de56a2a29329872c454d
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Fri Nov 2 16:35:23 2018 +0100
+
+    scsi: cxgb4i: fix thermal configuration dependencies
+    
+    I fixed a bug by adding a dependency in the network driver, but that fix
+    caused a related bug in the SCSI driver:
+    
+    WARNING: unmet direct dependencies detected for CHELSIO_T4
+      Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_CHELSIO [=y] && PCI [=y] && (IPV6 [=y] || IPV6 [=y]=n) && (THERMAL [=m] || !THERMAL [=m])
+      Selected by [y]:
+      - SCSI_CXGB4_ISCSI [=y] && SCSI_LOWLEVEL [=y] && SCSI [=y] && PCI [=y] && INET [=y] && (IPV6 [=y] || IPV6 [=y]=n)
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.o: In function `cxgb4_thermal_init':
+    cxgb4_thermal.c:(.text+0x158): undefined reference to `thermal_zone_device_register'
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.o: In function `cxgb4_thermal_remove':
+    cxgb4_thermal.c:(.text+0x1d8): undefined reference to `thermal_zone_device_unregister'
+    /git/arm-soc/Makefile:1042: recipe for target 'vmlinux' failed
+    
+    The same dependency needs to be propagated here to make it work correctly
+    with CONFIG_THERMAL=m and SCSI_CXGB4_ISCSI=y. That change by itself causes
+    another problem with a circular dependency, as we use 'select NETDEVICES'.
+    This is something we really should not do anyway, as a driver symbol should
+    never select another major subsystem, so let's turn that into a 'depends
+    on'. I don't see any downsides of that, as NETDEVICES is only disabled in
+    rather obscure cases that are not relevant to the users of cxgb4i.
+    
+    Fixes: e70a57fa59bb ("cxgb4: fix thermal configuration dependencies")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+commit c8a5f83fa43e8464f7bef12a8dc22f4e778bd78b
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Jan 25 17:44:12 2016 +0100
+
+    thermal: allow u8500-thermal driver to be a module
+    
+    [ Upstream commit 26716ce124fce88f288f07738ef685d5dfe5c13f ]
+    
+    When the thermal subsystem is a loadable module, the u8500 driver
+    fails to build:
+    
+    drivers/thermal/built-in.o: In function `db8500_thermal_probe':
+    db8500_thermal.c:(.text+0x96c): undefined reference to `thermal_zone_device_register'
+    drivers/thermal/built-in.o: In function `db8500_thermal_work':
+    db8500_thermal.c:(.text+0xab4): undefined reference to `thermal_zone_device_update'
+    
+    This changes the symbol to a tristate, so Kconfig can track the
+    dependency correctly.
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 90f9ed93549e68cd5e349d7c3a8ce0983728f1fe
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Jan 25 17:44:11 2016 +0100
+
+    thermal: allow spear-thermal driver to be a module
+    
+    [ Upstream commit 4d2f1794c07aae55b8f25f4d8aebcafc0d3e501d ]
+    
+    When the thermal subsystem is a loadable module, the spear driver
+    fails to build:
+    
+    drivers/thermal/built-in.o: In function `spear_thermal_exit':
+    spear_thermal.c:(.text+0xf8): undefined reference to `thermal_zone_device_unregister'
+    drivers/thermal/built-in.o: In function `spear_thermal_probe':
+    spear_thermal.c:(.text+0x230): undefined reference to `thermal_zone_device_register'
+    
+    This changes the symbol to a tristate, so Kconfig can track the
+    dependency correctly.
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e70a57fa59bb7fefe063780a49e063d0d0f61863
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Oct 11 10:57:57 2018 +0200
+
+    cxgb4: fix thermal configuration dependencies
+    
+    With CONFIG_THERMAL=m, we get a build error:
+    
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c: In function 'cxgb4_thermal_get_trip_type':
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c:48:11: error: 'struct adapter' has no member named 'ch_thermal'
+    
+    Once that is fixed by using IS_ENABLED() checks, we get a link error
+    against the thermal subsystem when cxgb4 is built-in:
+    
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.o: In function `cxgb4_thermal_init':
+    cxgb4_thermal.c:(.text+0x180): undefined reference to `thermal_zone_device_register'
+    drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.o: In function `cxgb4_thermal_remove':
+    cxgb4_thermal.c:(.text+0x1e0): undefined reference to `thermal_zone_device_unregister'
+    
+    Finally, since CONFIG_THERMAL can be =m, the Makefile fails to pick up the
+    extra file into built-in.a, and we get another link failure against the
+    cxgb4_thermal_init/cxgb4_thermal_remove files, so the Makefile has to
+    be adapted as well to work for both CONFIG_THERMAL=y and =m.
+    
+    Fixes: b18719157762 ("cxgb4: Add thermal zone support")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit c9899c183921f919e10fe821be7de9fea876ba65
+Author: Miquel Raynal <miquel.raynal@bootlin.com>
+Date:   Mon Jul 16 16:41:51 2018 +0200
+
+    thermal: armada: use the resource managed registration helper alternative
+    
+    Current use of thermal_zone_device_register() triggers a warning at boot
+    and should be replaced by devm_thermal_zone_of_sensor_register(). This
+    allows better handling of multiple thermal zones for later multi-sensors
+    support.
+    
+    Also change the driver data to embed a new structure to make the
+    difference between legacy data (which needs to be cleaned) and
+    syscon-related data.
+    
+    Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit 023b7b07ccb57317bee4d971be546cc4469f4e7e
+Author: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Date:   Thu Aug 31 11:30:45 2017 +0530
+
+    thermal : Remove const to make same prototype
+    
+    Here, prototype of thermal_zone_device_register is not matching
+    with static inline thermal_zone_device_register. One is using
+    const thermal_zone_params. Other is using non-const.
+    
+    Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit c971aa3693e1b68086e62645c54a087616217b6f
+Merge: 8e7757d83d07 b32b5e14b4e0
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Sep 11 22:26:20 2017 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux
+    
+    Pull thermal updates from Zhang Rui:
+    
+     - fix resources release in error paths when registering thermal zone.
+       (Christophe Jaillet)
+    
+     - introduce a new thermal driver for on-chip PVT (Process, Voltage and
+       Temperature) monitoring unit implemented on UniPhier SoCs. This
+       driver supports temperature monitoring and alert function. (Kunihiko
+       Hayashi)
+    
+     - Add support for mt2712 chip in the mtk_thermal driver. (Louis Yu)
+    
+     - Add support for RK3328 SOC in rockchip_thermal driver. (Rocky Hao)
+    
+     - cleanup a couple of platform thermal drivers to constify
+       thermal_zone_of_device_ops structures. (Julia Lawall)
+    
+     - a couple of fixes in int340x and intel_pch_thermal thermal driver.
+       (Arvind Yadav, Sumeet Pawnikar, Brian Bian, Ed Swierk, Zhang Rui)
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux: (27 commits)
+      Thermal: int3406_thermal: fix thermal sysfs I/F
+      thermal: mediatek: minor mtk_thermal.c cleanups
+      thermal: mediatek: extend calibration data for mt2712 chip
+      thermal: mediatek: add Mediatek thermal driver for mt2712
+      dt-bindings: thermal: Add binding document for Mediatek thermal controller
+      thermal: intel_pch_thermal: Fix enable check on Broadwell-DE
+      thermal: rockchip: Support the RK3328 SOC in thermal driver
+      dt-bindings: rockchip-thermal: Support the RK3328 SoC compatible
+      thermal: bcm2835: constify thermal_zone_of_device_ops structures
+      thermal: exynos: constify thermal_zone_of_device_ops structures
+      thermal: zx2967: constify thermal_zone_of_device_ops structures
+      thermal: rcar_gen3_thermal: constify thermal_zone_of_device_ops structures
+      thermal: qoriq: constify thermal_zone_of_device_ops structures
+      thermal: hisilicon: constify thermal_zone_of_device_ops structures
+      thermal: core: Fix resources release in error paths in thermal_zone_device_register()
+      thermal: core: Use the new 'thermal_zone_destroy_device_groups()' helper function
+      thermal: core: Add some new helper functions to free resources
+      thermal: int3400_thermal: process "thermal table changed" event
+      thermal: uniphier: add UniPhier thermal driver
+      dt-bindings: thermal: add binding documentation for UniPhier thermal monitor
+      ...
+
+commit 9d9ca1f9f04cf1d20427528cd3b3d05ebad47547
+Author: Christophe Jaillet <christophe.jaillet@wanadoo.fr>
+Date:   Tue Aug 8 16:39:54 2017 +0200
+
+    thermal: core: Fix resources release in error paths in thermal_zone_device_register()
+    
+    Reorder error handling code in order to fix some resources leaks in some
+    cases:
+       - 'tz' would leak if 'thermal_zone_create_device_groups()' fails
+       - memory allocated by 'thermal_zone_create_device_groups()' would leak
+         if 'device_register()' fails
+    
+    With this patch, we now have 2 error handling paths: one before
+    'device_register()', and one after it.
+    This is needed because some resources are released in 'thermal_release()'.
+    
+    Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 64a411e8042ed00057658000126fd9f2b4105bdd
+Author: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+Date:   Tue Jul 19 10:01:37 2016 +0000
+
+    thermal: rcar-thermal: enable hwmon when thermal_zone_of_sensor_register is used
+    
+    rcar-thermal is supporting both thermal_zone_of_sensor_register() and
+    thermal_zone_device_register(). But thermal_zone_of_sensor_register()
+    doesn't enable hwmon as default.
+    This patch enables it to keep compatibility
+    
+    Signed-off-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 3f0f77b6bb4fa56f6b22610f11d75464ac65743c
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece upstream.
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit acbda596b5cdf4784938fe6feca43b28c2dc8a53
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece upstream.
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 260c505e55b51645affb70a2c456b350f7e7460a
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    [ Upstream commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece ]
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+
+commit 5bc28b93a36e3cb3acc2870fb75cb6ffb182fece
+Author: Rhyland Klein <rklein@nvidia.com>
+Date:   Thu Jun 9 17:28:39 2016 -0400
+
+    power_supply: power_supply_read_temp only if use_cnt > 0
+    
+    Change power_supply_read_temp() to use power_supply_get_property()
+    so that it will check the use_cnt and ensure it is > 0. The use_cnt
+    will be incremented at the end of __power_supply_register, so this
+    will block to case where get_property can be called before the supply
+    is fully registered. This fixes the issue show in the stack below:
+    
+    [    1.452598] power_supply_read_temp+0x78/0x80
+    [    1.458680] thermal_zone_get_temp+0x5c/0x11c
+    [    1.464765] thermal_zone_device_update+0x34/0xb4
+    [    1.471195] thermal_zone_device_register+0x87c/0x8cc
+    [    1.477974] __power_supply_register+0x364/0x424
+    [    1.484317] power_supply_register_no_ws+0x10/0x18
+    [    1.490833] bq27xxx_battery_setup+0x10c/0x164
+    [    1.497003] bq27xxx_battery_i2c_probe+0xd0/0x1b0
+    [    1.503435] i2c_device_probe+0x174/0x240
+    [    1.509172] driver_probe_device+0x1fc/0x29c
+    [    1.515167] __driver_attach+0xa4/0xa8
+    [    1.520643] bus_for_each_dev+0x58/0x98
+    [    1.526204] driver_attach+0x20/0x28
+    [    1.531505] bus_add_driver+0x1c8/0x22c
+    [    1.537067] driver_register+0x68/0x108
+    [    1.542630] i2c_register_driver+0x38/0x7c
+    [    1.548457] bq27xxx_battery_i2c_driver_init+0x18/0x20
+    [    1.555321] do_one_initcall+0x38/0x12c
+    [    1.560886] kernel_init_freeable+0x148/0x1ec
+    [    1.566972] kernel_init+0x10/0xfc
+    [    1.572101] ret_from_fork+0x10/0x40
+    
+    Also make the same change to ps_get_max_charge_cntl_limit() and
+    ps_get_cur_chrage_cntl_limit() to be safe. Lastly, change the return
+    value of power_supply_get_property() to -EAGAIN from -ENODEV if
+    use_cnt <= 0.
+    
+    Fixes: 297d716f6260 ("power_supply: Change ownership from driver to core")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Rhyland Klein <rklein@nvidia.com>
+    Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+
+commit 5640c4c37eee293451388cd5ee74dfed3a30f32d
+Author: Mike Galbraith <umgwanakikbuti@gmail.com>
+Date:   Fri Apr 22 20:30:39 2016 -0400
+
+    Correct backport of fa3c776 ("Thermal: Ignore invalid trip points")
+    
+    Backport of 81ad4276b505e987dd8ebbdf63605f92cd172b52 failed to adjust
+    for intervening ->get_trip_temp() argument type change, thus causing
+    stack protector to panic.
+    
+    drivers/thermal/thermal_core.c: In function ‘thermal_zone_device_register’:
+    drivers/thermal/thermal_core.c:1569:41: warning: passing argument 3 of
+    ‘tz->ops->get_trip_temp’ from incompatible pointer type [-Wincompatible-pointer-types]
+       if (tz->ops->get_trip_temp(tz, count, &trip_temp))
+                                             ^
+    drivers/thermal/thermal_core.c:1569:41: note: expected ‘long unsigned int *’
+    but argument is of type ‘int *’
+    
+    CC: <stable@vger.kernel.org> #3.18,#4.1
+    Signed-off-by: Mike Galbraith <umgwanakikbuti@gmail.com>
+
+commit 95617b5e03996c9b76743c187d53849ae1c296a2
+Author: Mike Galbraith <umgwanakikbuti@gmail.com>
+Date:   Fri Apr 22 20:38:23 2016 -0400
+
+    Correct backport of fa3c776 ("Thermal: Ignore invalid trip points")
+    
+    Backport of 81ad4276b505e987dd8ebbdf63605f92cd172b52 failed to adjust
+    for intervening ->get_trip_temp() argument type change, thus causing
+    stack protector to panic.
+    
+    drivers/thermal/thermal_core.c: In function ‘thermal_zone_device_register’:
+    drivers/thermal/thermal_core.c:1569:41: warning: passing argument 3 of
+    ‘tz->ops->get_trip_temp’ from incompatible pointer type [-Wincompatible-pointer-types]
+       if (tz->ops->get_trip_temp(tz, count, &trip_temp))
+                                             ^
+    drivers/thermal/thermal_core.c:1569:41: note: expected ‘long unsigned int *’
+    but argument is of type ‘int *’
+    
+    CC: <stable@vger.kernel.org> #3.18,#4.1
+    Signed-off-by: Mike Galbraith <umgwanakikbuti@gmail.com>
+
+commit 26716ce124fce88f288f07738ef685d5dfe5c13f
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Jan 25 17:44:12 2016 +0100
+
+    thermal: allow u8500-thermal driver to be a module
+    
+    When the thermal subsystem is a loadable module, the u8500 driver
+    fails to build:
+    
+    drivers/thermal/built-in.o: In function `db8500_thermal_probe':
+    db8500_thermal.c:(.text+0x96c): undefined reference to `thermal_zone_device_register'
+    drivers/thermal/built-in.o: In function `db8500_thermal_work':
+    db8500_thermal.c:(.text+0xab4): undefined reference to `thermal_zone_device_update'
+    
+    This changes the symbol to a tristate, so Kconfig can track the
+    dependency correctly.
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit 4d2f1794c07aae55b8f25f4d8aebcafc0d3e501d
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Jan 25 17:44:11 2016 +0100
+
+    thermal: allow spear-thermal driver to be a module
+    
+    When the thermal subsystem is a loadable module, the spear driver
+    fails to build:
+    
+    drivers/thermal/built-in.o: In function `spear_thermal_exit':
+    spear_thermal.c:(.text+0xf8): undefined reference to `thermal_zone_device_unregister'
+    drivers/thermal/built-in.o: In function `spear_thermal_probe':
+    spear_thermal.c:(.text+0x230): undefined reference to `thermal_zone_device_register'
+    
+    This changes the symbol to a tristate, so Kconfig can track the
+    dependency correctly.
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit dbdf2532b46256584447cd7e742bfb1b31ac56c4
+Author: Sascha Hauer <s.hauer@pengutronix.de>
+Date:   Mon Jul 6 09:46:15 2015 +0200
+
+    thermal: remove unnecessary call to thermal_zone_device_set_polling
+    
+    When the thermal zone has no get_temp callback then thermal_zone_device_register()
+    calls thermal_zone_device_set_polling() with a polling delay of 0. This
+    only cancels the poll_queue. Since the poll_queue hasn't been scheduled this
+    is a no-op. Remove it.
+    
+    Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+    Acked-by: Eduardo Valentin <edubezval@gmail.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 4abe602d5d2c7a64bde935acae4b15e49c8b3238
+Author: Javi Merino <javi.merino@arm.com>
+Date:   Tue Mar 3 15:30:50 2015 +0000
+
+    thermal: x86_pkg_temp: drop const for thermal_zone_parameters
+    
+    8754d5115693 ("thermal: introduce the Power Allocator governor") dropped
+    the const attribute in the struct thermal_zone_device.  That means that
+    the thermal_zone_params pointer passed to thermal_zone_device_register()
+    also lost the const qualifier.  Drop the const in x86_pkg_temp_thermal.c
+    as well to avoid the following warning as reported by the kbuild test
+    robot:
+    
+       drivers/thermal/x86_pkg_temp_thermal.c: In function 'pkg_temp_thermal_device_add':
+    >> drivers/thermal/x86_pkg_temp_thermal.c:450:31: warning: passing argument 6 of 'thermal_zone_device_register' discards 'const' qualifier from pointer target type
+           phy_dev_entry, &tzone_ops, &pkg_temp_tz_params, 0, 0);
+                                      ^
+       In file included from drivers/thermal/x86_pkg_temp_thermal.c:30:0:
+       include/linux/thermal.h:378:29: note: expected 'struct thermal_zone_params *' but argument is of type 'const struct thermal_zone_params *'
+        struct thermal_zone_device *thermal_zone_device_register(const char *, int, int,
+                                    ^
+    
+    Cc: Jean Delvare <jdelvare@suse.de>
+    Cc: Zhang Rui <rui.zhang@intel.com>
+    Cc: Eduardo Valentin <edubezval@gmail.com>
+    Signed-off-by: Javi Merino <javi.merino@arm.com>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit 200db647112d9a0f1dce273604f949f916bd2426
+Author: Randy Dunlap <rdunlap@infradead.org>
+Date:   Mon Dec 15 09:00:13 2014 -0800
+
+    platform/x86/acerhdf: Still depends on THERMAL
+    
+    acerhdf uses thermal interfaces so it should depend on THERMAL.
+    It also should not select a thermal driver without checking that
+    THERMAL is enabled.
+    
+    This fixes the following build errors when THERMAL=m and
+    ACERHDF=y.
+    
+    drivers/built-in.o: In function `acerhdf_set_mode':
+    acerhdf.c:(.text+0x3e02e1): undefined reference to `thermal_zone_device_update'
+    drivers/built-in.o: In function `acerhdf_unbind':
+    acerhdf.c:(.text+0x3e052d): undefined reference to `thermal_zone_unbind_cooling_device'
+    drivers/built-in.o: In function `acerhdf_bind':
+    acerhdf.c:(.text+0x3e0593): undefined reference to `thermal_zone_bind_cooling_device'
+    drivers/built-in.o: In function `acerhdf_init':
+    acerhdf.c:(.init.text+0x1c2f5): undefined reference to `thermal_cooling_device_register'
+    acerhdf.c:(.init.text+0x1c360): undefined reference to `thermal_zone_device_register'
+    drivers/built-in.o: In function `acerhdf_unregister_thermal':
+    acerhdf.c:(.text.unlikely+0x3c67): undefined reference to `thermal_cooling_device_unregister'
+    acerhdf.c:(.text.unlikely+0x3c91): undefined reference to `thermal_zone_device_unregister'
+    
+    Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+    Acked-by: Peter Feuerer <peter@piie.net>
+    Signed-off-by: Darren Hart <dvhart@linux.intel.com>
+
+commit 90a21ff5824c3ae8b49c1c0498b137792b935aab
+Author: Heiner Kallweit <heiner.kallweit@web.de>
+Date:   Sat Nov 8 20:35:54 2014 +0100
+
+    imx: thermal: imx_get_temp might be called before sensor clock is prepared
+    
+    imx_get_temp might be called before the sensor clock is prepared
+    thus resulting in a timeout of the first attempt to read temp:
+    thermal thermal_zone0: failed to read out thermal zone 0
+    Happened to me on a Utilite Standard with IMX6 Dual SoC.
+    
+    Reason is that in imx_thermal_probe thermal_zone_device_register
+    is called before the sensor clock is prepared.
+    thermal_zone_device_register however calls
+    thermal_zone_device_update which eventually calls imx_get_temp.
+    
+    Fix this by preparing the clock before calling
+    thermal_zone_device_register.
+    
+    Signed-off-by: Heiner Kallweit <heiner.kallweit@web.de>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit ba9c91825d4a3bb49532d4a59c72e98b529b7eff
+Author: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Date:   Tue Oct 7 17:47:37 2014 +0200
+
+    power: charger-manager: Avoid recursive thermal get_temp call
+    
+    The charger manager supports POWER_SUPPLY_PROP_TEMP property and acts
+    as a thermal zone if any of these conditions match:
+    1. Fuel gauge used by charger manager supports POWER_SUPPLY_PROP_TEMP.
+    2. 'cm-thermal-zone' property is present in DTS (then it will supersede
+       the fuel gauge temperature property).
+    
+    However in case 1 (fuel gauge reports temperature and 'cm-thermal-zone'
+    is not set) the charger manager forwards its get_temp calls to fuel
+    gauge thermal zone.
+    
+    This leads to reporting by lockdep a false positive deadlock for thermal
+    zone's mutex because of nested calls to thermal_zone_get_temp(). This is
+    false positive because these are different mutexes: one for charger
+    manager thermal zone and second for fuel gauge thermal zone.
+    
+    Get rid of false lockdep alert and recursive call by setting
+    'no_thermal' property for this power supply class. The thermal zone for
+    charger manager won't be created (user space does not use it anyway).
+    
+    The lockdep report:
+    [    2.540339] charger-manager charger-manager@0: Ignoring full-battery voltage threshold as it is not supplied
+    [    2.540351] charger-manager charger-manager@0: Ignoring full-battery full capacity threshold as it is not supplied
+    [    2.546296]
+    [    2.546302] =============================================
+    [    2.546305] [ INFO: possible recursive locking detected ]
+    [    2.546312] 3.17.0-rc6-next-20140926-00012-gbb13895e46af-dirty #39 Not tainted
+    [    2.546316] ---------------------------------------------
+    [    2.546321] swapper/0/1 is trying to acquire lock:
+    [    2.546348]  (&tz->lock){+.+...}, at: [<c0321d24>] thermal_zone_get_temp+0x38/0x68
+    [    2.546352]
+    [    2.546352] but task is already holding lock:
+    [    2.546369]  (&tz->lock){+.+...}, at: [<c0321d24>] thermal_zone_get_temp+0x38/0x68
+    [    2.546373]
+    [    2.546373] other info that might help us debug this:
+    [    2.546376]  Possible unsafe locking scenario:
+    [    2.546376]
+    [    2.546378]        CPU0
+    [    2.546380]        ----
+    [    2.546386]   lock(&tz->lock);
+    [    2.546392]   lock(&tz->lock);
+    [    2.546394]
+    [    2.546394]  *** DEADLOCK ***
+    [    2.546394]
+    [    2.546397]  May be due to missing lock nesting notation
+    [    2.546397]
+    [    2.546401] 2 locks held by swapper/0/1:
+    [    2.546430]  #0:  (&dev->mutex){......}, at: [<c02720c4>] __driver_attach+0x58/0x98
+    [    2.546448]  #1:  (&tz->lock){+.+...}, at: [<c0321d24>] thermal_zone_get_temp+0x38/0x68
+    [    2.546451]
+    [    2.546451] stack backtrace:
+    [    2.546460] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.17.0-rc6-next-20140926-00012-gbb13895e46af-dirty #39
+    [    2.546497] [<c00140f0>] (unwind_backtrace) from [<c0011228>] (show_stack+0x10/0x14)
+    [    2.546526] [<c0011228>] (show_stack) from [<c046158c>] (dump_stack+0x70/0xbc)
+    [    2.546554] [<c046158c>] (dump_stack) from [<c005e32c>] (validate_chain.isra.24+0x718/0x890)
+    [    2.546569] [<c005e32c>] (validate_chain.isra.24) from [<c005f0a0>] (__lock_acquire+0x498/0xa78)
+    [    2.546581] [<c005f0a0>] (__lock_acquire) from [<c005fb50>] (lock_acquire+0x78/0xb8)
+    [    2.546594] [<c005fb50>] (lock_acquire) from [<c0464260>] (mutex_lock_nested+0x64/0x458)
+    [    2.546605] [<c0464260>] (mutex_lock_nested) from [<c0321d24>] (thermal_zone_get_temp+0x38/0x68)
+    [    2.546634] [<c0321d24>] (thermal_zone_get_temp) from [<c031f1e0>] (charger_get_property+0x10c/0x348)
+    [    2.546649] [<c031f1e0>] (charger_get_property) from [<c031af18>] (power_supply_read_temp+0x28/0x58)
+    [    2.546662] [<c031af18>] (power_supply_read_temp) from [<c0321d38>] (thermal_zone_get_temp+0x4c/0x68)
+    [    2.546676] [<c0321d38>] (thermal_zone_get_temp) from [<c03233d8>] (thermal_zone_device_update+0x24/0x9c)
+    [    2.546687] [<c03233d8>] (thermal_zone_device_update) from [<c0323874>] (thermal_zone_device_register+0x424/0x550)
+    [    2.546701] [<c0323874>] (thermal_zone_device_register) from [<c031b3c0>] (__power_supply_register+0x2a4/0x348)
+    [    2.546714] [<c031b3c0>] (__power_supply_register) from [<c031ff64>] (charger_manager_probe+0x600/0xe5c)
+    [    2.546727] [<c031ff64>] (charger_manager_probe) from [<c0273384>] (platform_drv_probe+0x48/0xa4)
+    [    2.546746] [<c0273384>] (platform_drv_probe) from [<c0271f54>] (driver_probe_device+0x10c/0x224)
+    [    2.546760] [<c0271f54>] (driver_probe_device) from [<c0272100>] (__driver_attach+0x94/0x98)
+    [    2.546772] [<c0272100>] (__driver_attach) from [<c0270780>] (bus_for_each_dev+0x54/0x88)
+    [    2.546784] [<c0270780>] (bus_for_each_dev) from [<c027173c>] (bus_add_driver+0xd4/0x1d0)
+    [    2.546797] [<c027173c>] (bus_add_driver) from [<c027271c>] (driver_register+0x78/0xf4)
+    [    2.546809] [<c027271c>] (driver_register) from [<c0008984>] (do_one_initcall+0x80/0x1d4)
+    [    2.546829] [<c0008984>] (do_one_initcall) from [<c0612d60>] (kernel_init_freeable+0x10c/0x1d8)
+    [    2.546847] [<c0612d60>] (kernel_init_freeable) from [<c045c238>] (kernel_init+0x8/0xec)
+    [    2.546863] [<c045c238>] (kernel_init) from [<c000e828>] (ret_from_fork+0x14/0x2c)
+    [    2.551396] charger-manager charger-manager@0: 'chg-reg' regulator's externally_control is 0
+    
+    Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+    Signed-off-by: Sebastian Reichel <sre@kernel.org>
+
+commit b688b5bf845eb1fc3be06073a7be3ba6b7933f52
+Author: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Date:   Fri Dec 20 17:42:07 2013 +0530
+
+    thermal:samsung: fix compilation warning
+    
+    This patch fixes a compilation warning.
+    
+    warning: passing argument 5 of 'thermal_zone_device_register' discards 'const'
+    qualifier from pointer target type [enabled by default]
+    include/linux/thermal.h:270:29: note: expected 'struct thermal_zone_device_ops *'
+    but argument is of type 'const struct thermal_zone_device_ops *'
+    
+    Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit b29bdba51924f6fd5971352ba111784dee3a5853
+Merge: e0fd9affeb64 de6558dc964f
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu May 9 09:40:49 2013 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux
+    
+    Pull thermal management update from Zhang Rui:
+     "The most important one is to build thermal core and governor and cpu
+      cooling code into one module.  This fixes a regression that thermal
+      core does not work if it is built as module, since 3.7.  I'll backport
+      them to stable kernel once those changes are in upstream.
+    
+      The largest batch is the thermal kernel-doc & coding style
+      updates/cleanups from Eduardo.
+    
+      Highlights:
+    
+       - build all thermal framework code into one module to fix a
+         regression that thermal does not work if it is built as module.
+    
+       - Marvell Armada 370/XP thermal sensor driver
+    
+       - thermal core/cpu cooling kernel-doc & coding style updates and
+         cleanups.
+    
+       - Add Eduardo Valentin as thermal sub-maintainer, both in mailing
+         list and patchwork.  He will help me on arm thermal drivers."
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux: (68 commits)
+      thermal: db8500_cpufreq_cooling: remove usage of IS_ERR_OR_NULL()
+      thermal: thermal_core: remove usage of IS_ERR_OR_NULL
+      thermal: cpu_cooling: improve line breaking
+      thermal: cpu_cooling: alignment improvements
+      thermal: cpu_cooling: remove checkpatch.pl warning
+      thermal: cpu_cooling: remove trailing blank line
+      thermal: cpu_cooling: align on open parenthesis
+      thermal: cpu_cooling: standardize comment style
+      thermal: cpu_cooling: standardize end of function
+      thermal: cpu_cooling: remove trailing white spaces
+      Thermal: update documentation for thermal_zone_device_register
+      thermal: update kernel-doc for thermal_zone_device_register
+      thermal: update kernel-doc for create_trip_attrs
+      thermal: update kernel-doc for thermal_cooling_device_register
+      thermal: update kernel-doc for thermal_zone_unbind_cooling_device
+      thermal: update kernel-doc for thermal_zone_bind_cooling_device
+      thermal: use EXPORT_SYMBOL_GPL
+      thermal: rename notify_thermal_framework to thermal_notify_framework
+      thermal: update driver license
+      thermal: use strlcpy instead of strcpy
+      ...
+
+commit 514e6d20147b86900f3302ef756af58890641b4d
+Author: Zhang Rui <rui.zhang@intel.com>
+Date:   Wed Apr 24 16:59:22 2013 +0000
+
+    Thermal: update documentation for thermal_zone_device_register
+    
+    Update kernel Documentation for thermal_zone_device_register.
+    
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit a00e55f9c8c06e2bba5db5f2e7dec16b86d560ec
+Author: Eduardo Valentin <eduardo.valentin@ti.com>
+Date:   Tue Apr 23 21:48:20 2013 +0000
+
+    thermal: update kernel-doc for thermal_zone_device_register
+    
+    This patch updates the documentation for thermal_zone_device_register
+    and removes the warnings generated by scripts/kernel-doc -v.
+    
+    Signed-off-by: Eduardo Valentin <eduardo.valentin@ti.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit f534e9bf8074ca8c258a1ce0e5224372298976f9
+Author: Axel Lin <axel.lin@ingics.com>
+Date:   Tue Mar 12 15:42:20 2013 +0000
+
+    thermal: db8500: Fix checking return value of thermal_zone_device_register
+    
+    thermal_zone_device_register() returns ERR_PTR on error, thus use
+    IS_ERR rather than IS_ERR_OR_NULL to check return value.
+    
+    Signed-off-by: Axel Lin <axel.lin@ingics.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 0a7e453103b9718d357688b83bb968ee108cc874
+Merge: cd8234693488 043e4652bf33
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Mar 21 08:37:10 2013 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux
+    
+    Pull thermal management fixes from Zhang Rui.
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux:
+      thermal: exynos_thermal: return a proper error code while thermal_zone_device_register fail.
+      thermal: rcar_thermal: propagate return value of thermal_zone_device_register
+      Thermal: kirkwood: Convert to devm_ioremap_resource()
+      Thermal: rcar: Convert to devm_ioremap_resource()
+      Thermal: dove: Convert to devm_ioremap_resource()
+      thermal: rcar: fix missing unlock on error in rcar_thermal_update_temp()
+
+commit 043e4652bf3378883e7c0db38fa47fa8e2558f9c
+Author: Devendra Naga <devendra.aaru@gmail.com>
+Date:   Mon Mar 4 16:52:48 2013 +0000
+
+    thermal: exynos_thermal: return a proper error code while thermal_zone_device_register fail.
+    
+    we are returning EINVAL while the thermal_zone_device_register function fail.
+    instead we can use the return value from the thermal_zone_device_register by
+    using PTR_ERR.
+    
+    Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit fb84d9907f0ff0e3f7d70d55039ddf0f78d2a472
+Author: Devendra Naga <devendra.aaru@gmail.com>
+Date:   Mon Mar 4 16:52:47 2013 +0000
+
+    thermal: rcar_thermal: propagate return value of thermal_zone_device_register
+    
+    thermal_zone_device_register returns a value contained in the pointer itself
+    use PTR_ERR to obtain the address and return it at the end.
+    
+    Signed-off-by: Devendra Naga <devendra.aaru@gmail.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 7eb0fad53ef76201d81a2e9e1bad5b68a457e4e3
+Author: Rajanikanth H.V <rajanikanth.hv@stericsson.com>
+Date:   Wed Jan 23 09:56:45 2013 +0530
+
+    ab8500_btemp: Demote initcall sequence
+    
+    commit eeb0751c99522a4d1bbcc7b6bc1460cd07d07488 upstream.
+    
+    Power supply subsystem creates thermal zone device for the property
+    'POWER_SUPPLY_PROP_TEMP' which requires thermal subsystem to be ready
+    before 'ab8500 battery temperature monitor' driver is initialized. ab8500
+    btemp driver is initialized with subsys_initcall whereas thermal subsystem
+    is initialized with fs_initcall which causes
+    thermal_zone_device_register(...) to crash since the required structure
+    'thermal_class' is not initialized yet:
+    
+    Unable to handle kernel NULL pointer dereference at virtual address 000000a4
+    pgd = c0004000
+    [000000a4] *pgd=00000000
+    Internal error: Oops: 5 [#1] PREEMPT SMP ARM
+    Modules linked in:
+    CPU: 0    Tainted: G        W     (3.8.0-rc4-00001-g632fda8-dirty #1)
+    PC is at _raw_spin_lock+0x18/0x54
+    LR is at get_device_parent+0x50/0x1b8
+    pc : [<c02f1dd0>]    lr : [<c01cb248>]    psr: 60000013
+    sp : ef04bdc8  ip : 00000000  fp : c0446180
+    r10: ef216e38  r9 : c03af5d0  r8 : ef275c18
+    r7 : 00000000  r6 : c0476c14  r5 : ef275c18  r4 : ef095840
+    r3 : ef04a000  r2 : 00000001  r1 : 00000000  r0 : 000000a4
+    Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+    Control: 10c5787d  Table: 0000404a  DAC: 00000015
+    Process swapper/0 (pid: 1, stack limit = 0xef04a238)
+    Stack: (0xef04bdc8 to 0xef04c000)
+    [...]
+    [<c02f1dd0>] (_raw_spin_lock+0x18/0x54) from [<c01cb248>] (get_device_parent+0x50/0x1b8)
+    [<c01cb248>] (get_device_parent+0x50/0x1b8) from [<c01cb8d8>] (device_add+0xa4/0x574)
+    [<c01cb8d8>] (device_add+0xa4/0x574) from [<c020b91c>] (thermal_zone_device_register+0x118/0x938)
+    [<c020b91c>] (thermal_zone_device_register+0x118/0x938) from [<c0202030>] (power_supply_register+0x170/0x1f8)
+    [<c0202030>] (power_supply_register+0x170/0x1f8) from [<c02055ec>] (ab8500_btemp_probe+0x208/0x47c)
+    [<c02055ec>] (ab8500_btemp_probe+0x208/0x47c) from [<c01cf0dc>] (platform_drv_probe+0x14/0x18)
+    [<c01cf0dc>] (platform_drv_probe+0x14/0x18) from [<c01cde70>] (driver_probe_device+0x74/0x20c)
+    [<c01cde70>] (driver_probe_device+0x74/0x20c) from [<c01ce094>] (__driver_attach+0x8c/0x90)
+    [<c01ce094>] (__driver_attach+0x8c/0x90) from [<c01cc640>] (bus_for_each_dev+0x4c/0x80)
+    [<c01cc640>] (bus_for_each_dev+0x4c/0x80) from [<c01cd6b4>] (bus_add_driver+0x16c/0x23c)
+    [<c01cd6b4>] (bus_add_driver+0x16c/0x23c) from [<c01ce54c>] (driver_register+0x78/0x14c)
+    [<c01ce54c>] (driver_register+0x78/0x14c) from [<c00086ac>] (do_one_initcall+0xfc/0x164)
+    [<c00086ac>] (do_one_initcall+0xfc/0x164) from [<c02e89c8>] (kernel_init+0x120/0x2b8)
+    [<c02e89c8>] (kernel_init+0x120/0x2b8) from [<c000e358>] (ret_from_fork+0x14/0x3c)
+    Code: e3c3303f e5932004 e2822001 e5832004 (e1903f9f)
+    ---[ end trace ed9df72941b5bada ]---
+    
+    Signed-off-by: Rajanikanth H.V <rajanikanth.hv@stericsson.com>
+    Signed-off-by: Anton Vorontsov <anton@enomsg.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1564220437d4e77154d3e9fbdccf039d60c60a68
+Author: Rajanikanth H.V <rajanikanth.hv@stericsson.com>
+Date:   Wed Jan 23 09:56:45 2013 +0530
+
+    ab8500_btemp: Demote initcall sequence
+    
+    commit eeb0751c99522a4d1bbcc7b6bc1460cd07d07488 upstream.
+    
+    Power supply subsystem creates thermal zone device for the property
+    'POWER_SUPPLY_PROP_TEMP' which requires thermal subsystem to be ready
+    before 'ab8500 battery temperature monitor' driver is initialized. ab8500
+    btemp driver is initialized with subsys_initcall whereas thermal subsystem
+    is initialized with fs_initcall which causes
+    thermal_zone_device_register(...) to crash since the required structure
+    'thermal_class' is not initialized yet:
+    
+    Unable to handle kernel NULL pointer dereference at virtual address 000000a4
+    pgd = c0004000
+    [000000a4] *pgd=00000000
+    Internal error: Oops: 5 [#1] PREEMPT SMP ARM
+    Modules linked in:
+    CPU: 0    Tainted: G        W     (3.8.0-rc4-00001-g632fda8-dirty #1)
+    PC is at _raw_spin_lock+0x18/0x54
+    LR is at get_device_parent+0x50/0x1b8
+    pc : [<c02f1dd0>]    lr : [<c01cb248>]    psr: 60000013
+    sp : ef04bdc8  ip : 00000000  fp : c0446180
+    r10: ef216e38  r9 : c03af5d0  r8 : ef275c18
+    r7 : 00000000  r6 : c0476c14  r5 : ef275c18  r4 : ef095840
+    r3 : ef04a000  r2 : 00000001  r1 : 00000000  r0 : 000000a4
+    Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+    Control: 10c5787d  Table: 0000404a  DAC: 00000015
+    Process swapper/0 (pid: 1, stack limit = 0xef04a238)
+    Stack: (0xef04bdc8 to 0xef04c000)
+    [...]
+    [<c02f1dd0>] (_raw_spin_lock+0x18/0x54) from [<c01cb248>] (get_device_parent+0x50/0x1b8)
+    [<c01cb248>] (get_device_parent+0x50/0x1b8) from [<c01cb8d8>] (device_add+0xa4/0x574)
+    [<c01cb8d8>] (device_add+0xa4/0x574) from [<c020b91c>] (thermal_zone_device_register+0x118/0x938)
+    [<c020b91c>] (thermal_zone_device_register+0x118/0x938) from [<c0202030>] (power_supply_register+0x170/0x1f8)
+    [<c0202030>] (power_supply_register+0x170/0x1f8) from [<c02055ec>] (ab8500_btemp_probe+0x208/0x47c)
+    [<c02055ec>] (ab8500_btemp_probe+0x208/0x47c) from [<c01cf0dc>] (platform_drv_probe+0x14/0x18)
+    [<c01cf0dc>] (platform_drv_probe+0x14/0x18) from [<c01cde70>] (driver_probe_device+0x74/0x20c)
+    [<c01cde70>] (driver_probe_device+0x74/0x20c) from [<c01ce094>] (__driver_attach+0x8c/0x90)
+    [<c01ce094>] (__driver_attach+0x8c/0x90) from [<c01cc640>] (bus_for_each_dev+0x4c/0x80)
+    [<c01cc640>] (bus_for_each_dev+0x4c/0x80) from [<c01cd6b4>] (bus_add_driver+0x16c/0x23c)
+    [<c01cd6b4>] (bus_add_driver+0x16c/0x23c) from [<c01ce54c>] (driver_register+0x78/0x14c)
+    [<c01ce54c>] (driver_register+0x78/0x14c) from [<c00086ac>] (do_one_initcall+0xfc/0x164)
+    [<c00086ac>] (do_one_initcall+0xfc/0x164) from [<c02e89c8>] (kernel_init+0x120/0x2b8)
+    [<c02e89c8>] (kernel_init+0x120/0x2b8) from [<c000e358>] (ret_from_fork+0x14/0x3c)
+    Code: e3c3303f e5932004 e2822001 e5832004 (e1903f9f)
+    ---[ end trace ed9df72941b5bada ]---
+    
+    Signed-off-by: Rajanikanth H.V <rajanikanth.hv@stericsson.com>
+    Signed-off-by: Anton Vorontsov <anton@enomsg.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit eeb0751c99522a4d1bbcc7b6bc1460cd07d07488
+Author: Rajanikanth H.V <rajanikanth.hv@stericsson.com>
+Date:   Wed Jan 23 09:56:45 2013 +0530
+
+    ab8500_btemp: Demote initcall sequence
+    
+    Power supply subsystem creates thermal zone device for the property
+    'POWER_SUPPLY_PROP_TEMP' which requires thermal subsystem to be ready
+    before 'ab8500 battery temperature monitor' driver is initialized. ab8500
+    btemp driver is initialized with subsys_initcall whereas thermal subsystem
+    is initialized with fs_initcall which causes
+    thermal_zone_device_register(...) to crash since the required structure
+    'thermal_class' is not initialized yet:
+    
+    Unable to handle kernel NULL pointer dereference at virtual address 000000a4
+    pgd = c0004000
+    [000000a4] *pgd=00000000
+    Internal error: Oops: 5 [#1] PREEMPT SMP ARM
+    Modules linked in:
+    CPU: 0    Tainted: G        W     (3.8.0-rc4-00001-g632fda8-dirty #1)
+    PC is at _raw_spin_lock+0x18/0x54
+    LR is at get_device_parent+0x50/0x1b8
+    pc : [<c02f1dd0>]    lr : [<c01cb248>]    psr: 60000013
+    sp : ef04bdc8  ip : 00000000  fp : c0446180
+    r10: ef216e38  r9 : c03af5d0  r8 : ef275c18
+    r7 : 00000000  r6 : c0476c14  r5 : ef275c18  r4 : ef095840
+    r3 : ef04a000  r2 : 00000001  r1 : 00000000  r0 : 000000a4
+    Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+    Control: 10c5787d  Table: 0000404a  DAC: 00000015
+    Process swapper/0 (pid: 1, stack limit = 0xef04a238)
+    Stack: (0xef04bdc8 to 0xef04c000)
+    [...]
+    [<c02f1dd0>] (_raw_spin_lock+0x18/0x54) from [<c01cb248>] (get_device_parent+0x50/0x1b8)
+    [<c01cb248>] (get_device_parent+0x50/0x1b8) from [<c01cb8d8>] (device_add+0xa4/0x574)
+    [<c01cb8d8>] (device_add+0xa4/0x574) from [<c020b91c>] (thermal_zone_device_register+0x118/0x938)
+    [<c020b91c>] (thermal_zone_device_register+0x118/0x938) from [<c0202030>] (power_supply_register+0x170/0x1f8)
+    [<c0202030>] (power_supply_register+0x170/0x1f8) from [<c02055ec>] (ab8500_btemp_probe+0x208/0x47c)
+    [<c02055ec>] (ab8500_btemp_probe+0x208/0x47c) from [<c01cf0dc>] (platform_drv_probe+0x14/0x18)
+    [<c01cf0dc>] (platform_drv_probe+0x14/0x18) from [<c01cde70>] (driver_probe_device+0x74/0x20c)
+    [<c01cde70>] (driver_probe_device+0x74/0x20c) from [<c01ce094>] (__driver_attach+0x8c/0x90)
+    [<c01ce094>] (__driver_attach+0x8c/0x90) from [<c01cc640>] (bus_for_each_dev+0x4c/0x80)
+    [<c01cc640>] (bus_for_each_dev+0x4c/0x80) from [<c01cd6b4>] (bus_add_driver+0x16c/0x23c)
+    [<c01cd6b4>] (bus_add_driver+0x16c/0x23c) from [<c01ce54c>] (driver_register+0x78/0x14c)
+    [<c01ce54c>] (driver_register+0x78/0x14c) from [<c00086ac>] (do_one_initcall+0xfc/0x164)
+    [<c00086ac>] (do_one_initcall+0xfc/0x164) from [<c02e89c8>] (kernel_init+0x120/0x2b8)
+    [<c02e89c8>] (kernel_init+0x120/0x2b8) from [<c000e358>] (ret_from_fork+0x14/0x3c)
+    Code: e3c3303f e5932004 e2822001 e5832004 (e1903f9f)
+    ---[ end trace ed9df72941b5bada ]---
+    
+    Signed-off-by: Rajanikanth H.V <rajanikanth.hv@stericsson.com>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Anton Vorontsov <anton@enomsg.org>
+
+commit d567c686aebc7140f73318ee250236bda39c04eb
+Author: Zhang Rui <rui.zhang@intel.com>
+Date:   Wed Dec 12 15:23:54 2012 +0800
+
+    Thermal: fix a NULL pointer dereference when generic thermal layer is built as a module
+    
+    [   12.761956] BUG: unable to handle kernel NULL pointer dereference at 0000000000000018
+    [   12.762016] IP: [<ffffffffa0005277>] handle_thermal_trip+0x47/0x130 [thermal_sys]
+    [   12.762060] PGD 1fec74067 PUD 1fee5b067 PMD 0
+    [   12.762127] Oops: 0000 [#1] SMP
+    [   12.762177] Modules linked in: hid_generic crc32c_intel usbhid hid firewire_ohci(+) e1000e(+) firewire_core crc_itu_t xhci_hcd(+) thermal(+) fan thermal_sys hwmon
+    [   12.762423] CPU 1
+    [   12.762443] Pid: 187, comm: modprobe Tainted: G       A     3.7.0-thermal-module+ #25                  /DH77DF
+    [   12.762496] RIP: 0010:[<ffffffffa0005277>]  [<ffffffffa0005277>] handle_thermal_trip+0x47/0x130 [thermal_sys]
+    [   12.762682] RSP: 0018:ffff8801fe7ddc18  EFLAGS: 00010282
+    [   12.762704] RAX: 0000000000000000 RBX: ffff8801ff3e9c00 RCX: ffff8801fdc39800
+    [   12.762728] RDX: ffff8801fe7ddc24 RSI: 0000000000000001 RDI: ffff8801ff3e9c00
+    [   12.762764] RBP: ffff8801fe7ddc48 R08: 0000000004000000 R09: ffffffffa001f568
+    [   12.762797] R10: ffffffff81363083 R11: 0000000000000001 R12: 0000000000000001
+    [   12.762832] R13: 0000000000000000 R14: 0000000000000001 R15: ffff8801fde73e68
+    [   12.762866] FS:  00007f5548516700(0000) GS:ffff88021f240000(0000) knlGS:0000000000000000
+    [   12.762912] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [   12.762946] CR2: 0000000000000018 CR3: 00000001fefe2000 CR4: 00000000001407e0
+    [   12.762979] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [   12.763014] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+    [   12.763048] Process modprobe (pid: 187, threadinfo ffff8801fe7dc000, task ffff8801fe5bdb40)
+    [   12.763095] Stack:
+    [   12.763122]  0000000000019640 00000000fdc39800 ffff8801fe7ddc48 ffff8801ff3e9c00
+    [   12.763225]  0000000000000002 0000000000000000 ffff8801fe7ddc78 ffffffffa00053e7
+    [   12.763338]  ffff8801ff3e9c00 0000000000006c98 ffffffffa0007480 ffff8801ff3e9c00
+    [   12.763440] Call Trace:
+    [   12.763470]  [<ffffffffa00053e7>] thermal_zone_device_update+0x77/0xa0 [thermal_sys]
+    [   12.763515]  [<ffffffffa0006d38>] thermal_zone_device_register+0x788/0xa88 [thermal_sys]
+    [   12.763562]  [<ffffffffa001f394>] acpi_thermal_add+0x360/0x4c8 [thermal]
+    [   12.763598]  [<ffffffff8133902a>] acpi_device_probe+0x50/0x190
+    [   12.763632]  [<ffffffff811bd793>] ? sysfs_create_link+0x13/0x20
+    [   12.763666]  [<ffffffff813cc41b>] driver_probe_device+0x7b/0x240
+    [   12.763699]  [<ffffffff813cc68b>] __driver_attach+0xab/0xb0
+    [   12.763732]  [<ffffffff813cc5e0>] ? driver_probe_device+0x240/0x240
+    [   12.763766]  [<ffffffff813ca836>] bus_for_each_dev+0x56/0x90
+    [   12.763799]  [<ffffffff813cbf4e>] driver_attach+0x1e/0x20
+    [   12.763831]  [<ffffffff813cbac0>] bus_add_driver+0x190/0x290
+    [   12.763864]  [<ffffffffa0022000>] ? 0xffffffffa0021fff
+    [   12.763896]  [<ffffffff813ccbea>] driver_register+0x7a/0x160
+    [   12.763928]  [<ffffffffa0022000>] ? 0xffffffffa0021fff
+    [   12.763960]  [<ffffffff813399fb>] acpi_bus_register_driver+0x43/0x45
+    [   12.763995]  [<ffffffffa002203a>] acpi_thermal_init+0x3a/0x42 [thermal]
+    [   12.764029]  [<ffffffff8100207f>] do_one_initcall+0x3f/0x170
+    [   12.764063]  [<ffffffff810b1a5f>] sys_init_module+0x8f/0x200
+    [   12.764097]  [<ffffffff815ff259>] system_call_fastpath+0x16/0x1b
+    [   12.764129] Code: 48 8b 87 c8 02 00 00 41 89 f4 48 8d 55 dc ff 50 28 44 8b 6d dc 41 8d 45 fe 83 f8 01 76 5e 48 8b 83 d8 02 00 00 44 89 e6 48 89 df <ff> 50 18 4c 8d a3 10 03 00 00 4c 89 e7 e8 87 f1 5e e1 8b 83 bc
+    [   12.765164] RIP  [<ffffffffa0005277>] handle_thermal_trip+0x47/0x130 [thermal_sys]
+    [   12.765223]  RSP <ffff8801fe7ddc18>
+    [   12.765252] CR2: 0000000000000018
+    [   12.765284] ---[ end trace 7723294cdfb00d2a ]---
+    
+    This is because thermal_zone_device_update() is invoked before
+    any thermal governors being registered.
+    
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 608f62b996c6e140ff7515abe75305aed4726b33
+Author: Devendra Naga <develkernel412222@gmail.com>
+Date:   Wed Oct 31 17:46:10 2012 +0900
+
+    thermal: solve compilation errors in rcar_thermal
+    
+    following were the errors reported
+    
+    drivers/thermal/rcar_thermal.c: In function ‘rcar_thermal_probe’:
+    drivers/thermal/rcar_thermal.c:214:10: warning: passing argument 3 of ‘thermal_zone_device_register’ makes integer from pointer without a cast [enabled by default]
+    include/linux/thermal.h:166:29: note: expected ‘int’ but argument is of type ‘struct rcar_thermal_priv *’
+    drivers/thermal/rcar_thermal.c:214:10: error: too few arguments to function ‘thermal_zone_device_register’
+    include/linux/thermal.h:166:29: note: declared here
+    make[1]: *** [drivers/thermal/rcar_thermal.o] Error 1
+    make: *** [drivers/thermal/rcar_thermal.o] Error 2
+    
+    with gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5)
+    
+    Signed-off-by: Devendra Naga <develkernel412222@gmail.com>
+    Signed-off-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 29b19e250434c6193c8b8e4c34c9c6284dd4f101
+Merge: 125c4c706b68 c072fed95c98
+Author: Len Brown <len.brown@intel.com>
+Date:   Tue Oct 9 01:35:52 2012 -0400
+
+    Merge branch 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux into thermal
+    
+    Conflicts:
+            drivers/staging/omap-thermal/omap-thermal-common.
+                    OMAP supplied dummy TC1 and TC2,
+                    at the same time that the thermal tree removed them
+                    from thermal_zone_device_register()
+    
+            drivers/thermal/cpu_cooling.c b/drivers/thermal/cpu_cooling.c
+                    propogate the upstream MAX_IDR_LEVEL re-name
+                            to prevent a build failure
+    
+            Previously-fixed-by: Stephen Rothwell <sfr@canb.auug.org.au>
+    
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 204dd1d39c32f39a95bf7a7248f63b372fd137a6
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Tue Aug 7 22:36:45 2012 -0700
+
+    thermal: Fix potential NULL pointer accesses
+    
+    The type parameter in thermal_zone_device_register and
+    thermal_cooling_device_register can be NULL, indicating that no sysfs attribute
+    for the type should be created. Only call strlen() and strcpy() on type if it is
+    not NULL.
+    
+    This patch addresses Coverity #102180 and #102182: Dereference before null check
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 4b1bf5871f7d59de6484cc887e205d6d2f1e6fbd
+Author: Anton Vorontsov <anton.vorontsov@linaro.org>
+Date:   Tue Jul 31 04:39:30 2012 -0700
+
+    thermal: Constify 'type' argument for the registration routine
+    
+    thermal_zone_device_register() does not modify 'type' argument, so it is
+    safe to declare it as const. Otherwise, if we pass a const string, we are
+    getting the ugly warning:
+    
+    CC drivers/power/power_supply_core.o
+    drivers/power/power_supply_core.c: In function 'psy_register_thermal':
+    drivers/power/power_supply_core.c:204:6: warning: passing argument 1 of 'thermal_zone_device_register' discards 'const' qualifier from pointer target type [enabled by default]
+    include/linux/thermal.h:140:29: note: expected 'char *' but argument is of type 'const char *'
+    
+    Signed-off-by: Anton Vorontsov <anton.vorontsov@linaro.org>
+    Acked-by: Jean Delvare <khali@linux-fr.org>
+
+commit e6db06a53b1dcf4e9da4aba143e2eb4d63418abb
+Merge: ecc2edd56c49 c56f5c0342df
+Author: Anton Vorontsov <anton.vorontsov@linaro.org>
+Date:   Tue Jul 31 04:59:42 2012 -0700
+
+    Merge with upstream to accommodate with thermal changes
+    
+    This merge is performed to take commit c56f5c0342dfee11a1 ("Thermal: Make
+    Thermal trip points writeable") out of Linus' tree and then fixup power
+    supply class. This is needed since thermal stuff added a new argument:
+    
+      CC      drivers/power/power_supply_core.o
+    drivers/power/power_supply_core.c: In function ‘psy_register_thermal’:
+    drivers/power/power_supply_core.c:204:6: warning: passing argument 3 of ‘thermal_zone_device_register’ makes integer from pointer without a cast [enabled by default]
+    include/linux/thermal.h:154:29: note: expected ‘int’ but argument is of type ‘struct power_supply *’
+    drivers/power/power_supply_core.c:204:6: error: too few arguments to function ‘thermal_zone_device_register’
+    include/linux/thermal.h:154:29: note: declared here
+    make[1]: *** [drivers/power/power_supply_core.o] Error 1
+    make: *** [drivers/power/] Error 2
+    
+    Signed-off-by: Anton Vorontsov <anton.vorontsov@linaro.org>
+
+commit 03ee62f0b9919535a1be02f72fe8153255a7fda0
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Wed Mar 21 12:55:04 2012 -0700
+
+    thermal: spear13xx: checking for NULL instead of IS_ERR()
+    
+    thermal_zone_device_register() never returns NULL, on error it returns and
+    ERR_PTR().
+    
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Reviewed-by: Viresh Kumar <viresh.kumar@st.com>
+    Reviewed-by: Vincenzo Frascino <vincenzo.frascino@st.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit bb070e43497d4fcfea7d8b52003fe1376c218343
+Author: Krzysztof Helt <krzysztof.h1@wp.pl>
+Date:   Tue Apr 8 17:41:52 2008 -0700
+
+    acpi thermal: fix result check
+    
+    thermal_zone_device_register() uses the ERR_PTR macro on its return values.  A
+    correct check is to use the IS_ERR() macro.
+    
+    The 2.6.25 kernels panic on Compaq AP550 without this patch as it has more
+    then 10 (THERMAL_MAX_TRIPS) trip points (there are 12).
+    
+    Signed-off-by: Krzysztof Helt <krzysztof.h1@wp.pl>
+    Cc: "Rafael J. Wysocki" <rjw@sisk.pl>
+    Cc: Len Brown <lenb@kernel.org>
+    Acked-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>

@@ -1,0 +1,2 @@
+    omap3: nand: making ecc layout as compatible with romcode ecc
+    device) to support hw ecc in romcode layout. So as to have in sync with ecc

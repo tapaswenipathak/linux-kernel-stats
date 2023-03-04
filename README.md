@@ -30,11 +30,14 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 ## How to run the scripts   
 #### Clone / download
 ##### Step 1
-Make a folder named "torvalds" in the home location : home/username
+[A] To clone the Linux Kernel Stable Tree. Make a folder named "linux-stable" in the home location : home/usernameclone the repo in the folder "linux-stable" using ``` git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git ```. "This will download the current kernel source repository"
 
-clone the repo in the folder "torvalds" using ``` git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git ```
+[B] Adiitionaly, you will need to clone, following 
+   * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git ```
+   * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git ```
+   * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git ```
+   * ``` git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive ```
 
-"This will download the current kernel source repository"
 
 ##### Step 2
 Now, Clone the repository that contains scripts using : ``` git clone https://github.com/tapaswenipathak/ linux-kernel-stats ```
@@ -68,7 +71,7 @@ A brief summary of various devices in the drivers directory can be found in the 
 ### Raise a PR
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-Various linux kernel stats are open for the contribution. To contribute Fork the Repo and create a Branch for any issue that you are working upon.Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
+Various linux kernel stats are open for the contribution. To contribute Fork the Repo and create a Branch for any issue that you are working upon. Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
 
 
 ### Create tickets

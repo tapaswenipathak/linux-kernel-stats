@@ -1,0 +1,1930 @@
+commit e425ac99b1573692fc4bb5bda1040caccb127490
+Author: Alexander Aring <aahringo@redhat.com>
+Date:   Thu Apr 7 10:45:42 2022 -0400
+
+    fs: dlm: cast resource pointer to uintptr_t
+    
+    This patch fixes the following warning when doing a 32 bit kernel build
+    when pointers are 4 byte long:
+    
+    In file included from ./include/linux/byteorder/little_endian.h:5,
+                     from ./arch/x86/include/uapi/asm/byteorder.h:5,
+                     from ./include/asm-generic/qrwlock_types.h:6,
+                     from ./arch/x86/include/asm/spinlock_types.h:7,
+                     from ./include/linux/spinlock_types_raw.h:7,
+                     from ./include/linux/ratelimit_types.h:7,
+                     from ./include/linux/printk.h:10,
+                     from ./include/asm-generic/bug.h:22,
+                     from ./arch/x86/include/asm/bug.h:87,
+                     from ./include/linux/bug.h:5,
+                     from ./include/linux/mmdebug.h:5,
+                     from ./include/linux/gfp.h:5,
+                     from ./include/linux/slab.h:15,
+                     from fs/dlm/dlm_internal.h:19,
+                     from fs/dlm/rcom.c:12:
+    fs/dlm/rcom.c: In function ‘dlm_send_rcom_lock’:
+    ./include/uapi/linux/byteorder/little_endian.h:32:43: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     #define __cpu_to_le64(x) ((__force __le64)(__u64)(x))
+                                               ^
+    ./include/linux/byteorder/generic.h:86:21: note: in expansion of macro ‘__cpu_to_le64’
+     #define cpu_to_le64 __cpu_to_le64
+                         ^~~~~~~~~~~~~
+    fs/dlm/rcom.c:457:14: note: in expansion of macro ‘cpu_to_le64’
+      rc->rc_id = cpu_to_le64(r);
+    
+    The rc_id value in dlm rcom is handled as u64. The rcom implementation
+    uses for an unique number generation the pointer value of the used
+    dlm_rsb instance. However if the pointer value is 4 bytes long
+    -Wpointer-to-int-cast will print a warning. We get rid of that warning
+    to cast the pointer to uintptr_t which is either 4 or 8 bytes. There
+    might be a very unlikely case where this number isn't unique anymore if
+    using dlm in a mixed cluster of nodes and sizeof(uintptr_t) returns 4 and
+    8.
+    
+    However this problem was already been there and this patch should get
+    rid of the warning.
+    
+    Fixes: 2f9dbeda8dc0 ("dlm: use __le types for rcom messages")
+    Reported-by: kernel test robot <lkp@intel.com>
+    Signed-off-by: Alexander Aring <aahringo@redhat.com>
+    Signed-off-by: David Teigland <teigland@redhat.com>
+
+commit 77993b595ada5731e513eb06a0f4bf4b9f1e9532
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Mon Nov 29 18:46:54 2021 +0100
+
+    locking: Allow to include asm/spinlock_types.h from linux/spinlock_types_raw.h
+    
+    The printk header file includes ratelimit_types.h for its __ratelimit()
+    based usage. It is required for the static initializer used in
+    printk_ratelimited(). It uses a raw_spinlock_t and includes the
+    spinlock_types.h.
+    
+    PREEMPT_RT substitutes spinlock_t with a rtmutex based implementation and so
+    its spinlock_t implmentation (provided by spinlock_rt.h) includes rtmutex.h and
+    atomic.h which leads to recursive includes where defines are missing.
+    
+    By including only the raw_spinlock_t defines it avoids the atomic.h
+    related includes at this stage.
+    
+    An example on powerpc:
+    
+    |  CALL    scripts/atomic/check-atomics.sh
+    |In file included from include/linux/bug.h:5,
+    |                 from include/linux/page-flags.h:10,
+    |                 from kernel/bounds.c:10:
+    |arch/powerpc/include/asm/page_32.h: In function âclear_pageâ:
+    |arch/powerpc/include/asm/bug.h:87:4: error: implicit declaration of function â=80=98__WARNâ=80=99 [-Werror=3Dimplicit-function-declaration]
+    |   87 |    __WARN();    \
+    |      |    ^~~~~~
+    |arch/powerpc/include/asm/page_32.h:48:2: note: in expansion of macro âWARN_ONâ=99
+    |   48 |  WARN_ON((unsigned long)addr & (L1_CACHE_BYTES - 1));
+    |      |  ^~~~~~~
+    |arch/powerpc/include/asm/bug.h:58:17: error: invalid application of âsizeofâ=99 to incomplete type âstruct bug_entryâ=99
+    |   58 |     "i" (sizeof(struct bug_entry)), \
+    |      |                 ^~~~~~
+    |arch/powerpc/include/asm/bug.h:89:3: note: in expansion of macro âBUG_ENTRYâ=99
+    |   89 |   BUG_ENTRY(PPC_TLNEI " %4, 0",   \
+    |      |   ^~~~~~~~~
+    |arch/powerpc/include/asm/page_32.h:48:2: note: in expansion of macro âWARN_ONâ=99
+    |   48 |  WARN_ON((unsigned long)addr & (L1_CACHE_BYTES - 1));
+    |      |  ^~~~~~~
+    |In file included from arch/powerpc/include/asm/ptrace.h:298,
+    |                 from arch/powerpc/include/asm/hw_irq.h:12,
+    |                 from arch/powerpc/include/asm/irqflags.h:12,
+    |                 from include/linux/irqflags.h:16,
+    |                 from include/asm-generic/cmpxchg-local.h:6,
+    |                 from arch/powerpc/include/asm/cmpxchg.h:526,
+    |                 from arch/powerpc/include/asm/atomic.h:11,
+    |                 from include/linux/atomic.h:7,
+    |                 from include/linux/rwbase_rt.h:6,
+    |                 from include/linux/rwlock_types.h:55,
+    |                 from include/linux/spinlock_types.h:74,
+    |                 from include/linux/ratelimit_types.h:7,
+    |                 from include/linux/printk.h:10,
+    |                 from include/asm-generic/bug.h:22,
+    |                 from arch/powerpc/include/asm/bug.h:109,
+    |                 from include/linux/bug.h:5,
+    |                 from include/linux/page-flags.h:10,
+    |                 from kernel/bounds.c:10:
+    |include/linux/thread_info.h: In function â=80=98copy_overflowâ=80=99:
+    |include/linux/thread_info.h:210:2: error: implicit declaration of function â=80=98WARNâ=80=99 [-Werror=3Dimplicit-function-declaration]
+    |  210 |  WARN(1, "Buffer overflow detected (%d < %lu)!\n", size, count);
+    |      |  ^~~~
+    
+    The WARN / BUG include pulls in printk.h and then ptrace.h expects WARN
+    (from bug.h) which is not yet complete. Even hw_irq.h has WARN_ON()
+    statements.
+    
+    On POWERPC64 there are missing atomic64 defines while building 32bit
+    VDSO:
+    |  VDSO32C arch/powerpc/kernel/vdso32/vgettimeofday.o
+    |In file included from include/linux/atomic.h:80,
+    |                 from include/linux/rwbase_rt.h:6,
+    |                 from include/linux/rwlock_types.h:55,
+    |                 from include/linux/spinlock_types.h:74,
+    |                 from include/linux/ratelimit_types.h:7,
+    |                 from include/linux/printk.h:10,
+    |                 from include/linux/kernel.h:19,
+    |                 from arch/powerpc/include/asm/page.h:11,
+    |                 from arch/powerpc/include/asm/vdso/gettimeofday.h:5,
+    |                 from include/vdso/datapage.h:137,
+    |                 from lib/vdso/gettimeofday.c:5,
+    |                 from <command-line>:
+    |include/linux/atomic-arch-fallback.h: In function âarch_atomic64_incâ=99:
+    |include/linux/atomic-arch-fallback.h:1447:2: error: implicit declaration of function âarch_atomic64_addâ; did you mean âarch_atomic_addâ? [-Werror=3Dimpl
+    |icit-function-declaration]
+    | 1447 |  arch_atomic64_add(1, v);
+    |      |  ^~~~~~~~~~~~~~~~~
+    |      |  arch_atomic_add
+    
+    The generic fallback is not included, atomics itself are not used. If
+    kernel.h does not include printk.h then it comes later from the bug.h
+    include.
+    
+    Allow asm/spinlock_types.h to be included from
+    linux/spinlock_types_raw.h.
+    
+    Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Link: https://lkml.kernel.org/r/20211129174654.668506-12-bigeasy@linutronix.de
+
+commit 07b8ca3792dec6bc3288b08ff85d80b5330de1d6
+Author: Tom Parkin <tparkin@katalix.com>
+Date:   Fri Nov 26 16:09:03 2021 +0000
+
+    net/l2tp: convert tunnel rwlock_t to rcu
+    
+    Previously commit e02d494d2c60 ("l2tp: Convert rwlock to RCU") converted
+    most, but not all, rwlock instances in the l2tp subsystem to RCU.
+    
+    The remaining rwlock protects the per-tunnel hashlist of sessions which
+    is used for session lookups in the UDP-encap data path.
+    
+    Convert the remaining rwlock to rcu to improve performance of UDP-encap
+    tunnels.
+    
+    Note that the tunnel and session, which both live on RCU-protected
+    lists, use slightly different approaches to incrementing their refcounts
+    in the various getter functions.
+    
+    The tunnel has to use refcount_inc_not_zero because the tunnel shutdown
+    process involves dropping the refcount to zero prior to synchronizing
+    RCU readers (via. kfree_rcu).
+    
+    By contrast, the session shutdown removes the session from the list(s)
+    it is on, synchronizes with readers, and then decrements the session
+    refcount.  Since the getter functions increment the session refcount
+    with the RCU read lock held we prevent getters seeing a zero session
+    refcount, and therefore don't need to use refcount_inc_not_zero.
+    
+    Signed-off-by: Tom Parkin <tparkin@katalix.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit b4c6f86ec2f648b5e6d4b04564fbc6d5351160a8
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Thu Oct 7 11:26:46 2021 +0200
+
+    irq_work: Handle some irq_work in a per-CPU thread on PREEMPT_RT
+    
+    The irq_work callback is invoked in hard IRQ context. By default all
+    callbacks are scheduled for invocation right away (given supported by
+    the architecture) except for the ones marked IRQ_WORK_LAZY which are
+    delayed until the next timer-tick.
+    
+    While looking over the callbacks, some of them may acquire locks
+    (spinlock_t, rwlock_t) which are transformed into sleeping locks on
+    PREEMPT_RT and must not be acquired in hard IRQ context.
+    Changing the locks into locks which could be acquired in this context
+    will lead to other problems such as increased latencies if everything
+    in the chain has IRQ-off locks. This will not solve all the issues as
+    one callback has been noticed which invoked kref_put() and its callback
+    invokes kfree() and this can not be invoked in hardirq context.
+    
+    Some callbacks are required to be invoked in hardirq context even on
+    PREEMPT_RT to work properly. This includes for instance the NO_HZ
+    callback which needs to be able to observe the idle context.
+    
+    The callbacks which require to be run in hardirq have already been
+    marked. Use this information to split the callbacks onto the two lists
+    on PREEMPT_RT:
+    - lazy_list
+      Work items which are not marked with IRQ_WORK_HARD_IRQ will be added
+      to this list. Callbacks on this list will be invoked from a per-CPU
+      thread.
+      The handler here may acquire sleeping locks such as spinlock_t and
+      invoke kfree().
+    
+    - raised_list
+      Work items which are marked with IRQ_WORK_HARD_IRQ will be added to
+      this list. They will be invoked in hardirq context and must not
+      acquire any sleeping locks.
+    
+    The wake up of the per-CPU thread occurs from irq_work handler/
+    hardirq context. The thread runs with lowest RT priority to ensure it
+    runs before any SCHED_OTHER tasks do.
+    
+    [bigeasy: melt tglx's irq_work_tick_soft() which splits irq_work_tick() into a
+              hard and soft variant. Collected fixes over time from Steven
+              Rostedt and Mike Galbraith. Move to per-CPU threads instead of
+              softirq as suggested by PeterZ.]
+    
+    Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Link: https://lkml.kernel.org/r/20211007092646.uhshe3ut2wkrcfzv@linutronix.de
+
+commit 9321f8152d9a764208c3f0dad49e0c55f293b7ab
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Tue Sep 28 17:00:06 2021 +0200
+
+    rtmutex: Wake up the waiters lockless while dropping the read lock.
+    
+    The rw_semaphore and rwlock_t implementation both wake the waiter while
+    holding the rt_mutex_base::wait_lock acquired.
+    This can be optimized by waking the waiter lockless outside of the
+    locked section to avoid a needless contention on the
+    rt_mutex_base::wait_lock lock.
+    
+    Extend rt_mutex_wake_q_add() to also accept task and state and use it in
+    __rwbase_read_unlock().
+    
+    Suggested-by: Davidlohr Bueso <dave@stgolabs.net>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Link: https://lkml.kernel.org/r/20210928150006.597310-3-bigeasy@linutronix.de
+
+commit e5e726f7bb9f711102edea7e5bd511835640e3b4
+Merge: 08403e2174c4 a055fcc132d4
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Aug 30 14:26:36 2021 -0700
+
+    Merge tag 'locking-core-2021-08-30' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+    
+    Pull locking and atomics updates from Thomas Gleixner:
+     "The regular pile:
+    
+       - A few improvements to the mutex code
+    
+       - Documentation updates for atomics to clarify the difference between
+         cmpxchg() and try_cmpxchg() and to explain the forward progress
+         expectations.
+    
+       - Simplification of the atomics fallback generator
+    
+       - The addition of arch_atomic_long*() variants and generic arch_*()
+         bitops based on them.
+    
+       - Add the missing might_sleep() invocations to the down*() operations
+         of semaphores.
+    
+      The PREEMPT_RT locking core:
+    
+       - Scheduler updates to support the state preserving mechanism for
+         'sleeping' spin- and rwlocks on RT.
+    
+         This mechanism is carefully preserving the state of the task when
+         blocking on a 'sleeping' spin- or rwlock and takes regular wake-ups
+         targeted at the same task into account. The preserved or updated
+         (via a regular wakeup) state is restored when the lock has been
+         acquired.
+    
+       - Restructuring of the rtmutex code so it can be utilized and
+         extended for the RT specific lock variants.
+    
+       - Restructuring of the ww_mutex code to allow sharing of the ww_mutex
+         specific functionality for rtmutex based ww_mutexes.
+    
+       - Header file disentangling to allow substitution of the regular lock
+         implementations with the PREEMPT_RT variants without creating an
+         unmaintainable #ifdef mess.
+    
+       - Shared base code for the PREEMPT_RT specific rw_semaphore and
+         rwlock implementations.
+    
+         Contrary to the regular rw_semaphores and rwlocks the PREEMPT_RT
+         implementation is writer unfair because it is infeasible to do
+         priority inheritance on multiple readers. Experience over the years
+         has shown that real-time workloads are not the typical workloads
+         which are sensitive to writer starvation.
+    
+         The alternative solution would be to allow only a single reader
+         which has been tried and discarded as it is a major bottleneck
+         especially for mmap_sem. Aside of that many of the writer
+         starvation critical usage sites have been converted to a writer
+         side mutex/spinlock and RCU read side protections in the past
+         decade so that the issue is less prominent than it used to be.
+    
+       - The actual rtmutex based lock substitutions for PREEMPT_RT enabled
+         kernels which affect mutex, ww_mutex, rw_semaphore, spinlock_t and
+         rwlock_t. The spin/rw_lock*() functions disable migration across
+         the critical section to preserve the existing semantics vs per-CPU
+         variables.
+    
+       - Rework of the futex REQUEUE_PI mechanism to handle the case of
+         early wake-ups which interleave with a re-queue operation to
+         prevent the situation that a task would be blocked on both the
+         rtmutex associated to the outer futex and the rtmutex based hash
+         bucket spinlock.
+    
+         While this situation cannot happen on !RT enabled kernels the
+         changes make the underlying concurrency problems easier to
+         understand in general. As a result the difference between !RT and
+         RT kernels is reduced to the handling of waiting for the critical
+         section. !RT kernels simply spin-wait as before and RT kernels
+         utilize rcu_wait().
+    
+       - The substitution of local_lock for PREEMPT_RT with a spinlock which
+         protects the critical section while staying preemptible. The CPU
+         locality is established by disabling migration.
+    
+      The underlying concepts of this code have been in use in PREEMPT_RT for
+      way more than a decade. The code has been refactored several times over
+      the years and this final incarnation has been optimized once again to be
+      as non-intrusive as possible, i.e. the RT specific parts are mostly
+      isolated.
+    
+      It has been extensively tested in the 5.14-rt patch series and it has
+      been verified that !RT kernels are not affected by these changes"
+    
+    * tag 'locking-core-2021-08-30' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip: (92 commits)
+      locking/rtmutex: Return success on deadlock for ww_mutex waiters
+      locking/rtmutex: Prevent spurious EDEADLK return caused by ww_mutexes
+      locking/rtmutex: Dequeue waiter on ww_mutex deadlock
+      locking/rtmutex: Dont dereference waiter lockless
+      locking/semaphore: Add might_sleep() to down_*() family
+      locking/ww_mutex: Initialize waiter.ww_ctx properly
+      static_call: Update API documentation
+      locking/local_lock: Add PREEMPT_RT support
+      locking/spinlock/rt: Prepare for RT local_lock
+      locking/rtmutex: Add adaptive spinwait mechanism
+      locking/rtmutex: Implement equal priority lock stealing
+      preempt: Adjust PREEMPT_LOCK_OFFSET for RT
+      locking/rtmutex: Prevent lockdep false positive with PI futexes
+      futex: Prevent requeue_pi() lock nesting issue on RT
+      futex: Simplify handle_early_requeue_pi_wakeup()
+      futex: Reorder sanity checks in futex_requeue()
+      futex: Clarify comment in futex_requeue()
+      futex: Restructure futex_requeue()
+      futex: Correct the number of requeued waiters for PI
+      futex: Remove bogus condition for requeue PI
+      ...
+
+commit 45e3d5a2af1d53164cc5fbd22c5ceea0d163ad45
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Tue Dec 15 20:43:13 2020 -0800
+
+    lib/test_lockup.c: minimum fix to get it compiled on PREEMPT_RT
+    
+    On PREEMPT_RT the locks are quite different so they can't be tested as it
+    is done below.  The alternative is to test for the waitlock within
+    rtmutex.
+    
+    This is the bare minimun to get it compiled.  Problems which exist on
+    PREEMP_RT:
+    
+     - none of the locks (spinlock_t, rwlock_t, mutex_t, rw_semaphore) may
+       be acquired with disabled preemption or interrupts.
+    
+       If I read the code correct the it is possible to acquire a mutex_t
+       with disabled interrupts.
+    
+       I don't know how to obtain a lock pointer. Technically they are not
+       exported to userland.
+    
+     - memory can not be allocated with disabled preemption or interrupts
+       even with GFP_ATOMIC.
+    
+    Link: https://lkml.kernel.org/r/20201028181041.xyeothhkouc3p4md@linutronix.de
+    Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+    Cc: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit a2e9ae58d5042b3aa4a61f676ff6975ff3bc7bc7
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Fri Oct 30 12:37:43 2020 +0100
+
+    lockdep/selftests: Fix PROVE_RAW_LOCK_NESTING
+    
+    The selftest nests rwlock_t inside raw_spinlock_t, this is invalid.
+    
+    Reported-by: Boqun Feng <boqun.feng@gmail.com>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+commit e1427f32b85010ca0c38104955e234ca89d4cee5
+Author: Clark Williams <williams@redhat.com>
+Date:   Tue Sep 29 23:22:11 2020 +0530
+
+    bus: mhi: Remove include of rwlock_types.h
+    
+    rwlock.h should not be included directly. Instead linux/splinlock.h
+    should be included. Including it directly will break the RT build.
+    
+    Also there is no point in including _types.h headers directly. There is
+    no benefit in including the type without the accessor.
+    
+    Fixes: 0cbf260820fa7 ("bus: mhi: core: Add support for registering MHI controllers")
+    Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+    Signed-off-by: Clark Williams <williams@redhat.com>
+    Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+    Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+    Link: https://lore.kernel.org/r/20200929175218.8178-13-manivannan.sadhasivam@linaro.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit b901892b51317b321c7bc96e2ccd2f522d1380ee
+Author: Ahmed S. Darwish <a.darwish@linutronix.de>
+Date:   Mon Jul 20 17:55:21 2020 +0200
+
+    netfilter: nft_set_rbtree: Use sequence counter with associated rwlock
+    
+    A sequence counter write side critical section must be protected by some
+    form of locking to serialize writers. A plain seqcount_t does not
+    contain the information of which lock must be held when entering a write
+    side critical section.
+    
+    Use the new seqcount_rwlock_t data type, which allows to associate a
+    rwlock with the sequence counter. This enables lockdep to verify that
+    the rwlock used for writer serialization is held when the write side
+    critical section is entered.
+    
+    If lockdep is disabled this lock association is compiled out and has
+    neither storage size nor runtime overhead.
+    
+    Signed-off-by: Ahmed S. Darwish <a.darwish@linutronix.de>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Link: https://lkml.kernel.org/r/20200720155530.1173732-16-a.darwish@linutronix.de
+
+commit 55f3560df975f557c48aa6afc636808f31ecb87a
+Author: Ahmed S. Darwish <a.darwish@linutronix.de>
+Date:   Mon Jul 20 17:55:15 2020 +0200
+
+    seqlock: Extend seqcount API with associated locks
+    
+    A sequence counter write side critical section must be protected by some
+    form of locking to serialize writers. If the serialization primitive is
+    not disabling preemption implicitly, preemption has to be explicitly
+    disabled before entering the write side critical section.
+    
+    There is no built-in debugging mechanism to verify that the lock used
+    for writer serialization is held and preemption is disabled. Some usage
+    sites like dma-buf have explicit lockdep checks for the writer-side
+    lock, but this covers only a small portion of the sequence counter usage
+    in the kernel.
+    
+    Add new sequence counter types which allows to associate a lock to the
+    sequence counter at initialization time. The seqcount API functions are
+    extended to provide appropriate lockdep assertions depending on the
+    seqcount/lock type.
+    
+    For sequence counters with associated locks that do not implicitly
+    disable preemption, preemption protection is enforced in the sequence
+    counter write side functions. This removes the need to explicitly add
+    preempt_disable/enable() around the write side critical sections: the
+    write_begin/end() functions for these new sequence counter types
+    automatically do this.
+    
+    Introduce the following seqcount types with associated locks:
+    
+         seqcount_spinlock_t
+         seqcount_raw_spinlock_t
+         seqcount_rwlock_t
+         seqcount_mutex_t
+         seqcount_ww_mutex_t
+    
+    Extend the seqcount read and write functions to branch out to the
+    specific seqcount_LOCKTYPE_t implementation at compile-time. This avoids
+    kernel API explosion per each new seqcount_LOCKTYPE_t added. Add such
+    compile-time type detection logic into a new, internal, seqlock header.
+    
+    Document the proper seqcount_LOCKTYPE_t usage, and rationale, at
+    Documentation/locking/seqlock.rst.
+    
+    If lockdep is disabled, this lock association is compiled out and has
+    neither storage size nor runtime overhead.
+    
+    Signed-off-by: Ahmed S. Darwish <a.darwish@linutronix.de>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Link: https://lkml.kernel.org/r/20200720155530.1173732-10-a.darwish@linutronix.de
+
+commit 632ca50f2cbd8809a2fc1934b4b2c9c49bd55e98
+Author: John Ogness <john.ogness@linutronix.de>
+Date:   Tue Jul 7 17:28:04 2020 +0206
+
+    af_packet: TPACKET_V3: replace busy-wait loop
+    
+    A busy-wait loop is used to implement waiting for bits to be copied
+    from the skb to the kernel buffer before retiring a block. This is
+    a problem on PREEMPT_RT because the copying task could be preempted
+    by the busy-waiting task and thus live lock in the busy-wait loop.
+    
+    Replace the busy-wait logic with an rwlock_t. This provides lockdep
+    coverage and makes the code RT ready.
+    
+    Signed-off-by: John Ogness <john.ogness@linutronix.de>
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+commit faca536008375bece23783e7382b5d0356c13ba5
+Author: Karsten Graul <kgraul@linux.ibm.com>
+Date:   Wed Apr 29 17:10:48 2020 +0200
+
+    net/smc: use mutex instead of rwlock_t to protect buffers
+    
+    The locks for sndbufs and rmbs are never used from atomic context. Using
+    a mutex for these locks will allow to nest locks with other mutexes.
+    
+    Signed-off-by: Karsten Graul <kgraul@linux.ibm.com>
+    Reviewed-by: Ursula Braun <ubraun@linux.ibm.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 94f1f42384f2477adea2929804dd29e54013beeb
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Thu Dec 6 17:11:29 2018 -0800
+
+    tools/lib/lockdep: Rename "trywlock" into "trywrlock"
+    
+    commit 7f3c7952d111ac93573fb86f4d5aeff527a07fcc upstream.
+    
+    This patch avoids that the following compiler warning is reported while
+    compiling the lockdep unit tests:
+    
+    include/liblockdep/rwlock.h: In function 'liblockdep_pthread_rwlock_trywlock':
+    include/liblockdep/rwlock.h:66:9: warning: implicit declaration of function 'pthread_rwlock_trywlock'; did you mean 'pthread_rwlock_trywrlock'? [-Wimplicit-function-declaration]
+      return pthread_rwlock_trywlock(&lock->rwlock) == 0 ? 1 : 0;
+             ^~~~~~~~~~~~~~~~~~~~~~~
+             pthread_rwlock_trywrlock
+    
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: Johannes Berg <johannes@sipsolutions.net>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Sasha Levin <sasha.levin@oracle.com>
+    Cc: Sasha Levin <sashal@kernel.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Waiman Long <longman@redhat.com>
+    Cc: johannes.berg@intel.com
+    Cc: tj@kernel.org
+    Fixes: 5a52c9b480e0 ("liblockdep: Add public headers for pthread_rwlock_t implementation")
+    Link: https://lkml.kernel.org/r/20181207011148.251812-6-bvanassche@acm.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit 7f3c7952d111ac93573fb86f4d5aeff527a07fcc
+Author: Bart Van Assche <bvanassche@acm.org>
+Date:   Thu Dec 6 17:11:29 2018 -0800
+
+    tools/lib/lockdep: Rename "trywlock" into "trywrlock"
+    
+    This patch avoids that the following compiler warning is reported while
+    compiling the lockdep unit tests:
+    
+    include/liblockdep/rwlock.h: In function 'liblockdep_pthread_rwlock_trywlock':
+    include/liblockdep/rwlock.h:66:9: warning: implicit declaration of function 'pthread_rwlock_trywlock'; did you mean 'pthread_rwlock_trywrlock'? [-Wimplicit-function-declaration]
+      return pthread_rwlock_trywlock(&lock->rwlock) == 0 ? 1 : 0;
+             ^~~~~~~~~~~~~~~~~~~~~~~
+             pthread_rwlock_trywrlock
+    
+    Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+    Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: Johannes Berg <johannes@sipsolutions.net>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Sasha Levin <sasha.levin@oracle.com>
+    Cc: Sasha Levin <sashal@kernel.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Waiman Long <longman@redhat.com>
+    Cc: johannes.berg@intel.com
+    Cc: tj@kernel.org
+    Fixes: 5a52c9b480e0 ("liblockdep: Add public headers for pthread_rwlock_t implementation")
+    Link: https://lkml.kernel.org/r/20181207011148.251812-6-bvanassche@acm.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 9214407d1237a985894894f9be2b1a7416b69d14
+Merge: eeee3149aaa0 7a107c0f55a3
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Jun 4 13:05:02 2018 -0700
+
+    Merge tag 'locks-v4.18-1' of git://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux
+    
+    Pull fasync fix from Jeff Layton:
+     "Just a single fix for a deadlock in the fasync handling code that
+      Kirill observed while testing.
+    
+      The fix is to change the fa_lock to be rwlock_t, and use a read lock
+      in kill_fasync_rcu"
+    
+    * tag 'locks-v4.18-1' of git://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux:
+      fasync: Fix deadlock between task-context and interrupt-context kill_fasync()
+
+commit 7a107c0f55a3b4c6f84a4323df5610360bde1684
+Author: Kirill Tkhai <tkhai@ya.ru>
+Date:   Thu Apr 5 14:58:06 2018 +0300
+
+    fasync: Fix deadlock between task-context and interrupt-context kill_fasync()
+    
+    I observed the following deadlock between them:
+    
+    [task 1]                          [task 2]                         [task 3]
+    kill_fasync()                     mm_update_next_owner()           copy_process()
+     spin_lock_irqsave(&fa->fa_lock)   read_lock(&tasklist_lock)        write_lock_irq(&tasklist_lock)
+      send_sigio()                    <IRQ>                             ...
+       read_lock(&fown->lock)         kill_fasync()                     ...
+        read_lock(&tasklist_lock)      spin_lock_irqsave(&fa->fa_lock)  ...
+    
+    Task 1 can't acquire read locked tasklist_lock, since there is
+    already task 3 expressed its wish to take the lock exclusive.
+    Task 2 holds the read locked lock, but it can't take the spin lock.
+    
+    Also, there is possible another deadlock (which I haven't observed):
+    
+    [task 1]                            [task 2]
+    f_getown()                          kill_fasync()
+     read_lock(&f_own->lock)             spin_lock_irqsave(&fa->fa_lock,)
+     <IRQ>                               send_sigio()                     write_lock_irq(&f_own->lock)
+      kill_fasync()                       read_lock(&fown->lock)
+       spin_lock_irqsave(&fa->fa_lock,)
+    
+    Actually, we do not need exclusive fa->fa_lock in kill_fasync_rcu(),
+    as it guarantees fa->fa_file->f_owner integrity only. It may seem,
+    that it used to give a task a small possibility to receive two sequential
+    signals, if there are two parallel kill_fasync() callers, and task
+    handles the first signal fastly, but the behaviour won't become
+    different, since there is exclusive sighand lock in do_send_sig_info().
+    
+    The patch converts fa_lock into rwlock_t, and this fixes two above
+    deadlocks, as rwlock is allowed to be taken from interrupt handler
+    by qrwlock design.
+    
+    Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+    Signed-off-by: Jeff Layton <jlayton@redhat.com>
+
+commit 1df9e416e647a427b8bea8a383625cc4d8c890cf
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Feb 21 14:45:20 2018 -0800
+
+    Kbuild: always define endianess in kconfig.h
+    
+    commit 101110f6271ce956a049250c907bc960030577f8 upstream.
+    
+    Build testing with LTO found a couple of files that get compiled
+    differently depending on whether asm/byteorder.h gets included early
+    enough or not.  In particular, include/asm-generic/qrwlock_types.h is
+    affected by this, but there are probably others as well.
+    
+    The symptom is a series of LTO link time warnings, including these:
+    
+        net/netlabel/netlabel_unlabeled.h:223: error: type of 'netlbl_unlhsh_add' does not match original declaration [-Werror=lto-type-mismatch]
+         int netlbl_unlhsh_add(struct net *net,
+        net/netlabel/netlabel_unlabeled.c:377: note: 'netlbl_unlhsh_add' was previously declared here
+    
+        include/net/ipv6.h:360: error: type of 'ipv6_renew_options_kern' does not match original declaration [-Werror=lto-type-mismatch]
+         ipv6_renew_options_kern(struct sock *sk,
+        net/ipv6/exthdrs.c:1162: note: 'ipv6_renew_options_kern' was previously declared here
+    
+        net/core/dev.c:761: note: 'dev_get_by_name_rcu' was previously declared here
+         struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
+        net/core/dev.c:761: note: code may be misoptimized unless -fno-strict-aliasing is used
+    
+        drivers/gpu/drm/i915/i915_drv.h:3377: error: type of 'i915_gem_object_set_to_wc_domain' does not match original declaration [-Werror=lto-type-mismatch]
+         i915_gem_object_set_to_wc_domain(struct drm_i915_gem_object *obj, bool write);
+        drivers/gpu/drm/i915/i915_gem.c:3639: note: 'i915_gem_object_set_to_wc_domain' was previously declared here
+    
+        include/linux/debugfs.h:92:9: error: type of 'debugfs_attr_read' does not match original declaration [-Werror=lto-type-mismatch]
+         ssize_t debugfs_attr_read(struct file *file, char __user *buf,
+        fs/debugfs/file.c:318: note: 'debugfs_attr_read' was previously declared here
+    
+        include/linux/rwlock_api_smp.h:30: error: type of '_raw_read_unlock' does not match original declaration [-Werror=lto-type-mismatch]
+         void __lockfunc _raw_read_unlock(rwlock_t *lock) __releases(lock);
+        kernel/locking/spinlock.c:246:26: note: '_raw_read_unlock' was previously declared here
+    
+        include/linux/fs.h:3308:5: error: type of 'simple_attr_open' does not match original declaration [-Werror=lto-type-mismatch]
+         int simple_attr_open(struct inode *inode, struct file *file,
+        fs/libfs.c:795: note: 'simple_attr_open' was previously declared here
+    
+    All of the above are caused by include/asm-generic/qrwlock_types.h
+    failing to include asm/byteorder.h after commit e0d02285f16e
+    ("locking/qrwlock: Use 'struct qrwlock' instead of 'struct __qrwlock'")
+    in linux-4.15.
+    
+    Similar bugs may or may not exist in older kernels as well, but there is
+    no easy way to test those with link-time optimizations, and kernels
+    before 4.14 are harder to fix because they don't have Babu's patch
+    series
+    
+    We had similar issues with CONFIG_ symbols in the past and ended up
+    always including the configuration headers though linux/kconfig.h.  This
+    works around the issue through that same file, defining either
+    __BIG_ENDIAN or __LITTLE_ENDIAN depending on CONFIG_CPU_BIG_ENDIAN,
+    which is now always set on all architectures since commit 4c97a0c8fee3
+    ("arch: define CPU_BIG_ENDIAN for all fixed big endian archs").
+    
+    Link: http://lkml.kernel.org/r/20180202154104.1522809-2-arnd@arndb.de
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Cc: Babu Moger <babu.moger@amd.com>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+    Cc: Nicolas Pitre <nico@linaro.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Will Deacon <will.deacon@arm.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0b82d316fa5b199125a22559fd457cf3100c34fc
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Feb 21 14:45:20 2018 -0800
+
+    Kbuild: always define endianess in kconfig.h
+    
+    commit 101110f6271ce956a049250c907bc960030577f8 upstream.
+    
+    Build testing with LTO found a couple of files that get compiled
+    differently depending on whether asm/byteorder.h gets included early
+    enough or not.  In particular, include/asm-generic/qrwlock_types.h is
+    affected by this, but there are probably others as well.
+    
+    The symptom is a series of LTO link time warnings, including these:
+    
+        net/netlabel/netlabel_unlabeled.h:223: error: type of 'netlbl_unlhsh_add' does not match original declaration [-Werror=lto-type-mismatch]
+         int netlbl_unlhsh_add(struct net *net,
+        net/netlabel/netlabel_unlabeled.c:377: note: 'netlbl_unlhsh_add' was previously declared here
+    
+        include/net/ipv6.h:360: error: type of 'ipv6_renew_options_kern' does not match original declaration [-Werror=lto-type-mismatch]
+         ipv6_renew_options_kern(struct sock *sk,
+        net/ipv6/exthdrs.c:1162: note: 'ipv6_renew_options_kern' was previously declared here
+    
+        net/core/dev.c:761: note: 'dev_get_by_name_rcu' was previously declared here
+         struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
+        net/core/dev.c:761: note: code may be misoptimized unless -fno-strict-aliasing is used
+    
+        drivers/gpu/drm/i915/i915_drv.h:3377: error: type of 'i915_gem_object_set_to_wc_domain' does not match original declaration [-Werror=lto-type-mismatch]
+         i915_gem_object_set_to_wc_domain(struct drm_i915_gem_object *obj, bool write);
+        drivers/gpu/drm/i915/i915_gem.c:3639: note: 'i915_gem_object_set_to_wc_domain' was previously declared here
+    
+        include/linux/debugfs.h:92:9: error: type of 'debugfs_attr_read' does not match original declaration [-Werror=lto-type-mismatch]
+         ssize_t debugfs_attr_read(struct file *file, char __user *buf,
+        fs/debugfs/file.c:318: note: 'debugfs_attr_read' was previously declared here
+    
+        include/linux/rwlock_api_smp.h:30: error: type of '_raw_read_unlock' does not match original declaration [-Werror=lto-type-mismatch]
+         void __lockfunc _raw_read_unlock(rwlock_t *lock) __releases(lock);
+        kernel/locking/spinlock.c:246:26: note: '_raw_read_unlock' was previously declared here
+    
+        include/linux/fs.h:3308:5: error: type of 'simple_attr_open' does not match original declaration [-Werror=lto-type-mismatch]
+         int simple_attr_open(struct inode *inode, struct file *file,
+        fs/libfs.c:795: note: 'simple_attr_open' was previously declared here
+    
+    All of the above are caused by include/asm-generic/qrwlock_types.h
+    failing to include asm/byteorder.h after commit e0d02285f16e
+    ("locking/qrwlock: Use 'struct qrwlock' instead of 'struct __qrwlock'")
+    in linux-4.15.
+    
+    Similar bugs may or may not exist in older kernels as well, but there is
+    no easy way to test those with link-time optimizations, and kernels
+    before 4.14 are harder to fix because they don't have Babu's patch
+    series
+    
+    We had similar issues with CONFIG_ symbols in the past and ended up
+    always including the configuration headers though linux/kconfig.h.  This
+    works around the issue through that same file, defining either
+    __BIG_ENDIAN or __LITTLE_ENDIAN depending on CONFIG_CPU_BIG_ENDIAN,
+    which is now always set on all architectures since commit 4c97a0c8fee3
+    ("arch: define CPU_BIG_ENDIAN for all fixed big endian archs").
+    
+    Link: http://lkml.kernel.org/r/20180202154104.1522809-2-arnd@arndb.de
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Cc: Babu Moger <babu.moger@amd.com>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+    Cc: Nicolas Pitre <nico@linaro.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Will Deacon <will.deacon@arm.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 101110f6271ce956a049250c907bc960030577f8
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Feb 21 14:45:20 2018 -0800
+
+    Kbuild: always define endianess in kconfig.h
+    
+    Build testing with LTO found a couple of files that get compiled
+    differently depending on whether asm/byteorder.h gets included early
+    enough or not.  In particular, include/asm-generic/qrwlock_types.h is
+    affected by this, but there are probably others as well.
+    
+    The symptom is a series of LTO link time warnings, including these:
+    
+        net/netlabel/netlabel_unlabeled.h:223: error: type of 'netlbl_unlhsh_add' does not match original declaration [-Werror=lto-type-mismatch]
+         int netlbl_unlhsh_add(struct net *net,
+        net/netlabel/netlabel_unlabeled.c:377: note: 'netlbl_unlhsh_add' was previously declared here
+    
+        include/net/ipv6.h:360: error: type of 'ipv6_renew_options_kern' does not match original declaration [-Werror=lto-type-mismatch]
+         ipv6_renew_options_kern(struct sock *sk,
+        net/ipv6/exthdrs.c:1162: note: 'ipv6_renew_options_kern' was previously declared here
+    
+        net/core/dev.c:761: note: 'dev_get_by_name_rcu' was previously declared here
+         struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
+        net/core/dev.c:761: note: code may be misoptimized unless -fno-strict-aliasing is used
+    
+        drivers/gpu/drm/i915/i915_drv.h:3377: error: type of 'i915_gem_object_set_to_wc_domain' does not match original declaration [-Werror=lto-type-mismatch]
+         i915_gem_object_set_to_wc_domain(struct drm_i915_gem_object *obj, bool write);
+        drivers/gpu/drm/i915/i915_gem.c:3639: note: 'i915_gem_object_set_to_wc_domain' was previously declared here
+    
+        include/linux/debugfs.h:92:9: error: type of 'debugfs_attr_read' does not match original declaration [-Werror=lto-type-mismatch]
+         ssize_t debugfs_attr_read(struct file *file, char __user *buf,
+        fs/debugfs/file.c:318: note: 'debugfs_attr_read' was previously declared here
+    
+        include/linux/rwlock_api_smp.h:30: error: type of '_raw_read_unlock' does not match original declaration [-Werror=lto-type-mismatch]
+         void __lockfunc _raw_read_unlock(rwlock_t *lock) __releases(lock);
+        kernel/locking/spinlock.c:246:26: note: '_raw_read_unlock' was previously declared here
+    
+        include/linux/fs.h:3308:5: error: type of 'simple_attr_open' does not match original declaration [-Werror=lto-type-mismatch]
+         int simple_attr_open(struct inode *inode, struct file *file,
+        fs/libfs.c:795: note: 'simple_attr_open' was previously declared here
+    
+    All of the above are caused by include/asm-generic/qrwlock_types.h
+    failing to include asm/byteorder.h after commit e0d02285f16e
+    ("locking/qrwlock: Use 'struct qrwlock' instead of 'struct __qrwlock'")
+    in linux-4.15.
+    
+    Similar bugs may or may not exist in older kernels as well, but there is
+    no easy way to test those with link-time optimizations, and kernels
+    before 4.14 are harder to fix because they don't have Babu's patch
+    series
+    
+    We had similar issues with CONFIG_ symbols in the past and ended up
+    always including the configuration headers though linux/kconfig.h.  This
+    works around the issue through that same file, defining either
+    __BIG_ENDIAN or __LITTLE_ENDIAN depending on CONFIG_CPU_BIG_ENDIAN,
+    which is now always set on all architectures since commit 4c97a0c8fee3
+    ("arch: define CPU_BIG_ENDIAN for all fixed big endian archs").
+    
+    Link: http://lkml.kernel.org/r/20180202154104.1522809-2-arnd@arndb.de
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Cc: Babu Moger <babu.moger@amd.com>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+    Cc: Nicolas Pitre <nico@linaro.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Will Deacon <will.deacon@arm.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit eb3b7b848fb3dd00f7a57d633d4ae4d194aa7865
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Fri Mar 24 17:32:23 2017 +0100
+
+    s390/rwlock: introduce rwlock wait queueing
+    
+    Like the common queued rwlock code the s390 implementation uses the
+    queued spinlock code on a spinlock_t embedded in the rwlock_t to achieve
+    the queueing. The encoding of the rwlock_t differs though, the counter
+    field in the rwlock_t is split into two parts. The upper two bytes hold
+    the write bit and the write wait counter, the lower two bytes hold the
+    read counter.
+    
+    The arch_read_lock operation works exactly like the common qrwlock but
+    the enqueue operation for a writer follows a diffent logic. After the
+    failed inline try to get the rwlock in write, the writer first increases
+    the write wait counter, acquires the wait spin_lock for the queueing,
+    and then loops until there are no readers and the write bit is zero.
+    Without the write wait counter a CPU that just released the rwlock
+    could immediately reacquire the lock in the inline code, bypassing all
+    outstanding read and write waiters. For s390 this would cause massive
+    imbalances in favour of writers in case of a contended rwlock.
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+
+commit 8b93b4a9e1be78930eb9d640f75818993f70e065
+Author: Babu Moger <babu.moger@oracle.com>
+Date:   Wed May 24 17:55:09 2017 -0600
+
+    arch/sparc: Remove the check #ifndef __LINUX_SPINLOCK_TYPES_H
+    
+    Saw these compile errors on SPARC when queued rwlock feature is enabled.
+    
+       CC      kernel/locking/qrwlock.o
+    In file included from ./include/asm-generic/qrwlock_types.h:5,
+                      from ./arch/sparc/include/asm/qrwlock.h:4,
+                      from kernel/locking/qrwlock.c:24:
+    ./arch/sparc/include/asm/spinlock_types.h:5:3: error:
+             #error "please don't include this file directly"
+    
+    SPARC has this guard which causes compile error when spinlock_types.h
+    is included directly.
+    @ifndef __LINUX_SPINLOCK_TYPES_H
+    @ error "please don't include this file directly"
+    @endif
+    
+    Remove this un-necessary "ifndef __LINUX_SPINLOCK_TYPES_H" stanza from SPARC.
+    
+    Signed-off-by: Babu Moger <babu.moger@oracle.com>
+    Suggested-by: David Miller <davem@davemloft.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 7587c407540006e4e8fd5ed33f66ffe6158e830a
+Author: Mike Galbraith <umgwanakikbuti@gmail.com>
+Date:   Tue Apr 5 15:03:21 2016 +0200
+
+    crypto: ccp - Fix RT breaking #include <linux/rwlock_types.h>
+    
+    Direct include of rwlock_types.h breaks RT, use spinlock_types.h instead.
+    
+    Fixes: 553d2374db0b crypto: ccp - Support for multiple CCPs
+    Signed-off-by: Mike Galbraith <umgwanakikbuti@gmail.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+commit 5405ff6e15f40f2f53e37d2dcd7de521e2b7a96f
+Author: Jon Paul Maloy <jon.maloy@ericsson.com>
+Date:   Thu Nov 19 14:30:44 2015 -0500
+
+    tipc: convert node lock to rwlock
+    
+    According to the node FSM a node in state SELF_UP_PEER_UP cannot
+    change state inside a lock context, except when a TUNNEL_PROTOCOL
+    (SYNCH or FAILOVER) packet arrives. However, the node's individual
+    links may still change state.
+    
+    Since each link now is protected by its own spinlock, we finally have
+    the conditions in place to convert the node spinlock to an rwlock_t.
+    If the node state and arriving packet type are rigth, we can let the
+    link directly receive the packet under protection of its own spinlock
+    and the node lock in read mode. In all other cases we use the node
+    lock in write mode. This enables full concurrent execution between
+    parallel links during steady-state traffic situations, i.e., 99+ %
+    of the time.
+    
+    This commit implements this change.
+    
+    Reviewed-by: Ying Xue <ying.xue@windriver.com>
+    Signed-off-by: Jon Maloy <jon.maloy@ericsson.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 53b8762727cfc81212fd7073618cb2609bd2fd60
+Merge: f09becc79f89 ca0f6a5cd99e
+Author: Pablo Neira Ayuso <pablo@netfilter.org>
+Date:   Mon Jun 15 18:31:22 2015 +0200
+
+    Merge branch 'master' of git://blackhole.kfki.hu/nf-next
+    
+    Jozsef Kadlecsik says:
+    
+    ====================
+    ipset patches for nf-next
+    
+    Please consider to apply the next bunch of patches for ipset. First
+    comes the small changes, then the bugfixes and at the end the RCU
+    related patches.
+    
+    * Use MSEC_PER_SEC consistently instead of the number.
+    * Use SET_WITH_*() helpers to test set extensions from Sergey Popovich.
+    * Check extensions attributes before getting extensions from Sergey Popovich.
+    * Permit CIDR equal to the host address CIDR in IPv6 from Sergey Popovich.
+    * Make sure we always return line number on batch in the case of error
+      from Sergey Popovich.
+    * Check CIDR value only when attribute is given from Sergey Popovich.
+    * Fix cidr handling for hash:*net* types, reported by Jonathan Johnson.
+    * Fix parallel resizing and listing of the same set so that the original
+      set is kept for the whole dumping.
+    * Make sure listing doesn't grab a set which is just being destroyed.
+    * Remove rbtree from ip_set_hash_netiface.c in order to introduce RCU.
+    * Replace rwlock_t with spinlock_t in "struct ip_set", change the locking
+      in the core and simplifications in the timeout routines.
+    * Introduce RCU locking in bitmap:* types with a slight modification in the
+      logic on how an element is added.
+    * Introduce RCU locking in hash:* types. This is the most complex part of
+      the changes.
+    * Introduce RCU locking in list type where standard rculist is used.
+    * Fix coding styles reported by checkpatch.pl.
+    ====================
+    
+    Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+
+commit b57b2d1fa53fe8563bdfc66a33b844463b9af285
+Author: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+Date:   Sat Jun 13 14:22:25 2015 +0200
+
+    netfilter: ipset: Prepare the ipset core to use RCU at set level
+    
+    Replace rwlock_t with spinlock_t in "struct ip_set" and change the locking
+    accordingly. Convert the comment extension into an rcu-avare object. Also,
+    simplify the timeout routines.
+    
+    Signed-off-by: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+
+commit 1a118ccfd60fc78e64c0a3ab9e85075545839d6e
+Author: Chao Yu <chao@kernel.org>
+Date:   Wed Feb 11 18:20:38 2015 +0800
+
+    f2fs: use spinlock for segmap_lock instead of rwlock
+    
+    rwlock can provide better concurrency when there are much more readers than
+    writers because readers can hold the rwlock simultaneously.
+    
+    But now, for segmap_lock rwlock in struct free_segmap_info, there is only one
+    reader 'mount' from below call path:
+    ->f2fs_fill_super
+      ->build_segment_manager
+        ->build_dirty_segmap
+          ->init_dirty_segmap
+            ->find_next_inuse
+              read_lock
+              ...
+              read_unlock
+    
+    Now that our concurrency can not be improved since there is no other reader for
+    this lock, we do not need to use rwlock_t type for segmap_lock, let's replace it
+    with spinlock_t type.
+    
+    Signed-off-by: Chao Yu <chao2.yu@samsung.com>
+    Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+
+commit d59b93da5e572703e1a7311c13dd3472a4e56e30
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Fri Sep 19 14:29:31 2014 +0200
+
+    s390/rwlock: use directed yield for write-locked rwlocks
+    
+    Add an owner field to the arch_rwlock_t to be able to pass the timeslice
+    of a virtual CPU with diagnose 0x9c to the lock owner in case the rwlock
+    is write-locked. The undirected yield in case the rwlock is acquired
+    writable but the lock is read-locked is removed.
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+
+commit bd01ec1a13f9a327950c8e3080096446c7804753
+Author: Waiman Long <Waiman.Long@hp.com>
+Date:   Mon Feb 3 13:18:57 2014 +0100
+
+    x86, locking/rwlocks: Enable qrwlocks on x86
+    
+    Make x86 use the fair rwlock_t.
+    
+    Implement the custom queue_write_unlock() for best performance.
+    
+    Signed-off-by: Waiman Long <Waiman.Long@hp.com>
+    [peterz: near complete rewrite]
+    Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+    Cc: Dave Jones <davej@redhat.com>
+    Cc: Jeremy Fitzhardinge <jeremy@goop.org>
+    Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Oleg Nesterov <oleg@redhat.com>
+    Cc: Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>
+    Cc: "Paul E.McKenney" <paulmck@linux.vnet.ibm.com>
+    Cc: linux-kernel@vger.kernel.org
+    Cc: x86@kernel.org
+    Link: http://lkml.kernel.org/n/tip-r1xuzmdysvuhl3h86n5fbxi7@git.kernel.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 70af2f8a4f48d6cebdf92d533d3aef37853ce6de
+Author: Waiman Long <Waiman.Long@hp.com>
+Date:   Mon Feb 3 13:18:49 2014 +0100
+
+    locking/rwlocks: Introduce 'qrwlocks' - fair, queued rwlocks
+    
+    This rwlock uses the arch_spin_lock_t as a waitqueue, and assuming the
+    arch_spin_lock_t is a fair lock (ticket,mcs etc..) the resulting
+    rwlock is a fair lock.
+    
+    It fits in the same 8 bytes as the regular rwlock_t by folding the
+    reader and writer count into a single integer, using the remaining 4
+    bytes for the arch_spinlock_t.
+    
+    Architectures that can single-copy adress bytes can optimize
+    queue_write_unlock() with a 0 write to the LSB (the write count).
+    
+    Performance as measured by Davidlohr Bueso (rwlock_t -> qrwlock_t):
+    
+     +--------------+-------------+---------------+
+     |   Workload   |   #users    |     delta     |
+     +--------------+-------------+---------------+
+     | alltests     | > 1400      | -4.83%        |
+     | custom       | 0-100,> 100 | +1.43%,-1.57% |
+     | high_systime | > 1000      | -2.61         |
+     | shared       | all         | +0.32         |
+     +--------------+-------------+---------------+
+    
+    http://www.stgolabs.net/qrwlock-stuff/aim7-results-vs-rwsem_optsin/
+    
+    Signed-off-by: Waiman Long <Waiman.Long@hp.com>
+    [peterz: near complete rewrite]
+    Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+    Cc: Arnd Bergmann <arnd@arndb.de>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: "Paul E.McKenney" <paulmck@linux.vnet.ibm.com>
+    Cc: linux-arch@vger.kernel.org
+    Cc: linux-kernel@vger.kernel.org
+    Link: http://lkml.kernel.org/n/tip-gac1nnl3wvs2ij87zv2xkdzq@git.kernel.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 5b3f683e694a835f5dfdab06102be1a50604c3b7
+Author: Philipp Hachtmann <phacht@linux.vnet.ibm.com>
+Date:   Mon Apr 7 18:25:23 2014 +0200
+
+    s390/spinlock: cleanup spinlock code
+    
+    Improve the spinlock code in several aspects:
+     - Have _raw_compare_and_swap return true if the operation has been
+       successful instead of returning the old value.
+     - Remove the "volatile" from arch_spinlock_t and arch_rwlock_t
+     - Rename 'owner_cpu' to 'lock'
+     - Add helper functions arch_spin_trylock_once / arch_spin_tryrelease_once
+    
+    [ Martin Schwidefsky: patch breakdown and code beautification ]
+    
+    Signed-off-by: Philipp Hachtmann <phacht@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+
+commit dbe941827eab53194eda5cd350a4e1414f192658
+Author: Sasha Levin <sasha.levin@oracle.com>
+Date:   Thu Jun 13 18:41:21 2013 -0400
+
+    liblockdep: Add pthread_rwlock_t test suite
+    
+    A simple test to make sure we handle rwlocks correctly.
+    
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+    Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+    Cc: torvalds@linux-foundation.org
+    Link: http://lkml.kernel.org/r/1371163284-6346-7-git-send-email-sasha.levin@oracle.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 5a52c9b480e09a782618dbf08de57f9ca54c8b49
+Author: Sasha Levin <sasha.levin@oracle.com>
+Date:   Thu Jun 13 18:41:20 2013 -0400
+
+    liblockdep: Add public headers for pthread_rwlock_t implementation
+    
+    Both pthreads and lockdep support dealing with rwlocks, so
+    here's the liblockdep implementation for those.
+    
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+    Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+    Cc: torvalds@linux-foundation.org
+    Link: http://lkml.kernel.org/r/1371163284-6346-6-git-send-email-sasha.levin@oracle.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 9bb17be062de6f5a9c9643258951aa0935652ec3
+Author: Will Deacon <will@kernel.org>
+Date:   Tue Jul 2 14:54:33 2013 +0100
+
+    ARM: locks: prefetch the destination word for write prior to strex
+    
+    The cost of changing a cacheline from shared to exclusive state can be
+    significant, especially when this is triggered by an exclusive store,
+    since it may result in having to retry the transaction.
+    
+    This patch prefixes our {spin,read,write}_[try]lock implementations with
+    pldw instructions (on CPUs which support them) to try and grab the line
+    in exclusive state from the start. arch_rwlock_t is changed to avoid
+    using a volatile member, since this generates compiler warnings when
+    falling back on the __builtin_prefetch intrinsic which expects a const
+    void * argument.
+    
+    Acked-by: Nicolas Pitre <nico@linaro.org>
+    Signed-off-by: Will Deacon <will.deacon@arm.com>
+
+commit c8efe8c2805748f93add31d0463252c57f27a0ab
+Author: Mikael Pettersson <mikpe@it.uu.se>
+Date:   Mon Aug 15 10:11:50 2011 +0000
+
+    sparc32: unbreak arch_write_unlock()
+    
+    commit 3f6aa0b113846a8628baa649af422cfc6fb1d786 upstream.
+    
+    The sparc32 version of arch_write_unlock() is just a plain assignment.
+    Unfortunately this allows the compiler to schedule side-effects in a
+    protected region to occur after the HW-level unlock, which is broken.
+    E.g., the following trivial test case gets miscompiled:
+    
+            #include <linux/spinlock.h>
+            rwlock_t lock;
+            int counter;
+            void foo(void) { write_lock(&lock); ++counter; write_unlock(&lock); }
+    
+    Fixed by adding a compiler memory barrier to arch_write_unlock().  The
+    sparc64 version combines the barrier and assignment into a single asm(),
+    and implements the operation as a static inline, so that's what I did too.
+    
+    Compile-tested with sparc32_defconfig + CONFIG_SMP=y.
+    
+    Signed-off-by: Mikael Pettersson <mikpe@it.uu.se>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 7fe1e169829030a8257be59636f82c45753ca941
+Author: Mikael Pettersson <mikpe@it.uu.se>
+Date:   Mon Aug 15 10:11:50 2011 +0000
+
+    sparc32: unbreak arch_write_unlock()
+    
+    commit 3f6aa0b113846a8628baa649af422cfc6fb1d786 upstream.
+    
+    The sparc32 version of arch_write_unlock() is just a plain assignment.
+    Unfortunately this allows the compiler to schedule side-effects in a
+    protected region to occur after the HW-level unlock, which is broken.
+    E.g., the following trivial test case gets miscompiled:
+    
+            #include <linux/spinlock.h>
+            rwlock_t lock;
+            int counter;
+            void foo(void) { write_lock(&lock); ++counter; write_unlock(&lock); }
+    
+    Fixed by adding a compiler memory barrier to arch_write_unlock().  The
+    sparc64 version combines the barrier and assignment into a single asm(),
+    and implements the operation as a static inline, so that's what I did too.
+    
+    Compile-tested with sparc32_defconfig + CONFIG_SMP=y.
+    
+    Signed-off-by: Mikael Pettersson <mikpe@it.uu.se>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 3f6aa0b113846a8628baa649af422cfc6fb1d786
+Author: Mikael Pettersson <mikpe@it.uu.se>
+Date:   Mon Aug 15 10:11:50 2011 +0000
+
+    sparc32: unbreak arch_write_unlock()
+    
+    The sparc32 version of arch_write_unlock() is just a plain assignment.
+    Unfortunately this allows the compiler to schedule side-effects in a
+    protected region to occur after the HW-level unlock, which is broken.
+    E.g., the following trivial test case gets miscompiled:
+    
+            #include <linux/spinlock.h>
+            rwlock_t lock;
+            int counter;
+            void foo(void) { write_lock(&lock); ++counter; write_unlock(&lock); }
+    
+    Fixed by adding a compiler memory barrier to arch_write_unlock().  The
+    sparc64 version combines the barrier and assignment into a single asm(),
+    and implements the operation as a static inline, so that's what I did too.
+    
+    Compile-tested with sparc32_defconfig + CONFIG_SMP=y.
+    
+    Signed-off-by: Mikael Pettersson <mikpe@it.uu.se>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 4477288a103631980750c86547d1fd54bfd2ba7d
+Author: Jeff Layton <jlayton@kernel.org>
+Date:   Fri Oct 15 15:34:03 2010 -0400
+
+    cifs: convert GlobalSMBSeslock from a rwlock to regular spinlock
+    
+    Convert this lock to a regular spinlock
+    
+    A rwlock_t offers little value here. It's more expensive than a regular
+    spinlock unless you have a fairly large section of code that runs under
+    the read lock and can benefit from the concurrency.
+    
+    Additionally, we need to ensure that the refcounting for files isn't
+    racy and to do that we need to lock areas that can increment it for
+    write. That means that the areas that can actually use a read_lock are
+    very few and relatively infrequently used.
+    
+    While we're at it, change the name to something easier to type, and fix
+    a bug in find_writable_file. cifsFileInfo_put can sleep and shouldn't be
+    called while holding the lock.
+    
+    Signed-off-by: Jeff Layton <jlayton@redhat.com>
+    Reviewed-by: Suresh Jayaraman <sjayaraman@suse.de>
+    Signed-off-by: Steve French <sfrench@us.ibm.com>
+
+commit 09dc942c2a767e2d298f1cc9294bc19c7d7208c5
+Merge: 90e0c225968f 6c7a120ac6c6
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Aug 7 13:03:53 2010 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4: (40 commits)
+      ext4: Adding error check after calling ext4_mb_regular_allocator()
+      ext4: Fix dirtying of journalled buffers in data=journal mode
+      ext4: re-inline ext4_rec_len_(to|from)_disk functions
+      jbd2: Remove t_handle_lock from start_this_handle()
+      jbd2: Change j_state_lock to be a rwlock_t
+      jbd2: Use atomic variables to avoid taking t_handle_lock in jbd2_journal_stop
+      ext4: Add mount options in superblock
+      ext4: force block allocation on quota_off
+      ext4: fix freeze deadlock under IO
+      ext4: drop inode from orphan list if ext4_delete_inode() fails
+      ext4: check to make make sure bd_dev is set before dereferencing it
+      jbd2: Make barrier messages less scary
+      ext4: don't print scary messages for allocation failures post-abort
+      ext4: fix EFBIG edge case when writing to large non-extent file
+      ext4: fix ext4_get_blocks references
+      ext4: Always journal quota file modifications
+      ext4: Fix potential memory leak in ext4_fill_super
+      ext4: Don't error out the fs if the user tries to make a file too big
+      ext4: allocate stripe-multiple IOs on stripe boundaries
+      ext4: move aio completion after unwritten extent conversion
+      ...
+    
+    Fix up conflicts in fs/ext4/inode.c as per Ted.
+    
+    Fix up xfs conflicts as per earlier xfs merge.
+
+commit a931da6ac9331a6c80dd91c199105806f2336188
+Author: Theodore Ts'o <tytso@mit.edu>
+Date:   Tue Aug 3 21:35:12 2010 -0400
+
+    jbd2: Change j_state_lock to be a rwlock_t
+    
+    Lockstat reports have shown that j_state_lock is a major source of
+    lock contention, especially on systems with more than 4 CPU cores.  So
+    change it to be a read/write spinlock.
+    
+    Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
+
+commit 3be924fb1d7be90c3ae6aa30ca42e9aa5d75efaf
+Author: Anil Veerabhadrappa <anilgv@broadcom.com>
+Date:   Tue Jun 23 14:07:40 2009 -0700
+
+    [SCSI] bnx2i: convert bnx2i_dev_lock to mutex
+    
+    convert bnx2i_dev_lock to type mutex from rwlock_t because
+    cnic->register_device() can sleep for various reasons including memory
+    allocation, waiting for ISCSI_INIT completion and while acquiring mutex lock,
+    cnic_lock.
+    
+    Signed-off-by: Michael Chan <mchan@broadcom.com>
+    Signed-off-by: Anil Veerabhadrappa <anilgv@broadcom.com>
+    Reviewed-by: Mike Christie <michaelc@cs.wisc.edu>
+    Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
+    Signed-off-by: James Bottomley <James.Bottomley@suse.de>
+
+commit 94cd3e6cbebf85903b4d53ed2147bdb4c6e08625
+Author: Eric Dumazet <dada1@cosmosbay.com>
+Date:   Tue Jan 27 17:45:10 2009 -0800
+
+    net: wrong test in inet_ehash_locks_alloc()
+    
+    In commit 9db66bdcc83749affe61c61eb8ff3cf08f42afec (net: convert
+    TCP/DCCP ehash rwlocks to spinlocks), I forgot to change one
+    occurrence of rwlock_t to spinlock_t
+    
+    I believe sizeof(raw_spinlock_t) might be > 0 on !CONFIG_SMP if
+    CONFIG_DEBUG_SPINLOCK while sizeof(raw_rwlock_t) should be 0 in this
+    case.
+    
+    Fortunatly, CONFIG_DEBUG_SPINLOCK adds fields to both spinlock_t and
+    rwlock_t, but at this might change in the future (being able to debug
+    spinlocks but not rwlocks for example), better to be safe.
+    
+    Signed-off-by: Eric Dumazet <dada1@cosmosbay.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 126468b1156211e26d97f74b2f1767acd141005a
+Author: Christoph Hellwig <hch@infradead.org>
+Date:   Thu Mar 6 13:44:57 2008 +1100
+
+    [XFS] kill xfs_rwlock/xfs_rwunlock
+    
+    We can just use xfs_ilock/xfs_iunlock instead and get rid of the ugly
+    bhv_vrwlock_t.
+    
+    SGI-PV: 976035
+    SGI-Modid: xfs-linux-melb:xfs-kern:30533a
+    
+    Signed-off-by: Christoph Hellwig <hch@infradead.org>
+    Signed-off-by: Lachlan McIlroy <lachlan@sgi.com>
+
+commit df96efd73b81b8bc2d23b3d8b6025cce3d43db6c
+Author: Yoichi Yuasa <yoichi_yuasa@tripeaks.co.jp>
+Date:   Tue Sep 11 22:24:45 2007 +0100
+
+    leds: Add missing include for leds.h
+    
+    This patch has added #include <linux/spinlock.h> to include/linux/leds.h
+    for rwlock_t.
+    
+    Signed-off-by: Yoichi Yuasa <yoichi_yuasa@tripeaks.co.jp>
+    Signed-off-by: Richard Purdie <rpurdie@rpsys.net>
+
+commit 4fe87745a6722d42ff27a60768c77958fa1fc498
+Author: Peter Zijlstra <a.p.zijlstra@chello.nl>
+Date:   Thu Jul 19 01:48:58 2007 -0700
+
+    lockstat: hook into spinlock_t, rwlock_t, rwsem and mutex
+    
+    Call the new lockstat tracking functions from the various lock primitives.
+    
+    Signed-off-by: Peter Zijlstra <a.p.zijlstra@chello.nl>
+    Acked-by: Ingo Molnar <mingo@elte.hu>
+    Acked-by: Jason Baron <jbaron@redhat.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit dbca9b2750e3b1ee6f56a616160ccfc12e8b161f
+Author: Eric Dumazet <dada1@cosmosbay.com>
+Date:   Thu Feb 8 14:16:46 2007 -0800
+
+    [NET]: change layout of ehash table
+    
+    ehash table layout is currently this one :
+    
+    First half of this table is used by sockets not in TIME_WAIT state
+    Second half of it is used by sockets in TIME_WAIT state.
+    
+    This is non optimal because of for a given hash or socket, the two chain heads
+    are located in separate cache lines.
+    Moreover the locks of the second half are never used.
+    
+    If instead of this halving, we use two list heads in inet_ehash_bucket instead
+    of only one, we probably can avoid one cache miss, and reduce ram usage,
+    particularly if sizeof(rwlock_t) is big (various CONFIG_DEBUG_SPINLOCK,
+    CONFIG_DEBUG_LOCK_ALLOC settings). So we still halves the table but we keep
+    together related chains to speedup lookups and socket state change.
+    
+    In this patch I did not try to align struct inet_ehash_bucket, but a future
+    patch could try to make this structure have a convenient size (a power of two
+    or a multiple of L1_CACHE_SIZE).
+    I guess rwlock will just vanish as soon as RCU is plugged into ehash :) , so
+    maybe we dont need to scratch our heads to align the bucket...
+    
+    Note : In case struct inet_ehash_bucket is not a power of two, we could
+    probably change alloc_large_system_hash() (in case it use __get_free_pages())
+    to free the unused space. It currently allocates a big zone, but the last
+    quarter of it could be freed. Again, this should be a temporary 'problem'.
+    
+    Patch tested on ipv4 tcp only, but should be OK for IPV6 and DCCP.
+    
+    Signed-off-by: Eric Dumazet <dada1@cosmosbay.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 36de6437866bbb1d37e2312ff4f95ee4ed6d2b61
+Author: Arnaldo Carvalho de Melo <acme@mandriva.com>
+Date:   Wed Dec 6 20:33:42 2006 -0800
+
+    [PATCH] Save some bytes in struct mm_struct
+    
+    Before:
+    [acme@newtoy net-2.6.20]$ pahole --cacheline 32 kernel/sched.o mm_struct
+    
+    /* include2/asm/processor.h:542 */
+    struct mm_struct {
+            struct vm_area_struct *    mmap;                 /*     0     4 */
+            struct rb_root             mm_rb;                /*     4     4 */
+            struct vm_area_struct *    mmap_cache;           /*     8     4 */
+            long unsigned int          (*get_unmapped_area)(); /*    12     4 */
+            void                       (*unmap_area)();      /*    16     4 */
+            long unsigned int          mmap_base;            /*    20     4 */
+            long unsigned int          task_size;            /*    24     4 */
+            long unsigned int          cached_hole_size;     /*    28     4 */
+            /* ---------- cacheline 1 boundary ---------- */
+            long unsigned int          free_area_cache;      /*    32     4 */
+            pgd_t *                    pgd;                  /*    36     4 */
+            atomic_t                   mm_users;             /*    40     4 */
+            atomic_t                   mm_count;             /*    44     4 */
+            int                        map_count;            /*    48     4 */
+            struct rw_semaphore        mmap_sem;             /*    52    64 */
+            spinlock_t                 page_table_lock;      /*   116    40 */
+            struct list_head           mmlist;               /*   156     8 */
+            mm_counter_t               _file_rss;            /*   164     4 */
+            mm_counter_t               _anon_rss;            /*   168     4 */
+            long unsigned int          hiwater_rss;          /*   172     4 */
+            long unsigned int          hiwater_vm;           /*   176     4 */
+            long unsigned int          total_vm;             /*   180     4 */
+            long unsigned int          locked_vm;            /*   184     4 */
+            long unsigned int          shared_vm;            /*   188     4 */
+            /* ---------- cacheline 6 boundary ---------- */
+            long unsigned int          exec_vm;              /*   192     4 */
+            long unsigned int          stack_vm;             /*   196     4 */
+            long unsigned int          reserved_vm;          /*   200     4 */
+            long unsigned int          def_flags;            /*   204     4 */
+            long unsigned int          nr_ptes;              /*   208     4 */
+            long unsigned int          start_code;           /*   212     4 */
+            long unsigned int          end_code;             /*   216     4 */
+            long unsigned int          start_data;           /*   220     4 */
+            /* ---------- cacheline 7 boundary ---------- */
+            long unsigned int          end_data;             /*   224     4 */
+            long unsigned int          start_brk;            /*   228     4 */
+            long unsigned int          brk;                  /*   232     4 */
+            long unsigned int          start_stack;          /*   236     4 */
+            long unsigned int          arg_start;            /*   240     4 */
+            long unsigned int          arg_end;              /*   244     4 */
+            long unsigned int          env_start;            /*   248     4 */
+            long unsigned int          env_end;              /*   252     4 */
+            /* ---------- cacheline 8 boundary ---------- */
+            long unsigned int          saved_auxv[44];       /*   256   176 */
+            unsigned int               dumpable:2;           /*   432     4 */
+            cpumask_t                  cpu_vm_mask;          /*   436     4 */
+            mm_context_t               context;              /*   440    68 */
+            long unsigned int          swap_token_time;      /*   508     4 */
+            /* ---------- cacheline 16 boundary ---------- */
+            char                       recent_pagein;        /*   512     1 */
+    
+            /* XXX 3 bytes hole, try to pack */
+    
+            int                        core_waiters;         /*   516     4 */
+            struct completion *        core_startup_done;    /*   520     4 */
+            struct completion          core_done;            /*   524    52 */
+            rwlock_t                   ioctx_list_lock;      /*   576    36 */
+            struct kioctx *            ioctx_list;           /*   612     4 */
+    }; /* size: 616, sum members: 613, holes: 1, sum holes: 3, cachelines: 20,
+          last cacheline: 8 bytes */
+    
+    After:
+    
+    [acme@newtoy net-2.6.20]$ pahole --cacheline 32 kernel/sched.o mm_struct
+    /* include2/asm/processor.h:542 */
+    struct mm_struct {
+            struct vm_area_struct *    mmap;                 /*     0     4 */
+            struct rb_root             mm_rb;                /*     4     4 */
+            struct vm_area_struct *    mmap_cache;           /*     8     4 */
+            long unsigned int          (*get_unmapped_area)(); /*    12     4 */
+            void                       (*unmap_area)();      /*    16     4 */
+            long unsigned int          mmap_base;            /*    20     4 */
+            long unsigned int          task_size;            /*    24     4 */
+            long unsigned int          cached_hole_size;     /*    28     4 */
+            /* ---------- cacheline 1 boundary ---------- */
+            long unsigned int          free_area_cache;      /*    32     4 */
+            pgd_t *                    pgd;                  /*    36     4 */
+            atomic_t                   mm_users;             /*    40     4 */
+            atomic_t                   mm_count;             /*    44     4 */
+            int                        map_count;            /*    48     4 */
+            struct rw_semaphore        mmap_sem;             /*    52    64 */
+            spinlock_t                 page_table_lock;      /*   116    40 */
+            struct list_head           mmlist;               /*   156     8 */
+            mm_counter_t               _file_rss;            /*   164     4 */
+            mm_counter_t               _anon_rss;            /*   168     4 */
+            long unsigned int          hiwater_rss;          /*   172     4 */
+            long unsigned int          hiwater_vm;           /*   176     4 */
+            long unsigned int          total_vm;             /*   180     4 */
+            long unsigned int          locked_vm;            /*   184     4 */
+            long unsigned int          shared_vm;            /*   188     4 */
+            /* ---------- cacheline 6 boundary ---------- */
+            long unsigned int          exec_vm;              /*   192     4 */
+            long unsigned int          stack_vm;             /*   196     4 */
+            long unsigned int          reserved_vm;          /*   200     4 */
+            long unsigned int          def_flags;            /*   204     4 */
+            long unsigned int          nr_ptes;              /*   208     4 */
+            long unsigned int          start_code;           /*   212     4 */
+            long unsigned int          end_code;             /*   216     4 */
+            long unsigned int          start_data;           /*   220     4 */
+            /* ---------- cacheline 7 boundary ---------- */
+            long unsigned int          end_data;             /*   224     4 */
+            long unsigned int          start_brk;            /*   228     4 */
+            long unsigned int          brk;                  /*   232     4 */
+            long unsigned int          start_stack;          /*   236     4 */
+            long unsigned int          arg_start;            /*   240     4 */
+            long unsigned int          arg_end;              /*   244     4 */
+            long unsigned int          env_start;            /*   248     4 */
+            long unsigned int          env_end;              /*   252     4 */
+            /* ---------- cacheline 8 boundary ---------- */
+            long unsigned int          saved_auxv[44];       /*   256   176 */
+            cpumask_t                  cpu_vm_mask;          /*   432     4 */
+            mm_context_t               context;              /*   436    68 */
+            long unsigned int          swap_token_time;      /*   504     4 */
+            char                       recent_pagein;        /*   508     1 */
+            unsigned char              dumpable:2;           /*   509     1 */
+    
+            /* XXX 2 bytes hole, try to pack */
+    
+            int                        core_waiters;         /*   512     4 */
+            struct completion *        core_startup_done;    /*   516     4 */
+            struct completion          core_done;            /*   520    52 */
+            rwlock_t                   ioctx_list_lock;      /*   572    36 */
+            struct kioctx *            ioctx_list;           /*   608     4 */
+    }; /* size: 612, sum members: 610, holes: 1, sum holes: 2, cachelines: 20,
+          last cacheline: 4 bytes */
+    
+    [acme@newtoy net-2.6.20]$ codiff -V /tmp/sched.o.before kernel/sched.o
+    /pub/scm/linux/kernel/git/acme/net-2.6.20/kernel/sched.c:
+      struct mm_struct |   -4
+        dumpable:2;
+         from: unsigned int          /*   432(30)    4(2) */
+         to:   unsigned char         /*   509(6)     1(2) */
+    < SNIP other offset changes >
+     1 struct changed
+    [acme@newtoy net-2.6.20]$
+    
+    I'm not aware of any problem about using 2 byte wide bitfields where
+    previously a 4 byte wide one was, holler if there is any, I wouldn't be
+    surprised, bitfields are things from hell.
+    
+    For the curious, 432(30) means: at offset 432 from the struct start, at
+    offset 30 in the bitfield (yeah, it comes backwards, hellish, huh?) ditto
+    for 509(6), while 4(2) and 1(2) means "struct field size(bitfield size)".
+    
+    Now we have a 2 bytes hole and are using only 4 bytes of the last 32
+    bytes cacheline, any takers? :-)
+    
+    Signed-off-by: Arnaldo Carvalho de Melo <acme@mandriva.com>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+
+commit 46ca5f5dc4f1c9b5ac02c0090ae8ff4ac8560446
+Author: Arnaldo Carvalho de Melo <acme@mandriva.com>
+Date:   Mon Nov 27 17:58:59 2006 -0200
+
+    [XFRM]: Pack struct xfrm_policy
+    
+    [acme@newtoy net-2.6.20]$ pahole net/ipv4/tcp.o xfrm_policy
+    /* /pub/scm/linux/kernel/git/acme/net-2.6.20/include/linux/security.h:67 */
+    struct xfrm_policy {
+            struct xfrm_policy *       next;                 /*     0     4 */
+            struct hlist_node          bydst;                /*     4     8 */
+            struct hlist_node          byidx;                /*    12     8 */
+            rwlock_t                   lock;                 /*    20    36 */
+            atomic_t                   refcnt;               /*    56     4 */
+            struct timer_list          timer;                /*    60    24 */
+            u8                         type;                 /*    84     1 */
+    
+            /* XXX 3 bytes hole, try to pack */
+    
+            u32                        priority;             /*    88     4 */
+            u32                        index;                /*    92     4 */
+            struct xfrm_selector       selector;             /*    96    56 */
+            struct xfrm_lifetime_cfg   lft;                  /*   152    64 */
+            struct xfrm_lifetime_cur   curlft;               /*   216    32 */
+            struct dst_entry *         bundles;              /*   248     4 */
+            __u16                      family;               /*   252     2 */
+            __u8                       action;               /*   254     1 */
+            __u8                       flags;                /*   255     1 */
+            __u8                       dead;                 /*   256     1 */
+            __u8                       xfrm_nr;              /*   257     1 */
+    
+            /* XXX 2 bytes hole, try to pack */
+    
+            struct xfrm_sec_ctx *      security;             /*   260     4 */
+            struct xfrm_tmpl           xfrm_vec[6];          /*   264   360 */
+    }; /* size: 624, sum members: 619, holes: 2, sum holes: 5 */
+    
+    So lets have just one hole instead of two, by moving 'type' to just before 'action',
+    end result:
+    
+    [acme@newtoy net-2.6.20]$ codiff -s /tmp/tcp.o.before net/ipv4/tcp.o
+    /pub/scm/linux/kernel/git/acme/net-2.6.20/net/ipv4/tcp.c:
+      struct xfrm_policy |   -4
+     1 struct changed
+    [acme@newtoy net-2.6.20]$
+    
+    [acme@newtoy net-2.6.20]$ pahole -c 64 net/ipv4/tcp.o xfrm_policy
+    /* /pub/scm/linux/kernel/git/acme/net-2.6.20/include/linux/security.h:67 */
+    struct xfrm_policy {
+            struct xfrm_policy *       next;                 /*     0     4 */
+            struct hlist_node          bydst;                /*     4     8 */
+            struct hlist_node          byidx;                /*    12     8 */
+            rwlock_t                   lock;                 /*    20    36 */
+            atomic_t                   refcnt;               /*    56     4 */
+            struct timer_list          timer;                /*    60    24 */
+            u32                        priority;             /*    84     4 */
+            u32                        index;                /*    88     4 */
+            struct xfrm_selector       selector;             /*    92    56 */
+            struct xfrm_lifetime_cfg   lft;                  /*   148    64 */
+            struct xfrm_lifetime_cur   curlft;               /*   212    32 */
+            struct dst_entry *         bundles;              /*   244     4 */
+            u16                        family;               /*   248     2 */
+            u8                         type;                 /*   250     1 */
+            u8                         action;               /*   251     1 */
+            u8                         flags;                /*   252     1 */
+            u8                         dead;                 /*   253     1 */
+            u8                         xfrm_nr;              /*   254     1 */
+    
+            /* XXX 1 byte hole, try to pack */
+    
+            struct xfrm_sec_ctx *      security;             /*   256     4 */
+            struct xfrm_tmpl           xfrm_vec[6];          /*   260   360 */
+    }; /* size: 620, sum members: 619, holes: 1, sum holes: 1 */
+    
+    Are there any fugly data dependencies here? None that I know.
+    
+    In the process changed the removed the __ prefixed types, that are just for
+    userspace visible headers.
+    
+    Signed-off-by: Arnaldo Carvalho de Melo <acme@mandriva.com>
+
+commit d5c42c0ec4f7fd5a4e19e33a2d561758b67c55c8
+Author: Arnaldo Carvalho de Melo <acme@mandriva.com>
+Date:   Mon Nov 27 17:58:02 2006 -0200
+
+    [NET]: Pack struct hh_cache
+    
+    [acme@newtoy net-2.6.20]$ pahole net/ipv4/tcp.o hh_cache
+    /* /pub/scm/linux/kernel/git/acme/net-2.6.20/include/linux/netdevice.h:190 */
+    struct hh_cache {
+            struct hh_cache *          hh_next;              /*     0     4 */
+            atomic_t                   hh_refcnt;            /*     4     4 */
+            __be16                     hh_type;              /*     8     2 */
+    
+            /* XXX 2 bytes hole, try to pack */
+    
+            int                        hh_len;               /*    12     4 */
+            int                        (*hh_output)();       /*    16     4 */
+            rwlock_t                   hh_lock;              /*    20    36 */
+            long unsigned int          hh_data[24];          /*    56    96 */
+    }; /* size: 152, sum members: 150, holes: 1, sum holes: 2 */
+    
+    [acme@newtoy net-2.6.20]$ find net -name "*.[ch]" | xargs grep 'hh_len.\+=' | sort -u
+    net/atm/br2684.c:               hh->hh_len = PADLEN + ETH_HLEN;
+    net/ethernet/eth.c:     hh->hh_len = ETH_HLEN;
+    net/ipv4/ipconfig.c:    int hh_len = LL_RESERVED_SPACE(dev);
+    net/ipv4/ip_output.c:   hh_len = LL_RESERVED_SPACE(rt->u.dst.dev);
+    net/ipv4/ip_output.c:   int hh_len = LL_RESERVED_SPACE(dev);
+    net/ipv4/netfilter.c:   hh_len = (*pskb)->dst->dev->hard_header_len;
+    net/ipv4/raw.c: hh_len = LL_RESERVED_SPACE(rt->u.dst.dev);
+    net/ipv6/ip6_output.c:  hh_len = LL_RESERVED_SPACE(rt->u.dst.dev);
+    net/ipv6/netfilter/ip6t_REJECT.c:       hh_len = (dst->dev->hard_header_len + 15)&~15;
+    net/ipv6/raw.c: hh_len = LL_RESERVED_SPACE(rt->u.dst.dev);
+    [acme@newtoy net-2.6.20]$
+    
+    [acme@newtoy net-2.6.20]$ find include -name "*.h" | xargs grep 'define ETH_HLEN'
+    include/linux/if_ether.h:#define ETH_HLEN       14              /* Total octets in header.       */
+    
+            (((dev)->hard_header_len&~(HH_DATA_MOD - 1)) + HH_DATA_MOD)
+    
+    [acme@newtoy net-2.6.20]$ pahole net/ipv4/tcp.o net_device | grep hard_header_len
+            short unsigned int         hard_header_len;      /*   106     2 */
+    [acme@newtoy net-2.6.20]$
+    
+    So I think we're safe in turning hh_len an u16, end result:
+    
+    [acme@newtoy net-2.6.20]$ codiff -sV /tmp/tcp.o.before net/ipv4/tcp.o
+    /pub/scm/linux/kernel/git/acme/net-2.6.20/net/ipv4/tcp.c:
+      struct hh_cache |   -4
+        hh_len;
+         from: int                   /*    12(0)     4(0) */
+         to:   u16                   /*    10(0)     2(0) */
+     1 struct changed
+    [acme@newtoy net-2.6.20]$
+    
+    Signed-off-by: Arnaldo Carvalho de Melo <acme@mandriva.com>
+
+commit 9f50b93f066f8dc339de9b0eb78a22a75e6c8f8f
+Author: Josh Triplett <josh@joshtriplett.org>
+Date:   Fri Sep 29 02:00:59 2006 -0700
+
+    [PATCH] Make spinlock/rwlock annotations more accurate by using parameters, not types
+    
+    The lock annotations used on spinlocks and rwlocks currently use
+    __{acquires,releases}(spinlock_t) and __{acquires,releases}(rwlock_t),
+    respectively.  This loses the information of which lock actually got
+    acquired or released, and assumes a different type for the parameter of
+    __acquires and __releases than the rest of the kernel.  While the current
+    implementations of __acquires and __releases throw away their argument,
+    this will not always remain the case.  Change this to use the lock
+    parameter instead, to preserve this information and increase consistency in
+    usage of __acquires and __releases.
+    
+    Signed-off-by: Josh Triplett <josh@freedesktop.org>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+
+commit 181a46a56e9f852060c54247209e93740329b6eb
+Author: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+Date:   Wed Jan 4 13:56:54 2006 -0800
+
+    [NETFILTER]: Use macro for spinlock_t/rwlock_t initializations/definition.
+    
+    Signed-off-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 196433c5b788eb732fdcf92449274e302f089ce4
+Author: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+Date:   Wed Jan 4 13:56:31 2006 -0800
+
+    [IPV6]: Use macro for rwlock_t initialization.
+    
+    Signed-off-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit fb1c8f93d869b34cacb8b8932e2b83d96a19d720
+Author: Ingo Molnar <mingo@elte.hu>
+Date:   Sat Sep 10 00:25:56 2005 -0700
+
+    [PATCH] spinlock consolidation
+    
+    This patch (written by me and also containing many suggestions of Arjan van
+    de Ven) does a major cleanup of the spinlock code.  It does the following
+    things:
+    
+     - consolidates and enhances the spinlock/rwlock debugging code
+    
+     - simplifies the asm/spinlock.h files
+    
+     - encapsulates the raw spinlock type and moves generic spinlock
+       features (such as ->break_lock) into the generic code.
+    
+     - cleans up the spinlock code hierarchy to get rid of the spaghetti.
+    
+    Most notably there's now only a single variant of the debugging code,
+    located in lib/spinlock_debug.c.  (previously we had one SMP debugging
+    variant per architecture, plus a separate generic one for UP builds)
+    
+    Also, i've enhanced the rwlock debugging facility, it will now track
+    write-owners.  There is new spinlock-owner/CPU-tracking on SMP builds too.
+    All locks have lockup detection now, which will work for both soft and hard
+    spin/rwlock lockups.
+    
+    The arch-level include files now only contain the minimally necessary
+    subset of the spinlock code - all the rest that can be generalized now
+    lives in the generic headers:
+    
+     include/asm-i386/spinlock_types.h       |   16
+     include/asm-x86_64/spinlock_types.h     |   16
+    
+    I have also split up the various spinlock variants into separate files,
+    making it easier to see which does what. The new layout is:
+    
+       SMP                         |  UP
+       ----------------------------|-----------------------------------
+       asm/spinlock_types_smp.h    |  linux/spinlock_types_up.h
+       linux/spinlock_types.h      |  linux/spinlock_types.h
+       asm/spinlock_smp.h          |  linux/spinlock_up.h
+       linux/spinlock_api_smp.h    |  linux/spinlock_api_up.h
+       linux/spinlock.h            |  linux/spinlock.h
+    
+    /*
+     * here's the role of the various spinlock/rwlock related include files:
+     *
+     * on SMP builds:
+     *
+     *  asm/spinlock_types.h: contains the raw_spinlock_t/raw_rwlock_t and the
+     *                        initializers
+     *
+     *  linux/spinlock_types.h:
+     *                        defines the generic type and initializers
+     *
+     *  asm/spinlock.h:       contains the __raw_spin_*()/etc. lowlevel
+     *                        implementations, mostly inline assembly code
+     *
+     *   (also included on UP-debug builds:)
+     *
+     *  linux/spinlock_api_smp.h:
+     *                        contains the prototypes for the _spin_*() APIs.
+     *
+     *  linux/spinlock.h:     builds the final spin_*() APIs.
+     *
+     * on UP builds:
+     *
+     *  linux/spinlock_type_up.h:
+     *                        contains the generic, simplified UP spinlock type.
+     *                        (which is an empty structure on non-debug builds)
+     *
+     *  linux/spinlock_types.h:
+     *                        defines the generic type and initializers
+     *
+     *  linux/spinlock_up.h:
+     *                        contains the __raw_spin_*()/etc. version of UP
+     *                        builds. (which are NOPs on non-debug, non-preempt
+     *                        builds)
+     *
+     *   (included on UP-non-debug builds:)
+     *
+     *  linux/spinlock_api_up.h:
+     *                        builds the _spin_*() APIs.
+     *
+     *  linux/spinlock.h:     builds the final spin_*() APIs.
+     */
+    
+    All SMP and UP architectures are converted by this patch.
+    
+    arm, i386, ia64, ppc, ppc64, s390/s390x, x64 was build-tested via
+    crosscompilers.  m32r, mips, sh, sparc, have not been tested yet, but should
+    be mostly fine.
+    
+    From: Grant Grundler <grundler@parisc-linux.org>
+    
+      Booted and lightly tested on a500-44 (64-bit, SMP kernel, dual CPU).
+      Builds 32-bit SMP kernel (not booted or tested).  I did not try to build
+      non-SMP kernels.  That should be trivial to fix up later if necessary.
+    
+      I converted bit ops atomic_hash lock to raw_spinlock_t.  Doing so avoids
+      some ugly nesting of linux/*.h and asm/*.h files.  Those particular locks
+      are well tested and contained entirely inside arch specific code.  I do NOT
+      expect any new issues to arise with them.
+    
+     If someone does ever need to use debug/metrics with them, then they will
+      need to unravel this hairball between spinlocks, atomic ops, and bit ops
+      that exist only because parisc has exactly one atomic instruction: LDCW
+      (load and clear word).
+    
+    From: "Luck, Tony" <tony.luck@intel.com>
+    
+       ia64 fix
+    
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>
+    Signed-off-by: Arjan van de Ven <arjanv@infradead.org>
+    Signed-off-by: Grant Grundler <grundler@parisc-linux.org>
+    Cc: Matthew Wilcox <willy@debian.org>
+    Signed-off-by: Hirokazu Takata <takata@linux-m32r.org>
+    Signed-off-by: Mikael Pettersson <mikpe@csd.uu.se>
+    Signed-off-by: Benoit Boissinot <benoit.boissinot@ens-lyon.org>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>

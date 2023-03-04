@@ -1,0 +1,2683 @@
+commit dc18175938e65e979b866f23dc5b93e81d649cc4
+Merge: fe563a2c554c 6c54b7bc8a31
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri Jan 20 11:14:41 2023 -0800
+
+    Merge tag 'thermal-6.2-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull thermal control fix from Rafael Wysocki:
+     "Modify __thermal_cooling_device_register() to make it call
+      put_device() after invoking device_register() and fix up a few error
+      paths calling thermal_cooling_device_destroy_sysfs() unnecessarily
+      (Viresh Kumar)"
+    
+    * tag 'thermal-6.2-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm:
+      thermal: core: call put_device() only after device_register() fails
+
+commit 6c54b7bc8a31ce0f7cc7f8deef05067df414f1d8
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Wed Jan 18 14:08:24 2023 +0530
+
+    thermal: core: call put_device() only after device_register() fails
+    
+    put_device() shouldn't be called before a prior call to
+    device_register(). __thermal_cooling_device_register() doesn't follow
+    that properly and needs fixing. Also
+    thermal_cooling_device_destroy_sysfs() is getting called unnecessarily
+    on few error paths.
+    
+    Fix all this by placing the calls at the right place.
+    
+    Based on initial work done by Caleb Connolly.
+    
+    Fixes: 4748f9687caa ("thermal: core: fix some possible name leaks in error paths")
+    Fixes: c408b3d1d9bb ("thermal: Validate new state in cur_state_store()")
+    Reported-by: Caleb Connolly <caleb.connolly@linaro.org>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Tested-by: Frank Rowand <frowand.list@gmail.com>
+    Reviewed-by: Yang Yingliang <yangyingliang@huawei.com>
+    Tested-by: Caleb Connolly <caleb.connolly@linaro.org>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 691806e977a3a64895bd891878ed726cdbd282c0
+Merge: 456ed864fd90 75b15aa0d83e
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon Dec 12 13:45:21 2022 -0800
+
+    Merge tag 'thermal-6.2-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull thermal control updates from Rafael Wysocki:
+     "These include thermal core fixes to protect thermal device operations
+      against thermal device removal, other thermal core fixes and updates
+      of Intel thermal control drivers.
+    
+      Specifics:
+    
+       - Fix race conditions related to thermal device operations that are
+         not protected against thermal device removal (Guenter Roeck)
+    
+       - Fix error code in __thermal_cooling_device_register() (Dan
+         Carpenter)
+    
+       - Validate new cooling device state (coming from user space) in
+         cur_state_store() and reuse the max_state value from cooling device
+         structure in the sysfs interface (Viresh Kumar)
+    
+       - Fix some possible name leaks in error paths in the thermal control
+         core code (Yang Yingliang)
+    
+       - Detect TCC lock bit set in the intel_tcc_cooling driver and make it
+         refuse to update the TCC offset in that case (Zhang Rui)
+    
+       - Add TCC cooling support for RaptorLake-S (Zhang Rui)
+    
+       - Prevent accidental clearing of HFI status by one of the other
+         drivers using the same status register (Srinivas Pandruvada)
+    
+       - Protect clearing of thermal status bits in Intel thermal control
+         drivers (Srinivas Pandruvada)
+    
+       - Allow the HFI thermal control driver to ACK an HFI event for the
+         previously observed timestamp (Srinivas Pandruvada)
+    
+       - Remove a pointless die_id check from the HFI thermal driver and
+         adjust the definition a data structure used by it (Ricardo Neri)"
+    
+    * tag 'thermal-6.2-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm:
+      thermal: intel: hfi: Remove a pointless die_id check
+      thermal: core: fix some possible name leaks in error paths
+      thermal: intel: hfi: ACK HFI for the same timestamp
+      thermal: intel: Protect clearing of thermal status bits
+      thermal: intel: Prevent accidental clearing of HFI status
+      thermal/core: Protect thermal device operations against thermal device removal
+      thermal/core: Remove thermal_zone_set_trips()
+      thermal/core: Protect sysfs accesses to thermal operations with thermal zone mutex
+      thermal/core: Protect hwmon accesses to thermal operations with thermal zone mutex
+      thermal/core: Introduce locked version of thermal_zone_device_update
+      thermal/core: Move parameter validation from __thermal_zone_get_temp to thermal_zone_get_temp
+      thermal/core: Ensure that thermal device is registered in thermal_zone_get_temp
+      thermal/core: Delete device under thermal device zone lock
+      thermal/core: Destroy thermal zone device mutex in release function
+      thermal: intel: intel_tcc_cooling: Add TCC cooling support for RaptorLake-S
+      thermal: intel: intel_tcc_cooling: Detect TCC lock bit
+      thermal: intel: hfi: Improve the type of hfi_features::nr_table_pages
+      thermal/core: fix error code in __thermal_cooling_device_register()
+      thermal: sysfs: Reuse cdev->max_state
+      thermal: Validate new state in cur_state_store()
+
+commit e49a1e1ee078aee21006192076a8d93335e0daa9
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Fri Oct 28 18:02:34 2022 +0300
+
+    thermal/core: fix error code in __thermal_cooling_device_register()
+    
+    Return an error pointer if ->get_max_state() fails.  The current code
+    returns NULL which will cause an oops in the callers.
+    
+    Fixes: c408b3d1d9bb ("thermal: Validate new state in cur_state_store()")
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 9abdf0c0184230f0cb5c6685aabf33dda89aa9fb
+Author: Yang Yingliang <yangyingliang@huawei.com>
+Date:   Wed May 11 10:06:05 2022 +0800
+
+    thermal/core: Fix memory leak in __thermal_cooling_device_register()
+    
+    [ Upstream commit 98a160e898c0f4a979af9de3ab48b4b1d42d1dbb ]
+    
+    I got memory leak as follows when doing fault injection test:
+    
+    unreferenced object 0xffff888010080000 (size 264312):
+      comm "182", pid 102533, jiffies 4296434960 (age 10.100s)
+      hex dump (first 32 bytes):
+        00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+        ff ff ff ff ff ff ff ff 40 7f 1f b9 ff ff ff ff  ........@.......
+      backtrace:
+        [<0000000038b2f4fc>] kmalloc_order_trace+0x1d/0x110 mm/slab_common.c:969
+        [<00000000ebcb8da5>] __kmalloc+0x373/0x420 include/linux/slab.h:510
+        [<0000000084137f13>] thermal_cooling_device_setup_sysfs+0x15d/0x2d0 include/linux/slab.h:586
+        [<00000000352b8755>] __thermal_cooling_device_register+0x332/0xa60 drivers/thermal/thermal_core.c:927
+        [<00000000fb9f331b>] devm_thermal_of_cooling_device_register+0x6b/0xf0 drivers/thermal/thermal_core.c:1041
+        [<000000009b8012d2>] max6650_probe.cold+0x557/0x6aa drivers/hwmon/max6650.c:211
+        [<00000000da0b7e04>] i2c_device_probe+0x472/0xac0 drivers/i2c/i2c-core-base.c:561
+    
+    If device_register() fails, thermal_cooling_device_destroy_sysfs() need be called
+    to free the memory allocated in thermal_cooling_device_setup_sysfs().
+    
+    Fixes: 8ea229511e06 ("thermal: Add cooling device's statistics in sysfs")
+    Reported-by: Hulk Robot <hulkci@huawei.com>
+    Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+    Link: https://lore.kernel.org/r/20220511020605.3096734-1-yangyingliang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 3802171f0b5b8b831f4ade5c827547cb323a5bb2
+Author: Yang Yingliang <yangyingliang@huawei.com>
+Date:   Wed May 11 10:06:05 2022 +0800
+
+    thermal/core: Fix memory leak in __thermal_cooling_device_register()
+    
+    [ Upstream commit 98a160e898c0f4a979af9de3ab48b4b1d42d1dbb ]
+    
+    I got memory leak as follows when doing fault injection test:
+    
+    unreferenced object 0xffff888010080000 (size 264312):
+      comm "182", pid 102533, jiffies 4296434960 (age 10.100s)
+      hex dump (first 32 bytes):
+        00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+        ff ff ff ff ff ff ff ff 40 7f 1f b9 ff ff ff ff  ........@.......
+      backtrace:
+        [<0000000038b2f4fc>] kmalloc_order_trace+0x1d/0x110 mm/slab_common.c:969
+        [<00000000ebcb8da5>] __kmalloc+0x373/0x420 include/linux/slab.h:510
+        [<0000000084137f13>] thermal_cooling_device_setup_sysfs+0x15d/0x2d0 include/linux/slab.h:586
+        [<00000000352b8755>] __thermal_cooling_device_register+0x332/0xa60 drivers/thermal/thermal_core.c:927
+        [<00000000fb9f331b>] devm_thermal_of_cooling_device_register+0x6b/0xf0 drivers/thermal/thermal_core.c:1041
+        [<000000009b8012d2>] max6650_probe.cold+0x557/0x6aa drivers/hwmon/max6650.c:211
+        [<00000000da0b7e04>] i2c_device_probe+0x472/0xac0 drivers/i2c/i2c-core-base.c:561
+    
+    If device_register() fails, thermal_cooling_device_destroy_sysfs() need be called
+    to free the memory allocated in thermal_cooling_device_setup_sysfs().
+    
+    Fixes: 8ea229511e06 ("thermal: Add cooling device's statistics in sysfs")
+    Reported-by: Hulk Robot <hulkci@huawei.com>
+    Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+    Link: https://lore.kernel.org/r/20220511020605.3096734-1-yangyingliang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 21ccc58b671aea924f2481cf5c1cf0ebbfd3552d
+Author: Yang Yingliang <yangyingliang@huawei.com>
+Date:   Wed May 11 10:06:05 2022 +0800
+
+    thermal/core: Fix memory leak in __thermal_cooling_device_register()
+    
+    [ Upstream commit 98a160e898c0f4a979af9de3ab48b4b1d42d1dbb ]
+    
+    I got memory leak as follows when doing fault injection test:
+    
+    unreferenced object 0xffff888010080000 (size 264312):
+      comm "182", pid 102533, jiffies 4296434960 (age 10.100s)
+      hex dump (first 32 bytes):
+        00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+        ff ff ff ff ff ff ff ff 40 7f 1f b9 ff ff ff ff  ........@.......
+      backtrace:
+        [<0000000038b2f4fc>] kmalloc_order_trace+0x1d/0x110 mm/slab_common.c:969
+        [<00000000ebcb8da5>] __kmalloc+0x373/0x420 include/linux/slab.h:510
+        [<0000000084137f13>] thermal_cooling_device_setup_sysfs+0x15d/0x2d0 include/linux/slab.h:586
+        [<00000000352b8755>] __thermal_cooling_device_register+0x332/0xa60 drivers/thermal/thermal_core.c:927
+        [<00000000fb9f331b>] devm_thermal_of_cooling_device_register+0x6b/0xf0 drivers/thermal/thermal_core.c:1041
+        [<000000009b8012d2>] max6650_probe.cold+0x557/0x6aa drivers/hwmon/max6650.c:211
+        [<00000000da0b7e04>] i2c_device_probe+0x472/0xac0 drivers/i2c/i2c-core-base.c:561
+    
+    If device_register() fails, thermal_cooling_device_destroy_sysfs() need be called
+    to free the memory allocated in thermal_cooling_device_setup_sysfs().
+    
+    Fixes: 8ea229511e06 ("thermal: Add cooling device's statistics in sysfs")
+    Reported-by: Hulk Robot <hulkci@huawei.com>
+    Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+    Link: https://lore.kernel.org/r/20220511020605.3096734-1-yangyingliang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 54cdc10ac7184f2159a4f5658b497e90244d1516
+Author: Daniel Lezcano <daniel.lezcano@linaro.org>
+Date:   Fri Mar 19 21:22:57 2021 +0100
+
+    thermal/core: Fix memory leak in the error path
+    
+    commit d44616c6cc3e35eea03ecfe9040edfa2b486a059 upstream.
+    
+    Fix the following error:
+    
+     smatch warnings:
+     drivers/thermal/thermal_core.c:1020 __thermal_cooling_device_register() warn: possible memory leak of 'cdev'
+    
+    by freeing the cdev when exiting the function in the error path.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Reported-by: kernel test robot <lkp@intel.com>
+    Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210319202257.890848-1-daniel.lezcano@linaro.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit b132abaa6515e14e0db292389c25007d666e1925
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    commit 0a5c26712f963f0500161a23e0ffff8d29f742ab upstream.
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 18530bedd221160823f63ccc20dd55c7a03edbcf
+Author: Yang Yingliang <yangyingliang@huawei.com>
+Date:   Wed May 11 10:06:05 2022 +0800
+
+    thermal/core: Fix memory leak in __thermal_cooling_device_register()
+    
+    [ Upstream commit 98a160e898c0f4a979af9de3ab48b4b1d42d1dbb ]
+    
+    I got memory leak as follows when doing fault injection test:
+    
+    unreferenced object 0xffff888010080000 (size 264312):
+      comm "182", pid 102533, jiffies 4296434960 (age 10.100s)
+      hex dump (first 32 bytes):
+        00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+        ff ff ff ff ff ff ff ff 40 7f 1f b9 ff ff ff ff  ........@.......
+      backtrace:
+        [<0000000038b2f4fc>] kmalloc_order_trace+0x1d/0x110 mm/slab_common.c:969
+        [<00000000ebcb8da5>] __kmalloc+0x373/0x420 include/linux/slab.h:510
+        [<0000000084137f13>] thermal_cooling_device_setup_sysfs+0x15d/0x2d0 include/linux/slab.h:586
+        [<00000000352b8755>] __thermal_cooling_device_register+0x332/0xa60 drivers/thermal/thermal_core.c:927
+        [<00000000fb9f331b>] devm_thermal_of_cooling_device_register+0x6b/0xf0 drivers/thermal/thermal_core.c:1041
+        [<000000009b8012d2>] max6650_probe.cold+0x557/0x6aa drivers/hwmon/max6650.c:211
+        [<00000000da0b7e04>] i2c_device_probe+0x472/0xac0 drivers/i2c/i2c-core-base.c:561
+    
+    If device_register() fails, thermal_cooling_device_destroy_sysfs() need be called
+    to free the memory allocated in thermal_cooling_device_setup_sysfs().
+    
+    Fixes: 8ea229511e06 ("thermal: Add cooling device's statistics in sysfs")
+    Reported-by: Hulk Robot <hulkci@huawei.com>
+    Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+    Link: https://lore.kernel.org/r/20220511020605.3096734-1-yangyingliang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit f4fb8596657c998ca4cdb833bc0f509533a38ddd
+Merge: 09583dfed2cb bbb544f33491
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue May 24 16:19:30 2022 -0700
+
+    Merge tag 'thermal-5.19-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull thermal control updates from Rafael Wysocki:
+     "These add a thermal library and thermal tools to wrap the netlink
+      interface into event-based callbacks, improve overheat condition
+      handling during suspend-to-idle on Intel SoCs, add some new hardware
+      support, fix bugs and clean up code.
+    
+      Specifics:
+    
+       - Add thermal library and thermal tools to encapsulate the netlink
+         into event based callbacks (Daniel Lezcano, Jiapeng Chong).
+    
+       - Improve overheat condition handling during suspend-to-idle in the
+         Intel PCH thermal driver (Zhang Rui).
+    
+       - Use local ops instead of global ops in devfreq_cooling (Kant Fan).
+    
+       - Clean up _OSC handling in int340x (Davidlohr Bueso).
+    
+       - Switch hisi_termal from CONFIG_PM_SLEEP guards to pm_sleep_ptr()
+         (Hesham Almatary).
+    
+       - Add new k3 j72xx bangdap driver and the corresponding bindings
+         (Keerthy).
+    
+       - Fix missing of_node_put() in the SC iMX driver at probe time
+         (Miaoqian Lin).
+    
+       - Fix memory leak in __thermal_cooling_device_register()
+         when device_register() fails by calling
+         thermal_cooling_device_destroy_sysfs() (Yang Yingliang).
+    
+       - Add sc8180x and sc8280xp compatible string in the DT bindings and
+         lMH support for QCom tsens driver (Bjorn Andersson).
+    
+       - Fix OTP Calibration Register values conforming to the documentation
+         on RZ/G2L and bindings documentation for RZ/G2UL (Biju Das).
+    
+       - Fix type in kerneldoc description for __thermal_bind_params
+         (Corentin Labbe).
+    
+       - Fix potential NULL dereference in sr_thermal_probe() on Broadcom
+         platform (Zheng Yongjun).
+    
+       - Add change mode ops to the thermal-of sensor (Manaf Meethalavalappu
+         Pallikunhi).
+    
+       - Fix non-negative value support by preventing the value to be clamp
+         to zero (Stefan Wahren).
+    
+       - Add compatible string and DT bindings for MSM8960 tsens driver
+         (Dmitry Baryshkov).
+    
+       - Add hwmon support for K3 driver (Massimiliano Minella).
+    
+       - Refactor and add multiple generations support for QCom ADC driver
+         (Jishnu Prakash).
+    
+       - Use platform_get_irq_optional() to get the interrupt on RCar driver
+         and document Document RZ/V2L bindings (Lad Prabhakar).
+    
+       - Remove NULL check after container_of() call from the Intel HFI
+         thermal driver (Haowen Bai)"
+    
+    * tag 'thermal-5.19-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm: (38 commits)
+      thermal: intel: pch: improve the cooling delay log
+      thermal: intel: pch: enhance overheat handling
+      thermal: intel: pch: move cooling delay to suspend_noirq phase
+      PM: wakeup: expose pm_wakeup_pending to modules
+      thermal: k3_j72xx_bandgap: Add the bandgap driver support
+      dt-bindings: thermal: k3-j72xx: Add VTM bindings documentation
+      thermal/drivers/imx_sc_thermal: Fix refcount leak in imx_sc_thermal_probe
+      thermal/core: Fix memory leak in __thermal_cooling_device_register()
+      dt-bindings: thermal: tsens: Add sc8280xp compatible
+      dt-bindings: thermal: lmh: Add Qualcomm sc8180x compatible
+      thermal/drivers/qcom/lmh: Add sc8180x compatible
+      thermal/drivers/rz2gl: Fix OTP Calibration Register values
+      dt-bindings: thermal: rzg2l-thermal: Document RZ/G2UL bindings
+      thermal: thermal_of: fix typo on __thermal_bind_params
+      tools/thermal: remove unneeded semicolon
+      tools/lib/thermal: remove unneeded semicolon
+      thermal/drivers/broadcom: Fix potential NULL dereference in sr_thermal_probe
+      tools/thermal: Add thermal daemon skeleton
+      tools/thermal: Add a temperature capture tool
+      tools/thermal: Add util library
+      ...
+
+commit c23b7517fe623d5812436682937a79ca0cc4cd39
+Merge: 7b145802ba54 ffcb2fc86eb7
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Thu May 19 19:15:34 2022 +0200
+
+    Merge tag 'thermal-v5.19-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/thermal/linux
+    
+    Pull thermal control material for 5.19-rc1 from Daniel Lezcano:
+    
+     - Add the new k3 j72xx bangdap driver and the corresponding bindings (Keerthy)
+    
+     - Fix the missing of_node_put() in the SC iMX driver at probe timer (Miaoqian Lin)
+    
+     - Fix memory leak in __thermal_cooling_device_register() when device_register()
+       fails by calling thermal_cooling_device_destroy_sysfs() (Yang Yingliang)
+    
+     - Add sc8180x and sc8280xp compatible string in the DT bindings and lMH support
+       for QCom tsens driver (Bjorn Andersson)
+    
+     - Fix OTP Calibration Register values conforming to the documentation on RZ/G2L
+       and bindings documentation for RZ/G2UL (Biju Das)
+    
+     - Fix type in kerneldoc description for __thermal_bind_params (Corentin Labbe)
+    
+     - Remove unneeded semi colon in libthermal and tools thermal as reported by
+       cocci (Jiapeng Chong)
+    
+     - Fix potential NULL dereference in sr_thermal_probe() on Broadcom platform
+       (Zheng Yongjun)
+    
+     - Add thermal library and thermal tools to encapsulate the netlink into event
+       based callbacks (Daniel Lezcano)
+    
+     - Add change mode ops for the thermal-of sensor (Manaf Meethalavalappu
+       Pallikunhi)
+    
+     - Fix non negative value support by preventing the value to be clamp to zero
+       (Stefan Wahren)
+    
+     - Add compatible string and DT bindings for MSM8960 tsens driver (Dmitry
+       Baryshkov)
+    
+     - Add hwmon support for K3 driver (Massimiliano Minella)
+    
+     - Refactor and add multiple generations support for QCom ADC driver (Jishnu
+       Prakash)
+    
+     - Use platform_get_irq_optional() to get the interrupt on RCar driver and
+       document Document RZ/V2L bindings (Lad Prabhakar)
+    
+    * tag 'thermal-v5.19-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/thermal/linux: (28 commits)
+      thermal: k3_j72xx_bandgap: Add the bandgap driver support
+      dt-bindings: thermal: k3-j72xx: Add VTM bindings documentation
+      thermal/drivers/imx_sc_thermal: Fix refcount leak in imx_sc_thermal_probe
+      thermal/core: Fix memory leak in __thermal_cooling_device_register()
+      dt-bindings: thermal: tsens: Add sc8280xp compatible
+      dt-bindings: thermal: lmh: Add Qualcomm sc8180x compatible
+      thermal/drivers/qcom/lmh: Add sc8180x compatible
+      thermal/drivers/rz2gl: Fix OTP Calibration Register values
+      dt-bindings: thermal: rzg2l-thermal: Document RZ/G2UL bindings
+      thermal: thermal_of: fix typo on __thermal_bind_params
+      tools/thermal: remove unneeded semicolon
+      tools/lib/thermal: remove unneeded semicolon
+      thermal/drivers/broadcom: Fix potential NULL dereference in sr_thermal_probe
+      tools/thermal: Add thermal daemon skeleton
+      tools/thermal: Add a temperature capture tool
+      tools/thermal: Add util library
+      tools/lib/thermal: Add a thermal library
+      thermal/drivers/thermal_of: Add change_mode ops support for thermal_of sensor
+      thermal/drivers/bcm2711: Don't clamp temperature at zero
+      thermal/drivers/tsens: Add compat string for the qcom,msm8960
+      ...
+
+commit 98a160e898c0f4a979af9de3ab48b4b1d42d1dbb
+Author: Yang Yingliang <yangyingliang@huawei.com>
+Date:   Wed May 11 10:06:05 2022 +0800
+
+    thermal/core: Fix memory leak in __thermal_cooling_device_register()
+    
+    I got memory leak as follows when doing fault injection test:
+    
+    unreferenced object 0xffff888010080000 (size 264312):
+      comm "182", pid 102533, jiffies 4296434960 (age 10.100s)
+      hex dump (first 32 bytes):
+        00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+        ff ff ff ff ff ff ff ff 40 7f 1f b9 ff ff ff ff  ........@.......
+      backtrace:
+        [<0000000038b2f4fc>] kmalloc_order_trace+0x1d/0x110 mm/slab_common.c:969
+        [<00000000ebcb8da5>] __kmalloc+0x373/0x420 include/linux/slab.h:510
+        [<0000000084137f13>] thermal_cooling_device_setup_sysfs+0x15d/0x2d0 include/linux/slab.h:586
+        [<00000000352b8755>] __thermal_cooling_device_register+0x332/0xa60 drivers/thermal/thermal_core.c:927
+        [<00000000fb9f331b>] devm_thermal_of_cooling_device_register+0x6b/0xf0 drivers/thermal/thermal_core.c:1041
+        [<000000009b8012d2>] max6650_probe.cold+0x557/0x6aa drivers/hwmon/max6650.c:211
+        [<00000000da0b7e04>] i2c_device_probe+0x472/0xac0 drivers/i2c/i2c-core-base.c:561
+    
+    If device_register() fails, thermal_cooling_device_destroy_sysfs() need be called
+    to free the memory allocated in thermal_cooling_device_setup_sysfs().
+    
+    Fixes: 8ea229511e06 ("thermal: Add cooling device's statistics in sysfs")
+    Reported-by: Hulk Robot <hulkci@huawei.com>
+    Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+    Link: https://lore.kernel.org/r/20220511020605.3096734-1-yangyingliang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit 8152d2a9e73deb2b483bef9035d53ded27f50317
+Author: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+Date:   Sun Nov 28 22:46:41 2021 +0100
+
+    thermal/drivers/intel_powerclamp: Constify static thermal_cooling_device_ops
+    
+    The only usage of powerclamp_cooling_ops is to pass its address to
+    thermal_cooling_device_register(), which takes a pointer to const struct
+    thermal_cooling_device_ops. Make it const to allow the compiler to put
+    it in read-only memory.
+    
+    Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+    Link: https://lore.kernel.org/r/20211128214641.30953-1-rikard.falkeborn@gmail.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit 3f25451eae2870b227e29593041f80a7b5322062
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    [ Upstream commit 0a5c26712f963f0500161a23e0ffff8d29f742ab ]
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit bc4555ffd158eda51518e96ab7492078a00b9a96
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    [ Upstream commit 0a5c26712f963f0500161a23e0ffff8d29f742ab ]
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit f73cd9c951a9dc23f0ee1260fef5cc61d2825fb3
+Merge: 833db72142b9 46e9f92f31e6
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Nov 2 16:18:04 2021 -0700
+
+    Merge tag 'thermal-5.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+    
+    Pull thermal control updates from Rafael Wysocki:
+     "These extend the thermal trip point crossing notifications sent via
+      netlink to contain the temperature causing the trip point to be
+      crossed, deprecate the user space thermal governor, add new DT
+      bindings to drivers, move ABI documentation to Documentation/ABI, fix
+      assorted issues and clean up code.
+    
+      Specifics:
+    
+       - Constify a variable in thermal MMIO driver (Rikard Falkeborn).
+    
+       - Add the current temperature in the netlink message when crossing a
+         trip point in order to prevent useless back and forth reading from
+         userspace (Daniel Lezcano).
+    
+       - Add support for the 'HC' variant on PM8998 PMIC in order to support
+         VADC channels on recent QCom boards (Bjorn Andersson).
+    
+       - Add support for calibration values from hardware when they are
+         fused (Niklas Söderlund).
+    
+       - Fix NULL pointer dereference in the thermal_release callback when
+         an error occurs in the thermal_zone_device_register() (Yuanzheng
+         Song).
+    
+       - Fix use-after-free in __thermal_cooling_device_register() in the
+         error path (Ziyang Xuan).
+    
+       - Fix compilation of the LMh driver when CONFIG_QCOM_SCM is not set
+         (Jackie Liu).
+    
+       - Add timeout when reading a register that can block forever in
+         certain circumstances in the tsens driver (Ansuel Smith).
+    
+       - Add DT binding for the reset lines and use them in the rockchip
+         sensor driver (Johan Jonker).
+    
+       - Add new uniphier NX1 SoC temperature sensor (Kunihiko Hayashi).
+    
+       - Save and restore the TCC value in the int340x driver (Antoine
+         Tenart).
+    
+       - Deprecate the writability of the cooling device state sysfs file
+         and the user space governor (Daniel Lezcano).
+    
+       - Delete bogus length check in int340x (Dan Carpenter).
+    
+       - Use bitmap_zalloc/bitmap_free when applicable in intel_powerclamp
+         (Christophe JAILLET).
+    
+       - Move thermal ABI documentation to Documentation/ABI (Mauro Carvalho
+         Chehab)"
+    
+    * tag 'thermal-5.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm: (21 commits)
+      thermal/core: Deprecate changing cooling device state from userspace
+      thermal/core: Make the userspace governor deprecated
+      thermal/drivers/int340x: Improve the tcc offset saving for suspend/resume
+      thermal/drivers/uniphier: Add compatible string for NX1 SoC
+      dt-bindings: thermal: uniphier: Add binding for NX1 SoC
+      thermal/drivers/rockchip_thermal: Allow more resets for tsadc node
+      dt-bindings: thermal: remove redundant comments from rockchip-thermal.yaml
+      dt-bindings: thermal: allow more resets for tsadc node in rockchip-thermal.yaml
+      thermal/drivers/tsens: Add timeout to get_temp_tsens_valid
+      thermal/drivers/qcom/lmh: make QCOM_LMH depends on QCOM_SCM
+      thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+      thermal/core: Fix null pointer dereference in thermal_release()
+      thermal: rcar_gen3_thermal: Read calibration from hardware
+      thermal: rcar_gen3_thermal: Store thcode and ptat in priv data
+      thermal/drivers/qcom/spmi-adc-tm5: Add support for HC variant
+      dt-bindings: thermal: qcom: add HC variant of adc-thermal monitor bindings
+      thermal: Move ABI documentation to Documentation/ABI
+      thermal/drivers/netlink: Add the temperature when crossing a trip point
+      thermal/drivers/thermal_mmio: Constify static struct thermal_mmio_ops
+      thermal: int340x: delete bogus length check
+      ...
+
+commit 83e8de89b9e8a66796259f2dbb8f2707e19e7b07
+Merge: 3906fe9bb7f1 a67a46af4ad6
+Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Date:   Tue Oct 26 14:59:13 2021 +0200
+
+    Merge tag 'thermal-v5.16-rc1' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/thermal/linux
+    
+    Pull thermal core and ARM thermal driver updates for v5.16 from
+    Daniel Lezcano:
+    
+     - Constify a variable in thermal mmio driver (Rikard Falkeborn)
+    
+     - Add the current temperature in the netlink message when crossing a
+       trip point in order to prevent useless back and forth reading from
+       userspace (Daniel Lezcano)
+    
+     - Add support for the 'HC' variant on PM8998 pmic in order to support
+       vadc channels on recent QCom boards (Bjorn Andersson)
+    
+     - Add support of calibration values from hardware when they are fused
+       (Niklas Söderlund)
+    
+     - Fix NULL pointer dereference from the thermal_release callback when
+       an error occured in the thermal_zone_device_register() function
+       (Yuanzheng Song)
+    
+     - Fix use after free call in the __thermal_cooling_device_register()
+       function in the error path (Ziyang Xuan)
+    
+     - Fix compilation error for the LMh driver when CONFIG_QCOM_SCM is not
+       set (Jackie Liu)
+    
+     - Add a timeout when reading a register which can block forever under
+       certain circumstances in the tsens driver (Ansuel Smith)
+    
+     - Add DT binding for the reset lines and use them in the rockchip
+       sensor driver (Johan Jonker)
+    
+     - Add new uniphier NX1 SoC temperature sensor (Kunihiko Hayashi)
+    
+     - Save and restore the TCC value in the int340x driver (Antoine
+       Tenart)
+    
+     - Deprecate the cooling device state sysfs file writable and the user
+       space governor (Daniel Lezcano)
+    
+    * tag 'thermal-v5.16-rc1' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/thermal/linux:
+      thermal/core: Deprecate changing cooling device state from userspace
+      thermal/core: Make the userspace governor deprecated
+      thermal/drivers/int340x: Improve the tcc offset saving for suspend/resume
+      thermal/drivers/uniphier: Add compatible string for NX1 SoC
+      dt-bindings: thermal: uniphier: Add binding for NX1 SoC
+      thermal/drivers/rockchip_thermal: Allow more resets for tsadc node
+      dt-bindings: thermal: remove redundant comments from rockchip-thermal.yaml
+      dt-bindings: thermal: allow more resets for tsadc node in rockchip-thermal.yaml
+      thermal/drivers/tsens: Add timeout to get_temp_tsens_valid
+      thermal/drivers/qcom/lmh: make QCOM_LMH depends on QCOM_SCM
+      thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+      thermal/core: Fix null pointer dereference in thermal_release()
+      thermal: rcar_gen3_thermal: Read calibration from hardware
+      thermal: rcar_gen3_thermal: Store thcode and ptat in priv data
+      thermal/drivers/qcom/spmi-adc-tm5: Add support for HC variant
+      dt-bindings: thermal: qcom: add HC variant of adc-thermal monitor bindings
+      thermal/drivers/netlink: Add the temperature when crossing a trip point
+      thermal/drivers/thermal_mmio: Constify static struct thermal_mmio_ops
+
+commit df8e58716afb3bee2b59de66b1ba1033f2e26303
+Author: Ido Schimmel <idosch@nvidia.com>
+Date:   Tue Oct 12 20:49:55 2021 +0300
+
+    mlxsw: thermal: Fix out-of-bounds memory accesses
+    
+    commit 332fdf951df8b870e3da86b122ae304e2aabe88c upstream.
+    
+    Currently, mlxsw allows cooling states to be set above the maximum
+    cooling state supported by the driver:
+    
+     # cat /sys/class/thermal/thermal_zone2/cdev0/type
+     mlxsw_fan
+     # cat /sys/class/thermal/thermal_zone2/cdev0/max_state
+     10
+     # echo 18 > /sys/class/thermal/thermal_zone2/cdev0/cur_state
+     # echo $?
+     0
+    
+    This results in out-of-bounds memory accesses when thermal state
+    transition statistics are enabled (CONFIG_THERMAL_STATISTICS=y), as the
+    transition table is accessed with a too large index (state) [1].
+    
+    According to the thermal maintainer, it is the responsibility of the
+    driver to reject such operations [2].
+    
+    Therefore, return an error when the state to be set exceeds the maximum
+    cooling state supported by the driver.
+    
+    To avoid dead code, as suggested by the thermal maintainer [3],
+    partially revert commit a421ce088ac8 ("mlxsw: core: Extend cooling
+    device with cooling levels") that tried to interpret these invalid
+    cooling states (above the maximum) in a special way. The cooling levels
+    array is not removed in order to prevent the fans going below 20% PWM,
+    which would cause them to get stuck at 0% PWM.
+    
+    [1]
+    BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x271/0x290
+    Read of size 4 at addr ffff8881052f7bf8 by task kworker/0:0/5
+    
+    CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted 5.15.0-rc3-custom-45935-gce1adf704b14 #122
+    Hardware name: Mellanox Technologies Ltd. "MSN2410-CB2FO"/"SA000874", BIOS 4.6.5 03/08/2016
+    Workqueue: events_freezable_power_ thermal_zone_device_check
+    Call Trace:
+     dump_stack_lvl+0x8b/0xb3
+     print_address_description.constprop.0+0x1f/0x140
+     kasan_report.cold+0x7f/0x11b
+     thermal_cooling_device_stats_update+0x271/0x290
+     __thermal_cdev_update+0x15e/0x4e0
+     thermal_cdev_update+0x9f/0xe0
+     step_wise_throttle+0x770/0xee0
+     thermal_zone_device_update+0x3f6/0xdf0
+     process_one_work+0xa42/0x1770
+     worker_thread+0x62f/0x13e0
+     kthread+0x3ee/0x4e0
+     ret_from_fork+0x1f/0x30
+    
+    Allocated by task 1:
+     kasan_save_stack+0x1b/0x40
+     __kasan_kmalloc+0x7c/0x90
+     thermal_cooling_device_setup_sysfs+0x153/0x2c0
+     __thermal_cooling_device_register.part.0+0x25b/0x9c0
+     thermal_cooling_device_register+0xb3/0x100
+     mlxsw_thermal_init+0x5c5/0x7e0
+     __mlxsw_core_bus_device_register+0xcb3/0x19c0
+     mlxsw_core_bus_device_register+0x56/0xb0
+     mlxsw_pci_probe+0x54f/0x710
+     local_pci_probe+0xc6/0x170
+     pci_device_probe+0x2b2/0x4d0
+     really_probe+0x293/0xd10
+     __driver_probe_device+0x2af/0x440
+     driver_probe_device+0x51/0x1e0
+     __driver_attach+0x21b/0x530
+     bus_for_each_dev+0x14c/0x1d0
+     bus_add_driver+0x3ac/0x650
+     driver_register+0x241/0x3d0
+     mlxsw_sp_module_init+0xa2/0x174
+     do_one_initcall+0xee/0x5f0
+     kernel_init_freeable+0x45a/0x4de
+     kernel_init+0x1f/0x210
+     ret_from_fork+0x1f/0x30
+    
+    The buggy address belongs to the object at ffff8881052f7800
+     which belongs to the cache kmalloc-1k of size 1024
+    The buggy address is located 1016 bytes inside of
+     1024-byte region [ffff8881052f7800, ffff8881052f7c00)
+    The buggy address belongs to the page:
+    page:0000000052355272 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1052f0
+    head:0000000052355272 order:3 compound_mapcount:0 compound_pincount:0
+    flags: 0x200000000010200(slab|head|node=0|zone=2)
+    raw: 0200000000010200 ffffea0005034800 0000000300000003 ffff888100041dc0
+    raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff8881052f7a80: 00 00 00 00 00 00 04 fc fc fc fc fc fc fc fc fc
+     ffff8881052f7b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    >ffff8881052f7b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                                                                    ^
+     ffff8881052f7c00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+     ffff8881052f7c80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    
+    [2] https://lore.kernel.org/linux-pm/9aca37cb-1629-5c67-1895-1fdc45c0244e@linaro.org/
+    [3] https://lore.kernel.org/linux-pm/af9857f2-578e-de3a-e62b-6baff7e69fd4@linaro.org/
+    
+    CC: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Fixes: a50c1e35650b ("mlxsw: core: Implement thermal zone")
+    Fixes: a421ce088ac8 ("mlxsw: core: Extend cooling device with cooling levels")
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Tested-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20211012174955.472928-1-idosch@idosch.org
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e59d839743b50cb1d3f42a786bea48cc5621d254
+Author: Ido Schimmel <idosch@nvidia.com>
+Date:   Tue Oct 12 20:49:55 2021 +0300
+
+    mlxsw: thermal: Fix out-of-bounds memory accesses
+    
+    commit 332fdf951df8b870e3da86b122ae304e2aabe88c upstream.
+    
+    Currently, mlxsw allows cooling states to be set above the maximum
+    cooling state supported by the driver:
+    
+     # cat /sys/class/thermal/thermal_zone2/cdev0/type
+     mlxsw_fan
+     # cat /sys/class/thermal/thermal_zone2/cdev0/max_state
+     10
+     # echo 18 > /sys/class/thermal/thermal_zone2/cdev0/cur_state
+     # echo $?
+     0
+    
+    This results in out-of-bounds memory accesses when thermal state
+    transition statistics are enabled (CONFIG_THERMAL_STATISTICS=y), as the
+    transition table is accessed with a too large index (state) [1].
+    
+    According to the thermal maintainer, it is the responsibility of the
+    driver to reject such operations [2].
+    
+    Therefore, return an error when the state to be set exceeds the maximum
+    cooling state supported by the driver.
+    
+    To avoid dead code, as suggested by the thermal maintainer [3],
+    partially revert commit a421ce088ac8 ("mlxsw: core: Extend cooling
+    device with cooling levels") that tried to interpret these invalid
+    cooling states (above the maximum) in a special way. The cooling levels
+    array is not removed in order to prevent the fans going below 20% PWM,
+    which would cause them to get stuck at 0% PWM.
+    
+    [1]
+    BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x271/0x290
+    Read of size 4 at addr ffff8881052f7bf8 by task kworker/0:0/5
+    
+    CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted 5.15.0-rc3-custom-45935-gce1adf704b14 #122
+    Hardware name: Mellanox Technologies Ltd. "MSN2410-CB2FO"/"SA000874", BIOS 4.6.5 03/08/2016
+    Workqueue: events_freezable_power_ thermal_zone_device_check
+    Call Trace:
+     dump_stack_lvl+0x8b/0xb3
+     print_address_description.constprop.0+0x1f/0x140
+     kasan_report.cold+0x7f/0x11b
+     thermal_cooling_device_stats_update+0x271/0x290
+     __thermal_cdev_update+0x15e/0x4e0
+     thermal_cdev_update+0x9f/0xe0
+     step_wise_throttle+0x770/0xee0
+     thermal_zone_device_update+0x3f6/0xdf0
+     process_one_work+0xa42/0x1770
+     worker_thread+0x62f/0x13e0
+     kthread+0x3ee/0x4e0
+     ret_from_fork+0x1f/0x30
+    
+    Allocated by task 1:
+     kasan_save_stack+0x1b/0x40
+     __kasan_kmalloc+0x7c/0x90
+     thermal_cooling_device_setup_sysfs+0x153/0x2c0
+     __thermal_cooling_device_register.part.0+0x25b/0x9c0
+     thermal_cooling_device_register+0xb3/0x100
+     mlxsw_thermal_init+0x5c5/0x7e0
+     __mlxsw_core_bus_device_register+0xcb3/0x19c0
+     mlxsw_core_bus_device_register+0x56/0xb0
+     mlxsw_pci_probe+0x54f/0x710
+     local_pci_probe+0xc6/0x170
+     pci_device_probe+0x2b2/0x4d0
+     really_probe+0x293/0xd10
+     __driver_probe_device+0x2af/0x440
+     driver_probe_device+0x51/0x1e0
+     __driver_attach+0x21b/0x530
+     bus_for_each_dev+0x14c/0x1d0
+     bus_add_driver+0x3ac/0x650
+     driver_register+0x241/0x3d0
+     mlxsw_sp_module_init+0xa2/0x174
+     do_one_initcall+0xee/0x5f0
+     kernel_init_freeable+0x45a/0x4de
+     kernel_init+0x1f/0x210
+     ret_from_fork+0x1f/0x30
+    
+    The buggy address belongs to the object at ffff8881052f7800
+     which belongs to the cache kmalloc-1k of size 1024
+    The buggy address is located 1016 bytes inside of
+     1024-byte region [ffff8881052f7800, ffff8881052f7c00)
+    The buggy address belongs to the page:
+    page:0000000052355272 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1052f0
+    head:0000000052355272 order:3 compound_mapcount:0 compound_pincount:0
+    flags: 0x200000000010200(slab|head|node=0|zone=2)
+    raw: 0200000000010200 ffffea0005034800 0000000300000003 ffff888100041dc0
+    raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff8881052f7a80: 00 00 00 00 00 00 04 fc fc fc fc fc fc fc fc fc
+     ffff8881052f7b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    >ffff8881052f7b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                                                                    ^
+     ffff8881052f7c00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+     ffff8881052f7c80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    
+    [2] https://lore.kernel.org/linux-pm/9aca37cb-1629-5c67-1895-1fdc45c0244e@linaro.org/
+    [3] https://lore.kernel.org/linux-pm/af9857f2-578e-de3a-e62b-6baff7e69fd4@linaro.org/
+    
+    CC: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Fixes: a50c1e35650b ("mlxsw: core: Implement thermal zone")
+    Fixes: a421ce088ac8 ("mlxsw: core: Extend cooling device with cooling levels")
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Tested-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20211012174955.472928-1-idosch@idosch.org
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ae0993739e14a102d506aa09e11b0065f3144f10
+Author: Ido Schimmel <idosch@nvidia.com>
+Date:   Tue Oct 12 20:49:55 2021 +0300
+
+    mlxsw: thermal: Fix out-of-bounds memory accesses
+    
+    commit 332fdf951df8b870e3da86b122ae304e2aabe88c upstream.
+    
+    Currently, mlxsw allows cooling states to be set above the maximum
+    cooling state supported by the driver:
+    
+     # cat /sys/class/thermal/thermal_zone2/cdev0/type
+     mlxsw_fan
+     # cat /sys/class/thermal/thermal_zone2/cdev0/max_state
+     10
+     # echo 18 > /sys/class/thermal/thermal_zone2/cdev0/cur_state
+     # echo $?
+     0
+    
+    This results in out-of-bounds memory accesses when thermal state
+    transition statistics are enabled (CONFIG_THERMAL_STATISTICS=y), as the
+    transition table is accessed with a too large index (state) [1].
+    
+    According to the thermal maintainer, it is the responsibility of the
+    driver to reject such operations [2].
+    
+    Therefore, return an error when the state to be set exceeds the maximum
+    cooling state supported by the driver.
+    
+    To avoid dead code, as suggested by the thermal maintainer [3],
+    partially revert commit a421ce088ac8 ("mlxsw: core: Extend cooling
+    device with cooling levels") that tried to interpret these invalid
+    cooling states (above the maximum) in a special way. The cooling levels
+    array is not removed in order to prevent the fans going below 20% PWM,
+    which would cause them to get stuck at 0% PWM.
+    
+    [1]
+    BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x271/0x290
+    Read of size 4 at addr ffff8881052f7bf8 by task kworker/0:0/5
+    
+    CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted 5.15.0-rc3-custom-45935-gce1adf704b14 #122
+    Hardware name: Mellanox Technologies Ltd. "MSN2410-CB2FO"/"SA000874", BIOS 4.6.5 03/08/2016
+    Workqueue: events_freezable_power_ thermal_zone_device_check
+    Call Trace:
+     dump_stack_lvl+0x8b/0xb3
+     print_address_description.constprop.0+0x1f/0x140
+     kasan_report.cold+0x7f/0x11b
+     thermal_cooling_device_stats_update+0x271/0x290
+     __thermal_cdev_update+0x15e/0x4e0
+     thermal_cdev_update+0x9f/0xe0
+     step_wise_throttle+0x770/0xee0
+     thermal_zone_device_update+0x3f6/0xdf0
+     process_one_work+0xa42/0x1770
+     worker_thread+0x62f/0x13e0
+     kthread+0x3ee/0x4e0
+     ret_from_fork+0x1f/0x30
+    
+    Allocated by task 1:
+     kasan_save_stack+0x1b/0x40
+     __kasan_kmalloc+0x7c/0x90
+     thermal_cooling_device_setup_sysfs+0x153/0x2c0
+     __thermal_cooling_device_register.part.0+0x25b/0x9c0
+     thermal_cooling_device_register+0xb3/0x100
+     mlxsw_thermal_init+0x5c5/0x7e0
+     __mlxsw_core_bus_device_register+0xcb3/0x19c0
+     mlxsw_core_bus_device_register+0x56/0xb0
+     mlxsw_pci_probe+0x54f/0x710
+     local_pci_probe+0xc6/0x170
+     pci_device_probe+0x2b2/0x4d0
+     really_probe+0x293/0xd10
+     __driver_probe_device+0x2af/0x440
+     driver_probe_device+0x51/0x1e0
+     __driver_attach+0x21b/0x530
+     bus_for_each_dev+0x14c/0x1d0
+     bus_add_driver+0x3ac/0x650
+     driver_register+0x241/0x3d0
+     mlxsw_sp_module_init+0xa2/0x174
+     do_one_initcall+0xee/0x5f0
+     kernel_init_freeable+0x45a/0x4de
+     kernel_init+0x1f/0x210
+     ret_from_fork+0x1f/0x30
+    
+    The buggy address belongs to the object at ffff8881052f7800
+     which belongs to the cache kmalloc-1k of size 1024
+    The buggy address is located 1016 bytes inside of
+     1024-byte region [ffff8881052f7800, ffff8881052f7c00)
+    The buggy address belongs to the page:
+    page:0000000052355272 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1052f0
+    head:0000000052355272 order:3 compound_mapcount:0 compound_pincount:0
+    flags: 0x200000000010200(slab|head|node=0|zone=2)
+    raw: 0200000000010200 ffffea0005034800 0000000300000003 ffff888100041dc0
+    raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff8881052f7a80: 00 00 00 00 00 00 04 fc fc fc fc fc fc fc fc fc
+     ffff8881052f7b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    >ffff8881052f7b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                                                                    ^
+     ffff8881052f7c00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+     ffff8881052f7c80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    
+    [2] https://lore.kernel.org/linux-pm/9aca37cb-1629-5c67-1895-1fdc45c0244e@linaro.org/
+    [3] https://lore.kernel.org/linux-pm/af9857f2-578e-de3a-e62b-6baff7e69fd4@linaro.org/
+    
+    CC: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Fixes: a50c1e35650b ("mlxsw: core: Implement thermal zone")
+    Fixes: a421ce088ac8 ("mlxsw: core: Extend cooling device with cooling levels")
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Tested-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20211012174955.472928-1-idosch@idosch.org
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0a5c26712f963f0500161a23e0ffff8d29f742ab
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Fri Oct 15 10:45:04 2021 +0800
+
+    thermal/core: fix a UAF bug in __thermal_cooling_device_register()
+    
+    When device_register() return failed, program will goto out_kfree_type
+    to release 'cdev->device' by put_device(). That will call thermal_release()
+    to free 'cdev'. But the follow-up processes access 'cdev' continually.
+    That trggers the UAF bug.
+    
+    ====================================================================
+    BUG: KASAN: use-after-free in __thermal_cooling_device_register+0x75b/0xa90
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+    Call Trace:
+     dump_stack_lvl+0xe2/0x152
+     print_address_description.constprop.0+0x21/0x140
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     kasan_report.cold+0x7f/0x11b
+     ? __thermal_cooling_device_register+0x75b/0xa90
+     __thermal_cooling_device_register+0x75b/0xa90
+     ? memset+0x20/0x40
+     ? __sanitizer_cov_trace_pc+0x1d/0x50
+     ? __devres_alloc_node+0x130/0x180
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa
+    ......
+    
+    Freed by task 258:
+     kasan_save_stack+0x1b/0x40
+     kasan_set_track+0x1c/0x30
+     kasan_set_free_info+0x20/0x30
+     __kasan_slab_free+0x109/0x140
+     kfree+0x117/0x4c0
+     thermal_release+0xa0/0x110
+     device_release+0xa7/0x240
+     kobject_put+0x1ce/0x540
+     put_device+0x20/0x30
+     __thermal_cooling_device_register+0x731/0xa90
+     devm_thermal_of_cooling_device_register+0x67/0xf0
+     max6650_probe.cold+0x557/0x6aa [max6650]
+    
+    Do not use 'cdev' again after put_device() to fix the problem like doing
+    in thermal_zone_device_register().
+    
+    [dlezcano]: as requested by Rafael, change the affectation into two statements.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+    Reported-by: kernel test robot <lkp@intel.com>
+    Link: https://lore.kernel.org/r/20211015024504.947520-1-william.xuanziyang@huawei.com
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+
+commit 332fdf951df8b870e3da86b122ae304e2aabe88c
+Author: Ido Schimmel <idosch@nvidia.com>
+Date:   Tue Oct 12 20:49:55 2021 +0300
+
+    mlxsw: thermal: Fix out-of-bounds memory accesses
+    
+    Currently, mlxsw allows cooling states to be set above the maximum
+    cooling state supported by the driver:
+    
+     # cat /sys/class/thermal/thermal_zone2/cdev0/type
+     mlxsw_fan
+     # cat /sys/class/thermal/thermal_zone2/cdev0/max_state
+     10
+     # echo 18 > /sys/class/thermal/thermal_zone2/cdev0/cur_state
+     # echo $?
+     0
+    
+    This results in out-of-bounds memory accesses when thermal state
+    transition statistics are enabled (CONFIG_THERMAL_STATISTICS=y), as the
+    transition table is accessed with a too large index (state) [1].
+    
+    According to the thermal maintainer, it is the responsibility of the
+    driver to reject such operations [2].
+    
+    Therefore, return an error when the state to be set exceeds the maximum
+    cooling state supported by the driver.
+    
+    To avoid dead code, as suggested by the thermal maintainer [3],
+    partially revert commit a421ce088ac8 ("mlxsw: core: Extend cooling
+    device with cooling levels") that tried to interpret these invalid
+    cooling states (above the maximum) in a special way. The cooling levels
+    array is not removed in order to prevent the fans going below 20% PWM,
+    which would cause them to get stuck at 0% PWM.
+    
+    [1]
+    BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x271/0x290
+    Read of size 4 at addr ffff8881052f7bf8 by task kworker/0:0/5
+    
+    CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted 5.15.0-rc3-custom-45935-gce1adf704b14 #122
+    Hardware name: Mellanox Technologies Ltd. "MSN2410-CB2FO"/"SA000874", BIOS 4.6.5 03/08/2016
+    Workqueue: events_freezable_power_ thermal_zone_device_check
+    Call Trace:
+     dump_stack_lvl+0x8b/0xb3
+     print_address_description.constprop.0+0x1f/0x140
+     kasan_report.cold+0x7f/0x11b
+     thermal_cooling_device_stats_update+0x271/0x290
+     __thermal_cdev_update+0x15e/0x4e0
+     thermal_cdev_update+0x9f/0xe0
+     step_wise_throttle+0x770/0xee0
+     thermal_zone_device_update+0x3f6/0xdf0
+     process_one_work+0xa42/0x1770
+     worker_thread+0x62f/0x13e0
+     kthread+0x3ee/0x4e0
+     ret_from_fork+0x1f/0x30
+    
+    Allocated by task 1:
+     kasan_save_stack+0x1b/0x40
+     __kasan_kmalloc+0x7c/0x90
+     thermal_cooling_device_setup_sysfs+0x153/0x2c0
+     __thermal_cooling_device_register.part.0+0x25b/0x9c0
+     thermal_cooling_device_register+0xb3/0x100
+     mlxsw_thermal_init+0x5c5/0x7e0
+     __mlxsw_core_bus_device_register+0xcb3/0x19c0
+     mlxsw_core_bus_device_register+0x56/0xb0
+     mlxsw_pci_probe+0x54f/0x710
+     local_pci_probe+0xc6/0x170
+     pci_device_probe+0x2b2/0x4d0
+     really_probe+0x293/0xd10
+     __driver_probe_device+0x2af/0x440
+     driver_probe_device+0x51/0x1e0
+     __driver_attach+0x21b/0x530
+     bus_for_each_dev+0x14c/0x1d0
+     bus_add_driver+0x3ac/0x650
+     driver_register+0x241/0x3d0
+     mlxsw_sp_module_init+0xa2/0x174
+     do_one_initcall+0xee/0x5f0
+     kernel_init_freeable+0x45a/0x4de
+     kernel_init+0x1f/0x210
+     ret_from_fork+0x1f/0x30
+    
+    The buggy address belongs to the object at ffff8881052f7800
+     which belongs to the cache kmalloc-1k of size 1024
+    The buggy address is located 1016 bytes inside of
+     1024-byte region [ffff8881052f7800, ffff8881052f7c00)
+    The buggy address belongs to the page:
+    page:0000000052355272 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1052f0
+    head:0000000052355272 order:3 compound_mapcount:0 compound_pincount:0
+    flags: 0x200000000010200(slab|head|node=0|zone=2)
+    raw: 0200000000010200 ffffea0005034800 0000000300000003 ffff888100041dc0
+    raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff8881052f7a80: 00 00 00 00 00 00 04 fc fc fc fc fc fc fc fc fc
+     ffff8881052f7b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    >ffff8881052f7b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                                                                    ^
+     ffff8881052f7c00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+     ffff8881052f7c80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+    
+    [2] https://lore.kernel.org/linux-pm/9aca37cb-1629-5c67-1895-1fdc45c0244e@linaro.org/
+    [3] https://lore.kernel.org/linux-pm/af9857f2-578e-de3a-e62b-6baff7e69fd4@linaro.org/
+    
+    CC: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Fixes: a50c1e35650b ("mlxsw: core: Implement thermal zone")
+    Fixes: a421ce088ac8 ("mlxsw: core: Extend cooling device with cooling levels")
+    Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+    Tested-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20211012174955.472928-1-idosch@idosch.org
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+commit aa85fb7bde558bb2e364e85976b14b259c8b6fe8
+Author: Vadim Pasternak <vadimp@nvidia.com>
+Date:   Thu Sep 16 21:31:51 2021 +0300
+
+    hwmon: (mlxreg-fan) Return non-zero value when fan current state is enforced from sysfs
+    
+    [ Upstream commit e6fab7af6ba1bc77c78713a83876f60ca7a4a064 ]
+    
+    Fan speed minimum can be enforced from sysfs. For example, setting
+    current fan speed to 20 is used to enforce fan speed to be at 100%
+    speed, 19 - to be not below 90% speed, etcetera. This feature provides
+    ability to limit fan speed according to some system wise
+    considerations, like absence of some replaceable units or high system
+    ambient temperature.
+    
+    Request for changing fan minimum speed is configuration request and can
+    be set only through 'sysfs' write procedure. In this situation value of
+    argument 'state' is above nominal fan speed maximum.
+    
+    Return non-zero code in this case to avoid
+    thermal_cooling_device_stats_update() call, because in this case
+    statistics update violates thermal statistics table range.
+    The issues is observed in case kernel is configured with option
+    CONFIG_THERMAL_STATISTICS.
+    
+    Here is the trace from KASAN:
+    [  159.506659] BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.516016] Read of size 4 at addr ffff888116163840 by task hw-management.s/7444
+    [  159.545625] Call Trace:
+    [  159.548366]  dump_stack+0x92/0xc1
+    [  159.552084]  ? thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.635869]  thermal_zone_device_update+0x345/0x780
+    [  159.688711]  thermal_zone_device_set_mode+0x7d/0xc0
+    [  159.694174]  mlxsw_thermal_modules_init+0x48f/0x590 [mlxsw_core]
+    [  159.700972]  ? mlxsw_thermal_set_cur_state+0x5a0/0x5a0 [mlxsw_core]
+    [  159.731827]  mlxsw_thermal_init+0x763/0x880 [mlxsw_core]
+    [  160.070233] RIP: 0033:0x7fd995909970
+    [  160.074239] Code: 73 01 c3 48 8b 0d 28 d5 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 99 2d 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ..
+    [  160.095242] RSP: 002b:00007fff54f5d938 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    [  160.103722] RAX: ffffffffffffffda RBX: 0000000000000013 RCX: 00007fd995909970
+    [  160.111710] RDX: 0000000000000013 RSI: 0000000001906008 RDI: 0000000000000001
+    [  160.119699] RBP: 0000000001906008 R08: 00007fd995bc9760 R09: 00007fd996210700
+    [  160.127687] R10: 0000000000000073 R11: 0000000000000246 R12: 0000000000000013
+    [  160.135673] R13: 0000000000000001 R14: 00007fd995bc8600 R15: 0000000000000013
+    [  160.143671]
+    [  160.145338] Allocated by task 2924:
+    [  160.149242]  kasan_save_stack+0x19/0x40
+    [  160.153541]  __kasan_kmalloc+0x7f/0xa0
+    [  160.157743]  __kmalloc+0x1a2/0x2b0
+    [  160.161552]  thermal_cooling_device_setup_sysfs+0xf9/0x1a0
+    [  160.167687]  __thermal_cooling_device_register+0x1b5/0x500
+    [  160.173833]  devm_thermal_of_cooling_device_register+0x60/0xa0
+    [  160.180356]  mlxreg_fan_probe+0x474/0x5e0 [mlxreg_fan]
+    [  160.248140]
+    [  160.249807] The buggy address belongs to the object at ffff888116163400
+    [  160.249807]  which belongs to the cache kmalloc-1k of size 1024
+    [  160.263814] The buggy address is located 64 bytes to the right of
+    [  160.263814]  1024-byte region [ffff888116163400, ffff888116163800)
+    [  160.277536] The buggy address belongs to the page:
+    [  160.282898] page:0000000012275840 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888116167000 pfn:0x116160
+    [  160.294872] head:0000000012275840 order:3 compound_mapcount:0 compound_pincount:0
+    [  160.303251] flags: 0x200000000010200(slab|head|node=0|zone=2)
+    [  160.309694] raw: 0200000000010200 ffffea00046f7208 ffffea0004928208 ffff88810004dbc0
+    [  160.318367] raw: ffff888116167000 00000000000a0006 00000001ffffffff 0000000000000000
+    [  160.327033] page dumped because: kasan: bad access detected
+    [  160.333270]
+    [  160.334937] Memory state around the buggy address:
+    [  160.356469] >ffff888116163800: fc ..
+    
+    Fixes: 65afb4c8e7e4 ("hwmon: (mlxreg-fan) Add support for Mellanox FAN driver")
+    Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20210916183151.869427-1-vadimp@nvidia.com
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 76bbb482d33bfcd7e9070ecf594c9ec73e01c930
+Author: Vadim Pasternak <vadimp@nvidia.com>
+Date:   Thu Sep 16 21:31:51 2021 +0300
+
+    hwmon: (mlxreg-fan) Return non-zero value when fan current state is enforced from sysfs
+    
+    [ Upstream commit e6fab7af6ba1bc77c78713a83876f60ca7a4a064 ]
+    
+    Fan speed minimum can be enforced from sysfs. For example, setting
+    current fan speed to 20 is used to enforce fan speed to be at 100%
+    speed, 19 - to be not below 90% speed, etcetera. This feature provides
+    ability to limit fan speed according to some system wise
+    considerations, like absence of some replaceable units or high system
+    ambient temperature.
+    
+    Request for changing fan minimum speed is configuration request and can
+    be set only through 'sysfs' write procedure. In this situation value of
+    argument 'state' is above nominal fan speed maximum.
+    
+    Return non-zero code in this case to avoid
+    thermal_cooling_device_stats_update() call, because in this case
+    statistics update violates thermal statistics table range.
+    The issues is observed in case kernel is configured with option
+    CONFIG_THERMAL_STATISTICS.
+    
+    Here is the trace from KASAN:
+    [  159.506659] BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.516016] Read of size 4 at addr ffff888116163840 by task hw-management.s/7444
+    [  159.545625] Call Trace:
+    [  159.548366]  dump_stack+0x92/0xc1
+    [  159.552084]  ? thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.635869]  thermal_zone_device_update+0x345/0x780
+    [  159.688711]  thermal_zone_device_set_mode+0x7d/0xc0
+    [  159.694174]  mlxsw_thermal_modules_init+0x48f/0x590 [mlxsw_core]
+    [  159.700972]  ? mlxsw_thermal_set_cur_state+0x5a0/0x5a0 [mlxsw_core]
+    [  159.731827]  mlxsw_thermal_init+0x763/0x880 [mlxsw_core]
+    [  160.070233] RIP: 0033:0x7fd995909970
+    [  160.074239] Code: 73 01 c3 48 8b 0d 28 d5 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 99 2d 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ..
+    [  160.095242] RSP: 002b:00007fff54f5d938 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    [  160.103722] RAX: ffffffffffffffda RBX: 0000000000000013 RCX: 00007fd995909970
+    [  160.111710] RDX: 0000000000000013 RSI: 0000000001906008 RDI: 0000000000000001
+    [  160.119699] RBP: 0000000001906008 R08: 00007fd995bc9760 R09: 00007fd996210700
+    [  160.127687] R10: 0000000000000073 R11: 0000000000000246 R12: 0000000000000013
+    [  160.135673] R13: 0000000000000001 R14: 00007fd995bc8600 R15: 0000000000000013
+    [  160.143671]
+    [  160.145338] Allocated by task 2924:
+    [  160.149242]  kasan_save_stack+0x19/0x40
+    [  160.153541]  __kasan_kmalloc+0x7f/0xa0
+    [  160.157743]  __kmalloc+0x1a2/0x2b0
+    [  160.161552]  thermal_cooling_device_setup_sysfs+0xf9/0x1a0
+    [  160.167687]  __thermal_cooling_device_register+0x1b5/0x500
+    [  160.173833]  devm_thermal_of_cooling_device_register+0x60/0xa0
+    [  160.180356]  mlxreg_fan_probe+0x474/0x5e0 [mlxreg_fan]
+    [  160.248140]
+    [  160.249807] The buggy address belongs to the object at ffff888116163400
+    [  160.249807]  which belongs to the cache kmalloc-1k of size 1024
+    [  160.263814] The buggy address is located 64 bytes to the right of
+    [  160.263814]  1024-byte region [ffff888116163400, ffff888116163800)
+    [  160.277536] The buggy address belongs to the page:
+    [  160.282898] page:0000000012275840 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888116167000 pfn:0x116160
+    [  160.294872] head:0000000012275840 order:3 compound_mapcount:0 compound_pincount:0
+    [  160.303251] flags: 0x200000000010200(slab|head|node=0|zone=2)
+    [  160.309694] raw: 0200000000010200 ffffea00046f7208 ffffea0004928208 ffff88810004dbc0
+    [  160.318367] raw: ffff888116167000 00000000000a0006 00000001ffffffff 0000000000000000
+    [  160.327033] page dumped because: kasan: bad access detected
+    [  160.333270]
+    [  160.334937] Memory state around the buggy address:
+    [  160.356469] >ffff888116163800: fc ..
+    
+    Fixes: 65afb4c8e7e4 ("hwmon: (mlxreg-fan) Add support for Mellanox FAN driver")
+    Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20210916183151.869427-1-vadimp@nvidia.com
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a6c42ae1530f94724d3c42cf91fe3d3c5e394f8a
+Author: Vadim Pasternak <vadimp@nvidia.com>
+Date:   Thu Sep 16 21:31:51 2021 +0300
+
+    hwmon: (mlxreg-fan) Return non-zero value when fan current state is enforced from sysfs
+    
+    [ Upstream commit e6fab7af6ba1bc77c78713a83876f60ca7a4a064 ]
+    
+    Fan speed minimum can be enforced from sysfs. For example, setting
+    current fan speed to 20 is used to enforce fan speed to be at 100%
+    speed, 19 - to be not below 90% speed, etcetera. This feature provides
+    ability to limit fan speed according to some system wise
+    considerations, like absence of some replaceable units or high system
+    ambient temperature.
+    
+    Request for changing fan minimum speed is configuration request and can
+    be set only through 'sysfs' write procedure. In this situation value of
+    argument 'state' is above nominal fan speed maximum.
+    
+    Return non-zero code in this case to avoid
+    thermal_cooling_device_stats_update() call, because in this case
+    statistics update violates thermal statistics table range.
+    The issues is observed in case kernel is configured with option
+    CONFIG_THERMAL_STATISTICS.
+    
+    Here is the trace from KASAN:
+    [  159.506659] BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.516016] Read of size 4 at addr ffff888116163840 by task hw-management.s/7444
+    [  159.545625] Call Trace:
+    [  159.548366]  dump_stack+0x92/0xc1
+    [  159.552084]  ? thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.635869]  thermal_zone_device_update+0x345/0x780
+    [  159.688711]  thermal_zone_device_set_mode+0x7d/0xc0
+    [  159.694174]  mlxsw_thermal_modules_init+0x48f/0x590 [mlxsw_core]
+    [  159.700972]  ? mlxsw_thermal_set_cur_state+0x5a0/0x5a0 [mlxsw_core]
+    [  159.731827]  mlxsw_thermal_init+0x763/0x880 [mlxsw_core]
+    [  160.070233] RIP: 0033:0x7fd995909970
+    [  160.074239] Code: 73 01 c3 48 8b 0d 28 d5 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 99 2d 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ..
+    [  160.095242] RSP: 002b:00007fff54f5d938 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    [  160.103722] RAX: ffffffffffffffda RBX: 0000000000000013 RCX: 00007fd995909970
+    [  160.111710] RDX: 0000000000000013 RSI: 0000000001906008 RDI: 0000000000000001
+    [  160.119699] RBP: 0000000001906008 R08: 00007fd995bc9760 R09: 00007fd996210700
+    [  160.127687] R10: 0000000000000073 R11: 0000000000000246 R12: 0000000000000013
+    [  160.135673] R13: 0000000000000001 R14: 00007fd995bc8600 R15: 0000000000000013
+    [  160.143671]
+    [  160.145338] Allocated by task 2924:
+    [  160.149242]  kasan_save_stack+0x19/0x40
+    [  160.153541]  __kasan_kmalloc+0x7f/0xa0
+    [  160.157743]  __kmalloc+0x1a2/0x2b0
+    [  160.161552]  thermal_cooling_device_setup_sysfs+0xf9/0x1a0
+    [  160.167687]  __thermal_cooling_device_register+0x1b5/0x500
+    [  160.173833]  devm_thermal_of_cooling_device_register+0x60/0xa0
+    [  160.180356]  mlxreg_fan_probe+0x474/0x5e0 [mlxreg_fan]
+    [  160.248140]
+    [  160.249807] The buggy address belongs to the object at ffff888116163400
+    [  160.249807]  which belongs to the cache kmalloc-1k of size 1024
+    [  160.263814] The buggy address is located 64 bytes to the right of
+    [  160.263814]  1024-byte region [ffff888116163400, ffff888116163800)
+    [  160.277536] The buggy address belongs to the page:
+    [  160.282898] page:0000000012275840 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888116167000 pfn:0x116160
+    [  160.294872] head:0000000012275840 order:3 compound_mapcount:0 compound_pincount:0
+    [  160.303251] flags: 0x200000000010200(slab|head|node=0|zone=2)
+    [  160.309694] raw: 0200000000010200 ffffea00046f7208 ffffea0004928208 ffff88810004dbc0
+    [  160.318367] raw: ffff888116167000 00000000000a0006 00000001ffffffff 0000000000000000
+    [  160.327033] page dumped because: kasan: bad access detected
+    [  160.333270]
+    [  160.334937] Memory state around the buggy address:
+    [  160.356469] >ffff888116163800: fc ..
+    
+    Fixes: 65afb4c8e7e4 ("hwmon: (mlxreg-fan) Add support for Mellanox FAN driver")
+    Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20210916183151.869427-1-vadimp@nvidia.com
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 5c6e0bce647d9cb32a17d58ffa669b3421fcc6ca
+Author: Vadim Pasternak <vadimp@nvidia.com>
+Date:   Thu Sep 16 21:31:51 2021 +0300
+
+    hwmon: (mlxreg-fan) Return non-zero value when fan current state is enforced from sysfs
+    
+    [ Upstream commit e6fab7af6ba1bc77c78713a83876f60ca7a4a064 ]
+    
+    Fan speed minimum can be enforced from sysfs. For example, setting
+    current fan speed to 20 is used to enforce fan speed to be at 100%
+    speed, 19 - to be not below 90% speed, etcetera. This feature provides
+    ability to limit fan speed according to some system wise
+    considerations, like absence of some replaceable units or high system
+    ambient temperature.
+    
+    Request for changing fan minimum speed is configuration request and can
+    be set only through 'sysfs' write procedure. In this situation value of
+    argument 'state' is above nominal fan speed maximum.
+    
+    Return non-zero code in this case to avoid
+    thermal_cooling_device_stats_update() call, because in this case
+    statistics update violates thermal statistics table range.
+    The issues is observed in case kernel is configured with option
+    CONFIG_THERMAL_STATISTICS.
+    
+    Here is the trace from KASAN:
+    [  159.506659] BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.516016] Read of size 4 at addr ffff888116163840 by task hw-management.s/7444
+    [  159.545625] Call Trace:
+    [  159.548366]  dump_stack+0x92/0xc1
+    [  159.552084]  ? thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.635869]  thermal_zone_device_update+0x345/0x780
+    [  159.688711]  thermal_zone_device_set_mode+0x7d/0xc0
+    [  159.694174]  mlxsw_thermal_modules_init+0x48f/0x590 [mlxsw_core]
+    [  159.700972]  ? mlxsw_thermal_set_cur_state+0x5a0/0x5a0 [mlxsw_core]
+    [  159.731827]  mlxsw_thermal_init+0x763/0x880 [mlxsw_core]
+    [  160.070233] RIP: 0033:0x7fd995909970
+    [  160.074239] Code: 73 01 c3 48 8b 0d 28 d5 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 99 2d 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ..
+    [  160.095242] RSP: 002b:00007fff54f5d938 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    [  160.103722] RAX: ffffffffffffffda RBX: 0000000000000013 RCX: 00007fd995909970
+    [  160.111710] RDX: 0000000000000013 RSI: 0000000001906008 RDI: 0000000000000001
+    [  160.119699] RBP: 0000000001906008 R08: 00007fd995bc9760 R09: 00007fd996210700
+    [  160.127687] R10: 0000000000000073 R11: 0000000000000246 R12: 0000000000000013
+    [  160.135673] R13: 0000000000000001 R14: 00007fd995bc8600 R15: 0000000000000013
+    [  160.143671]
+    [  160.145338] Allocated by task 2924:
+    [  160.149242]  kasan_save_stack+0x19/0x40
+    [  160.153541]  __kasan_kmalloc+0x7f/0xa0
+    [  160.157743]  __kmalloc+0x1a2/0x2b0
+    [  160.161552]  thermal_cooling_device_setup_sysfs+0xf9/0x1a0
+    [  160.167687]  __thermal_cooling_device_register+0x1b5/0x500
+    [  160.173833]  devm_thermal_of_cooling_device_register+0x60/0xa0
+    [  160.180356]  mlxreg_fan_probe+0x474/0x5e0 [mlxreg_fan]
+    [  160.248140]
+    [  160.249807] The buggy address belongs to the object at ffff888116163400
+    [  160.249807]  which belongs to the cache kmalloc-1k of size 1024
+    [  160.263814] The buggy address is located 64 bytes to the right of
+    [  160.263814]  1024-byte region [ffff888116163400, ffff888116163800)
+    [  160.277536] The buggy address belongs to the page:
+    [  160.282898] page:0000000012275840 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888116167000 pfn:0x116160
+    [  160.294872] head:0000000012275840 order:3 compound_mapcount:0 compound_pincount:0
+    [  160.303251] flags: 0x200000000010200(slab|head|node=0|zone=2)
+    [  160.309694] raw: 0200000000010200 ffffea00046f7208 ffffea0004928208 ffff88810004dbc0
+    [  160.318367] raw: ffff888116167000 00000000000a0006 00000001ffffffff 0000000000000000
+    [  160.327033] page dumped because: kasan: bad access detected
+    [  160.333270]
+    [  160.334937] Memory state around the buggy address:
+    [  160.356469] >ffff888116163800: fc ..
+    
+    Fixes: 65afb4c8e7e4 ("hwmon: (mlxreg-fan) Add support for Mellanox FAN driver")
+    Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20210916183151.869427-1-vadimp@nvidia.com
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 654b40ff096ef8493efd8fe90c10cce6c563b0f1
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Jul 22 11:06:44 2021 +0200
+
+    thermal/core: Fix thermal_cooling_device_register() prototype
+    
+    [ Upstream commit fb83610762dd5927212aa62a468dd3b756b57a88 ]
+    
+    There are two pairs of declarations for thermal_cooling_device_register()
+    and thermal_of_cooling_device_register(), and only one set was changed
+    in a recent patch, so the other one now causes a compile-time warning:
+    
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c: In function 'mt7915_thermal_init':
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c:134:48: error: passing argument 1 of 'thermal_cooling_device_register' discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+      134 |         cdev = thermal_cooling_device_register(wiphy_name(wiphy), phy,
+          |                                                ^~~~~~~~~~~~~~~~~
+    In file included from drivers/net/wireless/mediatek/mt76/mt7915/init.c:7:
+    include/linux/thermal.h:407:39: note: expected 'char *' but argument is of type 'const char *'
+      407 | thermal_cooling_device_register(char *type, void *devdata,
+          |                                 ~~~~~~^~~~
+    
+    Change the dummy helper functions to have the same arguments as the
+    normal version.
+    
+    Fixes: f991de53a8ab ("thermal: make device_register's type argument const")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Reviewed-by: Jean-Francois Dagenais <jeff.dagenais@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210722090717.1116748-1-arnd@kernel.org
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c9538018cb2d61c269c4c622131545763f24a9ee
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Jul 22 11:06:44 2021 +0200
+
+    thermal/core: Fix thermal_cooling_device_register() prototype
+    
+    [ Upstream commit fb83610762dd5927212aa62a468dd3b756b57a88 ]
+    
+    There are two pairs of declarations for thermal_cooling_device_register()
+    and thermal_of_cooling_device_register(), and only one set was changed
+    in a recent patch, so the other one now causes a compile-time warning:
+    
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c: In function 'mt7915_thermal_init':
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c:134:48: error: passing argument 1 of 'thermal_cooling_device_register' discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+      134 |         cdev = thermal_cooling_device_register(wiphy_name(wiphy), phy,
+          |                                                ^~~~~~~~~~~~~~~~~
+    In file included from drivers/net/wireless/mediatek/mt76/mt7915/init.c:7:
+    include/linux/thermal.h:407:39: note: expected 'char *' but argument is of type 'const char *'
+      407 | thermal_cooling_device_register(char *type, void *devdata,
+          |                                 ~~~~~~^~~~
+    
+    Change the dummy helper functions to have the same arguments as the
+    normal version.
+    
+    Fixes: f991de53a8ab ("thermal: make device_register's type argument const")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Reviewed-by: Jean-Francois Dagenais <jeff.dagenais@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210722090717.1116748-1-arnd@kernel.org
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a12743d0724976b838bc5928f367da063b0487a4
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Jul 22 11:06:44 2021 +0200
+
+    thermal/core: Fix thermal_cooling_device_register() prototype
+    
+    [ Upstream commit fb83610762dd5927212aa62a468dd3b756b57a88 ]
+    
+    There are two pairs of declarations for thermal_cooling_device_register()
+    and thermal_of_cooling_device_register(), and only one set was changed
+    in a recent patch, so the other one now causes a compile-time warning:
+    
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c: In function 'mt7915_thermal_init':
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c:134:48: error: passing argument 1 of 'thermal_cooling_device_register' discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+      134 |         cdev = thermal_cooling_device_register(wiphy_name(wiphy), phy,
+          |                                                ^~~~~~~~~~~~~~~~~
+    In file included from drivers/net/wireless/mediatek/mt76/mt7915/init.c:7:
+    include/linux/thermal.h:407:39: note: expected 'char *' but argument is of type 'const char *'
+      407 | thermal_cooling_device_register(char *type, void *devdata,
+          |                                 ~~~~~~^~~~
+    
+    Change the dummy helper functions to have the same arguments as the
+    normal version.
+    
+    Fixes: f991de53a8ab ("thermal: make device_register's type argument const")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Reviewed-by: Jean-Francois Dagenais <jeff.dagenais@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210722090717.1116748-1-arnd@kernel.org
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e6fab7af6ba1bc77c78713a83876f60ca7a4a064
+Author: Vadim Pasternak <vadimp@nvidia.com>
+Date:   Thu Sep 16 21:31:51 2021 +0300
+
+    hwmon: (mlxreg-fan) Return non-zero value when fan current state is enforced from sysfs
+    
+    Fan speed minimum can be enforced from sysfs. For example, setting
+    current fan speed to 20 is used to enforce fan speed to be at 100%
+    speed, 19 - to be not below 90% speed, etcetera. This feature provides
+    ability to limit fan speed according to some system wise
+    considerations, like absence of some replaceable units or high system
+    ambient temperature.
+    
+    Request for changing fan minimum speed is configuration request and can
+    be set only through 'sysfs' write procedure. In this situation value of
+    argument 'state' is above nominal fan speed maximum.
+    
+    Return non-zero code in this case to avoid
+    thermal_cooling_device_stats_update() call, because in this case
+    statistics update violates thermal statistics table range.
+    The issues is observed in case kernel is configured with option
+    CONFIG_THERMAL_STATISTICS.
+    
+    Here is the trace from KASAN:
+    [  159.506659] BUG: KASAN: slab-out-of-bounds in thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.516016] Read of size 4 at addr ffff888116163840 by task hw-management.s/7444
+    [  159.545625] Call Trace:
+    [  159.548366]  dump_stack+0x92/0xc1
+    [  159.552084]  ? thermal_cooling_device_stats_update+0x7d/0xb0
+    [  159.635869]  thermal_zone_device_update+0x345/0x780
+    [  159.688711]  thermal_zone_device_set_mode+0x7d/0xc0
+    [  159.694174]  mlxsw_thermal_modules_init+0x48f/0x590 [mlxsw_core]
+    [  159.700972]  ? mlxsw_thermal_set_cur_state+0x5a0/0x5a0 [mlxsw_core]
+    [  159.731827]  mlxsw_thermal_init+0x763/0x880 [mlxsw_core]
+    [  160.070233] RIP: 0033:0x7fd995909970
+    [  160.074239] Code: 73 01 c3 48 8b 0d 28 d5 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 99 2d 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ..
+    [  160.095242] RSP: 002b:00007fff54f5d938 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    [  160.103722] RAX: ffffffffffffffda RBX: 0000000000000013 RCX: 00007fd995909970
+    [  160.111710] RDX: 0000000000000013 RSI: 0000000001906008 RDI: 0000000000000001
+    [  160.119699] RBP: 0000000001906008 R08: 00007fd995bc9760 R09: 00007fd996210700
+    [  160.127687] R10: 0000000000000073 R11: 0000000000000246 R12: 0000000000000013
+    [  160.135673] R13: 0000000000000001 R14: 00007fd995bc8600 R15: 0000000000000013
+    [  160.143671]
+    [  160.145338] Allocated by task 2924:
+    [  160.149242]  kasan_save_stack+0x19/0x40
+    [  160.153541]  __kasan_kmalloc+0x7f/0xa0
+    [  160.157743]  __kmalloc+0x1a2/0x2b0
+    [  160.161552]  thermal_cooling_device_setup_sysfs+0xf9/0x1a0
+    [  160.167687]  __thermal_cooling_device_register+0x1b5/0x500
+    [  160.173833]  devm_thermal_of_cooling_device_register+0x60/0xa0
+    [  160.180356]  mlxreg_fan_probe+0x474/0x5e0 [mlxreg_fan]
+    [  160.248140]
+    [  160.249807] The buggy address belongs to the object at ffff888116163400
+    [  160.249807]  which belongs to the cache kmalloc-1k of size 1024
+    [  160.263814] The buggy address is located 64 bytes to the right of
+    [  160.263814]  1024-byte region [ffff888116163400, ffff888116163800)
+    [  160.277536] The buggy address belongs to the page:
+    [  160.282898] page:0000000012275840 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888116167000 pfn:0x116160
+    [  160.294872] head:0000000012275840 order:3 compound_mapcount:0 compound_pincount:0
+    [  160.303251] flags: 0x200000000010200(slab|head|node=0|zone=2)
+    [  160.309694] raw: 0200000000010200 ffffea00046f7208 ffffea0004928208 ffff88810004dbc0
+    [  160.318367] raw: ffff888116167000 00000000000a0006 00000001ffffffff 0000000000000000
+    [  160.327033] page dumped because: kasan: bad access detected
+    [  160.333270]
+    [  160.334937] Memory state around the buggy address:
+    [  160.356469] >ffff888116163800: fc ..
+    
+    Fixes: 65afb4c8e7e4 ("hwmon: (mlxreg-fan) Add support for Mellanox FAN driver")
+    Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
+    Link: https://lore.kernel.org/r/20210916183151.869427-1-vadimp@nvidia.com
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit dd4703876ea83b5fb5f4f0a1ec58f786143f5064
+Merge: 765092e4cdaa 70ee251ded6b
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Sep 11 09:20:57 2021 -0700
+
+    Merge tag 'thermal-v5.15-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/thermal/linux
+    
+    Pull thermal updates from Daniel Lezcano:
+    
+     - Add the tegra3 thermal sensor and fix the compilation testing on
+       tegra by adding a dependency on ARCH_TEGRA along with COMPILE_TEST
+       (Dmitry Osipenko)
+    
+     - Fix the error code for the exynos when devm_get_clk() fails (Dan
+       Carpenter)
+    
+     - Add the TCC cooling support for AlderLake platform (Sumeet Pawnikar)
+    
+     - Add support for hardware trip points for the rcar gen3 thermal driver
+       and store TSC id as unsigned int (Niklas Söderlund)
+    
+     - Replace the deprecated CPU-hotplug functions get_online_cpus() and
+       put_online_cpus (Sebastian Andrzej Siewior)
+    
+     - Add the thermal tools directory in the MAINTAINERS file (Daniel
+       Lezcano)
+    
+     - Fix the Makefile and the cross compilation flags for the userspace
+       'tmon' tool (Rolf Eike Beer)
+    
+     - Allow to use the IMOK independently from the GDDV on Int340x (Sumeet
+       Pawnikar)
+    
+     - Fix the stub thermal_cooling_device_register() function prototype
+       which does not match the real function (Arnd Bergmann)
+    
+     - Make the thermal trip point optional in the DT bindings (Maxime
+       Ripard)
+    
+     - Fix a typo in a comment in the core code (Geert Uytterhoeven)
+    
+     - Reduce the verbosity of the trace in the SoC thermal tegra driver
+       (Dmitry Osipenko)
+    
+     - Add the support for the LMh (Limit Management hardware) driver on the
+       QCom platforms (Thara Gopinath)
+    
+     - Allow processing of HWP interrupt by adding a weak function in the
+       Intel driver (Srinivas Pandruvada)
+    
+     - Prevent an abort of the sensor probe is a channel is not used
+       (Matthias Kaehlcke)
+    
+    * tag 'thermal-v5.15-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/thermal/linux:
+      thermal/drivers/qcom/spmi-adc-tm5: Don't abort probing if a sensor is not used
+      thermal/drivers/intel: Allow processing of HWP interrupt
+      dt-bindings: thermal: Add dt binding for QCOM LMh
+      thermal/drivers/qcom: Add support for LMh driver
+      firmware: qcom_scm: Introduce SCM calls to access LMh
+      thermal/drivers/tegra-soctherm: Silence message about clamped temperature
+      thermal: Spelling s/scallbacks/callbacks/
+      dt-bindings: thermal: Make trips node optional
+      thermal/core: Fix thermal_cooling_device_register() prototype
+      thermal/drivers/int340x: Use IMOK independently
+      tools/thermal/tmon: Add cross compiling support
+      thermal/tools/tmon: Improve the Makefile
+      MAINTAINERS: Add missing userspace thermal tools to the thermal section
+      thermal/drivers/intel_powerclamp: Replace deprecated CPU-hotplug functions.
+      thermal/drivers/rcar_gen3_thermal: Store TSC id as unsigned int
+      thermal/drivers/rcar_gen3_thermal: Add support for hardware trip points
+      drivers/thermal/intel: Add TCC cooling support for AlderLake platform
+      thermal/drivers/exynos: Fix an error code in exynos_tmu_probe()
+      thermal/drivers/tegra: Correct compile-testing of drivers
+      thermal/drivers/tegra: Add driver for Tegra30 thermal sensor
+
+commit fb83610762dd5927212aa62a468dd3b756b57a88
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Thu Jul 22 11:06:44 2021 +0200
+
+    thermal/core: Fix thermal_cooling_device_register() prototype
+    
+    There are two pairs of declarations for thermal_cooling_device_register()
+    and thermal_of_cooling_device_register(), and only one set was changed
+    in a recent patch, so the other one now causes a compile-time warning:
+    
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c: In function 'mt7915_thermal_init':
+    drivers/net/wireless/mediatek/mt76/mt7915/init.c:134:48: error: passing argument 1 of 'thermal_cooling_device_register' discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+      134 |         cdev = thermal_cooling_device_register(wiphy_name(wiphy), phy,
+          |                                                ^~~~~~~~~~~~~~~~~
+    In file included from drivers/net/wireless/mediatek/mt76/mt7915/init.c:7:
+    include/linux/thermal.h:407:39: note: expected 'char *' but argument is of type 'const char *'
+      407 | thermal_cooling_device_register(char *type, void *devdata,
+          |                                 ~~~~~~^~~~
+    
+    Change the dummy helper functions to have the same arguments as the
+    normal version.
+    
+    Fixes: f991de53a8ab ("thermal: make device_register's type argument const")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Reviewed-by: Jean-Francois Dagenais <jeff.dagenais@gmail.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210722090717.1116748-1-arnd@kernel.org
+
+commit d44616c6cc3e35eea03ecfe9040edfa2b486a059
+Author: Daniel Lezcano <daniel.lezcano@linaro.org>
+Date:   Fri Mar 19 21:22:57 2021 +0100
+
+    thermal/core: Fix memory leak in the error path
+    
+    Fix the following error:
+    
+     smatch warnings:
+     drivers/thermal/thermal_core.c:1020 __thermal_cooling_device_register() warn: possible memory leak of 'cdev'
+    
+    by freeing the cdev when exiting the function in the error path.
+    
+    Fixes: 584837618100 ("thermal/drivers/core: Use a char pointer for the cooling device name")
+    Reported-by: kernel test robot <lkp@intel.com>
+    Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+    Link: https://lore.kernel.org/r/20210319202257.890848-1-daniel.lezcano@linaro.org
+
+commit 31ffcb1077e6c4d36a67c40bccfb6f2bf0132f87
+Author: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+Date:   Thu Aug 27 00:56:08 2020 +0200
+
+    net: ath11k: constify ath11k_thermal_ops
+    
+    The only usage of ath11k_thermal_ops is to pass its address to
+    thermal_cooling_device_register() which takes a const pointer. Make it
+    const to allow the compiler to put it in read-only memory.
+    
+    Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+commit 05c9e0e14bc64ff07d50469ff2b6ce9dcb7bca79
+Author: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Date:   Wed May 13 22:14:54 2020 +0200
+
+    ath11k: Fix some resource leaks in error path in 'ath11k_thermal_register()'
+    
+    [ Upstream commit 25ca180ad380a0c7286442a922e7fbcc6a9f6083 ]
+    
+    If 'thermal_cooling_device_register()' fails, we must undo what has been
+    allocated so far. So we must go to 'err_thermal_destroy' instead of
+    returning directly
+    
+    In case of error in 'ath11k_thermal_register()', the previous
+    'thermal_cooling_device_register()' call must also be undone. Move the
+    'ar->thermal.cdev = cdev' a few lines above in order for this to be done
+    in 'ath11k_thermal_unregister()' which is called in the error handling
+    path.
+    
+    Fixes: 2a63bbca06b2 ("ath11k: add thermal cooling device support")
+    Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+    Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
+    Link: https://lore.kernel.org/r/20200513201454.258111-1-christophe.jaillet@wanadoo.fr
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 25ca180ad380a0c7286442a922e7fbcc6a9f6083
+Author: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Date:   Wed May 13 22:14:54 2020 +0200
+
+    ath11k: Fix some resource leaks in error path in 'ath11k_thermal_register()'
+    
+    If 'thermal_cooling_device_register()' fails, we must undo what has been
+    allocated so far. So we must go to 'err_thermal_destroy' instead of
+    returning directly
+    
+    In case of error in 'ath11k_thermal_register()', the previous
+    'thermal_cooling_device_register()' call must also be undone. Move the
+    'ar->thermal.cdev = cdev' a few lines above in order for this to be done
+    in 'ath11k_thermal_unregister()' which is called in the error handling
+    path.
+    
+    Fixes: 2a63bbca06b2 ("ath11k: add thermal cooling device support")
+    Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+    Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
+    Link: https://lore.kernel.org/r/20200513201454.258111-1-christophe.jaillet@wanadoo.fr
+
+commit b4ab114cc6a1bbf8ca1d9a2339f2b5b43374029b
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Thu Apr 18 12:58:15 2019 -0700
+
+    thermal: Introduce devm_thermal_of_cooling_device_register
+    
+    thermal_of_cooling_device_register() and thermal_cooling_device_register()
+    are typically called from driver probe functions, and
+    thermal_cooling_device_unregister() is called from remove functions. This
+    makes both a perfect candidate for device managed functions.
+    
+    Introduce devm_thermal_of_cooling_device_register(). This function can
+    also be used to replace thermal_cooling_device_register() by passing a NULL
+    pointer as device node. The new function requires both struct device *
+    and struct device_node * as parameters since the struct device_node *
+    parameter is not always identical to dev->of_node.
+    
+    Don't introduce a device managed remove function since it is not needed
+    at this point.
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit b1d0907c6feddcfe13f26b901d7e28c22d6650c0
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Sun Apr 22 19:56:17 2018 +0200
+
+    thermal: int3403_thermal: Fix NULL pointer deref on module load / probe
+    
+    [ Upstream commit 13b86f50eaaddaea4bdd2fe476fd12e6a0951add ]
+    
+    Starting with kernel 4.17 thermal_cooling_device_register() will call the
+    get_max_state() op during register.
+    
+    Since we deref priv->priv in int3403_get_max_state() this means we must
+    set priv->priv before calling thermal_cooling_device_register().
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ab68702463690e6a1e9290bb30b7cba93e6b0dca
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Sun Apr 22 19:56:17 2018 +0200
+
+    thermal: int3403_thermal: Fix NULL pointer deref on module load / probe
+    
+    [ Upstream commit 13b86f50eaaddaea4bdd2fe476fd12e6a0951add ]
+    
+    Starting with kernel 4.17 thermal_cooling_device_register() will call the
+    get_max_state() op during register.
+    
+    Since we deref priv->priv in int3403_get_max_state() this means we must
+    set priv->priv before calling thermal_cooling_device_register().
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 13b86f50eaaddaea4bdd2fe476fd12e6a0951add
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Sun Apr 22 19:56:17 2018 +0200
+
+    thermal: int3403_thermal: Fix NULL pointer deref on module load / probe
+    
+    Starting with kernel 4.17 thermal_cooling_device_register() will call the
+    get_max_state() op during register.
+    
+    Since we deref priv->priv in int3403_get_max_state() this means we must
+    set priv->priv before calling thermal_cooling_device_register().
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit b1a1efc57665f7c70e2051e0531837cb1985f11b
+Author: Bhumika Goyal <bhumirks@gmail.com>
+Date:   Wed Jun 21 14:10:42 2017 +0530
+
+    iwlwifi: mvm: add const to thermal_cooling_device_ops structure
+    
+    Declare thermal_cooling_device_ops structure as const as it is only passed
+    as an argument to the function thermal_cooling_device_register and this
+    argument is of type const. So, declare the structure as const.
+    
+    Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+    Signed-off-by: Luca Coelho <luciano.coelho@intel.com>
+
+commit 1cdb6c9fd43366413f928531a03fc07a8c14429a
+Author: Bhumika Goyal <bhumirks@gmail.com>
+Date:   Tue Jun 27 17:31:52 2017 +0300
+
+    ath10k: add const to thermal_cooling_device_ops structure
+    
+    Declare thermal_cooling_device_ops structure as const as it is only passed
+    as an argument to the function thermal_cooling_device_register and this
+    argument is of type const. So, declare the structure as const.
+    
+    Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+    Signed-off-by: Kalle Valo <kvalo@qca.qualcomm.com>
+
+commit 20485a565de73c58d39b74501b451b40bd817195
+Author: Bhumika Goyal <bhumirks@gmail.com>
+Date:   Wed Jun 21 12:34:17 2017 +0530
+
+    platform/x86: intel_menlow: Add const to thermal_cooling_device_ops structure
+    
+    Declare thermal_cooling_device_ops structure as const as it is only passed
+    as an argument to the function thermal_cooling_device_register and this
+    argument is of type const. So, declare the structure as const.
+    
+    Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+    Signed-off-by: Darren Hart (VMware) <dvhart@infradead.org>
+
+commit adee455112190a4a1ed5d01badcac59278c55d9c
+Author: Bhumika Goyal <bhumirks@gmail.com>
+Date:   Wed Jun 21 12:34:16 2017 +0530
+
+    platform/x86: acerhdf: Add const to thermal_cooling_device_ops structure
+    
+    Declare thermal_cooling_device_ops structure as const as it is only passed
+    as an argument to the function thermal_cooling_device_register and this
+    argument is of type const. So, declare the structure as const.
+    
+    Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+    Signed-off-by: Darren Hart (VMware) <dvhart@infradead.org>
+
+commit 528464eaa46ae1bd319882e4dd3495802e55b8c4
+Author: Viresh Kumar <viresh.kumar@linaro.org>
+Date:   Thu Jul 23 14:32:32 2015 +0530
+
+    thermal: remove dangling 'weight_attr' device file
+    
+    This file isn't getting removed while we unbind a device from thermal
+    zone. And this causes following messages when the device is registered
+    again:
+    
+    WARNING: CPU: 0 PID: 2228 at /home/viresh/linux/fs/sysfs/dir.c:31 sysfs_warn_dup+0x60/0x70()
+    sysfs: cannot create duplicate filename '/devices/virtual/thermal/thermal_zone0/cdev0_weight'
+    Modules linked in: cpufreq_dt(+) [last unloaded: cpufreq_dt]
+    CPU: 0 PID: 2228 Comm: insmod Not tainted 4.2.0-rc3-00059-g44fffd9473eb #272
+    Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+    [<c00153e8>] (unwind_backtrace) from [<c0012368>] (show_stack+0x10/0x14)
+    [<c0012368>] (show_stack) from [<c053a684>] (dump_stack+0x84/0xc4)
+    [<c053a684>] (dump_stack) from [<c002284c>] (warn_slowpath_common+0x80/0xb0)
+    [<c002284c>] (warn_slowpath_common) from [<c00228ac>] (warn_slowpath_fmt+0x30/0x40)
+    [<c00228ac>] (warn_slowpath_fmt) from [<c012d524>] (sysfs_warn_dup+0x60/0x70)
+    [<c012d524>] (sysfs_warn_dup) from [<c012d244>] (sysfs_add_file_mode_ns+0x13c/0x190)
+    [<c012d244>] (sysfs_add_file_mode_ns) from [<c012d2d4>] (sysfs_create_file_ns+0x3c/0x48)
+    [<c012d2d4>] (sysfs_create_file_ns) from [<c03c04a8>] (thermal_zone_bind_cooling_device+0x260/0x358)
+    [<c03c04a8>] (thermal_zone_bind_cooling_device) from [<c03c2e70>] (of_thermal_bind+0x88/0xb4)
+    [<c03c2e70>] (of_thermal_bind) from [<c03c10d0>] (__thermal_cooling_device_register+0x17c/0x2e0)
+    [<c03c10d0>] (__thermal_cooling_device_register) from [<c03c3f50>] (__cpufreq_cooling_register+0x3a0/0x51c)
+    [<c03c3f50>] (__cpufreq_cooling_register) from [<bf00505c>] (cpufreq_ready+0x44/0x88 [cpufreq_dt])
+    [<bf00505c>] (cpufreq_ready [cpufreq_dt]) from [<c03d6c30>] (cpufreq_add_dev+0x4a0/0x7dc)
+    [<c03d6c30>] (cpufreq_add_dev) from [<c02cd3ec>] (subsys_interface_register+0x94/0xd8)
+    [<c02cd3ec>] (subsys_interface_register) from [<c03d785c>] (cpufreq_register_driver+0x10c/0x1f0)
+    [<c03d785c>] (cpufreq_register_driver) from [<bf0057d4>] (dt_cpufreq_probe+0x60/0x8c [cpufreq_dt])
+    [<bf0057d4>] (dt_cpufreq_probe [cpufreq_dt]) from [<c02d03e4>] (platform_drv_probe+0x44/0xa4)
+    [<c02d03e4>] (platform_drv_probe) from [<c02cead8>] (driver_probe_device+0x174/0x2b4)
+    [<c02cead8>] (driver_probe_device) from [<c02ceca4>] (__driver_attach+0x8c/0x90)
+    [<c02ceca4>] (__driver_attach) from [<c02cd078>] (bus_for_each_dev+0x68/0x9c)
+    [<c02cd078>] (bus_for_each_dev) from [<c02ce2f0>] (bus_add_driver+0x19c/0x214)
+    [<c02ce2f0>] (bus_add_driver) from [<c02cf490>] (driver_register+0x78/0xf8)
+    [<c02cf490>] (driver_register) from [<c0009710>] (do_one_initcall+0x8c/0x1d4)
+    [<c0009710>] (do_one_initcall) from [<c05396b0>] (do_init_module+0x5c/0x1b8)
+    [<c05396b0>] (do_init_module) from [<c0086490>] (load_module+0xd34/0xed8)
+    [<c0086490>] (load_module) from [<c0086704>] (SyS_init_module+0xd0/0x120)
+    [<c0086704>] (SyS_init_module) from [<c000f480>] (ret_fast_syscall+0x0/0x3c)
+    ---[ end trace 3be0e7b7dc6e3c4f ]---
+    
+    Fixes: db91651311c8 ("thermal: export weight to sysfs")
+    Acked-by: Javi Merino <javi.merino@arm.com>
+    Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+    Signed-off-by: Eduardo Valentin <edubezval@gmail.com>
+
+commit e76ea26142821894bf78b0b311c8f7aceff0aa9b
+Author: Nishanth Menon <nm@ti.com>
+Date:   Wed Apr 8 18:23:52 2015 -0500
+
+    hwmon: (gpio-fan) Move the thermal registration after registration is complete
+    
+    Thermal framework may already be ready and cooling policies might
+    already be functional when we are attempting to register gpio fan as
+    a cooling device. This can be reproduced by changing probe order in
+    which registration of various modules are done in a system. In such
+    a case, kernel generates an oops since the data structures are not
+    completely populated with the wrong assumption that thermal framework
+    is not yet ready. Fix this by reordering the thermal framework
+    registration to occur after hwmon registration of the fan is complete.
+    
+    Example kernel oops:
+    [  149.005828] Unable to handle kernel NULL pointer dereference at virtual address 0000008c
+    [  149.014369] pgd = ecf48000
+    [  149.017204] [0000008c] *pgd=ac065831, *pte=00000000, *ppte=00000000
+    [  149.023820] Internal error: Oops: 17 [#1] SMP ARM
+    [  149.028745] Modules linked in: gpio_fan(+) cpufreq_dt ipv6 evdev leds_gpio led_class omap_wdt phy_omap_usb2 rtc_palmas palmas_pwrbutton tmp102 ti_soc_thermal dwc3_omap thermal_sys extcon rtc_omap rtc_ds1307 hwmon
+    [  149.048629] CPU: 1 PID: 1183 Comm: modprobe Not tainted 4.0.0-rc7-next-20150407-00002-g7a82da074c99 #3
+    [  149.058383] Hardware name: Generic DRA74X (Flattened Device Tree)
+    [  149.064763] task: edec1240 ti: ec0e0000 task.ti: ec0e0000
+    [  149.070421] PC is at dev_driver_string+0x0/0x38
+    [  149.075165] LR is at __dev_printk+0x24/0x70
+    [  149.079540] pc : [<c03d6cd0>]    lr : [<c03d72c4>]    psr: 20000013
+    [  149.079540] sp : ec0e1c28  ip : edec1240  fp : 00000000
+    [  149.091568] r10: edf3eee0  r9 : 00000000  r8 : ffffffff
+    [  149.097040] r7 : edf3eea0  r6 : 00000034  r5 : 00000010  r4 : ec0e1c44
+    [  149.103871] r3 : ec0e1c4c  r2 : ec0e1c44  r1 : c079d800  r0 : 00000010
+    [  149.110709] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+    [  149.118182] Control: 10c5387d  Table: acf4806a  DAC: 00000015
+    [  149.124198] Process modprobe (pid: 1183, stack limit = 0xec0e0218)
+    [  149.130673] Stack: (0xec0e1c28 to 0xec0e2000)
+    [  149.135235] 1c20:                   60000013 c05e2ae0 00000000 edf3ec00 ec934a10 c03d73d4
+    ...
+    [  149.392230] 1fe0: befe1888 befe1878 00019418 b6ea08f0 80000010 00000003 00000000 00000000
+    [  149.400798] [<c03d6cd0>] (dev_driver_string) from [<c03d72c4>] (__dev_printk+0x24/0x70)
+    [  149.409193] [<c03d72c4>] (__dev_printk) from [<c03d73d4>] (dev_warn+0x34/0x48)
+    [  149.416767] [<c03d73d4>] (dev_warn) from [<bf0f54fc>] (get_fan_speed_index+0x94/0xa4 [gpio_fan])
+    [  149.425980] [<bf0f54fc>] (get_fan_speed_index [gpio_fan]) from [<bf0f5524>] (gpio_fan_get_cur_state+0x18/0x30 [gpio_fan])
+    [  149.437476] [<bf0f5524>] (gpio_fan_get_cur_state [gpio_fan]) from [<bf02767c>] (thermal_zone_trip_update+0xe8/0x2a4 [thermal_sys])
+    [  149.449794] [<bf02767c>] (thermal_zone_trip_update [thermal_sys]) from [<bf027844>] (step_wise_throttle+0xc/0x74 [thermal_sys])
+    [  149.461832] [<bf027844>] (step_wise_throttle [thermal_sys]) from [<bf024ff4>] (handle_thermal_trip+0x5c/0x188 [thermal_sys])
+    [  149.473603] [<bf024ff4>] (handle_thermal_trip [thermal_sys]) from [<bf0256c4>] (thermal_zone_device_update+0x94/0x108 [thermal_sys])
+    [  149.486104] [<bf0256c4>] (thermal_zone_device_update [thermal_sys]) from [<bf026470>] (__thermal_cooling_device_register+0x2e8/0x374 [thermal_sys])
+    [  149.499956] [<bf026470>] (__thermal_cooling_device_register [thermal_sys]) from [<bf0f58e4>] (gpio_fan_probe+0x350/0x4d0 [gpio_fan])
+    [  149.512438] [<bf0f58e4>] (gpio_fan_probe [gpio_fan]) from [<c03db8a0>] (platform_drv_probe+0x48/0x98)
+    [  149.522109] [<c03db8a0>] (platform_drv_probe) from [<c03da30c>] (driver_probe_device+0x1b0/0x26c)
+    [  149.531399] [<c03da30c>] (driver_probe_device) from [<c03da45c>] (__driver_attach+0x94/0x98)
+    [  149.540238] [<c03da45c>] (__driver_attach) from [<c03d8bb0>] (bus_for_each_dev+0x54/0x88)
+    [  149.548814] [<c03d8bb0>] (bus_for_each_dev) from [<c03d9a34>] (bus_add_driver+0xdc/0x1d4)
+    [  149.557381] [<c03d9a34>] (bus_add_driver) from [<c03dac30>] (driver_register+0x78/0xf4)
+    [  149.565765] [<c03dac30>] (driver_register) from [<c0009784>] (do_one_initcall+0x80/0x1d8)
+    [  149.574340] [<c0009784>] (do_one_initcall) from [<c00c2278>] (do_init_module+0x5c/0x1b8)
+    [  149.582833] [<c00c2278>] (do_init_module) from [<c00c3bbc>] (load_module+0x1720/0x1dcc)
+    [  149.591212] [<c00c3bbc>] (load_module) from [<c00c43d0>] (SyS_finit_module+0x68/0x6c)
+    [  149.599418] [<c00c43d0>] (SyS_finit_module) from [<c000f3c0>] (ret_fast_syscall+0x0/0x4c)
+    [  149.607994] Code: 15830000 e1a00006 e28dd008 e8bd8070 (e590307c)
+    
+    Cc: Eduardo Valentin <edubezval@gmail.com>
+    Fixes: b5cf88e46bad ("(gpio-fan): Add thermal control hooks")
+    Signed-off-by: Nishanth Menon <nm@ti.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit f6906edeac16bb33b80d41fac84261767f18c14a
+Author: Randy Dunlap <rdunlap@infradead.org>
+Date:   Tue Mar 10 16:42:41 2015 -0700
+
+    hwmon: (gpio-fan) Fix build with CONFIG_THERMAL=m and SENSORS_GPIO_FAN=y
+    
+    Fix build error when CONFIG_THERMAL=m and SENSORS_GPIO_FAN=y
+    by preventing that combination.
+    
+    Fixes these build errors:
+    
+    drivers/built-in.o: In function `gpio_fan_remove':
+    gpio-fan.c:(.text+0x21e97e): undefined reference to `thermal_cooling_device_unregister'
+    drivers/built-in.o: In function `gpio_fan_probe':
+    gpio-fan.c:(.text+0x21efbc): undefined reference to `thermal_cooling_device_register'
+    
+    Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+    Cc:     Jean Delvare <jdelvare@suse.de>
+    Cc:     Guenter Roeck <linux@roeck-us.net>
+    Cc:     lm-sensors@lm-sensors.org
+    Cc:     Simon Guinot <sguinot@lacie.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+commit 200db647112d9a0f1dce273604f949f916bd2426
+Author: Randy Dunlap <rdunlap@infradead.org>
+Date:   Mon Dec 15 09:00:13 2014 -0800
+
+    platform/x86/acerhdf: Still depends on THERMAL
+    
+    acerhdf uses thermal interfaces so it should depend on THERMAL.
+    It also should not select a thermal driver without checking that
+    THERMAL is enabled.
+    
+    This fixes the following build errors when THERMAL=m and
+    ACERHDF=y.
+    
+    drivers/built-in.o: In function `acerhdf_set_mode':
+    acerhdf.c:(.text+0x3e02e1): undefined reference to `thermal_zone_device_update'
+    drivers/built-in.o: In function `acerhdf_unbind':
+    acerhdf.c:(.text+0x3e052d): undefined reference to `thermal_zone_unbind_cooling_device'
+    drivers/built-in.o: In function `acerhdf_bind':
+    acerhdf.c:(.text+0x3e0593): undefined reference to `thermal_zone_bind_cooling_device'
+    drivers/built-in.o: In function `acerhdf_init':
+    acerhdf.c:(.init.text+0x1c2f5): undefined reference to `thermal_cooling_device_register'
+    acerhdf.c:(.init.text+0x1c360): undefined reference to `thermal_zone_device_register'
+    drivers/built-in.o: In function `acerhdf_unregister_thermal':
+    acerhdf.c:(.text.unlikely+0x3c67): undefined reference to `thermal_cooling_device_unregister'
+    acerhdf.c:(.text.unlikely+0x3c91): undefined reference to `thermal_zone_device_unregister'
+    
+    Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+    Acked-by: Peter Feuerer <peter@piie.net>
+    Signed-off-by: Darren Hart <dvhart@linux.intel.com>
+
+commit 73b9bcd76d13716cc0e0ab053f8c1ae41f47636e
+Author: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Date:   Fri Oct 25 21:55:42 2013 +0800
+
+    thermal: cpu_cooling: fix return value check in cpufreq_cooling_register()
+    
+    In case of error, the function thermal_cooling_device_register() returns
+    ERR_PTR() and never returns NULL. The NULL test in the return value check
+    should be replaced with IS_ERR().
+    
+    Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit b29bdba51924f6fd5971352ba111784dee3a5853
+Merge: e0fd9affeb64 de6558dc964f
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu May 9 09:40:49 2013 -0700
+
+    Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux
+    
+    Pull thermal management update from Zhang Rui:
+     "The most important one is to build thermal core and governor and cpu
+      cooling code into one module.  This fixes a regression that thermal
+      core does not work if it is built as module, since 3.7.  I'll backport
+      them to stable kernel once those changes are in upstream.
+    
+      The largest batch is the thermal kernel-doc & coding style
+      updates/cleanups from Eduardo.
+    
+      Highlights:
+    
+       - build all thermal framework code into one module to fix a
+         regression that thermal does not work if it is built as module.
+    
+       - Marvell Armada 370/XP thermal sensor driver
+    
+       - thermal core/cpu cooling kernel-doc & coding style updates and
+         cleanups.
+    
+       - Add Eduardo Valentin as thermal sub-maintainer, both in mailing
+         list and patchwork.  He will help me on arm thermal drivers."
+    
+    * 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/rzhang/linux: (68 commits)
+      thermal: db8500_cpufreq_cooling: remove usage of IS_ERR_OR_NULL()
+      thermal: thermal_core: remove usage of IS_ERR_OR_NULL
+      thermal: cpu_cooling: improve line breaking
+      thermal: cpu_cooling: alignment improvements
+      thermal: cpu_cooling: remove checkpatch.pl warning
+      thermal: cpu_cooling: remove trailing blank line
+      thermal: cpu_cooling: align on open parenthesis
+      thermal: cpu_cooling: standardize comment style
+      thermal: cpu_cooling: standardize end of function
+      thermal: cpu_cooling: remove trailing white spaces
+      Thermal: update documentation for thermal_zone_device_register
+      thermal: update kernel-doc for thermal_zone_device_register
+      thermal: update kernel-doc for create_trip_attrs
+      thermal: update kernel-doc for thermal_cooling_device_register
+      thermal: update kernel-doc for thermal_zone_unbind_cooling_device
+      thermal: update kernel-doc for thermal_zone_bind_cooling_device
+      thermal: use EXPORT_SYMBOL_GPL
+      thermal: rename notify_thermal_framework to thermal_notify_framework
+      thermal: update driver license
+      thermal: use strlcpy instead of strcpy
+      ...
+
+commit 3a6eccb35219a7cfa7c7bbac16aa344d4a336fd4
+Author: Eduardo Valentin <eduardo.valentin@ti.com>
+Date:   Tue Apr 23 21:48:18 2013 +0000
+
+    thermal: update kernel-doc for thermal_cooling_device_register
+    
+    This patch updates the documentation for thermal_cooling_device_register
+    and removes the warnings generated by scripts/kernel-doc -v.
+    
+    Signed-off-by: Eduardo Valentin <eduardo.valentin@ti.com>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 160b7d8048b87cb594e1a22b5345b468b6c2c40e
+Author: hongbo.zhang <hongbo.zhang@linaro.com>
+Date:   Tue Oct 30 17:48:59 2012 +0100
+
+    Thermal: Remove the cooling_cpufreq_list.
+    
+    Problem of using this list is that the cpufreq_get_max_state callback will be
+    called when register cooling device by thermal_cooling_device_register, but
+    this list isn't ready at this moment. What's more, there is no need to maintain
+    such a list, we can get cpufreq_cooling_device instance by the private
+    thermal_cooling_device.devdata.
+    
+    Signed-off-by: hongbo.zhang <hongbo.zhang@linaro.com>
+    Reviewed-by: Francesco Lavra <francescolavra.fl@gmail.com>
+    Reviewed-by: Amit Daniel Kachhap <amit.kachhap@linaro.org>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit 204dd1d39c32f39a95bf7a7248f63b372fd137a6
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Tue Aug 7 22:36:45 2012 -0700
+
+    thermal: Fix potential NULL pointer accesses
+    
+    The type parameter in thermal_zone_device_register and
+    thermal_cooling_device_register can be NULL, indicating that no sysfs attribute
+    for the type should be created. Only call strlen() and strcpy() on type if it is
+    not NULL.
+    
+    This patch addresses Coverity #102180 and #102182: Dereference before null check
+    
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+
+commit b9e55f5a2720af59561b26dce20179deb118af1a
+Author: Randy Dunlap <randy.dunlap@oracle.com>
+Date:   Tue Feb 1 11:17:28 2011 -0800
+
+    gpu/stub: fix acpi_video build error, fix stub kconfig dependencies
+    
+    The comments under "config STUB_POULSBO" are close to correct,
+    but they are not being followed.  This patch updates them to reflect
+    the requirements for THERMAL.
+    
+    This build error is caused by STUB_POULSBO selecting ACPI_VIDEO
+    when ACPI_VIDEO's config requirements are not met.
+    
+    ERROR: "thermal_cooling_device_register" [drivers/acpi/video.ko] undefined!
+    ERROR: "thermal_cooling_device_unregister" [drivers/acpi/video.ko] undefined!
+    
+    Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+    Tested-by: Ingo Molnar <mingo@elte.hu>
+    Signed-off-by: Dave Airlie <airlied@redhat.com>
+
+commit 69bc70d4f97ce82153bed0afc9f432700c60390b
+Author: Randy Dunlap <randy.dunlap@oracle.com>
+Date:   Tue Feb 1 11:17:28 2011 -0800
+
+    gpu/stub: fix acpi_video build error, fix stub kconfig dependencies
+    
+    The comments under "config STUB_POULSBO" are close to correct,
+    but they are not being followed.  This patch updates them to reflect
+    the requirements for THERMAL.
+    
+    This build error is caused by STUB_POULSBO selecting ACPI_VIDEO
+    when ACPI_VIDEO's config requirements are not met.
+    
+      ERROR: "thermal_cooling_device_register" [drivers/acpi/video.ko] undefined!
+      ERROR: "thermal_cooling_device_unregister" [drivers/acpi/video.ko] undefined!
+    
+    Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 4b4fe3b62e8d88068083218d3e42c45223b51d29
+Author: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date:   Sat Aug 8 00:26:25 2009 -0700
+
+    ACPI: video - fix potential crash when unloading
+    
+    thermal_cooling_device_register() returns error encoded in a pointer
+    when it fails in which case we need to explictly set device->cdev
+    to NULL so we don't try to unregister it when unloading.
+    
+    Signed-off-by: Dmitry Torokhov <dtor@mail.ru>
+    Acked-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 3a8ca95e9d62980fd3b41165ec05032c63ce21da
+Author: Julia Lawall <julia@diku.dk>
+Date:   Tue Apr 29 00:59:30 2008 -0700
+
+    drivers/misc: elide a non-zero test on a result that is never 0
+    
+    The function thermal_cooling_device_register always returns either a valid
+    pointer or a value made with ERR_PTR, so a test for non-zero on the result
+    will always succeed.
+    
+    The problem was found using the following semantic match.
+    (http://www.emn.fr/x-info/coccinelle/)
+    
+    //<smpl>
+    @a@
+    expression E, E1;
+    statement S,S1;
+    position p;
+    @@
+    
+    E = thermal_cooling_device_register(...)
+    ... when != E = E1
+    if@p (E) S else S1
+    
+    @n@
+    position a.p;
+    expression E,E1;
+    statement S,S1;
+    @@
+    
+    E = NULL
+    ... when != E = E1
+    if@p (E) S else S1
+    
+    @depends on !n@
+    expression E;
+    statement S,S1;
+    position a.p;
+    @@
+    
+    * if@p (E)
+      S else S1
+    //</smpl>
+    
+    Signed-off-by: Julia Lawall <julia@diku.dk>
+    Cc: Thomas Sujith <sujith.thomas@intel.com>
+    Cc: Len Brown <len.brown@intel.com>
+    Cc: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 9030062f3d61f87c1e787b3aa134fa3a8e4b2d25
+Author: Julia Lawall <julia@diku.dk>
+Date:   Fri Apr 11 10:09:24 2008 +0800
+
+    ACPI: elide a non-zero test on a result that is never 0
+    
+    thermal_cooling_device_register used to return NULL if THERMAL is "n".
+    As the ACPI fan, processor and video drivers SELECT the generic
+    thermal in PATCH 01, this is not a problem any more.
+    
+    Signed-off-by: Julia Lawall <julia@diku.dk>
+    Signed-off-by: Zhang Rui <rui.zhang@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 48d3d8263c491822d50e64547bae5f6b4a54ec59
+Author: Ingo Molnar <mingo@elte.hu>
+Date:   Fri Mar 28 14:28:03 2008 +0100
+
+    revert "ACPI: drivers/acpi: elide a non-zero test on a result that is never 0"
+    
+    Revert commit 1192aeb957402b45f311895f124e4ca41206843c ("ACPI:
+    drivers/acpi: elide a non-zero test on a result that is never 0")
+    because it turns out that thermal_cooling_device_register() does
+    actually return NULL if CONFIG_THERMAL is turned off (then the routine
+    turns into a dummy inline routine in the header files that returns NULL
+    unconditionally).
+    
+    This was found with randconfig testing, causing a crash during bootup:
+    
+      initcall 0x78878534 ran for 13 msecs: acpi_button_init+0x0/0x51()
+      Calling initcall 0x78878585: acpi_fan_init+0x0/0x2c()
+      BUG: unable to handle kernel NULL pointer dereference at 00000000
+      IP: [<782b8ad0>] acpi_fan_add+0x7d/0xfd
+      *pde = 00000000
+      Oops: 0000 [#1]
+      Modules linked in:
+    
+      Pid: 1, comm: swapper Not tainted (2.6.25-rc7-sched-devel.git-x86-latest.git #14)
+      EIP: 0060:[<782b8ad0>] EFLAGS: 00010246 CPU: 0
+      EIP is at acpi_fan_add+0x7d/0xfd
+      EAX: b787c718 EBX: b787c400 ECX: b782ceb4 EDX: 00000007
+      ESI: 00000000 EDI: b787c6f4 EBP: b782cee0 ESP: b782cecc
+       DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068
+      Process swapper (pid: 1, ti=b782c000 task=b7846000 task.ti=b782c000)
+      Stack: b787c459 00000000 b787c400 78790888 b787c60c b782cef8 782b6fb8 ffffffda
+             b787c60c 00000000 78790958 b782cf0c 783005d7 b787c60c 78790958 78790584
+             b782cf1c 783007f6 b782cf28 00000000 b782cf40 782ffc4a 78790958 b794d558
+      Call Trace:
+       [<782b6fb8>] ? acpi_device_probe+0x3e/0xdb
+       [<783005d7>] ? driver_probe_device+0x82/0xfc
+       [<783007f6>] ? __driver_attach+0x3a/0x70
+       [<782ffc4a>] ? bus_for_each_dev+0x3e/0x60
+       [<7830048c>] ? driver_attach+0x14/0x16
+       [<783007bc>] ? __driver_attach+0x0/0x70
+       [<7830006a>] ? bus_add_driver+0x9d/0x1b0
+       [<783008c3>] ? driver_register+0x47/0xa3
+       [<7813db00>] ? timespec_to_ktime+0x9/0xc
+       [<782b7331>] ? acpi_bus_register_driver+0x3a/0x3c
+       [<78878592>] ? acpi_fan_init+0xd/0x2c
+       [<78863656>] ? kernel_init+0xac/0x1f9
+       [<788635aa>] ? kernel_init+0x0/0x1f9
+       [<78114563>] ? kernel_thread_helper+0x7/0x10
+       =======================
+      Code: 6e 78 e8 57 44 e7 ff 58 e9 93 00 00 00 8b 55 f0 8d bb f4 02 00 00 80 4b 2d 10 8b 03 e8 87 cb ff ff 8d 83 18 03 00 00 80 63 2d ef <ff> 35 00 00 00 00 50 68 e8 9c 6e 78 e8 22 44 e7 ff b9 b6 9c 6e
+      EIP: [<782b8ad0>] acpi_fan_add+0x7d/0xfd SS:ESP 0068:b782cecc
+      ---[ end trace 778e504de7e3b1e3 ]---
+      Kernel panic - not syncing: Attempted to kill init!
+    
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>
+    Acked-by: Julia Lawall <julia@diku.dk>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 1192aeb957402b45f311895f124e4ca41206843c
+Author: Julia Lawall <julia@diku.dk>
+Date:   Thu Mar 27 01:48:22 2008 -0400
+
+    ACPI: drivers/acpi: elide a non-zero test on a result that is never 0
+    
+    The function thermal_cooling_device_register always returns either a valid
+    pointer or a value made with ERR_PTR, so a test for non-zero on the result
+    will always succeed.
+    
+    The problem was found using the following semantic match.
+    (http://www.emn.fr/x-info/coccinelle/)
+    
+    //<smpl>
+    @a@
+    expression E, E1;
+    statement S,S1;
+    position p;
+    @@
+    
+    E = thermal_cooling_device_register(...)
+    ... when != E = E1
+    if@p (E) S else S1
+    
+    @n@
+    position a.p;
+    expression E,E1;
+    statement S,S1;
+    @@
+    
+    E = NULL
+    ... when != E = E1
+    if@p (E) S else S1
+    
+    @depends on !n@
+    expression E;
+    statement S,S1;
+    position a.p;
+    @@
+    
+    * if@p (E)
+      S else S1
+    //</smpl>
+    
+    Signed-off-by: Julia Lawall <julia@diku.dk>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 20f8d2a49360980f1dc0afe2ea227e3ba887e575
+Merge: e6364cd3a1a3 1f1519ef597a
+Author: Linus Torvalds <torvalds@woody.linux-foundation.org>
+Date:   Thu Feb 21 16:33:19 2008 -0800
+
+    Merge branch 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux-acpi-2.6
+    
+    * 'release' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux-acpi-2.6: (26 commits)
+      PM: Make suspend_device() static
+      PCI ACPI: Fix comment describing acpi_pci_choose_state
+      Hibernation: Handle DEBUG_PAGEALLOC on x86
+      ACPI: fix build warning
+      ACPI: TSC breaks atkbd suspend
+      ACPI: remove is_processor_present prototype
+      acer-wmi: Add DMI match for mail LED on Acer TravelMate 4200 series
+      ACPI: sparse fix, replace macro with static function
+      ACPI: thinkpad-acpi: add tablet-mode reporting
+      ACPI: thinkpad-acpi: minor hotkey_radio_sw fixes
+      ACPI: thinkpad-acpi: improve thinkpad-acpi input device documentation
+      ACPI: thinkpad-acpi: issue input events for tablet swivel events
+      ACPI: thinkpad-acpi: make the video output feature optional
+      ACPI: thinkpad-acpi: synchronize input device switches
+      ACPI: thinkpad-acpi: always track input device open/close
+      ACPI: thinkpad-acpi: trivial fix to documentation
+      ACPI: thinkpad-acpi: trivial fix to module_desc typo
+      intel_menlo: extract return values using PTR_ERR
+      ACPI video: check for error from thermal_cooling_device_register
+      ACPI thermal: extract return values using PTR_ERR
+      ...
+
+commit 69f6b8dd6b94ac594b6920b4530a3390fb1d3fd6
+Author: Thomas Sujith <sujith.thomas@intel.com>
+Date:   Fri Feb 15 01:05:23 2008 -0500
+
+    intel_menlo: extract return values using PTR_ERR
+    
+    Need to extract errors using PTR_ERR macro and
+    process accordingly.thermal_cooling_device_register
+    returning NULL means that CONFIG_THERMAL=n and in that
+    case no need to create symbolic links.
+    
+    Signed-off-by: Thomas Sujith <sujith.thomas@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 43ff39f2f6450fa2e9a566f8bf007a26d76f2c9d
+Author: Thomas Sujith <sujith.thomas@intel.com>
+Date:   Fri Feb 15 18:29:18 2008 -0500
+
+    ACPI video: check for error from thermal_cooling_device_register
+    
+    Need to check whether thermal_cooling_device_register
+    returned ERROR or not.
+    
+    Signed-off-by: Thomas Sujith <sujith.thomas@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit d76628c67cdeebf84766a19c67c821c2e518baa4
+Author: Thomas Sujith <sujith.thomas@intel.com>
+Date:   Fri Feb 15 18:26:54 2008 -0500
+
+    ACPI thermal: extract return values using PTR_ERR
+    
+    Need to extract errors using PTR_ERR macro and
+    process accordingly.thermal_cooling_device_register
+    returning NULL means that CONFIG_THERMAL=n and in that
+    case no need to create symbolic links.
+    
+    Signed-off-by: Thomas Sujith <sujith.thomas@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit 19b36780ee7ddeb5080e3f1f858a83c4824f1fdc
+Author: Thomas Sujith <sujith.thomas@intel.com>
+Date:   Fri Feb 15 01:01:52 2008 -0500
+
+    ACPI fan: extract return values using PTR_ERR
+    
+    Need to extract errors using PTR_ERR macro and
+    process accordingly.  thermal_cooling_device_register
+    returning NULL means that CONFIG_THERMAL=n and in that
+    case no need to create symbolic links.
+    
+    Signed-off-by: Thomas Sujith <sujith.thomas@intel.com>
+    Signed-off-by: Len Brown <len.brown@intel.com>
+
+commit a0dd25b2c83de4623487ca4de9c1d962b552ca0f
+Author: Len Brown <len.brown@intel.com>
+Date:   Sat Feb 9 04:01:48 2008 -0500
+
+    ACPI: thermal: buildfix for CONFIG_THERMAL=n
+    
+    This fixes the build, but acpi_fan_add() still needs
+    to be updated to handle thermal_cooling_device_register()
+    returning NULL as a non-fatal condition.
+    
+    Signed-off-by: Len Brown <len.brown@intel.com>

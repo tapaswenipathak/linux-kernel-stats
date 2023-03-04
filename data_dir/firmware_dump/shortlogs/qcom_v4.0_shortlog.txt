@@ -1,0 +1,451 @@
+      clk: qcom: fix platform_no_drv_owner.cocci warnings
+      clk: qcom: fix platform_no_drv_owner.cocci warnings
+      clk: qcom: Add PLL4 vote clock
+      clk: qcom: lcc-msm8960: Fix PLL rate detection
+      clk: qcom: Fix slimbus n and m val offsets
+      dmaengine: qcom_bam_dma: fix wrong register offsets
+    dmaengine: qcom_bam_dma: fix wrong register offsets
+    The commit fb93f520e (dmaengine: qcom_bam_dma: Generalize BAM
+    clk: qcom: fix platform_no_drv_owner.cocci warnings
+    drivers/clk/qcom/lcc-msm8960.c:577:3-8: No need to set .owner here. The core will do it.
+    clk: qcom: fix platform_no_drv_owner.cocci warnings
+    drivers/clk/qcom/lcc-ipq806x.c:465:3-8: No need to set .owner here. The core will do it.
+    clk: qcom: Add PLL4 vote clock
+    clk: qcom: lcc-msm8960: Fix PLL rate detection
+    Fixes: b82875ee07e5 "clk: qcom: Add MSM8960/APQ8064 LPASS clock
+    clk: qcom: Fix slimbus n and m val offsets
+    Fixes: b82875ee07e5 "clk: qcom: Add MSM8960/APQ8064 LPASS clock controller (LCC) driver"
+      regulator: qcom-rpm: Add missing state flag in call to RPM
+      mfd: qcom-rpm: Driver for the Qualcomm RPM
+      ARM: 8301/1: qcom: Use secondary_startup_arm()
+       - Add support for Qualcomm MSM8916 in the qcom driver.
+      pinctrl: qcom: delete pin_config_get/set pinconf operations
+      pinctrl: qcom: Add msm8916 pinctrl driver
+      pinctrl: qcom: increase variable size for register offsets
+    ARM: 8301/1: qcom: Use secondary_startup_arm()
+    On qcom platforms we always enter the kernel in ARM mode,
+      regulator: qcom-rpm: Make it possible to specify supply
+      regulator: qcom-rpm: signedness bug in probe()
+      regulator: qcom_rpm: Don't update vreg->uV/mV if rpm_reg_write fails
+    Merge remote-tracking branches 'regulator/topic/max8649', 'regulator/topic/mode', 'regulator/topic/mt6397', 'regulator/topic/pfuze100' and 'regulator/topic/qcom-rpm' into regulator-next
+    Merge remote-tracking branch 'regulator/fix/qcom-rpm' into regulator-linus
+    So after clarification from qcom, it seems mdp4 and mdp5 support
+    pinctrl: qcom: delete pin_config_get/set pinconf operations
+    The .pin_config_get/set operation are not supported in qcom pinctrl
+    pinctrl: qcom: Add msm8916 pinctrl driver
+    pinctrl: qcom: increase variable size for register offsets
+    The zynq and qcom-spmi pinctrl drivers both use pin_config_item arrays
+    pinctrl/qcom/pinctrl-spmi-gpio.c:139:37: error: array type has incomplete element type
+    pinctrl/qcom/pinctrl-spmi-gpio.c:140:2: error: implicit declaration of function 'PCONFDUMP' [-Werror=implicit-function-declaration]
+    pinctrl/qcom/pinctrl-spmi-gpio.c:139:37: warning: 'pmic_conf_items' defined but not used [-Wunused-variable]
+    regulator: qcom-rpm: Make it possible to specify supply
+    regulator: qcom-rpm: signedness bug in probe()
+    devicetree: bindings: Document qcom,lcc
+    clk: qcom: Add MSM8960/APQ8064 LPASS clock controller (LCC) driver
+    clk: qcom: Add IPQ806X LPASS clock controller (LCC) driver
+    clk: qcom: Add simple regmap based muxes
+    clk: qcom: Add support for regmap divider clocks
+     .../bindings/net/wireless/qcom,ath10k.txt          |   30 +
+    regulator: qcom_rpm: Don't update vreg->uV/mV if rpm_reg_write fails
+    Merge tag 'qcom-soc-for-3.20-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/soc
+    merge "qcom SoC changes for v3.20-2" from Kumar Gala:
+    * tag 'qcom-soc-for-3.20-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: qcom: Drop unnecessary selects from ARCH_QCOM
+      ARM: qcom: Fix SCM interface for big-endian kernels
+      ARM: qcom: scm: Clarify boot interface
+      ARM: qcom: Add SCM warmboot flags for quad core targets.
+      ARM: qcom: scm: Add logging of actual return code from scm call
+      ARM: qcom: scm: Flush the command buffer only instead of the entire cache
+      ARM: qcom: scm: Get cacheline size from CTR
+      ARM: qcom: scm: Fix incorrect cache invalidation
+      ARM: qcom: Select ARCH_SUPPORTS_BIG_ENDIAN
+    ARM: qcom: Drop unnecessary selects from ARCH_QCOM
+    ARM: qcom: Fix SCM interface for big-endian kernels
+    ARM: qcom: scm: Clarify boot interface
+    ARM: qcom: Add SCM warmboot flags for quad core targets.
+    regulator: qcom-rpm: Add missing state flag in call to RPM
+    mfd: qcom-rpm: Driver for the Qualcomm RPM
+    Merge tag 'qcom-dt-for-3.20' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/dt
+    Merge "qcom DT changes for v3.20" from Kumar Gala:
+    * tag 'qcom-dt-for-3.20' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: dts: qcom: Correct IPQ8064 tlmm interrupt
+      ARM: dts: qcom: Add Support for SD Card Detect for ifc6410 board
+    ufs-qcom: add support for Qualcomm Technologies Inc platforms
+    - qcom-ufs generic phy driver initialization, calibration,
+    phy: qcom-ufs: add support for 14nm phy
+    This change adds a support for a 14nm qcom-ufs phy that is
+    required in platforms that use ufs-qcom controller.
+    phy: qcom-ufs: add support for 20nm phy
+    This change adds a support for a 20nm qcom-ufs phy that is required in
+    platforms that use ufs-qcom controller.
+    phy: qcom-ufs: add support for QUALCOMM Technologies UFS PHY drivers
+      pinctrl: qcom: Don't iterate past end of function array
+    ARM: dts: qcom: Correct IPQ8064 tlmm interrupt
+    ARM: dts: qcom: Add Support for SD Card Detect for ifc6410 board
+    ARM: qcom: scm: Add logging of actual return code from scm call
+    ARM: qcom: scm: Flush the command buffer only instead of the entire cache
+    ARM: qcom: scm: Get cacheline size from CTR
+    ARM: qcom: scm: Fix incorrect cache invalidation
+    ARM: qcom: Select ARCH_SUPPORTS_BIG_ENDIAN
+    We can run qcom platforms in big-endian mode. Select the option.
+    pinctrl: qcom: Don't iterate past end of function array
+    Fixes: 327455817a92 "pinctrl: qcom: Add support for reset for apq8064"
+    pinctrl: qcom-spmi-gpio: Migrate to pinconf-generic
+       - BAM v1.3.0 support form qcom bam dma
+                            qcom,ath10k-calibration-data = [ 01 02 03 ... ];
+      clk: qcom: Fix duplicate rbcpr clock name
+            mdp: qcom,mdss_mdp@fd900000 {
+                    compatible = "qcom,mdss_mdp";
+            hdmi: qcom,hdmi_tx@fd922100 {
+                    compatible = "qcom,hdmi-tx-8074";
+    clk: qcom: Fix duplicate rbcpr clock name
+    Fixes: 2b46cd23a5a2 ("clk: qcom: Add APQ8084 Multimedia Clock Controller (MMCC) support")
+    dt/bindings: dmaengine: qcom_bam_dma: Add compatible string for BAM v1.3.0
+    dmaengine: qcom_bam_dma: Add BAM v1.3.0 support
+    dmaengine: qcom_bam_dma: Generalize BAM register offset calculations
+    [<c04bd5bc>] (msm_cpu_pm_enter_sleep) from [<c071bd24>] (qcom_lpm_enter_spc+0x20/0x2c)
+    [<c071bd24>] (qcom_lpm_enter_spc) from [<c0719a44>] (cpuidle_enter_state+0x44/0xf0)
+    [<c04bd5bc>] (msm_cpu_pm_enter_sleep) from [<c071bd24>] (qcom_lpm_enter_spc+0x20/0x2c)
+    [<c071bd24>] (qcom_lpm_enter_spc) from [<c0719a44>] (cpuidle_enter_state+0x44/0xf0)
+      watchdog: qcom: register a restart notifier
+      watchdog: qcom: document device tree bindings
+      watchdog: qcom: add support for KPSS WDT
+    watchdog: qcom: register a restart notifier
+    watchdog: qcom: document device tree bindings
+    watchdog: qcom: add support for KPSS WDT
+    soc: qcom: drop owner assignment from platform_drivers
+    pinctrl: qcom: drop owner assignment from platform_drivers
+    clk: qcom: drop owner assignment from platform_drivers
+      There's also a qcom DT update that adds support for SATA on AP148, and
+      ARM: dts: qcom: add CM-QS600 board
+      ARM: dts: qcom: Add initial DTS file for Sony Xperia Z1 phone
+      ARM: dts: qcom: Add SATA support on IPQ8064/AP148
+    Merge tag 'qcom-dt-for-3.18-3' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into fixes
+    Merge "qcom DT changes for v3.18-3" from Kumar Gala:
+    * tag 'qcom-dt-for-3.18-3' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: dts: qcom: add CM-QS600 board
+      ARM: dts: qcom: Add initial DTS file for Sony Xperia Z1 phone
+      ARM: dts: qcom: Add SATA support on IPQ8064/AP148
+    ARM: dts: qcom: add CM-QS600 board
+    ARM: dts: qcom: Add initial DTS file for Sony Xperia Z1 phone
+    ARM: dts: qcom: Add SATA support on IPQ8064/AP148
+      mfd: dt-bindings: qcom-pm8xxx: Rename doc file to conform to naming convention
+      ata: qcom: Add device tree bindings information
+      ARM: qcom: Update defconfig
+       - qcom: improved support for IPQ8064 and MSM8x60
+      regulator: qcom_rpm: Fix FORCE_MODE_IS_2_BITS macro
+      regulator: qcom_rpm: Don't explicitly initialise the first field of config
+      regulator: qcom-rpm: Regulator driver for the Qualcomm RPM
+      pinctrl: qcom: use restart_notifier mechanism for ps_hold
+    Merge tag 'qcom-defconfig-for-3.18' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/defconfig
+    * tag 'qcom-defconfig-for-3.18' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: qcom: Update defconfig
+      ARM: qcom: Update defconfig
+      thus touching many lines.  The qcom gsbi change also restructures
+      drivers/soc: qcom: do not disable the iface clock in probe
+    Merge tag 'qcom-clocks-for-3.18' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into clk-next
+    qcom clock changes for 3.18
+    pinctrl: qcom: use restart_notifier mechanism for ps_hold
+    regulator: qcom_rpm: Fix FORCE_MODE_IS_2_BITS macro
+    regulator: qcom_rpm: Don't explicitly initialise the first field of config
+    mfd: dt-bindings: qcom-pm8xxx: Rename doc file to conform to naming convention
+    regulator: qcom-rpm: Regulator driver for the Qualcomm RPM
+    Merge tag 'qcom-dt-for-3.18-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/dt
+    Merge "qcom DT changes for v3.18-2" from Kumar Gala:
+    * tag 'qcom-dt-for-3.18-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: dts: qcom: Add I2C dt node for MSM8974 and DB8074 board
+    Merge tag 'qcom-dt-for-3.18' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/dt
+    Merge "qcom DT changes for v3.18" from Kumar Gala:
+    * tag 'qcom-dt-for-3.18' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: dts: qcom: Add 8064 multimedia clock controller node
+      ARM: dts: qcom: Add TLMM DT node for APQ8084
+      ARM: dts: qcom: Add initial IFC6540 board device tree
+      ARM: qcom: Add initial IPQ8064 SoC and AP148 device trees
+      ARM: dts: qcom: Add APQ8084 serial port DT node
+      ARM: dts: qcom: Add APQ8084 Global Clock Controller DT node
+    drivers/soc: qcom: do not disable the iface clock in probe
+    ata: qcom: Add device tree bindings information
+    dmaengine: qcom_adm: Add device tree binding
+      clk: qcom: Fix sdc 144kHz frequency entry
+    clk: qcom: Add support for banked MD RCGs
+    clk: qcom: Add support for setting rates on PLLs
+    clk: qcom: Consolidate frequency finding logic
+    clk: qcom: Add IPQ8064 PLL required for USB
+    Fixes: 24d8fba44af3 "clk: qcom: Add support for IPQ8064's global clock controller (GCC)"
+    ARM: qcom: Update defconfig
+    ARM: dts: qcom: Add I2C dt node for MSM8974 and DB8074 board
+    usb: dwc3: qcom: Add device tree binding
+    ARM: dts: qcom: Add 8064 multimedia clock controller node
+    ARM: dts: qcom: Add TLMM DT node for APQ8084
+    ARM: dts: qcom: Add initial IFC6540 board device tree
+     (qcom_iommu_lock){+.+...}, at: [<c079f664>] qcom_iommu_unmap+0x1c/0x1f0
+    -> #4 (qcom_iommu_lock){+.+...}:
+           [<c079f860>] qcom_iommu_map+0x28/0x450
+           [<c079f6f4>] qcom_iommu_unmap+0xac/0x1f0
+      prepare_lock --> &dev->struct_mutex --> qcom_iommu_lock
+      lock(qcom_iommu_lock);
+                                   lock(qcom_iommu_lock);
+     #2:  (qcom_iommu_lock){+.+...}, at: [<c079f664>] qcom_iommu_unmap+0x1c/0x1f0
+    [<c079f614>] (__flush_iotlb_va) from [<c079f6f4>] (qcom_iommu_unmap+0xac/0x1f0)
+    [<c079f6f4>] (qcom_iommu_unmap) from [<c079ea3c>] (iommu_unmap+0x9c/0xe8)
+    mmc: mmci: Add qcom dml support to the driver.
+    pinctrl: qcom: Make the target processor value configurable
+    pinctrl: qcom: Add APQ8084 pinctrl support
+    clk: qcom: Fix sdc 144kHz frequency entry
+    Fixes: 24d8fba44af3 "clk: qcom: Add support for IPQ8064's global clock controller (GCC)"
+    pinctrl: qcom: Add support for reset for apq8064
+    pinctrl: qcom: remove gpiochip in failure cases
+      pinctrl: qcom: apq8064: Correct interrupts in example
+    ARM: qcom: Update defconfig
+    ARM: qcom: Add initial IPQ8064 SoC and AP148 device trees
+    ARM: dts: qcom: Add APQ8084 serial port DT node
+    ARM: dts: qcom: Add APQ8084 Global Clock Controller DT node
+    pinctrl: qcom: apq8064: Correct interrupts in example
+      pinctrl: qcom: Make muxing of gpio function explicit
+    (from linaro qcom integration branch.. mostly stuff queued up for
+    Merge tag 'qcom-clocks-for-3.17' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into clk-next-msm
+    qcom clock changes for 3.17
+    pinctrl: qcom: Make muxing of gpio function explicit
+    phy: qcom: Add device tree bindings for IPQ806x SATA PHY
+    phy: qcom: Add driver for QCOM IPQ806x SATA PHY
+    phy: qcom-apq8064: fix possible timeout without check
+    phy: qcom: Add APQ8064 SATA PHY device tree bindings
+    phy: qcom: Add driver for QCOM APQ8064 SATA PHY
+    clk: qcom: Add support for APQ8064 multimedia clocks
+    clk: qcom: pll: Add support for configuring SR PLLs
+    clk: qcom: mdp_lut_clk is a child of mdp_src
+    Fixes: 6d00b56fe "clk: qcom: Add support for MSM8960's multimedia clock controller (MMCC)"
+    clk: qcom: Fix PLL rate configurations
+    Split the qcom_cc_probe() function into two pieces, map and
+    Fixes: 49fc825f0cc2 "clk: qcom: Consolidate common probe code"
+    clk: qcom: Fix MN frequency tables, parent map, and jpegd
+    Fixes: 6d00b56fe "clk: qcom: Add support for MSM8960's multimedia clock controller (MMCC)"
+    clk: qcom: Support bypass RCG configuration
+    clk: qcom: Add support for IPQ8064's global clock controller (GCC)
+    clk: qcom: Add APQ8084 Multimedia Clock Controller (MMCC) support
+    dmaengine: qcom_bam_dma: Add descriptor flags
+      clk: qcom: HDMI source sel is 3 not 2
+    clk: qcom: Add APQ8084 clocks for SATA, PCIe and UFS
+    clk: qcom: Add APQ8084 Global Clock Controller support
+    clk: qcom: Add APQ8084 Global Clock Controller documentation
+    clk: qcom: Fully support apq8064 global clock control
+    clk: qcom: add clocks necessary for apq8064 sdcc
+    create a qcom subdirectory to hold all the Qualcomm stuff.
+    pinctrl: qcom: Add BUS_HOLD pin bias
+    This patch implements a qcom specific get_rx_fifocnt function which is
+    implemented based on status register flags. Based on qcom_fifo flag in
+    ARM: DT: qcom: Add Qualcomm crypto driver binding document
+    clk: qcom: HDMI source sel is 3 not 2
+    Fixes: 6d00b56fe "clk: qcom: Add support for MSM8960's multimedia clock controller (MMCC)"
+      qcom:
+    Commit 8fc1b0f87d9f ("ARM: qcom: Split Qualcomm support into legacy and
+      clk: qcom: Return error pointers for unimplemented clocks
+      clk: qcom: Support msm8974pro global clock control hardware
+      clk: qcom: Properly support display clocks on msm8974
+      clk: qcom: Support display RCG clocks
+      clk: qcom: Return highest rate when round_rate() exceeds plan
+      clk: qcom: Fix mmcc-8974's PLL configurations
+      clk: qcom: Fix clk_rcg2_is_enabled() check
+      clocksource: qcom: Implement read_current_timer for udelay
+      pinctrl: qcom: ipq8064: Fix naming convention
+    Commit 99cbd064b0 ("clk: qcom: Support display RCG clocks") adds
+    the qcom clock as a module.
+      soc: qcom: fix of_device_id table
+      ARM: dts: qcom: Add APQ8084-MTP board support
+      ARM: dts: qcom: Add APQ8084 SoC support
+      ARM: qcom: Enable GSBI driver in defconfig
+      ARM: config: Add qcom_defconfig
+      ARM: debug: qcom: add UART addresses to Kconfig help for APQ8084
+    Merge tag 'qcom-drivers-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/drivers
+    * tag 'qcom-drivers-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+    Merge tag 'qcom-soc-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/soc
+    * tag 'qcom-soc-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: debug: qcom: add UART addresses to Kconfig help for APQ8084
+    Merge tag 'qcom-defconfig-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/defconfig
+    * Enable qcom GSBI driver
+    * tag 'qcom-defconfig-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: qcom: Enable GSBI driver in defconfig
+    Merge tag 'qcom-dt-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/dt
+    * tag 'qcom-dt-for-3.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: dts: qcom: Add APQ8084-MTP board support
+      ARM: dts: qcom: Add APQ8084 SoC support
+      ARM: dts: qcom: Add initial APQ8064 SoC and IFC6410 board device trees
+      ARM: dts: qcom: Update msm8660 device trees
+      ARM: dts: qcom: Update msm8960 device trees
+      ARM: dts: qcom: Update msm8974/apq8074 device trees
+    clk: qcom: Return error pointers for unimplemented clocks
+    clk: qcom: Support msm8974pro global clock control hardware
+    clk: qcom: Properly support display clocks on msm8974
+    clk: qcom: Support display RCG clocks
+    clk: qcom: Return highest rate when round_rate() exceeds plan
+    clk: qcom: Fix mmcc-8974's PLL configurations
+    Fixes: d8b212014e69 (clk: qcom: Add support for MSM8974's multimedia clock controller (MMCC))
+    clk: qcom: Fix clk_rcg2_is_enabled() check
+    Fixes: bcd61c0f535a (clk: qcom: Add support for root clock generators (RCGs))
+    ARM: qcom: Enable GSBI driver in defconfig
+    ARM: dts: qcom: Add APQ8084-MTP board support
+    ARM: dts: qcom: Add APQ8084 SoC support
+    ARM: debug: qcom: add UART addresses to Kconfig help for APQ8084
+    ARM: dts: qcom: Add initial APQ8064 SoC and IFC6410 board device trees
+    the IFC6410 board.  Also, keep dtb build list and qcom_dt_match in sorted
+    ARM: dts: qcom: Update msm8660 device trees
+    * Move serial enabling into board file (qcom-msm8660-surf.dts)
+    ARM: dts: qcom: Update msm8960 device trees
+    * Move serial enabling into board file (qcom-msm8960-cdp.dts)
+    pinctrl: qcom: ipq8064: Fix naming convention
+    ARM: dts: qcom: Update msm8974/apq8074 device trees
+    * Move serial enabling into board file (qcom-apq8074-dragonboard.dts)
+    soc: qcom: fix of_device_id table
+    clk: qcom: Fix blsp2_ahb_clk register offset
+    Merge tag 'qcom-drivers-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/drivers
+    * tag 'qcom-drivers-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      soc: qcom: Add GSBI driver
+    Merge tag 'qcom-defconfig-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/defconfig
+    * Add a new qcom_defconfig for mach-qcom
+    * tag 'qcom-defconfig-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: config: Add qcom_defconfig
+    Merge tag 'qcom-dt-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into for-next
+    * tag 'qcom-dt-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      soc: qcom: Add device tree binding for GSBI
+    Merge tag 'qcom-soc-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/soc
+    * tag 'qcom-soc-for-3.16' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: qcom: Select PINCTRL by default for ARCH_QCOM
+      ARM: debug: qcom: make UART address selection configuration option
+      ARM: qcom: Enable ARM_AMBA option for Qualcomm SOCs.
+            arch/arm/mach-qcom/Kconfig
+    soc: qcom: Add device tree binding for GSBI
+    soc: qcom: Add GSBI driver
+    ARM: qcom: Select PINCTRL by default for ARCH_QCOM
+    ARM: debug: qcom: make UART address selection configuration option
+    ARM: qcom: Enable ARM_AMBA option for Qualcomm SOCs.
+    mach-qcom, put back a non-DT based SoC into the msm_defconfig and
+      ARM: qcom: clean-up unneeded kconfig selects
+    clocksource: qcom: Implement read_current_timer for udelay
+    clk: qcom: Fix msm8660 GCC probe
+    Fixes: 49fc825f0cc2 (clk: qcom: Consolidate common probe code)
+    ARM: config: Add qcom_defconfig
+    Add a defconfig for mach-qcom platforms (copied from msm_defconfig).
+      ARM: qcom: clean-up unneeded kconfig selects
+    pinctrl: qcom: Correct name for pin 0
+    clk: qcom: Various fixes for MSM8960's global clock controller
+    clk: qcom: Add basic support for APQ8064 global clock controller clocks
+    clk: qcom: Consolidate common probe code
+    pinctrl: qcom: Add definitions for IPQ8064
+    ARM: qcom: clean-up unneeded kconfig selects
+    DT bindingdocumentation for qcom,apq8064-pinctrl driver.
+      dmaengine: qcom_bam_dma: Add device tree binding
+    Commit 8fc1b0f87d9f ("ARM: qcom: Split Qualcomm support into legacy and
+      ARM: qcom: Enable basic support for Qualcomm platforms in multi_v7_defconfig
+       - mach-qcom gains new features, most importantly SMP support for the
+         new-style mach-qcom, to allow easier maintainance of the new
+    dmaengine: qcom_bam_dma: Add device tree binding
+    remove the "qcom" prefix from pins and functions as this binding
+    Merge tag 'qcom-dt-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/dt
+    * tag 'qcom-dt-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: dts: qcom-msm8960-cdp: Add RNG device tree node
+      ARM: dts: qcom: Add RNG device tree node
+      ARM: dts: qcom: Add nodes necessary for SMP boot
+    Merge branch 'qcom/cleanup' into next/dt
+    This is a dependency for the qcom/dt branch.
+    ARM: qcom: Enable basic support for Qualcomm platforms in multi_v7_defconfig
+    [khilman: removed non-qcom changes]
+    Merge tag 'qcom-drivers-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/drivers
+    Merge "qcom driver changes for v3.15" from Kumar Gala:
+    * tag 'qcom-drivers-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+    Merge branch 'qcom/cleanup' into next/drivers
+    * qcom/cleanup:
+      ARM: qcom: Rename various msm prefixed functions to qcom
+      clocksource: qcom: split building of legacy vs multiplatform support
+      ARM: qcom: Split Qualcomm support into legacy and multiplatform
+      clocksource: qcom: Move clocksource code out of mach-msm
+    This cleanup branch is a dependency for the following qcom driver changes.
+    ARM: dts: qcom-msm8960-cdp: Add RNG device tree node
+    ARM: dts: qcom: Add RNG device tree node
+    ARM: dts: qcom: Add nodes necessary for SMP boot
+    Merge tag 'qcom-soc-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/soc
+    * tag 'qcom-soc-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: qcom: Add SMP support for KPSSv2
+      ARM: qcom: Add SMP support for KPSSv1
+      devicetree: bindings: Document qcom,saw2 node
+      devicetree: bindings: Document qcom,kpss-acc
+      ARM: qcom: Re-organize platsmp to make it extensible
+      ARM: qcom: Rename various msm prefixed functions to qcom
+      clocksource: qcom: split building of legacy vs multiplatform support
+      ARM: qcom: Split Qualcomm support into legacy and multiplatform
+      clocksource: qcom: Move clocksource code out of mach-msm
+    Merge tag 'qcom-cleanup-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom into next/cleanup
+    Split of the multiplatform support for the Qualcomm SoCs into a mach-qcom
+    * tag 'qcom-cleanup-for-3.15' of git://git.kernel.org/pub/scm/linux/kernel/git/galak/linux-qcom:
+      ARM: qcom: Rename various msm prefixed functions to qcom
+      clocksource: qcom: split building of legacy vs multiplatform support
+      ARM: qcom: Split Qualcomm support into legacy and multiplatform
+      clocksource: qcom: Move clocksource code out of mach-msm
+    ARM: qcom: Add SMP support for KPSSv2
+    ARM: qcom: Add SMP support for KPSSv1
+    devicetree: bindings: Document qcom,saw2 node
+    devicetree: bindings: Document qcom,kpss-acc
+    ARM: qcom: Re-organize platsmp to make it extensible
+      of: Update qcom vendor prefix description
+                        from drivers/clk/qcom/reset.c:18:
+    drivers/clk/qcom/reset.c: In function 'qcom_reset':
+    ARM: qcom: Rename various msm prefixed functions to qcom
+    As mach-qcom will support a number of different Qualcomm SoC platforms
+    we replace the msm prefix on function names with qcom to be a bit more
+    clocksource: qcom: split building of legacy vs multiplatform support
+    ARM: qcom: Split Qualcomm support into legacy and multiplatform
+    Introduce a new mach-qcom that will support SoCs that intend to be
+    to mach-qcom.
+    clocksource: qcom: Move clocksource code out of mach-msm
+    and multiplatform supported qcom SoCs.
+    of: Update qcom vendor prefix description
+      dt-bindings: qcom: Fix warning with duplicate dt define
+      clk: qcom: Fix modular build
+    dt-bindings: qcom: Fix warning with duplicate dt define
+    arch/arm/boot/dts/include/dt-bindings/clock/qcom,mmcc-msm8974.h:60:0:
+      devicetree: bindings: Document qcom,mmcc
+      devicetree: bindings: Document qcom,gcc
+      clk: qcom: Add support for MSM8660's global clock controller (GCC)
+      clk: qcom: Add support for MSM8974's multimedia clock controller (MMCC)
+      clk: qcom: Add support for MSM8974's global clock controller (GCC)
+      clk: qcom: Add support for MSM8960's multimedia clock controller (MMCC)
+      clk: qcom: Add support for MSM8960's global clock controller (GCC)
+      clk: qcom: Add reset controller support
+      clk: qcom: Add support for branches/gate clocks
+      clk: qcom: Add support for root clock generators (RCGs)
+      clk: qcom: Add support for phase locked loops (PLLs)
+      clk: qcom: Add a regmap type clock struct
+    clk: qcom: Fix modular build
+    should be clk-qcom-y. Otherwise the build will fail if
+    devicetree: bindings: Document qcom,mmcc
+    devicetree: bindings: Document qcom,gcc
+    clk: qcom: Add support for MSM8660's global clock controller (GCC)
+    clk: qcom: Add support for MSM8974's multimedia clock controller (MMCC)
+    clk: qcom: Add support for MSM8974's global clock controller (GCC)
+    clk: qcom: Add support for MSM8960's multimedia clock controller (MMCC)
+    clk: qcom: Add support for MSM8960's global clock controller (GCC)
+    clk: qcom: Add reset controller support
+    clk: qcom: Add support for branches/gate clocks
+    clk: qcom: Add support for root clock generators (RCGs)
+    clk: qcom: Add support for phase locked loops (PLLs)
+    clk: qcom: Add a regmap type clock struct
+    Merge branch 'qcom/fixes' into next/fixes-non-critical
+    * qcom/fixes:
+    Merge branch 'qcom/soc2' into next/soc
+    * qcom/soc2:
+    Merge branch 'qcom/soc2' into next/soc
+    * qcom/soc2:
+    Merge branch 'qcom/drivers' into next/drivers
+    * qcom/drivers:
+    Merge branch 'qcom/boards' into next/boards
+    * qcom/boards:
+    Merge branch 'qcom/dt' into next/dt
+    * qcom/dt:
+    Merge branch 'qcom/soc' into next/soc
+    * qcom/soc:
+    Merge branch 'qcom/fixes' into next/fixes-non-critical
+    * qcom/fixes:
+    existing DT files to have a common 'qcom' prefix.
+      ARM: msm: Rename msm devicetrees to have standard 'qcom' prefix
+    https://www.codeaurora.org/cgit/external/hisense/platform/vendor/qcom-opensource/wlan/prima/tree/firmware_bin?h=8130_CS
+    ARM: msm: Rename msm devicetrees to have standard 'qcom' prefix
+    Use a standard 'qcom' prefix to denotate device trees meant for Qualcomm
