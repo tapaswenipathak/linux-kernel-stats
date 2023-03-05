@@ -1,0 +1,2556 @@
+    Since the rate scaling algorithm is separate in mac80211, it also
+    invokes the rate scaling algorithm for such stations. It doesn't
+    know that our rate scaling algorithm is tightly integrated with
+    This leads to crashes when the rate scaling algorithm tries to
+    Protect against this in the rate scaling algorithm. We cannot get
+    Although the commit correctly implemented the CUBIC algorithm, which
+    the rate control algorithm are already doing similar workarounds by
+    algorithm and non optimal performance.
+    Allow more compression algorithms as well as uncompressed uImage.bin
+    disables Nagle’s algorithm and improves latency characteristics.
+      crypto: cts - Weed out non-CBC algorithms
+    checksum needs to be modified using the normal algorithm.
+    checksum option it still changes the checksum per the algorithm
+      gpio: sch: Consolidate similar algorithms
+     4) Allow congestion control algorithm selection via routing metrics.
+    # gpg: WARNING: digest algorithm MD5 is deprecated
+    # gpg: WARNING: digest algorithm MD5 is deprecated
+    Unfortunately the same algorithm does not work well on IOMMUs with
+    control algorithm") for RED marking ECT(0) packets with CE.
+    The run-length encoding algorithm should compare 16-bit encoded pixel
+    gpio: sch: Consolidate similar algorithms
+    Consolidating similar algorithms into common functions to make
+    running with smt enabled. Due to group scheduling algorithms when running in
+    in common congestion control algorithms, like Reno and CUBIC, which
+    control algorithms that were designed and tuned years ago with
+    changes all congestion control algorithms to pass in 1 for the ACKed
+    as is done in s/w algorithm implementations.
+    additional scrubbing of data, even when the ECC algorithm in use is
+       algorithms). Note heigh tof use
+    This patch forbids any algorithm with an IV size of less than 8
+    crypto: cts - Weed out non-CBC algorithms
+    The cts algorithm as currently implemented assumes the underlying
+    is a CBC-mode algorithm.  So this patch adds a check for that to
+    designed for IPsec algorithms.  Since cts users do not actually
+    changed the automatic module loading when requesting crypto algorithms
+    would otherwise match the requested crypto algorithm.
+    Current algorithm picks the first fifo which is equal to or greater
+    endpoints with smaller maxps. Change the algorithm to pick the
+      x86_64, vdso: Fix the vdso address randomization algorithm
+    KVM: nVMX: Add nested msr load/restore algorithm
+    as shared variables in synchronization algorithms.  It also documents
+    Changed the whole algorithm for a call to mktime64 that takes
+    control algorithm via routing table. For details, please see individual
+    congestion control algorithm. Generally, this opens up the possibility
+    control algorithms with optimal strategies for each of them based
+    algorithm. We also thought about a per netns setting (where different
+    congestion control algorithm and the optional lock parameter allows
+    to enforce the given algorithm so that applications in user space
+    would not be allowed to overwrite that algorithm for that destination.
+    algorithms are being initialized, thus overhead is very low when the
+    user space to be the actual congestion control algorithm name, similarly
+    now being reassigned to a different congestion control algorithm,
+    congestion control algorithm name member and map that into u32 key
+    now be unloaded, the congestion control algorithm for a specific
+    reload time it will switch back to the expected algorithm
+    they are the same and it doesn't break the filtering algorithm.
+    register. Note that the algorithm assumes that IRQ numbers and
+    algorithm suggested by Andy.  The trick is to atomically increment
+    This NMI-coordination algorithms has been validated by the following
+      algorithm)
+    x86_64, vdso: Fix the vdso address randomization algorithm
+    The current algorithm is buggy: the vdso has about a 50% probability
+    of being at the very end of a PMD.  The current algorithm also has a
+    It's worth noting that this algorithm is inherently biased: the vdso
+    algorithm are unchanged.
+    it out makes it easier to change the underlying algorithms and to
+      LZ4 is a lightweight compression algorithm which can be used on
+      usr/Kconfig: make initrd compression algorithm selection not expert
+    usr/Kconfig: make initrd compression algorithm selection not expert
+    The kernel has support for (nearly) every compression algorithm known to
+    compression algorithms, and not always include every possible algorithm
+    clarify parts of the algorithm.
+    queues are provided by a block driver. With the current algorithm
+    if number of pages haven't changed sorting algorithm
+    Add the SHA1 and SHA256 algorithms to the driver.
+    LZ4 compression algorithm.
+    helps the firmware's rate-control algorithm work properly.
+    In this commit we discard the lru algorithm for inodes with extent
+    This module registers a crc32 algorithm and a crc32c algorithm
+    Improvement compared to crc32c-generic algorithm:
+    used (by the rate-control algorithm), even if the sta
+    The algorithm used for programming the DMA Controller doesn't take into
+    Chaining mode (CBC) algorithms from ablkcipher to givencrypt.
+    counting algorithm.
+    dm cache policy mq: tweak algorithm that decides when to promote a block
+    chain.  This is not suitable for the simple recursive walk algorithm,
+    v4: Rework and document the algorithm after Ville found that it was all
+    This patch implements the watermark algorithm and its necessary
+    Add support for one-shot givencrypt algorithms.
+    Givencrypt algorithms will generate their IV and encrypt data
+    Current algorithms merged from ablkcipher to givencrypt are:
+    used along with authenc algorithms (md5, sha1, sha224, sha256, sha384,
+    sha512) as one-shot aead algorithms.
+    NX SHA algorithms stores the message digest into tfm what
+    The PMECC use the BCH algorithm, so based on the build_gf_tables()
+    state into stack and state pruning algorithm recognizing
+    to other ranking in the source address selection algorithm.
+    algorithm; this patch provides the mechanism to detect the kind
+    will allow the DAPM algorithms to assume that they never see such paths.
+              source. The DAPM algorithm only uses the conneceted() callback for
+    DAPM algorithm, more generic and significantly shorter.
+    always true checks from one of the hottest paths of the DAPM algorithm and
+    irq: Consolidate algorithm of mapping (ioapic, pin) to IRQ number"
+    net: fec: ptp: Use hardware algorithm to adjust PTP counter.
+    This algorithm works only if program size is strictly decreasing.
+    prologue, which may cause algorithm to erroneously decide that size converged.
+    We want "cbc(aes)" algorithm, so select CRYPTO_CBC too, not just
+    lib/genalloc.c: add power aligned algorithm
+    One of the more common algorithms used for allocation is to align the
+    as an algorithm option for genalloc.
+      12) Add Datacenter TCP congestion control algorithm support, From
+      Input: cros_ec_keyb - optimize ghosting algorithm
+    The current verifier algorithm is brute force depth first search with
+    state pruning. If anyone can come up with another algorithm that demonstrates
+    better results, we'll replace the algorithm without affecting user space.
+    Change the algorithm to iterate over the set bits in the
+    net: tcp: DCTCP congestion control algorithm
+    control algorithm. Please see individual patches for the details.
+    net: tcp: add DCTCP congestion control algorithm
+    algorithm [1], which has been first published at SIGCOMM 2010 [2],
+    DCTCP is an enhancement to the TCP congestion control algorithm for
+    The algorithm itself has already seen deployments in large production
+    Changes in the CA framework code are minimal, and DCTCP algorithm
+    congestion algorithm module outside of the core stack.
+    control algorithm.
+    algorithm as it makes a different choice depending on ECE being
+    This patch adds a flag to TCP congestion algorithms that allows
+    capable, that is, ECT(0), when required by a congestion algorithm.
+    algorithm/behaviour slightly diverges from RFC3168, therefore this
+    (DCTCP) congestion control algorithm - we need to be able to
+         frequency setup according to the new algorithm.
+    it will register its crypto algorithms.  If the system does not have
+    is attempted to be queued by the registered crypto algorithms.
+    is the same algorithm that ldflags() already uses.
+      exponential algorithm described in section 5.1.3. is not used. [...]
+    the exponential algorithm from 5.1.3, we cannot [strictly speaking] be
+    not to be any implementations that make use of that exponential algorithm
+    reaction time of the RS algorithm. Also, an upcoming change in
+    Enable ACK timeout estimation algorithm if set_coverage_class routine has been
+    Add ACK timeout estimation algorithm to ath9k Makefile and Kconfig
+    Add dynamic ACK timeout estimation algorithm based on ACK frame RX timestamp,
+    algorithm (dynack)
+    These methods will be used in ACK timeout estimation algorithm (dynack)
+    allowed to override the function called by the iteration algorithm.
+    NVIDIA appear to have tweaked the algorithm from GF110, this implements
+    the previous algorithm for them still.
+    The allocation algorithm doesn't expect there to be holes in the mm, which
+    point after the initial tree algorithm debugging.
+    setting algorithm and use suitable timeout for different CMDs.
+    calculation algorithm. To be flexible, this patch provides a .set_timeout
+    staging: vt6656: remove rate_control_algorithm pid
+    rate control algorithm pid was removed from wireless tree
+    The device defaults to algorithm 'minstrel_ht'
+    There has been no problems using this algorithm.
+    negotiation failure. This patch implements the algorithm to retry the
+    This patch also fixes the code to match the algorithm for the printing
+    estimation algorithm (dynack) passing coverage class equals to -1
+    Enable ACK timeout estimation algorithm (dynack) using mac80211
+    Input: cros_ec_keyb - optimize ghosting algorithm
+    Previous algorithm was a bit conservative and complicating with respect to
+    debug statements to the quota allocation algorithm.
+    an invalid hash algorithm.  Although we can not verify the xattr, we still
+    need to measure the file.  Use the default IMA hash algorithm.
+    algorithm.  Although we can not verify the xattr, we still need to
+    measure the file.  Use the default IMA hash algorithm.
+    algorithm. While this prevents changes to the extent list during the
+    The current shift algorithm uses the extent index to iterate the in-core
+    As with the full writeback, this is a temporary fix until the algorithm
+    algorithms.
+    The same issue was present in the lz4hc algorithm.
+    multi-buffer algorithm.  It also contains the flush routine to that's
+    The SHA1 multi-buffer crypto algorithm is defined and initialized in
+    belonging to SHA1 crypto jobs to the SHA1 multibuffer algorithm.  It is
+    crypto: sha-mb - SHA1 multibuffer algorithm data structures
+    crypto algorithm.  The idea of the multi-buffer algorihtm is to put
+    Currently, the selection algorithm for T.ACT and T.RET is as follows:
+    I2S output provides monitor data to the SOC/CODEC/DSP for speaker protection/enhancement algorithms
+    table. The algorithms for calculating the coefficients and setting the
+    We'll need a different algorithm to select the shared DPLL.
+      want to fully understand why the algorithm works before making that
+            simulations or other programs/algorithms which are doing
+            GRND_RANDOM.  The cryptographic algorithms used for
+    algorithms.
+    This patch adds ARM NEON assembly implementation of SHA-1 algorithm.
+    Change the algorithm to iterate over the set bits in the
+    first fragment should be cleared at the very final step of the queueing algorithm.
+    ethernet frame, the queueing algorithm can no longer expect a 'TX_USED' bit to be set by
+    filtering algorithm for eofblocks scans. This flag is intentionally left
+    SMP and the XADD algorithm variant.
+    For architectures that don't have cycle counters, the algorithm for
+    using an overcomplicated custom stripping algorithm.
+    algorithms with crypto API layer.
+    content of the PE binary and the OID of the digest algorithm used (typically
+    computation is done using the common hash algorithm to be consistent
+    Linux had a generic (for all of IPv4) implementation of the algorithm
+    crypto queue and finally register the algorithms into crypto
+    - ablkcipher algorithms
+     all algorithms supported by the crypto block. It also exports
+     few helper functions needed by algorithms:
+    subsystem, at points where we can catch both algorithm module loads and
+    Reverse the search algorithm to ensure that address mapping and IRQ
+      with that compression algorithm"
+    This also eliminates another round of determine algorithm based on key
+    length, followed by determine key length based on algorithm.
+    Then it implements an algorithm to dynamically allocate IRQ number
+    x86, ACPI, irq: Consolidate algorithm of mapping (ioapic, pin) to IRQ number
+    Currently ACPI and ioapic both implement algorithms to map (ioapic, pin)
+    Patch adds x86_64 assembly implementation of Triple DES EDE cipher algorithm.
+    algorithms.
+    some fixes to the dequeuing algorithm.
+      the GHASH crypto algorithm (which went in during this merging window)
+       - GHASH crypto algorithm fix and performance improvement
+      arm64/crypto: improve performance of GHASH algorithm
+      arm64/crypto: fix data corruption bug in GHASH algorithm
+    Fixes: 3c68198e7511 ("sctp: Make hmac algorithm selection for cookie generation dynamic")
+    arm64/crypto: improve performance of GHASH algorithm
+    arm64/crypto: fix data corruption bug in GHASH algorithm
+    This fixes a bug in the GHASH algorithm resulting in the calculated hash to be
+    detection algorithm and if when applying a delayed move/rename there's a path loop
+    The algorithm relies on having proper mmap2 support in the kernel to help determine
+    This is largely based on a patch by Stéphane Marchesin but the algorithm
+     - Optimised crypto algorithms making use of the ARMv8 crypto extensions
+    (Drop whitespaces + rename to chap_check_algorithm + save original
+    list iteration (i.e.  Schlemiel the painter's algorithm) in the case where
+    capability to negotiate not only the hash algorithm selection, but also
+    which queue to use for a particular packet. In general, the algorithm
+       - The PID controller algorithm used by intel_pstate assumes that the
+    I would like to use one of the RPC client's congestion algorithm
+    use more elaborate matching algorithms if necessary.  That is needed
+    If the rate control algorithm uses a selection table, it
+    registration of the rate-control algorithm. Although not yet reported,
+    to register a particular rate-control algorithm more than once. I believe
+    is to rename the algorithm used in r8192ee.
+        halbtc8723b2ant_action_algorithm
+        halbtc8723b2ant_action_algorithm
+    algorithm specific checks fail, the function returns without enqueuing
+    requested algorithm is not supported by the driver, the function returns
+    algorithm is not supported by the driver, the function returns without
+    staging: rtl8723au: Store algorithm type in a u32
+    [NiteshNarayanLal@freescale.com: added hooks for the missing algorithms test and tested the patch]
+    The checking for the type of algorithm implementation is pretty
+    algorithm they are using (might be using an HW RC algo).
+    able to query the RC algorithm (this patch provides an
+    FPSIMD register bank context switching and crypto algorithms
+    This matches the algorithm used by earlier kernels when selecting the
+    This patch adds support for the AES-CCM encryption algorithm for CPUs that
+    This patch adds support for the AES symmetric encryption algorithm for CPUs
+    basic algorithm is: if a CPU is booting at EL2, it will set a flag at
+    After fixes to the rs algorithm reenable MCS9.
+    fixes the race with an unnecessary spinlock in a lockless algorithm.
+    In case hash key is bigger than algorithm block size, it is hashed.
+    the original algorithm. Once the inode is allocated, update the
+    Move the original xfs_dialloc_ag() algorithm to
+    algorithm to output different values for different TCs and we can
+    also. This allows the algorithm to output different values for different
+    cases, the algorithm is the same, doesn't matter the behavior.
+      staging: r8723au: Add missing initialization of change_inx in sort algorithm
+    staging: r8723au: Add missing initialization of change_inx in sort algorithm
+    Patch adds large test-vectors for SHA algorithms for better code coverage in
+    crypto: bfin_crc - ignore duplicated registration of the same algorithm
+    compared to the rate scale algorithm which was planned to yield
+    Implement Adaptive Tx Power Control algorithm.
+    algorithm).
+    compression algorithm request, ERR_PTR(-ENOMEM) for allocation (zcomp or
+    zram: add lz4 algorithm backend
+    zram: make compression algorithm selection possible
+    Add and document `comp_algorithm' device attribute.  This attribute allows
+    algorithms:
+            cat /sys/block/zram0/comp_algorithm
+    and change selected compression algorithm:
+            echo lzo > /sys/block/zram0/comp_algorithm
+    (buffer and algorithm private part), so in order to prevent data
+    ZRAM performs direct LZO compression algorithm calls, making it the one
+    and only option.  While LZO is generally performs well, LZ4 algorithm
+    multiple compression algorithms with the following set of operations:
+    time, zram_meta must be aware of a) specific compression algorithm memory
+    compress/decompress `buffer' and compression algorithm `private' part.
+    respectively, allocate and deallocate algorithm specific zcomp_strm
+    which initialises compressing backend if requested algorithm is supported.
+    algorithm.
+       - Added hash-only AEAD algorithms in caam
+      crypto: export NULL algorithms defines
+    one would've eventually become a master with the current algorithm.
+    So the current algorithmus reads the newest message first, which
+    The crypto algorithm modules utilizing the crypto daemon could
+    crypto: export NULL algorithms defines
+    OMAP NAND driver supports multiple flavours of BCH4 and BCH8 ECC algorithms.
+       between different implementations of same ECC algorithm.
+    data. An obvious example is the roaming algorithm that will
+    doc: update driver TX algorithm in timestamping.txt
+    problems, and implements a smoother flow control algorithm in iw_cxgb4,
+    The algorithm is designed such that if the DB write load is high enough,
+    Since the ANI algorithm is different here compared to the old
+    The incremental send algorithm assumed that it was possible to issue
+    based on Paul McKenney's and Josh Triplett's algorithm "Optimized Resizing
+      The receiver MUST use the HMAC algorithm indicated in
+      the HMAC Identifier field. If this algorithm was not
+    As per current algorithm used in the firmware, imply Rx BACK
+       when we migrate a state with aead algorithm attached.
+    does not take into concern quickfailover algorithm. Therefore, quickfailover
+    no crypto algorithm attached if the original state uses
+    an aead algorithm. This patch add the missing information
+    This commit therefore uses a greedy algorithm to re-order the test
+    Please note that this is still not an optimal bin-packing algorithm,
+    the bin-packing algorithm.  This commit therefore adds a --dryrun
+    Proposed solution simplifies whole algorithm having on mind definition from rfc:
+    algorithm. Finally, as proposed solution is simplification, some lines of code,
+      only matching and fallback to old matching algorithm"
+      VME: Correct read/write alignment algorithm
+    more details. Also add references to algorithm (IETF draft and paper) to top of
+    tipc: changes to general packet reception algorithm
+    After the previous redesign of the tunnel reception algorithm and
+    In this commit, we change the algorithm for receiving failover
+    In this commit, we change the algorithm for receiving DUPLICATE_MSG
+    As commit 3c68198e75111a90("sctp: Make hmac algorithm selection for
+    using FIPS approved algorithms. Which means that E0, SAFER+ and P-192
+    algorithms such as WPA1/WPA2 and should not be used to set
+    crypto: ccp - Allow for selective disablement of crypto API algorithms
+    crypto algorithm by not registering the algorithm with the
+    The simple way to fix this is to implement the same algorithm as ARMv7
+    VME: Correct read/write alignment algorithm
+    drivers implement an algorithm to utilise the largest possible width reads and
+    writes whilst maintaining natural alignment constraints. The algorithm
+    more sophisticated allocation algorithm.
+    This is a patch to improve swap readahead algorithm.  It's from Hugh and
+    I don't prepare a sophisticated algorithm for the sequential workload
+    The algorithm is purposely pretty naive. I don't think we need much in
+    There's not a single rate control algorithm actually in
+      i2c: update i2c_algorithm documentation
+    lockless recv algorithm, we still need to document these specific
+    i2c: update i2c_algorithm documentation
+    Add some kerneldoc style documentaton to the i2c_algorithm
+    Replace hardcoded lowest common multiple algorithm by the lcm()
+      serial: sh-sci: Simplify baud rate calculation algorithms
+      serial: sh-sci: Remove baud rate calculation algorithm 5
+    matching algorithm. It only supports two usual wildcardes:
+    This algorithm is safe since it is non-recursive.
+    We thought about introducing the reciprocal_divide algorithm in
+    reciprocal_divide: update/correction of the algorithm
+    by using the algorithm proposed in "Division by Invariant Integers
+      ima: change the default hash algorithm to SHA1 in ima_eventdigest_ng_init()
+    First (EDF) scheduling algorithm, augmented with a mechanism (called
+    The EDF algorithms selects the task with the smallest absolute
+     - implements the core logic of the scheduling algorithm in the new
+    Add the syscalls needed for supporting scheduling algorithms
+    refine the algorithm that enables UART_BUG_NOMSR to take those exceptions
+    don't trigger rate control algorithm calls.
+    selection algorithm with a simple prandom_u32() in order to mitigate
+    the hash algorithm as prefix and the 'd-ng' will always have it, we can
+    use the hash algorithm to differentiate the two cases in the modified
+    ima: change the default hash algorithm to SHA1 in ima_eventdigest_ng_init()
+    the hash algorithm so that the prefix 'sha1:' is added to violation
+      serial: sh-sci: Simplify baud rate calculation algorithms
+      serial: sh-sci: Remove baud rate calculation algorithm 5
+    * Simplify baud rate calculation algorithms
+    * Remove baud rate calculation algorithm 5
+      serial: sh-sci: Simplify baud rate calculation algorithms
+      serial: sh-sci: Remove baud rate calculation algorithm 5
+    in the master-slave algorithm.
+    With the new ASID allocation algorithm, active ASIDs at the time of a
+    baud rate calculation algorithm. The algorithm ID will be removed from
+    rate calculation algorithm ID passed through platform data. However, it
+    calculation algorithm ID isn't specified, and allow platforms to
+    rate calculation algorithm. Compute it using hardware identification
+    serial: sh-sci: Simplify baud rate calculation algorithms
+    serial: sh-sci: Remove baud rate calculation algorithm 5
+    The algorithm isn't used, remove it.
+    algorithms.
+    is zero by the design of the multi-stage filter algorithm.
+    same algorithm as ARM. We use the fls64 macro, which expands to a clz
+    algorithm which may lead to non optimal throughput and
+    FW implements protective algorithm to identify AP's improper uAPSD
+    resulting hash algorithm is a collision-free though not minimal hash that can
+    The hashing algorithm relies on the inherent properties set in the ARM ARM
+    The hash algorithm is quite simple and can easily be implemented in assembly
+      Unsupported authentication algorithm (36088)
+    by the rate scale algorithm.
+    before the algorithm steps from one node containing keyrings to a child node
+    However, if the algorithm does need to step from a node to a child node, it
+    means that the algorithm will keep scanning the same node over and over again
+    Some s390 crypto algorithms incorrectly use the crypto_tfm structure to
+    The original algorithm would depend on the order of the assoc->transport_list
+      KEYS: The RSA public key algorithm needs to select MPILIB
+      ima: enable support for larger default filedata hash algorithms
+    conf->prev_algo, conf->algorithm, the stripe_hashtbl and inactive_list. Except
+    offers a choice of compression algorithm to compress initial ramfs image;
+    support for LZ4 compression algorithm.  Also updates the
+    The kernel's readahead algorithm sometimes interprets random read
+    algorithm intends to check whether offset - previous offset == 1
+    algorithm is presented in [1] by the very same author who also
+    designed the original algorithm in [2].
+    taus88 and taus113 algorithm is also part of GSL. I added a test
+    algorithm                 taus88           taus113
+    drivers/staging/rtl8192e/rtllib_softmac.c:821:33:    expected restricted __le16 [usertype] algorithm
+    with CRC32 algorithm.  Resulting value is xored with ciphertext sector
+    We introduce a new reassembly algorithm that improves performance
+    a completely new reassembly algorithm. So we change the code to
+    encapsulates all control information specific to BCH ecc algorithm in software.
+    The cbc-aes-s390 algorithm incorrectly places the IV in the tfm
+    GRO, etc).  But slow start algorithm is to send twice the amount of
+    algorithm in __crc32c_le() otherwise); plus use the __crc32c_le_combine()
+    over the skb with different algorithms.
+    ASoC: wm_adsp: Remove and free algorithm regions for ADSP1
+    KEYS: The RSA public key algorithm needs to select MPILIB
+    The RSA public key algorithm needs to select MPILIB directly in Kconfig as the
+    same hash algorithm.  Changing from one hash algorithm to another,
+    type, which includes the hash algorithm, permitting different files
+    to be hashed with different algorithms.
+    ima: enable support for larger default filedata hash algorithms
+    Kconfig support for defining larger default filedata hash algorithms
+    <uapi/linux/hash_info.h> contains a list of hash algorithms.  The
+    Kconfig default hash algorithm is a subset of this list, but any hash
+    algorithm included in the list can be specified at boot, using the
+    ima: defer determining the appraisal hash algorithm for 'ima' template
+    The same hash algorithm should be used for calculating the file
+    data integrity.  (The appraise hash algorithm is stored in the
+    Different files might be signed based on different hash algorithms.
+    algorithm.
+    - use ':' as delimiter between the hash algorithm and the digest
+    - always include the hash algorithm used when audit-logging a measurement
+    field prefixes the inode digest with the hash algorithim, when
+    - always prefix digest with hash algorithm - Mimi
+            calculated with the SHA1 or MD5 hash algorithm;
+               algorithm (field format: [<hash algo>:]digest, where the digest
+               prefix is shown only if the hash algorithm is not SHA1 or MD5);
+    With multiple hash algorithms, ima_hash_tfm is no longer guaranteed to be sha1.
+    ima: support arbitrary hash algorithms in ima_calc_buffer_hash
+    ima_calc_buffer_hash will be used with different hash algorithms.
+    This patch provides support for arbitrary hash algorithms in
+    for different file data hash algorithms.
+    ima: read and use signature hash algorithm
+    algorithm.  In preparation for files from different packages being
+    signed using different hash algorithms, this patch adds support for
+    reading the signature hash algorithm from the 'security.ima' extended
+    ima: provide support for arbitrary hash algorithms
+    In preparation of supporting more hash algorithms with larger hash sizes
+    hash algorithm, digest size, and digest.
+    This patch makes use of the newly defined common hash algorithm info,
+    This patch provides a single place for information about hash algorithms,
+    If a machine has no hardware support for the xts-aes or ctr-aes algorithms
+    unregisters the algorithms which causes crypto_remove_alg to crash.
+    current routing algorithm being used. To easily make this
+    mechanism routing algorithm agnostic add a orig_node
+    specific API that each algorithm can populate with its own
+    without knowing which routing algorithm is currently in use
+    algorithm specific detail
+    batman-adv: make struct batadv_orig_node algorithm agnostic
+    specific and therefore they are moved in a algorithm specific
+    substruct in order to make batadv_orig_node routing algorithm
+    batman-adv: make struct batadv_neigh_node algorithm agnostic
+    related to the B.A.T.M.A.N. IV algorithm. In order to
+    make the struct usable by any routing algorithm it has to be
+    The original algorithm to find the best baud rate dividers does not necessarily
+    since rate scaling algorithm can not work optimally.
+    structures in improved scheduling algorithms.
+    algorithm. Create a common implementation with a simple architecture
+    and around 25% for decryption. This implementation of the AES algorithm
+    This algorithm processes up to 8 blocks in parallel in constant time. This
+    This is because the algorithm in __perf_session__process_events()
+    packet, the algorithms fall back to L2 hashing.
+    fast-reclocking algorithm to converge more quickly on the desired bin.
+    Enable rs algorithm to use VHT rates and use 80Mhz.
+    combining algorithm when processing subframes in
+    X.509: Check the algorithm IDs obtained from parsing an X.509 certificate
+    Check that the algorithm IDs obtained from the ASN.1 parse by OID lookup
+    corresponds to algorithms that are available to us.
+    Store public key algorithm ID in public_key_signature struct for reference
+    KEYS: Move the algorithm pointer array from x509 to public_key.c
+    Move the public-key algorithm pointer array from x509_public_key.c to
+    Rename the arrays of public key parameters (public key algorithm names, hash
+    algorithm names and ID type names) so that the array name ends in "_name".
+    each passive detection cycle. Without this algorithm, Android 4.3 based
+         array itself or its algorithms.
+      sporadic crashes when multiple threads load the same algorithm.
+      It also fixes the crct10dif algorithm again to prevent boot failures
+    initialization failed), then the registration of hash/algorithms/rng shouldn't
+    algorithm for initializing the 128bit RNG using timespec and
+    xen_netbk_count_skb_slots(), more closely follow the algorithm used by
+    load the new crypto crct10dif algorithm.
+    pattern, because the new cluster allocation algorithm is just for SSD.
+    swap: change block allocation algorithm for SSD
+    Here I introduced a simple algorithm to search cluster.  Since we only
+    We only enable the algorithm for SSD.  Hard disk swap isn't fast enough
+    and has downside with the algorithm which might introduce regression (see
+    I only enable the algorithm for SSD).
+    handle queue full and use its algorithm to ramp down/up queue
+        - Rework the ASID allocation algorithm to remove asid-mm reverse map
+    Change the hash algorithm a bit so it produces only values in the
+    sources keeps its unique hash with the slightly modified algorithm:
+    SCTP data chunk fragmentation algorithm has problems with MTU values which are
+    running through the algorithm to determine it, hardcode the value and get it
+    we need to account for resources with locks.  The new algorithm is: If
+    for the use of other compression algorithms in future, and is how a few
+    today. Today, the algorithm even has quadratic effort (based on the
+    Unfortunately this confused the algorithm to assign the objectid
+    The PMECC use BCH algorithm to correct error. In BCH algorithm, the primitive
+    It could be better but on that case calculation algorithm goes more
+    Pstore will make use of deflate and inflate algorithm to compress and decompress
+    recursive algorithm and manages to not only free all the pagetables,
+    The basic algorithm, rounding and several code comments/explanations
+    further code/algorithm descriptions.
+    to special case the allocation algorithm code coverage debug switch.
+    Also, the routing DRAM Requests algorithm is different for F15h M30h.
+    ath9k: Run the LNA combining algorithm properly
+    The LNA combining algorithm has to be run for cards
+    enabing this algorithm.
+    algorithm to accomodate RSSI variation. Add a couple
+    true with the ECC algorithms used by IFC.
+    The current code can be rewritten to use a similar algorithm as the
+    shared count is unnecessary and unsafe with a lockless algorithm.
+    Simplify n_tty_read(); extract complex copy algorithm
+    such as pgbench suffer. It's also time-consuming algorithmically.
+    have never been retransmitted. The Karn's algorithm does not apply
+    The algorithm applied is:
+    With this algorithm, the start or end of almost any bank can be non-
+    that has 16385 blocks and algorithm sha256.
+    Add support for lz4 and lz4hc compression algorithm using the lib/lz4/*
+    very fast lossless compression algorithm and it also features an extremely
+    According with Manu Abraham, stb0899 seek algorithm is broken
+         simple hashing algorithm and updates current cpu_{suspend}/{resume}
+    The sh_mobile_ceu_camera driver implements a generic algorithm for setting
+    algorithms and can be re-used by other V4L2 camera host drivers too. These
+    avoidance algorithm is only needed for correctness against
+    hashing algorithm and updates current cpu_{suspend}/{resume} code to use
+    operations, because the current PCI MMIO alignment algorithm may
+    The driver currently selects a HCA based on the algorithm that PSM
+    on the algorithm that is currently enforced or selected by PSM - round
+    The unmap path uses the same algorithm as legacy KVM.  We don't want
+    intentional.  So long as we use a consistent algorithm, all the
+    The hashing algorithm must be simple, fast, and implementable with few
+    hash algorithm is a collision-free though not minimal hash that can be
+    The hashing algorithm relies on the inherent properties set in the ARM ARM
+    The hash algorithm is quite simple and can easily be implemented in assembly
+            That's why all successful congestion control algorithms must
+    improved algorithm of matching ACPI device IDs used for ACPI scan
+    overflow protection algorithm in receiving sockets so that it
+     * More tweaking to the EFI variable anti-bricking algorithm. Quite a
+    also defaults ath9k to use the minstrel_ht rate control algorithm.
+    The ath9k rate control algorithm has various architectural
+    algorithm so that the BMBT block owner information can be updated
+    algorithm so that the BMBT block owner information can be updated
+    algorithms may run whilst the AP is asleepi and require to wake the AP
+    hard-interface.c has to do not contain any routing algorithm
+    useless and algorithm specific member initialisation
+    is idle. This algorithm is on top of beacon filtering feature. Enable
+    on the power save algorithm.
+    the writeback data integrity algorithm that uses a mark-and-sweep
+    use this faster algorithm when crct10dif_pclmul module is loaded.
+    Fixes a race on driver init with registering algorithms where the
+    the writeback data integrity algorithm that uses a mark-and-sweep
+    data. The original algorithm sends a TMC request for each subset of the data
+    Given the fact that we have not written hierarchical algorithm in a
+    the behaviour of algorithms (such as allocation) to improve test
+    change any algorithms, and will allow us to find strange "out of
+    Here is patch, which adds Linus's cputime scaling algorithm to the
+    Linus crated a different algorithm, which completely avoids the
+    lib/int_sqrt.c: optimize square root algorithm
+    algorithm, described by John von Newmann[1] and Guy L Steele.
+    [ 1952.639373] EDAC DEBUG: decode_mtr:          Scrub algorithm for x8 is on enhanced mode
+    [ 1952.639387] EDAC DEBUG: decode_mtr:          Scrub algorithm for x8 is on enhanced mode
+     * The EFI variable anti-bricking algorithm merged in -rc8 broke booting
+     * The anti-bricking algorithm also introduced a compiler warning on
+    and CPUs going up, as well as documentation on the used algorithms,
+    The algorithm uses a simple LRU mechanism that removes (if needed) the
+    The algorithm allows the user to change the maximum number of
+    Thus we add a simple algorithm here that detects an 'interrupt storm'
+    v2: Fix the algorithm to actually use the scaled gpu frequency for the ring.
+    KVM: VMX: Add the deliver posted interrupt algorithm
+    algorithm ID, include these in the algorithm list.
+    based on the previous simplistic algorithm. This is inconsistent with
+    algorithm to check weights by using minimum weights in the
+    The webcam "SpeedLink VAD Laplace" (em2765 + ov2640) uses a special algorithm
+    algorithm always succeeds there although no slave device is connected.
+    The algorithm likely also works for real i2c client devices (OV2640 uses SCCB),
+    phy: Elimination the forced speed reduction algorithm.
+    100 duplex full) with an ethernet cable plugged off, the mentioned algorithm
+    on the state of the quota. We use the same general algorithm to
+    cached for later use by the throttling algorithm.
+    be a headset mic jack. The algorithm can be later refined if needed.
+    The implementaion follows the three steps of SACK enhanced algorithm
+    In addition to the RFC algorithm, a spurious timeout may be detected
+    While the algorithm in the RFC does not change the congestion control,
+    existing Eifel undo algorithms like DSACK or TCP timestamp based
+      drm/mgag200: Bug fix: Modified pll algorithm for EH project
+    since the last iteration. That algorithm isn't going to work if
+    Freescale. It is capable of performing cipher algorithms
+    (separate encryption and integrity algorithms) does not conform
+    (separate encryption and integrity algorithms) does not conform
+    drm/mgag200: Bug fix: Modified pll algorithm for EH project
+    algorithm with the previous mgag200 xorg driver pll algorithm,
+    discrepencies were found.  Once the kms pll algorithm was
+    algorithm with a loss detection scheme.
+    from the sender. The loss detection algorithm relies on counting
+    This patch series implement the Tail loss probe (TLP) algorithm described
+    first patch implements the basic algorithm.
+    (ER) algorithm, such that ER and TLP together can in principle recover any
+    The Kconfig entry for CAAM's hash algorithm implementations has always
+    The updated speculative preallocation algorithm for handling sparse
+    available RAM affect the writeback bandwidth slicing algorithm,
+    to charge algorithm driver started from 0. As a result,charge
+    algorithm was going into wrong state and charging was stopped.
+    what the FG-algorithm says. This made fg get stuck at 1% if
+    The driver assumed that the rate control algorithm made a
+    use them together, but that causes the algorithm to not
+    increase the readability of the algorithm.
+    Both rate control algorithms (minstrel and minstrel_ht) calculate
+    By definition of (the algorithm of) QFQ+, the system virtual time must
+      DM RAID: Add support for MD's RAID10 "far" and "offset" algorithms
+      MD RAID10: Improve redundancy for 'far' and 'offset' algorithms (part 2)
+      MD RAID10: Improve redundancy for 'far' and 'offset' algorithms (part 1)
+    DM RAID: Add support for MD's RAID10 "far" and "offset" algorithms
+    DM RAID:  Add support for MD's RAID10 "far" and "offset" algorithms
+    algorithms, but only with the improved redundancy that is brought with
+    the RAID10 algorithm can be found in the opening comments of
+    MD RAID10: Improve redundancy for 'far' and 'offset' algorithms (part 2)
+    MD RAID10:  Improve redundancy for 'far' and 'offset' algorithms (part 2)
+                    "far" algorithm
+    MD RAID10: Improve redundancy for 'far' and 'offset' algorithms (part 1)
+    The MD RAID10 'far' and 'offset' algorithms make copies of entire stripe
+                    "far" algorithm
+                    "offset" algorithm
+    Redundancy for these algorithms is gained by shifting the copied stripes
+    The above "far" algorithm example would change to:
+                    "far" algorithm
+    We cannot simply replace the old algorithms, so the 17th bit of the 'layout'
+    "far" algorithm or the "offset" algorithm is being used.)
+      MODSIGN: Specify the hash algorithm on sign-file command line
+    based on a sane algorithm in shrink_inactive_list().
+    For the non current case, the algorithm used by get_ptep is derived from the
+    1/ The structures used for the netlink based crypto algorithm report API
+    Also switch to use strncpy() to copy the algorithm's name and
+    limit used by the flow control algorithm, and is there only
+    the rate control algorithm and driver. Instead of doing it
+    let the driver and rate control algorithm know.
+    The algorithm is modified to prevent EOF speculative preallocation
+    2) Prepare xfrm and pf_key for algorithms without pf_key support,
+    instead of the current complex custom algorithm.
+    i2c: mxs: Implement arbitrary clock speed derivation algorithm
+    This new algorithm is also only derived by using a scope, but it seems
+    the old algorithm.  This commit therefore updates them to match the
+    new algorithm.
+    different hash algorithms, the hash used in this patch is calculated
+    during the IMA collection phase, based on the configured algorithm.
+    The default algorithm is sha1, but for backwards compatibility md5
+    generated using a sha1 hash algorithm.
+    As the rate scaling algorithm will attempt to enable
+    pf_key/xfrm_algo: prepare pf_key and xfrm_algo for new algorithms without pfkey support
+    Mark existing algorithms as pfkey supported and make pfkey only use algorithms
+    out the algorithm into a common function that uses register
+    instead of the current complex custom algorithm.
+    MODSIGN: Specify the hash algorithm on sign-file command line
+      was causing a bug on our option parsing algorithm.
+    ASoC: wm_adsp: Use GFP_DMA for algorithm readback
+    This patch adds crc32 algorithms to shash crypto api. One is wrapper to
+    crypto: omap-aes - Add CTR algorithm Support
+    module support the CTR algorithm in addition to ECB
+    in an ealier commit to hold the list of algorithms
+    will use that list to register the correct algorithms.
+    algorithm the voltage read is the loaded battery voltage and no
+      were a number of cases that the more complex algorithm made worse
+    ASoC: wm_adsp: Implement support for algorithm-specific coefficient blocks
+    WMDR coefficient files can specify coefficients in terms of algorithm
+    parsing the algorithms and then use them to handle coefficients with
+    ASoC: wm_asdp: Validate sanity of algorithm count
+    If we run into I/O problems the algorithm count may be crazy, validate it
+    ASoC: wm_adsp: Add support for parsing algorithms
+    ADSP devices report information on the algorithms loaded on them.  Parse
+    algorithms.
+    ctr(aes) algorithms to be utilized automatically by IPSEC.
+    in an ealier commit to hold the list of algorithms
+    will use that list to register the correct algorithms.
+    struct i2c_algorithm.
+      layout, but also for selecting allocation and cleaning algorithms.
+    to represent Bayer format frames compressed by A-LAW algorithm,
+    algorithm selectable.  This is all well and good, but Linus noted that it
+    algorithm, so we don't needlessly bloat the kernel by forcing a non-none
+     - Allow compression algorithms in FIPS mode.
+            "autonuma: memory follows CPU algorithm and task/mm_autonuma stats
+      a cost-benefit algorithm, while on-demand cleaning uses a greedy algorithm.
+    Patch just set fips_enabled flag to 1 to all compression algorithms
+    wlcore: improved Tx scheduling algorithm
+    fast/slow link bitmap in FW to improve the scheduling algorithm for
+    The improved algorithm:
+    improved Tx scheduling algorithm.
+    replace only the accessory identification parts of the algorithm (eg,
+      ACPICA: AcpiExec: Improve algorithm for tracking memory leaks
+    This patch adds device tree support for charging algorithm driver
+    custom charging algorithms based on platform state.
+    ACPICA: AcpiExec: Improve algorithm for tracking memory leaks
+    rcu: Document alternative RCU/reference-count algorithms
+    algorithm was changed for an established connection, but the common case of
+    configuring the algorithm before connecting was still broken.  Fix that.
+    only return hash algorithms.  It is not necessary to reconfirm that we
+    actually got a hash algorithm.
+    I compared the performance of both algorithms side by side and the new
+    algorithm is noticeably faster. Sample instrumentation output from a
+    the new algorithm was put in place and postmark showed a decent
+    Before the new algorithm:
+    With the new algorithm:
+    This patch improves the ASID allocation algorithm by using a
+    generic thermal layer. This algorithm throttles the
+      net: fix divide by zero in tcp algorithm illinois
+    net: fix divide by zero in tcp algorithm illinois
+    Reading TCP stats when using TCP Illinois congestion control algorithm
+    clock. Rather than hard coding any kind of estimation algorithm into the
+    sctp: Make hmac algorithm selection for cookie generation dynamic
+    Currently sctp allows for the optional use of md5 of sha1 hmac algorithms to
+    add a sysctl that allows for the dynamic selection of these algorithms at run
+    hmac algorithm.  I chose not to implement that intentionally, as RFC 6458
+    In addition to the existing algorithm, flip bit 7 of 5th octet. Since both
+    This algorithm silently assumes that the register does not contain
+    Fix the algorithm to really do a read-modify-write cycle. This fixes
+    Delays caused by IRQ latency won't confuse the algorithm unless they
+    indicate that our training algorithm isn't robust enough anyway and
+    A white paper detailing the algorithm can be found here:
+    signature so that the hash algorithm is guaranteed to be present in the kernel.
+    itself - but this won't work if the digest algorithm must be loaded as a
+         'algo' contains the public-key algorithm identifier (0->DSA, 1->RSA).
+         'hash' contains the digest algorithm identifier (0->MD4, 1->MD5, 2->SHA1,
+    recursive algorithms, we can expose it a bit more.
+    algorithms are similar to lib/interval_tree.c; however that code can't be
+    VMA.  So instead, the common algorithm is moved into a template and the
+    trees as well, as this is the simpler and more well known algorithm.  prio
+    tree algorithm ends up running faster than the more clever prio tree.
+    coloring/rebalancing algorithms keep it up to date.
+      be further branches in the algorithm)
+                    algorithm               AlgorithmIdentifier,
+    RSA: Implement signature verification algorithm [PKCS#1 / RFC3447]
+    the signature verification algorithm is supported.  This uses the asymmetric
+    This should be filled in prior to calling the function.  The hash algorithm
+    algorithm becomes available for which this is not the case, the above structure
+    It is also assumed that it will have been checked that the signature algorithm
+    matches the key algorithm.
+    KEYS: Asymmetric public-key algorithm crypto key subtype
+    Add a subtype for supporting asymmetric public-key encryption algorithms such
+    cryptographic algorithms.
+    resides inside the algorithm code and does not know how to handle a custom
+    To allow users to choose an elevator algorithm for their particular
+    genalloc: make it possible to use a custom allocation algorithm
+    Premit use of another algorithm than the default first-fit one.  For
+    example a custom algorithm could be used to manage alignment requirements.
+    allocation algorithm.
+    Add of best-fit algorithm function:
+    best-fit algorithm
+    This new algorithm help to remove static allocations on ESRAM, a small but
+    fine tune the allocation algorithm. I my case best-fit algorithm give
+     - Add/use multi-algorithm registration helpers where possible.
+      crypto: Build SPARC DES algorithms on SPARC only.
+    crypto: Build SPARC DES algorithms on SPARC only.
+    Current VFs enumeration algorithm used in be_find_vfs does not take domain
+    This because the algorithm of disk_i_size update is wrong. Though there are
+    The algorithm for handling P_Key tables which contain both the limited
+    Current VFs enumeration algorithm used in be_find_vfs does not take domain
+    as both active and passive cooling can share the same algorithm,
+    The current quiescent-state detection algorithm is needlessly
+    slots. The algorithm used is based on Lagrange relaxation, and performs
+    [SCSI] lpfc 8.3.33: Make I/O to hw queue distribution algorithm a module parameter
+    >> the zig-zag-algorithm or just the set frequency to tune to.
+    that we are stopping the ANI algorithm.
+    this is not true if an async crypto algorithm is employed.
+    Use proportional rate reduction (PRR) algorithm to reduce cwnd in CWR state,
+    use the same algorithm:
+    To prepare replacing rate halving with PRR algorithm in CWR state.
+    To prepare replacing rate halving with PRR algorithm in CWR state.
+    ablkcipher, and hash algorithms are all common; move them to a
+    atomic_dec-based mutex algorithm is now marginally more efficient for
+    processing algorithms efficiently and autonomously, while the host
+    The algorithm chosen (xor'ing the bottom three quads of the source and
+    from server logs. This algorithm had the most even distribution for both
+    behavior also attempts to closely match that of the IPv4 algorithm.
+    algorithm not using the flow label already offers a very even distribution.
+      drm/mgag200: fix G200ER pll picking algorithm
+    need to use the generic lockbreak algorithm. Remove the Kconfig
+    drm/mgag200: fix G200ER pll picking algorithm
+    use them together, but that causes the algorithm to not
+    crypto modules that register multiple algorithms.
+    peer received, breaking the algorithms and resulting in low
+    distance based algorithm sometimes can cause severe performance issue for SSD
+    algorithm doesn't work well too.
+    V2: For hard disk and SSD mixed raid, doesn't use distance based algorithm for
+    random IO too. This makes the algorithm generic for raid with SSD.
+    based algorithm, where this change help detect truly sequential read for SSD.
+    struct i2c_algorithm. Moreover, i2c_algo field is not used since
+    struct i2c_algorithm. Moreover, i2c_algo field is not used since
+    struct i2c_algorithm. Moreover, i2c_algo field is not used since
+    struct i2c_algorithm. Moreover, i2c_algo field is not used since
+    The solution, the algorithm for which has been outlined by
+      ARM: 7446/1: spinlock: use ticket algorithm for ARMv6+ locking implementation
+     - Fixed algorithm construction hang when self-test fails.
+      crypto: talitos - add sha224, sha384 and sha512 to existing AEAD algorithms
+    Currently the backoff algorithm for when to retry alua rtpg
+    aggressive backoff algorithm that is additive would not
+    uses the same algorithm to fix the tsi148.
+    as the last stage. Current algorithm merges the two phases
+    crypto: talitos - add sha224, sha384 and sha512 to existing AEAD algorithms
+        . A multi-standard baseband algorithm accelerator for Channel
+          UP/DL Channel processing, and CRC algorithms
+    same algorithm as x86. We use the fls macro from ARMv5 onwards, where
+    ARM: 7446/1: spinlock: use ticket algorithm for ARMv6+ locking implementation
+    This patch implements the ticket spinlock algorithm for ARM, replacing
+    Fix this by using the same algorithm for 16bit and 13bit
+    There are several bugs at the signal strength algorithm:
+    files and files that implement the actual B.A.T.M.A.N. path finding algorithm.
+    also opens the door for future optimized rpfilter algorithms that do
+    caam supports and registers unkeyed sha algorithms and md5.
+    caam supports ahash hmac with sha algorithms and md5.
+    usually caused by an algorithm failing to pass the self-test.
+    If an algorithm fails to be constructed, we will immediately notify
+    where the algorithm fails to be constructed with that of the
+    different authentication algorithms.
+    code, but it restores the same algorithm as was previously used.
+      kconfig: update compression algorithm info
+    kconfig: update compression algorithm info
+    There have been new compression algorithms added without updating nearby
+    algorithms and (b) the most recent one.  Fix these inconsistencies.
+    Next: there are two algorithms to print larger numbers.  One is generic:
+    Second algorithm splits 64-bit unsigned long long into 16-bit chunks,
+    will use the first algorithm.  If long long is > 64 bits (strange
+    architecture with VERY large long long), second algorithm can't be used,
+    on little-endian the generic algorithms are wasteful, since you can
+     - WORD_AT_A_TIME_CONSTANTS: specific constants that the algorithm
+     4) Lai Jiangshan's algorithmic implementation of SRCU, which includes
+      rcu: Implement a variant of Peter's SRCU algorithm
+      rcu: Direct algorithmic SRCU implementation
+    will be reworked into a more exact algorithm at a later stage. But for
+    high, but internally it implements the same algorithm that is needed for
+    speed up the search algorithm by checking if the address to look for
+    algorithms, as it can skip full pages when the search address is
+    This will allow the bsearch algorithm to be sped up as it can
+    [media] cxd2820r: tweak search algorithm behavior
+    The applications can control each of the algorithms independently,
+    processing and capture control algorithm optimized for common
+    level the auto-gain algorithm aims for.
+    [media] gscpa_pac207: Switch to coarse_grained_expo auto gain algorithm
+    big steps. So lets use an autogain algorithm optimised for that.
+     4)     Lai Jiangshan's algorithmic implementation of SRCU, which includes
+    * minor improvement for the routing algorithm
+    srcu:   Lai Jiangshan's algorithmic implementation of SRCU, including
+    algorithm is released.
+    include/net/codel.h contains codel algorithm as close as possible than
+    complex algorithm if more complex things start to happen.
+    algorithm in any way.
+    operation IE, have the rate control algorithm respect this by disabling
+    enumeration is no longer used.  Instead a generic algorithm internal
+    the v4l algorithm works with the correct set of hardware supported
+    [media] gspca_pac7311: Switch to coarse expo autogain algorithm
+    making our expo control coarse, switch to an autogain algorithm optimized for
+    derived magic algorithms.
+    While the algorithm is simple, small but frequent network reordering
+    derived magic algorithms.
+    on dig_encoder. We didn't really need that algorithm.
+    The earlier algorithm used an "expedited" flag combined with a "trycount"
+    rcu: Implement a variant of Peter's SRCU algorithm
+    This commit implements a variant of Peter's algorithm, which may be found
+    rcu: Direct algorithmic SRCU implementation
+    takes a strictly algorithmic bits-in-memory approach.  This has the
+    ext4: make block group checksums use metadata_csum algorithm
+    checksum calculation algorithm use either crc16 or the metadata_csum
+    chosen algorithm depending on which flag is set.  Print a warning if
+    ext4: record the checksum algorithm in use in the superblock
+    Record the type of checksum algorithm we're using for metadata in the
+    superblock, in case we ever want/need to change the algorithm.
+    ftrace had to do a complex algorithm with various stages of setup
+    Simple algorithm, just look for the next backward jump that points to
+    MCS rates being used by the rate control algorithm even if no ht had
+    fack-based congestion algorithm survives dropping all of the stats
+    ieee80211 phy0: Selected rate control algorithm 'minstrel_ht'
+    Implement aggregation algorithm, combining more data into a single
+    The current virtio block's naming algorithm just supports 18278
+    just like external rate control algorithms get a
+    the rate control algorithm about the desired
+     - Fix for user-space algorithm lookup hang with IV generators.
+     - Fix for netlink dump of algorithms where stuff went missing due to
+      crypto: user - Fix lookup of algorithms with IV generator
+    lot of algorithms to userspace. As a result, not all of the instantiated
+    algorithms dumped to userspace. So calculate an upper bound on the message
+    crypto: user - Fix lookup of algorithms with IV generator
+    We lookup algorithms with crypto_alg_mod_lookup() when instantiating via
+    crypto_add_alg(). However, algorithms that are wrapped by an IV genearator
+    (e.g. aead or genicv type algorithms) need special care. The userspace
+    to lookup these algorithms. So export the lookup functions for these
+    algorithms and use them in crypto_add_alg().
+    Validate checksum algorithm during mount and prevent BUG_ON later in
+      crc32: add help text for the algorithm select option
+    crc32: add help text for the algorithm select option
+    Add help text to the crc32 algorithm selection option in Kconfig.
+      crc32: select an algorithm via Kconfig
+      crc32: add slice-by-8 algorithm to existing code
+    the algorithm can correct a max of 8 bits in 4200 bits ie the error indices can
+    mtd: fsmc: Newly erased page read algorithm implemented
+    less than 8, the page is considered erased and correction algorithm is not tried
+    abx500 charging algorithm driver to monitor the battery.
+    This information in turn will be used by the abx500 charging algorithm driver
+    abx500-chargalg: Add abx500 charging algorithm
+    This is a charging algorithm driver for abx500 variants. It is the central
+    crc32: select an algorithm via Kconfig
+    Allow the kernel builder to choose a crc32* algorithm for the kernel.
+    crc32: add slice-by-8 algorithm to existing code
+    Add slicing-by-8 algorithm to the existing slicing-by-4 algorithm.  This
+    crc32.c provides a choice of one of several algorithms for computing the
+    step of the algorithm so that the old value 8 has been replaced with the
+    This also allows us to add in a widely used crc algorithm that computes
+    the crc 8 bits at a time called the Sarwate algorithm.
+    algorithm.
+         configuration of algorithm coefficients.
+      * Bulk algorithm registration interface to make driver registration easier.
+      crypto: Add bulk algorithm registration interface
+    algorithm fails to get a valid tsc_start value in
+    should skip the refined tsc algorithm.
+    algorithm.
+    algorithm are also put into the private struct.
+    in order to configure the rate control algorithm, but uses
+    compression algorithms.
+    algorithms.
+    The auto gain uses the knee algorithm.
+    mesh synchronization algorithms.
+      of algorithm coefficients.
+    smoothed exponential estimates and the algorithm used is
+    3. To improve the algorithm for selecting resource groups for
+    The revised algorithm for detecting a duplicate node considers both the
+    The algorithm also handles cases in which a node reboots and re-establishes
+    Some of the comments for the nesting NMI algorithm were stale and
+    rate control algorithms concludes the rate as invalid
+    controls for algorithms in the register blocks which also hold the
+    if the delimiter is printed or not. But this algorithm fails when
+    batman-adv: export used routing algorithm via sysfs
+    batman-adv: allowing changing the routing algorithm via module parameter
+    batman-adv: convert batman iv algorithm to use dynamic infrastructure
+    batman-adv: add infrastructure to change routing algorithm at runtime
+    Rate control algorithms are supposed to stop processing when they
+    tipc: Major redesign of broadcast link ACK/NACK algorithms
+    operability with nodes using the "classic" algorithms is maintained.
+    The revised algorithms are as follows:
+    tipc: improve the link deferred queue insertion algorithm
+    Re-code the algorithm for inserting an out-of-sequence message into
+    for smaller buffers if anyone modifies the algorithm for rectangle
+    modify that algorithm is to tune the performance of buffer moves).
+    * Match rates provided by the rate control algorithm to the mask set,
+    crypto: Add bulk algorithm registration interface
+    different algorithms with the core. Simplify their code slightly,
+    number of algorithms in a single call.
+    support swapping rate control algorithms at
+    Update the loss heuristic comments. The algorithm above is documented
+    Added CRYPTO dependency and selected SHA1 algorithm.
+    caam ffe300000.crypto: fsl,sec-v4.0 algorithms registered in /proc/crypto
+    crypto: caam - add sha224 and sha384 variants to existing AEAD algorithms
+    epoll file descriptors that cause the epoll algorithms to traverse them
+    To fix the loop detection path check algorithms, I simply keep track of
+    This dramatically decreases the run-time of the loop check algorithm.  In
+    algorithms to have this information, the function should be
+    Credit for discovering the BCH algorith parameters, and bit
+    reversing algorithm is to be give to Mike Dunn and Ivan
+    Just like the other DVB algorithms, drivers should use the DVBv5
+    hardware algorithm wants the driver to re-tune or not.
+    the anti-flicker algorithm is also enabled in automatic frequency detection
+    hmac algorithms").
+    next check point selected by the dirty throttling algorithm.
+    different algorithm, more similar to what Apple does, that treats those
+    the current maximum, not the guest lifetime max). The existing algorithm
+    max_queue_depth.  The algorithm for calculating the
+    Modify the algorithm to build the source hashing hash table to add
+    OTOH, we now have a fine, run time performed clock selection algorithm
+    idea is stolen from current omap24xx clock rate selection algorithm.
+    Allocation algorithm (SiTA).  The purpose of the algorithm is to keep
+      xfs: fix the logspace waiting algorithm
+    xfs: fix the logspace waiting algorithm
+    algorithm for waiting on log space instead of subtly different ones before,
+    In my tests the new algorithm was a tad faster than the original and has
+    Care must be taken as the rescheduling algorithm is O(n!) which will
+    2 states to limit the number of loops the algorithm takes in the worst
+    previous algorithm.
+    The algorithm is modified so that the range of weight values is now
+    algorithm that hands out device BARs in a way that makes them fit in
+    controllers than, for example SCSI RAID controllers. This algorithm
+    Some platforms need to perform resource allocation using a custom algorithm
+    crypto: caam - add support for MD5 algorithm variants
+    specifically, add these algorithm combinations:
+    talitos prints every algorithm it registers at module load time.
+    user of algorithm registration status in /proc/crypto, like so:
+    talitos ffe30000.crypto: fsl,sec3.1 algorithms registered in /proc/crypto
+    crypto: talitos - add hmac algorithms
+    Add these hmac algorithms to talitos:
+    Fixed up to not register HMAC algorithms on sec2.0 devices.
+    Commits 2cdc6899a8 ("crypto: ghash - Add GHASH digest algorithm for
+    iwlwifi: fix rate-scaling algorithm for BT combo devices
+    is active. A bug in the rate-scaling algorithm was causing the combo
+    device to never attempt MIMO rates. Fix the algorithm to
+    Initialize rate control algorithms only when supported rates are known
+    headers. The signature header contains version information, algorithm,
+    tcp: Fix comments for Nagle algorithm
+    Users probably don't care about the specific compression algorithm and
+    we might want to use a different algorithm (snappy being the one I'm
+      crypto: Add userspace report for compress type algorithms
+      crypto: Add userspace report for cipher type algorithms
+      crypto: Add userspace report for rng type algorithms
+      crypto: Add userspace report for pcompress type algorithms
+      crypto: Add userspace report for nivaead type algorithms
+      crypto: Add userspace report for aead type algorithms
+      crypto: Add userspace report for givcipher type algorithms
+      crypto: Add userspace report for ablkcipher type algorithms
+      crypto: Add userspace report for blkcipher type algorithms
+      crypto: Add userspace report for ahash type algorithms
+    Useful for analyzing the dynamics of the throttling algorithms and
+    Docs: wording: functions -> algorithm
+    CORDIC algorithm.
+      [SCSI] lpfc 8.3.27: Change algorithm for getting physical port name
+    The main algorithm behind the XOR engine is the 2 dimensional array:
+    The algorithm described in the comment compares two reads from the RTC but
+    crypto: Add userspace report for compress type algorithms
+    crypto: Add userspace report for cipher type algorithms
+    crypto: Add userspace report for rng type algorithms
+    crypto: Add userspace report for pcompress type algorithms
+    crypto: Add userspace report for nivaead type algorithms
+    crypto: Add userspace report for aead type algorithms
+    crypto: Add userspace report for givcipher type algorithms
+    crypto: Add userspace report for ablkcipher type algorithms
+    crypto: Add userspace report for blkcipher type algorithms
+    crypto: Add userspace report for ahash type algorithms
+    crypto: Add userspace report for shash type algorithms
+    crypto: Add userspace report for larval type algorithms
+    crypto algorithms to userspace.
+    algorithms from userspace.
+    to remove the spawns on top on an algorithm, so export
+    to remove the spawns on top on an algorithm, so export
+    algorithm is an instance that is build from templates.
+    The allocation algorithm is the same as previously, except that we
+    [SCSI] lpfc 8.3.27: Change algorithm for getting physical port name
+    Implemented new algorithm for getting physical port name for all SLI4 devices
+    resources using a specific algorithm to fit some HW constraints of
+    The previous algorithm for dealing with overlapping concurrent writes
+    correctly.  Improve it algorithm as follows:
+    Commit 9b1e63e changed the concurrent write detection algorithm to only insert
+    while the algorithm runs, but this case was not handled correctly.  Instead of
+    making the algorithm deal with this case, switch back to adding peer requests
+    rework of the the preparation algorithms were necessary.
+    xfs_bmapi_allocate to clear it when the lowspace algorithm is
+    leading the algorithm to believe that any window in the range 0x0000000
+    kmalloc. This mulit-step algorithm was being done in one
+    Therefore, I split this algorithm into three logical steps.
+    As a side effect, the algorithm for building the e820 memory map is
+    The keycode mangling algorithm is kept the same, so the new external
+    When asyncronous crypto algorithms are used, there might be many
+    DAPM algorithm - it repeats the same checks many times whenever it is run
+    those numbers. Substantial changes in the algorithm may require tweaks to
+    The revised algorithm now locates the link carrying the message only once,
+    at the start of the enabling algorithm.
+    The complication for this algorithm is that the bit of hardware logic that
+    I won't go into the details of the algorithm, as it's pretty well
+    In preparation of the upcoming improved routing algorithm the code based has
+    to be re-organized to allow choosing the routing algorithm at compile time.
+    caam, and the algorithms it supports, and disable the
+    PRR is an algorithm that determines TCP's sending rate in fast
+    algorithm. PRR also improves accuracy of the amount of data sent
+    replaces the existing rate halving algorithm. PRR improves upon the
+    congestion control algorithm and,
+    The algorithm for choosing which 2 fingers to report and in which packet:
+    The DFT algorithm returns a real (R) and imaginary (I) data-word at each
+    algorithms using the default coefficient sets.  Further patches will
+    As cryptd is depeneded on by other algorithms such as aesni-intel,
+    is still seen by the push algorithm (the loop).
+    The push algorithm, which does the scan of RT priorities (and
+    This is an assembler implementation of the SHA1 algorithm using the
+    With this algorithm I was able to increase the throughput of a single
+    Using this algorithm on a IPsec gateway gives much more reasonable and
+    to reimplement the same algorithm for each SHA-1 implementation. This
+    algorithm is implemented in the patch.  Where after the first
+      regulator: Improve WM831x DVS VSEL selection algorithm
+    or a loss once the algorithm is in Congestion Avoidance.
+    regulator: Improve WM831x DVS VSEL selection algorithm
+    1) it was a potentially quadratic algorithm (although highly unlikely that
+    In the new code the algorithm is no longer quadratic but linear in the
+    In the patch the algorithm is fixed in order to correctly handle
+    Using shash is more efficient, because the algorithm is allocated only
+    caam_alg_template supports multiple algorithm types
+    algorithm template array do not exceed TALITOS_MAX_KEY_SIZE.
+    a226f6c899 (FRV: Clean up bootmem allocator's page freeing algorithm)
+    FIXME in comment since it signalled a problem in the Minstrel algorithm,
+    the rate control algorithm) was not yet taking RTS/CTS into account.
+    TCP congestion-window-validation algorithms. By continuing this work, it may
+    Do this by adding the proper algorithm description and initialization.
+    and swap 2 machine words. This allows lockless algorithms to move more
+    based on the same algorithm, so we can refactor those code paths to
+    lib: crc8: add new library module providing crc8 algorithm
+    kernel driver using this algorithm (ie. drivers/ssb) we are providing
+    w1: complete the 1-wire (w1) ds1wm driver search algorithm
+    I also made a few tweaks to a couple of the read and write algorithms
+    But yes, a better algorithm is needed.
+    that the algorithms used in user-level RCU might be applied here, but
+      Input: ad714x - fix captouch wheel option algorithm
+      crypto: caam - add support for sha512 variants of existing AEAD algorithms
+    'send one-by-one' algorithm).
+    crypto: caam - add support for sha512 variants of existing AEAD algorithms
+    data by inconsistent and overly-complex algorithms. Simplify them both.
+    Input: ad714x - fix captouch wheel option algorithm
+    As reported by Jean-Francois Dagenais, the wheel algorithm caused a
+    In fact it turned out that the whole algorithm had several problems.
+    diversity algorithm module in the rx. this will continuosly configure
+    from the algorithm
+      algorithm
+    ASoC: Skip noop reconfiguration of WM8958 DSP2 algorithms
+    If we're setting the currently applied value for one of the DSP algorithm
+    The old, impure algorithm took two divisions for inverting lw->weight,
+    solve this we will switch to a search-based algorithm when fN is NULL.
+    Revises the algorithm governing the sending of link request messages
+    Implement good battery algorithm defined in the battery charging V1.2 spec
+    that the algorithms used in user-level RCU might be applied here, but
+    them, following a default algorithm. This patch restores the default
+    type that supports an accelerated algorithm.
+    algorithm for GCM (Galois/Counter Mode).
+    The specification which crypto facility is required for an algorithm is added
+    as a parameter to the availability check which is done before an algorithm is
+    registered. With this change it is easier to add new algorithms that require
+    algorithm, and AP is configured as shared then connection never
+    driver which first detects this, then tries open algorithm for the
+    sctp: teach CACC algorithm about removed transports
+    the data to a new active path.  This can trigger CACC algorithm
+    because the transport passed to the CACC algorithm is the one
+    IPv6 address, the duplicate address detection algorithm
+    and Minchan slightly changed the algorithm and fixed it .
+    So fix this algorithm and call it from kvm_emulate_cpuid().
+    by Fabio Checconi. The same algorithm is already implemented in ipfw
+    data that is transformed by an asynchronous algorithm.
+    for use by others.  Only AEAD algorithms are implemented
+    mlx4_en: optimize adaptive moderation algorithm for better latency
+    on the algorithm used by the user virtual memory allocator.
+    ASoC: Refactor WM8958 DSP to support additional algorithms
+    In preparation for the addition of additional WM8958 algorithms
+    algorithm will cause panic.
+    [media] ds3000: hardware tune algorithm
+      selinux: Fix check for xfrm selinux context algorithm
+      rtmutex: Simplify PI algorithm and make highest prio task get lock
+    Some algorithms need high resolution (Vegas style) but most only
+    then 0 should be returned rather than no estimate. Otherwise algorithms
+    We use the authencesn crypto algorithm to handle esp with separate
+    encryption/authentication algorithms.
+    We use the authencesn crypto algorithm to handle esp with separate
+    encryption/authentication algorithms.
+    crypto: authencesn - Add algorithm to handle IPsec extended sequence numbers
+    ESP with separate encryption/authentication algorithms needs a special
+    treatment for the associated data. This patch add a new algorithm that
+    allocation algorithm on arches that support fast this_cpu_ops.
+    implements recently developed algorithms for fast polynomial root finding
+    If drbd used to have crypto digest algorithms configured, then is being
+    unconfigured (but not unloaded), it frees the algorithms, but does not
+    algorithm, it "forgot" to re-allocate the algorithms, thinking that the
+    It will then Oops on the first attempt to actually use those algorithms.
+    algorithm in anticipation of the new scheme.
+    Then we use a tested bubble sort algorithm to sort the array.
+    incorrect crc algorithm (ether_crc_le) instead of (ether_crc).
+    Increase resolution of MaxBW algorithm to suit
+      bnx2x: properly configure coefficients for MinBW algorithm (NPAR mode).
+    ieee80211 phy0: Selected rate control algorithm 'minstrel_ht'
+    bnx2x: properly configure coefficients for MinBW algorithm (NPAR mode).
+    selinux: Fix check for xfrm selinux context algorithm
+    interpretation against the selinux context algorithm. This patch
+    fixes this by checking ctx_alg against the selinux context algorithm.
+    * Do not fail if the peer supports more or less than 3 algorithms.
+     * Ignore unknown congestion control algorithms instead of failing.
+     * Simplify congestion algorithm negotiation (largest is best).
+    incorrect crc algorithm (ether_crc_le) instead of (ether_crc).
+    General SFB algorithm can be found in figure 14, page 15:
+    have to change the algorithms to generate the perfctr's msr addresses.
+    algorithm.
+    For most of the authentication algorithms, the ICV size is 96 bits.
+    the state as we go. The algorithm is simply:
+    This allows users to tune the connection-loss algorithms
+    packet scheduler based on the Random Exponential Drop (RED) algorithm.
+       rtmutex: Simplify PI algorithm and make highest prio task get lock
+    The routing algorithm must be able to decide if a fragment can be merged with
+    The routing algorithm must know how large two fragments are to be able to
+    fips_allowed algorithm. Because of gcm's dependence on what is now seen
+    as a non-fips_allowed algorithm, its self-tests refuse to run.
+    rtmutex: Simplify PI algorithm and make highest prio task get lock
+    The algorithm is much simpler than before, no pending owner, no
+    The iwlagn powersave algorithm uses the supports_idle parameter
+    algorithms one of these algorithms being the extended transmission
+    selection algorithm currently being used for DCB.
+    pathwalk algorithm to handle directories with follow_link() semantics.
+    this point the pathwalk algorithm will be in ref-walk mode.
+    optimal value by default.  This moves the hugeadm algorithm in kernel.
+    XZ compression algorithm.
+    we can do without adding rather sophisticated algorithms to either the EC
+      xfs: convert grant head manipulations to lockless algorithm
+    Westmere processors use a different algorithm for
+    Remove ADC gain from the supported calibration algorithms.
+    algorithm used to calculate the hash resulting in a 35x / 3500% performance
+    apply the one algorithm in software or hardware.  NETIF_F_HW_CSUM has the
+    algorithm which is a refcount based walk, or ref-walk.
+    algorithm performance is critical and seqlocks are in use.
+    UBIFS scanning and recovery algorithms are able to perform
+    programming algorithm. In case of NAND flash mtd->writebufsize
+    Also set the algorithm data const, use strlcpy instead of strcpy, fix
+    Lzo is a much faster compression algorithm than gzib, so would allow
+    btrfs: Allow to add new compression algorithm
+    xfs: convert grant head manipulations to lockless algorithm
+    calculations to be executed, which the algorithms currently don't allow.
+    To make these multi-step calculations atomic, convert the algorithms to
+    selection algorithm (HWMP, implemented in the kernel), and a vendor
+    The cnt32_to_63 algorithm relies on proper counter data evaluation
+    Allow drivers or rate control algorithms to specify BlockAck session
+    Due to the changed algorithm, we can now use arbitrarily many buffer
+    If the rate control algorithm filled in txrc.reported_rate we don't need
+    converting the accounting algorithms to atomic operations. his patch
+    just converts the variables; the algorithmic changes are in a
+    Blind copy of codec finding algorithm from soc_bind_dai_link does not work
+    toa different algorithm, factor them so both the gratn heads use the
+    A lot of crypto algorithms implement their own chaining function.
+    So add a generic one that can be used from all the algorithms that
+    perf session: Fix list sort algorithm
+    The homebrewn sort algorithm fails to sort in time order. One of the problem
+    Staging: sst: add ioctls for post processing algorithm interface
+    This i/f can be used by application to send algorithm parameters
+    Each algorithm type will provide its own implementation that plugs
+    Disconnected antenna algorithm is used to find out which antennas are
+    Disconnected antenna algorithm is seperated into its own function from chain noise
+    new circular buffer interface. It contributes a new algorithm which
+    essential, since analysis and experience showed that the basic algorithm was
+    The algorithm now
+    fbdev: export fb_edid_add_monspecs() for modules, improve algorithm
+    selected. This patch also improves the algorithm by removing a redundant
+     (b) A `tail_seqno' field. When naively implementing the algorithm of Appendix A
+    There are no real algorithmic changes, rather an adaptation:
+    crypto: hash - Fix async import on shash algorithm
+    signed integers are actually necessary for the algorithm to work.
+    always pick the closest supported frequency. The algorithm could
+      crypto: fips - FIPS requires algorithm self-tests
+    drivers/i2c/algos/Kconfig makes all the algorithms dependent on
+    dependencies when some driver selects one of the algorithms. Ideally
+    The mm system on Book3s_32 instead uses a clever algorithm to distribute VSIDs
+    debugger.  The algorithm for entering the kernel debug core and
+    different walk algorithm, so separate it out so that it can be
+    algorithm:
+    and we wish to reuse the same rate rounding algorithm.
+    This patch attempts to ensure that ath9k's built-in rate control algorithm
+    algorithms handling of A-MPDU frames:
+    if the rate control algorithm sets IEEE80211_TX_CTL_RATE_CTRL_PROBE.
+    algorithm but instead use their own retry table (for example rt2800).
+    the rc algorithm cannot make use of the extended information the device
+    registers itself with a max_rates value > 1 the rc algorithm assumes
+    When TCP uses FACK algorithm to mark lost packets in
+    [   41.261941] ieee80211 phy0: Selected rate control algorithm 'minstrel_ht'
+    dccp ccid-3: A lower bound for the inter-packet scheduling algorithm
+    The algorithm from RFC 5348, 8.3 below continually computes a send time t_nom,
+    changing the above algorithm to:
+    is not updated by rs algorithm
+    ath9k: Implement an algorithm for Antenna diversity and combining
+    This algorithm chooses the best main and alt lna out of
+    The Kernighan algorithm is not able to calculate the number of set bits
+    crypto: fips - FIPS requires algorithm self-tests
+    broke that limit slightly with some algorithms. In discussing with
+      - built-in scanning algorithm
+    a driver advertises an algorithm that cfg80211
+    drivers can specify any algorithm they like.
+    dccp ccid-2: Replace broken RTT estimator with better algorithm
+    Reasons for reusing the Linux TCP estimator algorithm:
+      different scheduling algorithms for queue and group scheduling. These IOPS
+    including a missing crypto algorithm.  Change ieee80211_key_alloc()
+    Add a simple algorithm which calculates the pixel clock based on the video
+    algorithm used for calculating it.
+    element, and so on. This patch simplifies the algorithm, which is now as
+    The algorithm handling manual update overlay adjusting may adjust the
+    Replace phys_to_dma()/dma_to_phys() looping algorithm with an O(1) algorithm
+    This implementation is inefficient due to our main algorithm and
+    different algorithm alltogether.
+    gettimeofday() algorithm computes the time in "xsecs", which are
+    using the algorithm
+    The new algorithm is
+    - Enhanced round-robin FCF failover algorithm to re-start on "New FCF"
+    rates as the rate control algorithm always finds MCS15 is better
+    The pv clock algorithm needs to work correctly for the xen_clocksource
+    reliably find a PLL setting.  I extracted the search algorithm and
+    IB/qib: Allow PSM to select from multiple port assignment algorithms
+    which affected only the ahash algorithms.
+    if padata user uses algorithm for callback CPU selection according to serial cpumask.
+    gettimeofday() algorithm computes the time in "xsecs", which are
+    using the algorithm
+    The new algorithm is
+        Probably it is possible to get a better algorithm for calculating
+    mac82011: Allow selection of minstrel_ht as default rc algorithm
+    Allow selection of minstrel_ht as default rate control algorithm. At
+    This should avoid problems with the sequence number sliding window algorithm
+    which were then ignored by the rate control algorithm and mac80211.
+    the lowest rate (index 0). This should give the rate control algorithm
+    Before this patch we reported success to the rate control algorithm which
+    each non-empty bucket.  The whole algorithm is O(n^2).
+    buckets  the table.  This algorithm t read the whole table is O(n).
+    twofish_generic according to the other algorithms with assembler
+    Use the same color-calculating algorithm as in atyfb_imageblit in this
+    mac80211: add the minstrel_ht rate control algorithm
+    - In the worst case, the algorithm used by update_queue() is O(N^2).
+    The algorithm that is used to identify the tasks is O(N^2) in the worst
+    n2_crypto: Log algorithm success/failure in kernel log.
+      crypto: talitos - add hash algorithms
+      crypto: talitos - second prepare step for adding ahash algorithms
+      crypto: talitos - prepare for adding ahash algorithms
+    calculates the boundary value, too.  The changed algorithm leads to
+    It will be back as soon as an algorithm will be found.
+    algorithm but the code is duplicated and slightly different in each
+    the existing algorithm adversely.
+    crypto: talitos - add hash algorithms
+    crypto: talitos - second prepare step for adding ahash algorithms
+    so that it will accommodate ahash algorithms.
+    No actual algorithms yet.
+    crypto: talitos - prepare for adding ahash algorithms
+    Extend testmgr such that it tests async hash algorithms,
+    The cost of async vs. sync for the software algorithm implementations
+    IP checksum is based on 16-bit one's complement algorithm, so to deduce a
+    type, it lacks the ARC4 algorithm execution unit required to be able
+    The algorithm to find the offset in the msrpm for a given
+    estimator algorithm.
+    wrong information to the routing algorithm after the memory area is
+    This algorithm falls flat on its face in the light of workloads
+    This patch changes the ondemand algorithm to count iowait time
+    perf: Provide a new deterministic events reordering algorithm
+    The current events reordering algorithm is based on a heuristic that
+    algorithm, we need to know when we reach a point where we just
+                    * HT rate control algorithm
+    Back before e1000-7.3.20, the e1000 driver had a simple algorithm that
+    [SCSI] qla4xxx: Updated firmware ready timeout algorithm
+    Updated firmware ready timeout algorithm to prevent
+    sctp: fast recovery algorithm is per association.
+    SCTP fast recovery algorithm really applies per association
+    SCTP congestion control algorithms.
+    The algorithm is supposed to look for a config whose first interface
+    frame based on information from the rate control algorithm. However, for
+    as the rate control algorithm is not executed, and because the used rate is
+      drm/edid: Strengthen the algorithm for standard mode codes
+    LDPC will be enabled through the rate control algorithm
+    fullfills the algorithms and state machines for these components and
+    [SCSI] mpt2sas : Device removal algorithm in interrupt context only
+    removal algorithm. There is duplicate code in both interrupt and user
+    The current algorithm will sometimes "detect" that
+    have implemented some things differently, the basic algorithm is practically
+    algorithm later.
+    drm/edid: Strengthen the algorithm for standard mode codes
+    The averaging algorithm is copied from rt2x00, Thanks :)
+    algorithmically, this is required on AR9271.
+      * use jhash2 rather than some old BSD algorithm
+    This patch is to fix the vmac algorithm, add more test cases for vmac,
+    The rate control algorithm, default is Minstrel for ath5k, determines
+    control algorithm.  This changes the number of retries the rate
+    control algorithm considers necessary.  By removing the
+    algorithm is given control over the number of retries.
+    algorithms using the standard mac80211 rate control API, so fix this by
+    mac80211: give warning if building w/out rate ctrl algorithm
+    and drivers w/ no rate control algorithm.  For drivers like RTL8187 that don't
+    supply their own RC algorithms, this will cause ieee80211_register_hw to
+    This will tell kconfig to provide a warning if no rate control algorithms
+    their drivers supply a rate control algorithm can safely ignore the
+    drivers) can select a default RC algorithm.
+    In the rare case the fast algorithm see a too long chain, and before
+        http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+    Simon's algorithm performs O(log N) passes over the entire input list,
+    algorithm instead merges pairs of equal length lists as early as possible,
+    in recursive order.  For either algorithm, the elements that extend the
+        http://www.sorting-algorithms.com/merge-sort
+    Simon's algorithm requires only O(1) extra space rather than the generic
+    algorithm's O(log N), but in my non-recursive implementation the actual
+    *heuristic* readahead algorithm, and to use a dumb one which faithfully
+    Improved rendering algorithm to hardware with lower CPU consumption,
+    Add a new autogain algorithm for the coarse exposure case, which normally
+    The linear feedback shift register (LFSR) algorithm is used for
+    its current detection algorithm. It also performs its recovery action when
+    The current ASID allocation algorithm doesn't ensure the notification
+    The algorithm to detect cpu lock ups is the same as the old
+    the picking algorithm.
+    The algorithm takes into account the list of counter constraints for each
+    this algorithm which is designed to be fairly generic.
+    algorithm. This will cause early failure in perf_event_open().
+    the scheduling algorithm and the actual assignment separately. Actual
+    algorithms to be cleanly supported.
+    The mac_esp PIO algorithm no longer works in 2.6.31 and crashes my Centris
+    Now that the AIL push algorithm is traversal safe, we don't need a
+    Since frames are now going through the rate control algorithm
+    Beacon frames and similarly, with all rate control algorithms that use
+    match the algorithm used elsewhere.
+    implementing AMD's recommended algorithm.
+    algorithm and converts it to process the crypto transforms in
+    parallel. For the moment only aead algorithms are supported.
+    crypto: testmgr - Fix complain about lack test for internal used algorithm
+     test for some internal used algorithm.
+    This patch add NULL test entries for these algorithm and driver.
+    for an out-of-tree rate control algorithm.
+    algorithm to remedy this and apply the same alignment principles to the
+      Long term we should fix the timer wheel algorithm, but for now if we reduce
+      [SCSI] bnx2i: update CQ arming algorith for 5771x chipsets
+    This patch simplifies the algorithms for migrating GRU contexts between
+    sysv sem algorithm: Most (at least: some important) users only use simple
+    V4L/DVB (13651): sh_mobile_ceu_camera: document the scaling and cropping algorithm
+    The sh_mobile_ceu_camera driver implements an advanced algorithm, combining
+    algorithm deserves separate documentation.
+      xfrm: Fix truncation length of authentication algorithms installed via PF_KEY
+    algorithm to initialize the USB as is used in the linwizard
+    xfrm: Fix truncation length of authentication algorithms installed via PF_KEY
+    installation of authentication algorithms via PF_KEY, as the state
+    specific truncation length is not installed with the algorithms
+      amd64_edac: add a leaner syndrome decoding algorithm
+    [SCSI] bnx2i: update CQ arming algorith for 5771x chipsets
+      crypto: testmgr - Add ghash algorithm test before provide to users
+    amd64_edac: add a leaner syndrome decoding algorithm
+    the syndrome in error. The algorithm operates independently of symbol
+    override the algorithm on a per-board basis.
+    with a scheduler algorithm thati caused the VCPU to
+    may be possible with a more sophisticated yield algorithm.
+    ipsec: can not add camellia cipher algorithm when using "ip xfrm state" command
+    can not add camellia cipher algorithm when using "ip xfrm state" command.
+        bus as the rate control algorithm chooses a slower rate which
+    xfrm: Add SHA384 and SHA512 HMAC authentication algorithms to XFRM
+    These algorithms use a truncation of 192/256 bits, as specified
+    algorithms, use the truncation length specified on xfrm_state.
+    Adding a xfrm_state requires an authentication algorithm specified
+    If no truncation length is specified, or the authentication algorithm
+    is specified using xfrm_algo, the truncation length from the algorithm
+    argument allows the installation of authentication algorithms with
+    sctp: Update SWS avaoidance receiver side algorithm
+    crypto: testmgr - Add ghash algorithm test before provide to users
+    Add ghash algorithm test before provide it to users
+    is negative, fall back to the old IRQ detection algorithm.
+    Handle netfs pages that the vmscan algorithm wants to evict from the pagecache
+    The rate control algorithms also need TX status, but
+    given buffer, the algorithm has to do the queuing based on the
+    fixes the algorithm and disables the use of local functions as a reference
+    as a reference. The actual algorithm is: choose the first global function we
+    md: Factor out RAID6 algorithms into lib/
+    audio material filtered by an 50/15 uS algorithm. Not sure whether we
+    Update the TX path block calculation algorithm based on TI reference.
+         In these situations the default N-disk algorithm will present
+    algorithm selects one more retransmission in some cases. Allow
+    code for the obsolete hash algorithm.
+    To support for ahash algorithms, we add a pointer to a
+    algorithms maintained out of tree will break at build time rather than
+    Remove special handling of old-style digest algorithms from the procfs
+    iwlwifi: add aggregation tables to the rate scaling algorithm
+    Current rate scale algorithm fluctuates between different MIMO modes fairly
+    algorithm.
+    The algorithm is simply valid blocks have a next address and that
+    ceph: CRUSH mapping algorithm
+    ipv4: fib table algorithm performance improvement
+    The FIB algorithim for IPV4 is set at compile time, but kernel goes through
+                    no cstates      current linux   new algorithm
+    While it would be a novel idea to describe the new algorithm in this
+    But in the Correction algorithm when calculating the byte offset
+    linear algorithmic complexity, because the data structures have not
+    This is very useful in various motion estimation algorithms.
+    algorithm. It only transports data to and from user space
+    set_frontend call in software zigzag algorithm fails and the card was
+    if the SW zigzag algorithm in dvb-core kicks in with a retune after the
+    algorithms might not pick the best flex_bg for new allocation.
+      crypto: vmac - New hash algorithm for intel_txt support
+      crypto: api - Do not displace newly registered algorithms
+      crypto: gcm - Use GHASH digest algorithm
+      crypto: ghash - Add GHASH digest algorithm for GCM
+    and possibly IXP43x use a bit different clock generation algorithm - it
+    with the Nagle algorithm.
+    Use the more advanced single pass variance algorithm outlined
+    crypto: vmac - New hash algorithm for intel_txt support
+    range_cyclic algorithm in ext4_da_writepages().  (See commit 2acf2c26
+    crypto: api - Do not displace newly registered algorithms
+    We have a mechanism where newly registered algorithms of a higher
+    implementation of the same algorithm with a lower priority.
+    algorithm to displace itself if it depends on an existing version
+    of the same algorithm.
+    This patch fixes this by keeping all algorithms that the newly
+    reigstered algorithm depends on, thus protecting them from being
+    array cases.  In these situations the default N-disk algorithm will
+    algorithm is simplified to only reuse Q as a source.
+    division algorithm, using only integer math.
+    While debugging the scheduler push / pull algorithm, I found
+    the algorithm to work with any list.
+    This variant of preemptable RCU uses a new algorithm whose
+    under CONFIG_PREEMPT. This new algorithm's update-side expense
+    hierarchical RCU.  Perhaps more important, this new algorithm
+    algorithm.
+    lock-protected algorithm to handle accounting when tasks block
+    we don't follow this synchronization algorithm.
+    mac80211: Decouple fail_avg stats used by mesh from rate control algorithm.
+    between the mesh stack and the rate control algorithm.  Mesh will now work
+    independently of the chosen rate control algorithm.
+    of xcbc and not the alignmask of the underlying algorithm
+    the stream ciphers.  In particular, all algorithms where the IV
+    This algorithm could be described as modify-write-read.  It
+    to do this modify-write-read algorithm or switch to a read-
+    modify-write algorithm when initially allocating the page
+    algorithm name. The new allocated one is guaranteed to be cryptd-ed
+    crypto: gcm - Use GHASH digest algorithm
+    digest algorithm instead. This will make GCM uses hardware accelerated
+    crypto: ghash - Add GHASH digest algorithm for GCM
+    GHASH is implemented as a shash algorithm. The actual implementation
+    algorithm to execute correctly.
+    All current rate control algorithms agree to send management and no-ack
+    for this and simplify the rate control algorithm code.
+    Developers wishing to make enhancements to rate control algorithms
+    rate control algorithms when they have a valid sta to
+    once the circle is found, breadth-first search algorithem is
+    crypto: shash - Test for the algorithms import function before exporting it
+    before exporting the algorithms import function to ahash.
+    crypto: shash - Require all algorithms to support export/import
+    shash algorithms.  It simply copies the descriptor context as
+    This in essence means that all existing shash algorithms now
+    When an shash algorithm is exported as ahash, ahash will access
+    may end up crashing on shash algorithms because we're always
+    Create the standard timing modeline by using CVT/GFT algorithm while
+    which is used to determine whether the CVT/GTF algorithm is selected to
+    drm/mode: add the GTF algorithm in kernel space
+    Add the GTF algorithm in kernel space. And this function can be called to
+    drm/mode: add the CVT algorithm in kernel space
+    Add the CVT algorithm in kernel space. And this function can be called to
+    In particular, we now use ahash_alg to define ahash algorithms
+    ahash algorithms.
+    parameter.  This is useful when instantiating algorithms that
+    require a mask other than the default, e.g., ahash algorithms.
+    crypto: ahash - Convert to new style algorithms
+    algorithm type is retained until the existing ahash implementations
+    crypto: cryptd - Use shash algorithms
+    This patch changes cryptd to use shash algorithms instead of the
+    no algorithms use them anymore.  The interface though will remain
+    This patch converts the xcbc algorithm to the new shash type.
+    current algorithm for lingle/dual Channel LVDS when
+    format across all implementations of a given algorithm.
+    cfg80211: reset auth algorithm
+    reset the auth algorithm because wpa_supplicant
+    mac80211: remove auth algorithm retry
+    The automatic auth algorithm issue is now solved in
+    different algorithms -- just using whatever cfg80211
+    When the auth algorithm is rejected, but we don't have
+    Additionally, when trying the next auth algorithm, we
+    algorithm.
+    that would have needed some non trivial changes in the algorithms.
+    resizing/rebalancing the current lookup algorithm can miss valid leaves
+    It hasn't been needed until now since no existing shash algorithms
+    normal algorithms.
+    algorithm based on the information in the given attribute.
+    intended to be used by new style algorithm types such as shash.
+    spawns, i.e., to use shash algorithms in a template.
+    algorithms like shash.  In particular, this means storing the
+    algorithm under it.  Note that the instance itself doesn't have
+    sets aside some space before the instance for use by algorithms
+    Use unaligned address for domain->max_addr. That algorithm isn't ideal
+    3. use a generic bit array based XOR algorithm to detect key
+      ipsec: Fix name of CAST algorithm
+    algorithm malfunctioning, so it is not a matter of producing the
+    As it stands we use chainiv for sync algorithms and eseqiv for
+    async algorithms.  However, when there is more than one CPU
+    for sync algorithms.
+    crypto: skcipher - Fix request for sync algorithms
+    When a sync givcipher algorithm is requested, if an async version
+    of the same algorithm already exists, then we will loop forever
+    getting a larval for the geniv algorithm that is to be constructed.
+    ipsec: Fix name of CAST algorithm
+    Our CAST algorithm is called cast5, not cast128.  Clearly nobody
+    This permits each port to select its own SCBRR calculation algorithm,
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    The v4l function has a better algorithm for aligning image size.
+    It uses an efficient algorithm that will try to find the "closest" image
+    standard as part of its internal algorithm.  This therefore means that
+      dma-debug: check for sg_call_ents in best-fit algorithm too
+    crypto: tcrypt - Test algorithms by name
+    algorithm by name. If the algorithm type is not ad-hoc
+    clear for a algorithm (e.g. pcrypt, cryptd) it is possilbe
+    to set the algorithm type with the 'type' module parameter.
+    readahead: introduce context readahead algorithm
+    Introduce page cache context based readahead algorithm.
+    The current readahead algorithm detects interleaved reads in a _passive_ way.
+    The context readahead algorithm guarantees to discover the sequentialness no
+    the algorithm to find the index.
+    scheduling algorithm could be added for host controllers without
+    function changed to a best-fit algorithm these entries have to be more
+    dma-debug: check for sg_call_ents in best-fit algorithm too
+    parent directory inode allocation algorithms.
+    layout algorithms.
+    The assert was happening because the rate control algorithm
+    addresses in the 36GB address with the same algorithm.
+    algorithm.
+    Because all fips-allowed algorithms must be self-tested before they
+    algorithms may nest, i.e., one may construct another in order to
+    the chances of an algorithm failing due to memory shortage.
+    crypto: talitos - Add ablkcipher algorithms
+    Add these ablkcipher algorithms:
+    crypto: talitos - scaffolding for new algorithm types
+    This patch is preparation for adding new algorithm types.
+    The algorithm template structure was changed to
+    more general with respect to algorithm types.
+    - Add a new AES algorithm implementation named __aes-aesni without
+    kernel_fpu_end(). If they are invoked in cipher algorithm
+    for the key algorithm specified.
+      crypto: api - Fix algorithm module auto-loading
+      crypto: eseqiv - Fix IV generation for sync algorithms
+    the number of search tables were 3. Every time the rate scale algorithm
+    second patch for pid algorithm and found similar bug."
+    To deter future rate scaling algorithm writers from requesting NO_ACK
+    packets to be retried, throw a WARN_ON_ONCE if the algorithm hands us
+    [ Impact: tweak NTP algorithm for faster convergence ]
+    The new bitfit algorithm was counting from the wrong end of
+    debugging rate scaling algorithm, easy to understand what is the current
+    in rate scaling algorithm. If the device support 3x3, then utilize all
+    crypto: api - Fix algorithm module auto-loading
+    api - Fix module load deadlock with fallback algorithms) broke
+    the auto-loading of algorithms that require fallbacks.  The
+    applying it, allowing improvements in the power sequencing algorithms.
+    When determining the UV pnode, the algorithm for determining the pnode
+    algorithm is used:
+    phy0: Selected rate control algorithm 'pid'
+    crypto: eseqiv - Fix IV generation for sync algorithms
+    Improve the algorithm to nominate the idle load balancer from a semi idle
+    The algorithm is activated only when sched_mc/smt_power_savings != 0.
+    the DAPM algorithms and (more immediately) the additon of events for
+     - in case of missing AES support, the AES algorithms are not registered
+    Even if the background flushing algorithm is radically changed, it is
+    strong checksum of the transferred data. It is possible to configure algorithms
+    This patch simply moves code around & does not change the algorithm.
+    memcg: fix shrinking memory to return -EBUSY by fixing retry algorithm
+            (More smart algorithm can be implemented..)
+    A corresponding patch to the decompression algorithm in
+    Bayer frames.  The decompression algorithm for still images is the same as for
+    gets checked in the algorithm.
+    This patch changes mac80211 to not notify the rate control algorithm's
+    through the rate control algorithm's get_rate() method.
+    search for loops) introduced a regression in the loop detection algorithm,
+    An alignment issue with the existing bitfit algorithm was reported
+    patch implement full nodes sorting using n*log(n) algorithm.
+    condition (receive 0 retry packet). also change the algorithm to make
+    which may cause the AES-NI-based AES algorithm implementation to panic.
+      V4L/DVB (10978): Report tuning algorith correctly
+    (5) doorbell algorithm imported changes from windows driver
+    V4L/DVB (10978): Report tuning algorith correctly
+    the actual (name of the) (de)compression algorithm.
+      crypto: api - Fix module load deadlock with fallback algorithms
+    tcp: add helper for AI algorithm
+    rate control algorithm is not notified. This patch adds a new callback
+    to indicate such changes to the RC algorithm.
+    crypto: api - Fix module load deadlock with fallback algorithms
+    With the mandatory algorithm testing at registration, we have
+    now created a deadlock with algorithms requiring fallbacks.
+    This can happen if the module containing the algorithm requiring
+    first.  The system will then try to test the new algorithm, find
+    As both algorithms share the same module alias, it can attempt
+    to load the original algorithm again and block indefinitely.
+    As algorithms requiring fallbacks are a special case, we can fix
+    algorithms we're trying to find.
+    The sharing discovery code follows the algorithm recommended in the
+    ext4: New inode/block allocation algorithms for flex_bg filesystems
+    replaced.  One of its problems (besides ignoring the Orlov algorithm)
+    to test these algorithms.
+    Conversely, we're currently testing nivaead algorithms with IVs,
+    nivaead algorithms have any test vectors.  This patch also fixes
+    test vectors for the existing nivaead algorithms.  They're tested
+    through the underlying algorithms only.
+    shash.c, not even algorithms code).
+    untested algorithms, but never both at the same time.  However,
+    initial release that includes the driver framework with AES and SHA1 algorithms
+    The remaining algorithms will be released in the near future.
+    implemented algorithms.  We already panic when any of the test in testmgr.c
+    This patch converts the S390 sha algorithms to the new shash interface.
+    This function is needed by algorithms that don't know their own
+    specified algorithm name. The new allocated one is guaranteed to be
+    Update the Adaptive Interrupt Moderation algorithm so that the low latency
+    mac80211 notifies the RC algorithm if RTS/CTS and short preamble
+    Also, set the rts_cts_rate_idx inside the RC algorithm.
+      crypto: api - Fix algorithm test race that broke aead initialisation
+    [ARM] OMAP3 clock: optimize DPLL rate rounding algorithm
+    The previous DPLL rate rounding algorithm counted the divider (N) down
+    The algorithm works unconditionally. If bitval is one, the first line is
+    algorithm. This version of the patch disables rate fallback.
+    The rate control algorithm needs to know if a STA allows
+    Return -EOPNOTSUPP if the algorithm is not supported and -ENOSPC if
+    Added new SIOCSIWENCODEEXT algorithm for configuring BIP (AES-CMAC)
+    crypto: api - Fix algorithm test race that broke aead initialisation
+    algorithm with the same driver name prior to the removal of the
+    test larval, they will fail with EEXIST as only one algorithm of
+    This broke the initialisation of aead and givcipher algorithms as
+    they will register two algorithms with the same driver name, in
+    we drop the mutex, and also ignoring all dead or dying algorithms
+    The old matching algorithm was too fuzzy, causing false positives.
+    Change the algorithm such that:
+    crc32c algorithm provides a byteswaped result.  On little-endian
+    it's locking algorithms work (see Documentations/filesystems/Locking)
+    it's locking algorithms work (see Documentations/filesystems/Locking)
+    As it is if an algorithm with a zero-length IV is used (e.g.,
+    not take into account that the ath9k rate control algorithm was
+    rate control algorithm, so the best option now seems to be to revert the
+    INTx swizzling algorithm specified in Table 9-1 of the "PCI-to-PCI
+    why a good algorithm in a HLL is preferrable to a bad algorithm written in
+    It turns out that the adt7470's automatic fan control algorithm only works
+    the type of memory required and depend on how the algorithm is implemented
+    :    balancing algorithm would require that if we're scanning 100 pages of
+    Make all the compression algorithms properly configurable, and make
+    sure the ramdisk options pull in the proper compression algorithms, as
+    the algorithm and didn't have quite the (possibly still imperfect) grasp
+    eventually leading to wrong search algorithm to be employed in
+    rq->lock for certain workloads, and by making sure the algorithm
+    This patch makes the algorithm more fair by forcing all paths to have
+    paths nested further inside the algorithm which still remain that allow
+    The tables used by the various AES algorithms are currently
+    because some AES algorithms may be registered before the tables
+    for this algorithm to be used with shash it is moved to a static
+    Since most cryptographic hash algorithms have no keys, this patch
+    When self-testing (de)compression algorithms, make sure the actual size of
+    The reason for the change is to tap into the algorithm selection
+    This patch adds a test for the requirement that all crc32c algorithms
+    This patch allows shash algorithms to be used through the old hash
+    underlying algorithms to shash before converting the users across.
+    This patch allows shash algorithms to be used through the ahash
+    interface.  This is required before we can convert digest algorithms
+    synchronous algorithms and as such scatter lists are unnecessary.
+    algorithms have been completely converted.
+    This will be extended to ahash once the algorithm conversion is
+    This is also the first time that an algorithm type has their own
+    registration function.  Existing algorithm types will be converted
+    actual ahash algorithm or a crypto_hash algorithm.  Putting
+    crypto algorithm fail during operation in fips mode, we need to prevent
+    crypto layer will fallback to the software algorithms.
+    control algorithm table.
+    Looking at the RC algorithm this is no longer necessary.
+    wireless: Incorrect LEAP authentication algorithm identifier.
+    LEAP authentication algorithm identifier should be 128.
+      crypto: api - Disallow cryptomgr as a module if algorithms are built-in
+    crypto: api - Disallow cryptomgr as a module if algorithms are built-in
+    If we have at least one algorithm built-in then it no longer makes
+    change in the congestion avoidance algorithm) can be seen at:
+    Sparc64 uses a non-recursive sibling traversal algorithm
+    control algorithm is effectively unable to reduce cwnd below the
+    Ian Campbell <ijc@hellion.org.uk> (simplified find algorithms)
+    number printed is quite strange. This fixes the algorithm to handle
+    Btrfs: add support for multiple csum algorithms
+    algorithims at some point in the future.  We save the csum algorithim type
+    (Perhaps a better address space allocation algorithm could rid us of the
+    the standard orinoco resume algorithm.
+    mac80211: Fix pid rate-setting algorithm to allow rate changes
+    to total number of tries. As a result, the pid rate-setting algorithm fails
+    mac80211: make Minstrel the default rate control algorithm
+    This makes minstrel the default rate control algorithm
+    If someone can come up with a better algorithm they get a prize
+    This patch eliminates sparse warnings in pid rate scale algorithm
+    The main difference to the algorithm described in "Efficient Fair Queueing
+    selection algorithm, probably following the Channel Selection Policy
+    basic copy algorithm is the same as in memcpy() - this version just
+    The old decisions made by the filter algorithm was complex and incorrect.
+    algorithm determining if processes are root processes and should be less
+    fat_hash() is using the algorithm known as bad. Instead of it, this
+    "Clearing" the rate control algorithm is pointless, none of
+    the algorithms actually uses this operation and it's not even
+    need to since rate control algorithms work per station.
+    iwl3945: fix station stuff in RC algorithm
+      mac80211: correct warnings in minstrel rate control algorithm
+    ext4: Add support for non-native signed/unsigned htree hash algorithms
+    The original ext3 hash algorithms assumed that variables of type char
+    ext3: Add support for non-native signed/unsigned htree hash algorithms
+    The original ext3 hash algorithms assumed that variables of type char
+    wusb: disable verification of the key generation algorithms
+    Verifing the key generation algorithms could take too long on a freshly
+    mac80211: correct warnings in minstrel rate control algorithm
+    rewritten inlining algorithm and disabling this option will generate a
+    linked list to improve the algorithmic scalability.
+    throw off kswapd's balancing algorithms.  Place them on the unevictable
+    The algorithm to pick one of them based on the user input is not
+    That hack in ath9k should be removed once the rate control algorithm
+    The algorithm we use basically considers unassigned a window that
+      rcu classic: new algorithm for callbacks-processing(v2)
+    Change the load calculation algorithm in ondemand to work well with software
+    mac80211: add the 'minstrel' rate control algorithm
+    ANI is as algorithm designed to minimize the detrimental
+    SACK processing when doing SFR-CACC algorithm.  We can restructure
+    There's one internal use in the PID algorithm left for mesh networking,
+    algorithm or via new API.
+    algorithm.
+    Rate control algorithms may need access to a station's
+    mac80211: move txrate_idx into RC algorithms
+    The sta_info->txrate_idx member isn't used by all RC algorithms
+    As more preparation for a saner rate control algorithm API,
+    mac80211: move last_txrate_idx into RC algorithms
+    by the Intel RC algorithms, so move it into those.
+    algorithm to update sta->tx_retry_failed and sta->tx_retry_count
+    found, but all rate control algorithms ignore such calls anyway.
+    implementing rate control algorithms without internals.
+    iwlwifi: use the results from disconnected antenna algorithm
+    enables during the chain noise algorithm. Hence, power management is
+    restored only after the completion of the algorithm.
+    scaling algorithm.
+    algorithm starts with a setting most suitable for daylight, the picture
+    A detailed discussion of the algorithm (with plots) is on
+    The algorithm has negative side effects:
+       counter-acting the algorithm;
+    This improves the receiver RTT sampling algorithm so that it tries harder to get
+    The algorithm is based the concepts presented in RFC 4340, 8.1, using timestamps
+    In the last case the algorithm tried to optimise by storing away the candidate
+       algorithm;
+    The algorithm now stores away the current sample only if the difference is 0.
+    confirmed by instrumenting the algorithm with counters. The results of two 20
+     * With the old algorithm and a total of 38442 function calls, only 394 of these
+     * With the new algorithm and a total of 37057 function calls, 1702 usable RTT
+    dccp ccid-2: Replace broken RTT estimator with better algorithm
+    Reasons for reusing the Linux TCP estimator algorithm:
+    new circular buffer interface. It contributes a new algorithm which
+    essential, since analysis and experience showed that the basic algorithm was
+    The algorithm now
+     (b) A `tail_seqno' field. When naively implementing the algorithm of Appendix A
+    There are no real algorithmic changes, rather an adaptation:
+    dccp ccid-3: Bug fix for the inter-packet scheduling algorithm
+    The algorithm from RFC 3448, 4.6 below continually computes a send time t_nom,
+    whose value depends on CONFIG_HZ, changing the above algorithm to:
+    This patch rewrites the TX power recalculation algorithms to scale better
+    value. With the old algorithm it could take about 30 to 45 seconds to settle to
+    algorithms to pass a run-time test before they're made available to
+    cryptomgr.  This shall allow us to use it for testing at algorithm
+    This patch creates a new interface algorithm testing.  A test can
+    be requested for a particular implementation of an algorithm.  This
+    is achieved by taking both the name of the algorithm and that of
+    a duplicate listing of all algorithms with tests.  In that process
+    algorithms at registration time.
+    CRC32c algorithm with the new CRC32 instruction in SSE 4.2 instruction set.
+    digit value '100'.  This is due to a bug in the rounding algorithm
+    Use the MIC algorithm from the crypto subsystem.
+    Extra algorithm to program PDA values using defaults where necessary.
+    Add some comments explaining the locking and pinning algorithm when
+    algorithm to allow the very large SMP machines -- requested by some
+      i2c: Let users select algorithm drivers manually again
+    i2c: Let users select algorithm drivers manually again
+    In kernel 2.6.26, the ability to select I2C algorithm drivers manually
+      [XFS] Restore the lowspace extent allocator algorithm
+    algorithm
+    algorithm.
+    [XFS] Restore the lowspace extent allocator algorithm
+    to 0). In this case the allocator will enable the lowspace algorithm which
+    newroots) to allocate from sequential AGs. This algorithm has been broken
+    Thanks to Hugh for pointing out an improvement to the algorithm setting
+    different algorithm.  (thanks to Christoph for new idea.)
+    textsearch algorithms can be loaded, make the code depend
+    rcu classic: new algorithm for callbacks-processing(v2)
+    The code/algorithm of the implement of current callbacks-processing
+    This is my algorithm. But I do not add any field for struct rcu_head
+    algorithm for RR but I really see no reason to export this aspect of
+    Implement a version of the old spinlock algorithm, in which everyone
+    This algorithm is much better than ticket locks in a virtual
+    old lock algorithm, which allows the next scheduled vcpu to take the
+    tipc: Optimization to multicast name lookup algorithm
+    This patch simplifies and speeds up TIPC's algorithm for identifying
+    algorithm does individualized scope checking for each published
+      crypto: talitos - Use proper form for algorithm driver names
+    <vitb@kernel.crashing.org> and the actual algorithm used by the i2c
+    edge triggered migration. But the good news is, we use the same algorithm
+    allocation algorithms. By controlling the inode allocation, it can
+    The algorithm to calculate the 'now' of another CPU is not correct.
+    same in speed between two clocks the algorithm would be:
+    Currently the algorithm is:
+    Cleaned up AIM algorithms in general
+    This patch adds the walking helpers for hash algorithms akin to
+    reimplement existing hash algorithms using the new ahash interface.
+    The digest size check on hash algorithms is incorrect.  It's
+    perfectly valid for hash algorithms to have a digest length
+    for such algorithms.
+    crypto: talitos - Use proper form for algorithm driver names
+    should be reserved for templates that spawn algorithms.
+    for testing hash algorithm correctness.  The speed tests will continue
+    [CRYPTO] ripemd: Add Kconfig entries for extended RIPEMD hash algorithms
+    RIPEMD-320 hash algorithms.
+    algorithms RIPEMD-256 and RIPEMD-320.
+    When the CryptoAPI instantiates a new algorithm, it performs a lookup
+    algorithm, the lookup may return an incorrect algorithm.
+    [CRYPTO] ripemd: Add Kconfig entries for RIPEMD hash algorithms
+    RIPEMD-160 hash algorithms and digests (HMAC).
+    [CRYPTO] ripemd: Add support for RIPEMD hash algorithms
+    hash algorithms.
+    The algorithm relies on the invariant that any page which is part of
+    textsearch: ts_kmp: support case insensitive searching in Knuth-Morris-Pratt algorithm
+    Add support for case insensitive search to Knuth-Morris-Pratt algorithm.
+    textsearch: ts_bm: support case insensitive searching in Boyer-Moore algorithm
+    Add support for case insensitive search to Boyer-Moore algorithm.
+    ARM: OMAP2: Clock: New OMAP2/3 DPLL rate rounding algorithm
+    This patch adds a new rate rounding algorithm for DPLL clocks on the
+    This DPLL rate rounding algorithm:
+    The rate rounding algorithm caches the last rounded M, N, and rate
+    The algorithm trades execution speed for rate accuracy.  It will find
+    scaling algorithm to take in count frames that were sent in AMPDUs.
+    iwlwifi: configure uCode to use open loop tx power algorithm
+    This patch configures uCode to use open loop tx power algorithm
+    build algorithms into the mac80211 module
+    - the default algorithm is built into mac80211
+    - other algorithms get into their own modules
+    algorithm would most likely not get it right at his first attempt.
+    This patch therefore builds all enabled algorithms into the mac80211
+    The user interface for the rate control algorithms changes as follows:
+    - first the user can choose which algorithms to enable (currently only
+    - if more than one algorithm is enabled (currently not possible since
+      only one algorithm is present) the user then chooses the default one
+    - all selected algorithms get into the mac80211 module
+    Searching algorithm should return 0 for those things.
+    currently uses a first match algorithm, stopping when it finds the first
+    each SGE is 1 page. The FW also implements a timeout algorithm and it
+    The current code use a linear algorithm which causes scaling issues
+    on larger SMP machines.  This patch replaces that algorithm with a
+    Dmitry Adamushko pointed out a known flaw in the rt-balancing algorithm
+    This patch tries to enhance the balancing algorithm by accomodating this
+    means that the rate control algorithm is never triggered and 0 is used as
+    This patch adds an algorith to check the following condition:
+      ext4: mballoc fix mb_normalize_request algorithm for 1KB block size filesystems
+    ext4: mballoc fix mb_normalize_request algorithm for 1KB block size filesystems
+    This patch modifies the algorithm in ext4_mb_normalize_group_request to
+    1. This patch restructures rate scale algorithm to support
+    b43: Rewrite LO calibration algorithm
+    key algorithm and whether it is a shared or pairwise key.
+    use digest_null directly.  However, when the null algorithm is
+    ([IPSEC]: Add support for combined mode algorithms) added a new
+    This patch adds support for a new backoff algorithm for half duplex supported
+    Re-seeding random values for the backoff algorithms are performed when a
+    irq moderation algorithm. This change does not require an
+    so consolidating the algorithm at one place will help
+    algorithm to ignore any ATSC standards (such things are better handled
+    This is a major pvrusb2 change.  The driver core has an algorithm that
+    video streaming.  The algorithm had originally been written for analog
+      [IPSEC]: Fix catch-22 with algorithm IDs above 31
+      i2c: Add platform driver on top of the new pca-algorithm
+      i2c: Remove the algorithm drivers from the config menu
+    i2c: Add platform driver on top of the new pca-algorithm
+    The separation between algorithm and adapter was unsharp at places. This was
+    preparations to add a platform driver on top of the algorithm, while still
+      Similar to other algorithms, now a pointer to this data is passed to the
+      from the adapter, not the algorithm.
+    In the algorithm-file:
+    - adapt to new algorithm
+    i2c: Remove the algorithm drivers from the config menu
+    The algorithm drivers are helper drivers that are selected automatically
+    [IPSEC]: Fix catch-22 with algorithm IDs above 31
+    As it stands it's impossible to use any authentication algorithms
+    The reason is that we're using a bit mask to check the algorithm
+    applications, the best solution IMHO is to allow all algorithms when
+    using the NULL authentication algorithm which has an ID of 251.
+    > > with the <algorithm name>_init/_fini
+    > > or init/fini_<algorithm name> (if the
+    > > <algorithm name>_init/_fini exist)
+            <algorithm name>_mod_init ()
+    and fini () is replaced with <algorithm name>_mod_fini.
+    all the test vectors for each algorithm. The test vectors are
+    as the engine handles it's own keys, algorithms, everything.  All
+    Various SMP balancing algorithms require that the bandwidth period
+    subtraction of the TSC value and the reference value. This algorithm
+      [GFS2] Faster gfs2_bitfit algorithm
+      The HMAC algorithm based on SHA-1 MUST be supported and
+    subtraction of the TSC value and the reference value. This algorithm
+    [GFS2] Faster gfs2_bitfit algorithm
+    This version of the gfs2_bitfit algorithm includes the latest
+    algorithm is often 15 times faster, and given the right
+    HTB is event driven algorithm and part of its work is to apply
+    algorithm. Fix by using the SO_DEFER_ACCEPT value if the ack has
+    This patch introduces a simple irq moderation algorithm based
+    algorithm then cleans the appropriate ring/queues on interrupt
+    rt2x00lib depended on 2 crc algorithms because rt61/rt73
+    use a different algorithm then rt2800. This means that
+    even when only 1 algorithm was needed, the dependency was
+    It's also useful for tuning an RC algorithm.
+    has been asked for. Use the same algorithm as SLAB for this.
+    This needs to be exported because rate control algorithms
+    the kernel crashes. It seems this algorithm doesn't
+    in order to make the learning algorithm aware of constraints on rates. Also
+    Now the ESP uses the AEAD interface even for algorithms which are
+    otherwise only combined mode algorithms will work.
+    rate control algorithms, however those can, if they need it,
+    in order to make the learning algorithm aware of constraints on rates. Also
+    The driver should select what CRC algorithm is required
+    the same as a different algorithm which is also available as library. ;)
+    Change xfrm_policy and xfrm_state walking algorithm from O(n^2) to O(n).
+    Our algorithm expects the previous behavior; otherwise we have RDMA
+      ext4: modify block allocation algorithm for the last group
+    The authenc algorithm requires BLKCIPHER to be present.
+    by most algorithms anyway this is an acceptable trade-off.
+    ext4: modify block allocation algorithm for the last group
+    sizing algorithm and drop this parameter.  For the time being, it is a
+    algorithm. Tested this using setkey in ipsec-tools.
+    Add the page_cgroup to the per cgroup LRU.  The reclaim algorithm has
+    The AIL push is, in effect, a simple I/O dispatch algorithm complicated by
+    Implement get_wchan - the algorithm is similar to x86.  It starts with the
+    then the algorithm would come up with a page size of 0x2000 and a list
+    With the implementation of the new mark and sweep algorithm for shutting
+    the built-in rate control algorithms fail to initialise, fix
+    When the rate control algorithms are built-in, their exit
+    [IPSEC]: Add support for combined mode algorithms
+    This patch adds support for combined mode algorithms with GCM being
+    the first algorithm supported.
+    Combined mode algorithms can be added through the xfrm_user interface
+    using the new algorithm payload type XFRMA_ALG_AEAD.  Each algorithms
+    For the purposes of matching algorithms in xfrm_tmpl structures,
+    combined mode algorithms occupy the same name space as encryption
+    algorithms.  This is in line with how they are negotiated using IKE.
+    [IPSEC]: Allow async algorithms
+    algorithms in IPsec.
+    the authenc algorithm.  This lays the foundations for future support of
+    combined mode algorithms.
+    This patch changes the backtracer to use the regular backtracing algorithm
+    The algorithm also tells us how many CPUs are contending the lock, so
+    we'd better take that into account when doing switch by auth->algorithm,
+    Update RSS hash function to a symmetric algorithm.
+    mac80211: better rate control algorithm selection
+       algorithm as default
+     * always allow tri-state for the rate control algorithms,
+     * force the default rate control algorithm to be built into
+    It also makes both rate control algorithms proper modules again
+    which will cause no algorithm to be selected, this will work
+    the algorithm, simply determine first if the modulo is needed
+    with a certain algorithm up into the TX handlers rather than having it
+    in the crypto algorithm implementation.
+    rc80211-pid: add rate behaviour learning algorithm
+    This patch introduces a learning algorithm in order for the PID controller
+    mac80211: make PID rate control algorithm the default
+    This makes the new PID TX rate control algorithm the default instead of the
+    rc80211_simple rate control algorithm. The simple algorithm was flawed in
+    relying on properly. The PID algorithm allows us to tune characteristics such
+    The default algorithm can be overridden to select simple instead. Which
+    ever algorithm is the default is included as part of the mac80211
+    module automatically. The other algorithm (simple vs. pid) can
+    algorithm included in mac80211. The default algorithm can be set
+    mac80211: add PID controller based rate control algorithm
+    Add a new rate control algorithm based on a PID controller. It samples the
+    selection algorithms, and fix iwlwifi accordingly. While at it, clean up the
+    This implements the algorithm to update the allowed sending rate X upon
+    The crc32c library used an identical table and algorithm
+     * provision of RFC-compliant algorithm to re-compute average loss interval;
+     * provision of comprehensive, new loss detection algorithm
+    [CCID2]: Disable broken Ack Ratio adaptation algorithm
+    This comments out a problematic section comprising a half-finished algorithm:
+    In its current state, the commented-out algorithm interfers with normal processing by
+    A new algorithm is necessary, which will not necessarily use the same variables as used by
+    algorithms.
+    The algorithms used make the realtime scheduler O(tg), linear scaling wrt the
+    of, the avg. case of the algorithms can be improved, I focused on correctness
+    This patch adds the algorithm to pull tasks from RT overloaded runqueues.
+    This patch adds an algorithm to push extra RT tasks off a run queue to
+    When more than one RT task is added to a run queue, this algorithm takes
+    more.  The algorithm stops when the next highest RT task can't preempt any
+    TODO: The algorithm may stop when there are still RT tasks that can be
+      [CRYPTO] xcbc: Fix algorithm leak when block size check fails
+      [CRYPTO] salsa20_i586: Salsa20 stream cipher algorithm (i586 version)
+    elaborate attribute selection algorithms to do this same thing.
+      [IPV6] ROUTE: Make sending algorithm more friendly with RFC 4861.
+    [IPV6] ROUTE: Make sending algorithm more friendly with RFC 4861.
+    So, let's avoid mixing sending algorithm of RFC 4191 and that of RFC
+    4861, and make the algorithm more friendly with RFC 4861 if RFC 4191
+    algorithms.  This patch makes it available by itself at number 106.
+    When setting the digest size xcbc tests to see if the underlying algorithm
+    [CRYPTO] xcbc: Fix algorithm leak when block size check fails
+    When the underlying algorithm has a block size other than 16 we abort
+    without freeing it.  In fact, we try to return the algorithm itself
+    This is the x86-64 version of the Salsa20 stream cipher algorithm. The
+    [CRYPTO] salsa20_i586: Salsa20 stream cipher algorithm (i586 version)
+    it (added indents) so that it matches the other algorithms in
+    algorithms.
+    contention if the user allows the use of asynchronous algorithms.  If
+    a synchronous algorithm is requested then we behave as before.
+    Now that seqiv supports AEAD algorithms it needs to select the AEAD option.
+    a zero length.  In particular the null digest algorithm when used as part
+    [CRYPTO] null: Add null blkcipher algorithm
+    This patch adds a null blkcipher algorithm called ecb(cipher_null) for
+    backwards compatibility.  Previously the null algorithm when used by
+    IPsec copied the data byte by byte.  This new algorithm optimises that
+    This patch makes crypto_alloc_aead always return algorithms that is
+    All existing AEAD algorithms already do.  New ones must either supply
+    This patch adds support for using seqiv with AEAD algorithms.  This is
+    useful for those AEAD algorithms that performs authentication before
+    encryption because the IV generated by the underlying encryption algorithm
+    generator templates that wrap around AEAD algorithms by adding an IV
+    generator to them.  This is useful for AEAD algorithms with no built-in
+    [CRYPTO] aead: Allow algorithms with no givcrypt support
+    Some algorithms always require manual IV construction.  For instance,
+    the generic CCM algorithm requires the first byte of the IV to be manually
+    constructed.  Such algorithms are always used by other algorithms equipped
+    givcrypt operations, i.e., sometimes only the algorithm knows how the
+    requirements of the algorithm because it's not used during the operation.
+    with a salt.  This algorithm is mainly useful for CTR and similar modes.
+    This patch converts the gcm algorithm over to crypto_grab_skcipher
+    This also fixes a leak of the cipher algorithm that was previously
+    This patch converts the authenc algorithm over to crypto_grab_skcipher
+    return algorithms that are capable of generating their own IVs through
+    givencrypt and givdecrypt.  Each algorithm may specify its default IV
+    For algorithms that do not set the geniv field, the blkcipher layer will
+    pick a default.  Currently it's chainiv for synchronous algorithms and
+    eseqiv for asynchronous algorithms.  Note that if these wrappers do not
+    work on an algorithm then that algorithm must specify its own geniv or
+    the plain text.  This algorithm requires that the block size be equal
+    called when an ablkcipher algorithm has completed a givcrypt request.
+    templates that wrap around existing blkcipher/ablkcipher algorithms by adding
+    [CRYPTO] cryptd: Use geniv of the underlying algorithm
+    If the underlying algorithm specifies a specific geniv algorithm then
+    generator for each algorithm.  It should point to a string that is not
+    freed as long as the algorithm is registered.
+    have their own IV generation algorithms.
+    be paired with which IV generation algorithm.
+    generate IVs would use it instead of ablkcipher.  All other algorithms
+    (including all existing ones) would generate a givcipher algorithm upon
+    registration.  This givcipher algorithm will be constructed from the geniv
+    string that's stored in every algorithm.  That string will locate a template
+    which is instantiated by the blkcipher/ablkcipher algorithm in question to
+    give a givcipher algorithm.
+    steps, first getting the algorithm and then calling crypto_init_spawn.
+    whether the user is specifically requesting a sync algorithm.
+    into a chainable algorithm called ctr.  The IPsec-specific variant of
+    ablkcipher algorithms will use it to create givcipher objects.  As such
+    aligned to the value required by the algorithm.
+    first half of crypto_attr_alg.  That is, it returns an algorithm name
+    [CRYPTO] lzo: Add LZO compression algorithm support
+    Add LZO compression algorithm support
+    if the underlying algorithm is asynchronous.  This patch changes it so
+    The scatterwalk infrastructure is used by algorithms so it needs to
+    the ICV (if the algorithm has an explicit one) available in the
+    For now no algorithm needs this so this patch changes gcm to conform
+    Since the authenc algorithm is mainly used for legacy purposes where its
+    As it is authsize is an algorithm paramter which cannot be changed at
+    algorithms would have to register each authsize that they support
+    Since authsize is a property common to all AEAD algorithms, we can add
+    support for the other keys which may be required. The generic algorithm
+    [CRYPTO] gcm: New algorithm
+    Up until now we have ablkcipher algorithms have been identified as
+    refers to and algorithm type underneath.
+    As it is you cannot request a synchronous block cipher algorithm
+    with the algorithm implementation only.
+    SHA-224 chould be chosen as a hash algorithm when 112 bits of security
+    The setkey() function can be shared with the generic algorithm.
+    The setkey() function can be shared with the generic algorithm.
+    algorithm, the sizeof the nonce, and the sizeof the iv.
+      [IPSEC]: Avoid undefined shift operation when testing algorithm ID
+    The previous counting algorithm has O(n^2) complexity.  Basically two
+    [IPSEC]: Avoid undefined shift operation when testing algorithm ID
+    resources and an algorithm similar to x86 for claiming existing ones.
+    congestion control algorithm.  This is present in 2.6.18 onwards and
+    algorithm with tcp_set_default_congestion_control. Otherwise, it returns the
+    algorithm to detect a safe_state to fallback in case of bm_activity and
+    modified rate arrangement with CCK rate first. Change rate scale algorithm
+      iwlwifi: select proper rate control algorithm
+      mac80211: allow driver to ask for a rate control algorithm
+      mac80211: make simple rate control algorithm built-in
+    iwlwifi: select proper rate control algorithm
+    registered rate control algorithm which, depending on system
+    the simple algorithm built-in, it would always be simple.
+    rate control algorithm.
+    mac80211: allow driver to ask for a rate control algorithm
+    This allows a driver to ask for a specific rate control algorithm.
+    The rate control algorithm asked for must be registered and be
+    algorithm twice. This is a programming error in the registration
+    mac80211: make simple rate control algorithm built-in
+    their hardware probing fails due to no rate control algorithm
+    being available. This makes the 'simple' algorithm built into
+    rate control algorithm.)
+    a possible bug in the u32 hash/bucket computing algorithm
+    option is specified, the traditional algorithm of evenly dividing TCs
+    algorithms so that it doesn't impact on the speed test results.
+      apm_power: improve battery finding algorithm
+    every algorithm (that needs this) other than AH6 already does its own
+    This patch changes mode selection matching algorithm.  It allows to choose
+    The algorithm works in a opportunistic way, in that it does not try to detect
+    i2c: Remove i2c_algorithm.algo_control()
+     - An effectively unused hook:  i2c_algorithm.algo_control.
+    cx23885: Drop empty i2c algorithm control callback
+    i2c_algorithm.algo_control is about to be removed.
+    i2c: Remove NOP i2c_algorithm.algo_control() methods
+    This removes NOP implementations of i2c_algorithm.algo_control.
+    Loading the crypto algorithm by the alias instead of by module directly
+    has the advantage that all possible implementations of this algorithm
+      the algorithm is actually used which does not lead to dead-locks
+    Loading the crypto algorithm by the alias instead of by module directly
+    has the advantage that all possible implementations of this algorithm
+    Loading the crypto algorithm by the alias instead of by module directly
+    has the advantage that all possible implementations of this algorithm
+    the algorithm being registered against the cra_name of a larval as opposed
+    the algorithm being registered can or can not satisfy the larval.
+    the algorithm's required alignment.  With the pending addition of CTR this
+    [CRYPTO] authenc: Kill spaces in algorithm names
+    We do not allow spaces in algorithm names or parameters.  Thanks to Joy Latten
+    [CRYPTO] cryptomgr: Fix parsing of recursive algorithms
+    As Joy Latten points out, inner algorithm parameters will miss the closing
+    bracket which will also cause the outer algorithm to terminate prematurely.
+    This patch adds the authenc algorithm which constructs an AEAD algorithm
+    The authenc algorithm exists as a template with four parameters:
+    The authentication algorithm, the authentication size (i.e., truncating
+    the output of the authentication algorithm), the encryption algorithm,
+    The key for the authenc algorithm is the concatenation of the keys for
+    the authentication algorithm with the encryption algorithm.  For the
+    The scatterwalk code is only used by algorithms that can be built as
+    for integer parameters in addition to the current algorithm
+    four parameters: the authentication algorithm, the encryption
+    algorithm, the authentication size and the encryption key
+    (Authenticated Encryption with Associated Data) algorithms.
+    AEAD algorithms perform authentication and encryption in one
+    different crypto algorithms to perform these.  With AEAD
+    this comes down to one algorithm and one operation.
+    Of course if traditional algorithms were used we'd still
+    algorithms may allow the underlying operations to be
+    [CRYPTO] seed: New cipher algorithm
+    algorithm itself.
+    Other options requiring specific block cipher algorithms already have
+    but that requires more complicated changes to the algorithm; thus a
+    This "algorithm" is used only internally and is not useful.
+    This patch adds debugfs handler to rate scale algorithms.
+    [PATCH] iwlwifi: Fix typo in rate sacling algorithm
+    This patch fixes tiny typo in 4965 rate sacling algorithm
+    Currently, we run through all three crypto algorithms for each
+    key we have and as such already know which algorithm will be
+    [PATCH] mac80211: remove crypto algorithm typedef
+    xrlim_allow algorithm for Syncs, permitting bursts just increases the problems.)
+    The algorithm in this patch has been improved with regard to wrapping issues
+    No changes in algorithm, all changes are text replacement/substitution.
+    Remove adding a fake key with a NONE key algorithm for each
+    Additionally, I've removed the ALG_NULL key algorithm since we have
+    [XFRM] netlink: Move algorithm length calculation to its own function
+    algorithm attribute to simplify the code.
+    guarantee for that. The new fast recovery loss marking algorithm
+        Change the C-state early break out algorithm in menu governor.
+    implements an algorithm that uses the set of "supported" standards as
+    a hint to decide on the initial standard.  This algorithm ONLY comes
+    apm_power: improve battery finding algorithm
+      - Detection algorithm has been changed
+    The same applies to rate control algorithms.
+    it does not implemented the prescribed algorithms from
+    Add some casts to the LZO compression algorithm after they were removed
+    placement algorithm.
+    readahead: remove the old algorithm
+    Remove the old readahead algorithm.
+    This is a minimal readahead algorithm that aims to replace the current one.
+    reclaim algorithm targets pages in LRU order, which is great for fairness at
+    This patch set adds a lumpy reclaim algorithm to the allocator.  It targets
+      the two may share algorithms in the future
+    have a proper interface to the rate control algorithms they don't
+    algorithms as the assembly version.
+    and hence data loss.  The old algorithm operated on all unix sockets
+    The new algorithm instead only operates on "in flight" sockets, which
+    This means the faster lzo algorithm can be preferred when there
+    requested alignment by the algorithm. This patch fixes it. The extra
+    algorithm then converges: time differences > 1000 microseconds trigger the
+    Add LZO1X algorithm to the kernel
+    algorithm to the kernel.  Nitin and myself have merged the best parts of
+    We use the same algorithms as the CPU scheduler to calculate the time
+    Use generic 64-bit division algorithm from the asm-generic directory.\
+      [IPSEC] pfkey: Load specific algorithm in pfkey_add rather than all
+      [CRYPTO] api: Read module pointer before freeing algorithm
+    [IPSEC] pfkey: Load specific algorithm in pfkey_add rather than all
+        [XFRM]: Probe selected algorithm only.
+    the same thing for af_key.  In other words, we load the algorithm requested
+       flows was in the middle of FRTO algorithm (and then RTO is
+    2) SACK reneging occurs during FRTO algorithm
+    [CRYPTO] api: Read module pointer before freeing algorithm
+    The function crypto_mod_put first frees the algorithm and then drops
+    which after freeing the algorithm and that pointer sits inside the
+    There's a bug in the MCA bus matching algorithm in that it promotes from
+    behavior not desirable, so it keeps using the old algorithm.
+      [CRYPTO] api: Do not remove users unless new algorithm matches
+    Register aes-s390 algorithms with the actual supported max keylen size
+    [    6.052000] padlock: Using VIA PadLock ACE for AES algorithm.
+    [    6.052000] padlock: Using VIA PadLock ACE for SHA1/SHA256 algorithms.
+    synchronous software crypto algorithm and converts it to an asynchronous
+    [CRYPTO] api: Do not remove users unless new algorithm matches
+    As it is whenever a new algorithm with the same name is registered
+    users of the old algorithm will be removed so that they can take
+    advantage of the new algorithm.  This presents a problem when the
+    new algorithm is not equivalent to the old algorithm.  In particular,
+    the new algorithm might only function on top of the existing one.
+    new algorithm.
+      used by the wear-levelling algorithm in the UBI layer. The algorithm
+    benefit of caching subtree roots), we remove most of the algorithms and
+    [TCP] YeAH-TCP: algorithm implementation
+    algorithm, which uses a mixed loss/delay approach to compute the
+       segment between SND.UNA and RecoveryPoint in algorithm step 3.
+       algorithm [RFC3517]"
+    The basic version of the FRTO algorithm can still be used also
+        "If the sender implements some loss recovery algorithm other
+         than Reno or NewReno [FHG04], the F-RTO algorithm SHOULD
+    FRTO algorithm and implementation is described in greater detail.
+    [TCP] FRTO: Separated response from FRTO detection algorithm
+    FRTO spurious RTO detection algorithm (RFC4138) does not include response
+    to a detected spurious RTO but can use different response algorithms.
+    Correct mis-spellings of "algorithm", "appear", "consistent" and
+    Instead of using a somewhat algorithmic approach of initializing the
+    This patch adds the developer of Camellia cipher algorithm.
+    [IPSEC]: added the entry of Camellia cipher algorithm to ealg_list[]
+    This patch adds the entry of Camellia cipher algorithm to ealg_list[].
+    cipher algorithm.
+    [CRYPTO] camellia: added the code of Camellia cipher algorithm.
+    This patch adds the main code of Camellia cipher algorithm.
+    algorithm by passing the type and mask through to the backend type
+    random numbers by an algorithm similar to the ANSI X9.17 standard.
+    Installing an IPsec SA using old algorithm names (.compat) does not work
+    if the algorithm is not already loaded. When not using the PF_KEY
+    interface, algorithms are not preloaded in xfrm_probe_algs() and
+    in the old algorithm.
+    BIOS table. It has this parsing algorithm for the EBDA:
+    acpi_video_get_next_level was supposed to implement an algorithm to select
+    This patch does not alter any algorithm, just the debug message format:
+     The algorithm will do nothing if either RTT is initialised to 0 (which is ok) or if
+         - the RTT is further needed for the window counter algorithm
+    implementation use a different algorithm that works without
+       o moved definition of struct i2c_algorithm, making forward
+    The allocation algorithm sizes the fdarray in such a way that its memory usage
+    increases in easy page-sized chunks. The overall algorithm expands the allowed
+    This patch contains several fixes for the autosearch algorithm and other small ones.
+       I've optimized is making the scan faster, not algorithmically
+    The algorithm used has been validated on a 16-bit scale for all possible
+    [CRYPTO] xcbc: New algorithm
+    XCBC is an algorithm that forms a MAC algorithm out of a cipher algorithm.
+    For example, AES-XCBC-MAC is a MAC algorithm based on the AES cipher
+    algorithm.
+            - known OID values for algorithms added.
+    This replaces the linear search algorithm for reverse lookup with
+    This patch does not change the algorithm as such.
+    zero in some future gact_prob algorithm?
+    Committer note: Simplified the patch a bit, original algorithm kept.
+    Add a new dynamic itr algorithm, with 2 modes, and make it the default
+    however, and for this reason an adaptive interrupt moderation algorithm
+    The algorithm classifies the incoming traffic every interval into
+    grid computing, the algorithm can reduce latency even more when
+    abstraction to simplify and speed up the sort algorithm.  I think
+    between 100 and 200 entries.  If we hit that then I'll change the algorithm to
+    Since cryptomgr is the only way to construct algorithm instances
+    This is fast, simple, and efficient pseudo number generator algorithm.  We
+    It is a non-standard heap-sort algorithm implementation because the index
+    standard algorithm.
+    a timer which uses a mark-and-sweep algorithm every 6 minutes.  This reduces
+    remarkably efficient for a brute force algorithm.  Given that a typical
+    code that today makes this tradeoff just does a rather simple algorithm;
+      [SCTP]: Enable Nagle algorithm by default.
+    [SCTP]: Enable Nagle algorithm by default.
+      i2c: Constify i2c_algorithm declarations, part 2
+      i2c: Constify i2c_algorithm declarations, part 1
+      i2c: Let drivers constify i2c_algorithm data
+    i2c: Constify i2c_algorithm declarations, part 2
+    i2c: Constify i2c_algorithm declarations, part 2
+    Make struct i2c_algorithm declarations const in all i2c bus drivers
+    i2c: Constify i2c_algorithm declarations, part 1
+    i2c: Constify i2c_algorithm declarations, part 1
+    Make struct i2c_algorithm declarations const in all i2c algorithm
+    i2c: Let drivers constify i2c_algorithm data
+    i2c: Let drivers constify i2c_algorithm data
+    Let drivers constify I2C algorithm method operations tables,
+    used by the algorithm code (the code has always been ifdef'd out.)
+    hardware-dependent SMBus implementation and not a reusable algorithm.
+    V4L/DVB (4477): Improve hardware algorithm by setting the appropriate registers
+    Hardware algorithm needs to be configured to:
+    This ports the algorithm from x86-64 (with improvements) to i386.
+    For NUMA optimization and some other algorithms it is useful to have a fast
+    The grow algorithm is simple, we grow if:
+    IPsec encryption/authentication algorithm.
+    [XFRM]: Restrict authentication algorithm only when inbound transformation protocol is IPsec.
+    which is set if and only if an algorithm needs a fallback of the same
+    existing simple digest algorithms may still be used to refer to their
+    standard digest algorithms like any other.
+    applicable.  Similar to the HMAC conversion, existing algorithm names
+    [IPSEC]: Add compatibility algorithm name support
+    This patch adds a compatibility name field for each IPsec algorithm.  This
+    is needed when parameterised algorithms are used.  For example, "md5" will
+    This patch adds block cipher algorithms for S390.  Once all users of the
+    This patch adds block cipher algorithms for cbc(aes) and ecb(aes) for
+    This patch adds two block cipher algorithms, CBC and ECB.  These
+    algorithms.  They invoke the single-block cipher through the new
+    algorithms which operate on a single block at a time, block ciphers
+    algorithm rather than the cipher mid-layer.  This is needed for drivers
+    algorithms as it reduces the total number of indirect calls by one.
+    In future the existing cipher algorithm will be converted to only have
+    crypto algorithm types, beginning with block ciphers.
+    objects for crypto algorithms of the same type, in particular, there will
+    be a different crypto_type objects for asynchronous algorithms.
+    Now that we have the type/mask fields when looking up algorithms, it
+    is easy to request for an algorithm of the precise type that the user
+    Accelerated versions of crypto algorithms must carry a distinct driver name
+    only look up algorithms that are synchronous.
+    the bounds specified by the algorithm.
+    to autoload all configured padlock algorithms.
+    [CRYPTO] padlock: Driver for SHA1 / SHA256 algorithms
+    Support for SHA1 / SHA256 algorithms in VIA C7 processors.
+    padlock.ko with all supported algorithms, instead we'll
+    Spawns lock a specific crypto algorithm in place.  They can then be used
+    with crypto_spawn_tfm to allocate a tfm for that algorithm.  When the base
+    algorithm of a spawn is deregistered, all its spawns will be automatically
+    [CRYPTO] api: Allow algorithm lookup by type
+    This patch also adds the infrastructure to pick an algorithm based on
+    algorithm "aes", instead of any algorithm registered under the name
+    The cryptomgr module is a simple manager of crypto algorithm instances.
+    It ensures that parameterised algorithms of the type tmpl(alg) (e.g.,
+    This patch adds a notifier chain for algorithm/template registration events.
+    This will be used to register compound algorithms such as cbc(aes).  In
+    low-level part which is used by cryptographic entities such as algorithms.
+    algorithms are built as modules.
+    However, with parameterised crypto algorithms a crypto_alg object may need
+    modules rather than the algorithms.  Therefore it makes sense to call
+    This is needed because we need to have real algorithm reference counters
+    for parameterised algorithms as they can be unregistered from below by
+    when their parameter algorithms are themselves unregistered.
+    Secure Digital cards use a different algorithm to calculate the timeout
+      o aic94xx: fix routing algorithms
+       evade from this problem, but "block allocation" algorithm is tied to
+    use smarter state management algorithms inside of
+    But on some systems and some workloads, this algorithm
+    the buddy allocator algorithm. Also anyone using mem=XXX on boot line and
+    The hashlimit table name and the textsearch algorithm need to be
+      [PATCH] i2c: Handle i2c_add_adapter failure in i2c algorithm drivers
+    [PATCH] i2c: Handle i2c_add_adapter failure in i2c algorithm drivers
+    It is possible for i2c_add_adapter() to fail.  Several I2C algorithm
+    [01/07] i2c: add intelfb bit algorithm id
+    Adds the intelfb bit algorithm id to i2c-id.h.
+    the development of new NUMA balancing algorithms that may be able to improve
+    technique that often cannot be replaced with lockless algorithms.  As we can
+    and 1:100.  Lockless is hard, and the complexity of lockless algorithms often
+    of lockless algorithms.  Furthermore, there are cases (like shared hardware,
+    death. This will be re-enabled once some issues in the algorithm used have
+      [CRYPTO] tcrypt: Speed benchmark support for digest algorithms
+      [CRYPTO] api: Allow replacement when registering new algorithms
+      [CRYPTO] all: Pass tfm instead of ctx to algorithms
+    [CRYPTO] tcrypt: Speed benchmark support for digest algorithms
+    This patch adds speed tests (benchmarks) for digest algorithms.
+    algorithms use the same input buffer.
+    [CRYPTO] api: Allow replacement when registering new algorithms
+    We already allow asynchronous removal of existing algorithm modules.  By
+    allowing the replacement of existing algorithms, we can replace algorithms
+    instantiated algorithms.  So let's stop lying to the compiler and get
+    Fix a few omissions in passing TFM instead of CTX to algorithms.
+    [CRYPTO] all: Pass tfm instead of ctx to algorithms
+    Up until now algorithms have been happy to get a context pointer since
+    However, once we have parameterised algorithms, such information will
+    be specific to each tfm.  So the algorithm API needs to be changed to
+    Various digest algorithms operate one block at a time and therefore
+    publication removal algorithm and to simplify name table sanity checking
+    The XTEA algorithm is implemented inline since it's simple enough to do so,
+    V4L/DVB (4161): Utilize the device specific algorithm callbacks
+    V4L/DVB (4160): Use device specific algorithms
+    V4L/DVB (4159): Implement tuning algorithm as a module parameter
+    the enhancement of TCP Reno/Sack congestion control algorithm by using
+     TCP Low Priority is a distributed algorithm whose goal is to utilize only
+    As of 2.6.13, Linux supports pluggable congestion control algorithms.
+    Forthcoming AMD products will use a different algorithm for transitioning
+    placement algorithms.
+    This simplifies the locking algorithm in nand_get/release_chip().
+    algorithm used is to ensure that the entire path to the file being
+    inode, so the wrong hash algorithm was being used.  But only for
+    priv->last_noise is not used with the exponential averaging algorithm
+    This patch is an enhancement of OVERCOMMIT_GUESS algorithm in
+    When the OVERCOMMIT_GUESS algorithm calculates the number of free pages,
+    the algorithm subtracts the number of reserved pages from the result
+    This patch is an enhancement of OVERCOMMIT_GUESS algorithm in
+    When the OVERCOMMIT_GUESS algorithm calculates the number of free pages,
+    the algorithm subtracts the number of reserved pages from the result
+    These patches are an enhancement of OVERCOMMIT_GUESS algorithm in
+      When the OVERCOMMET_GUESS algorithm calculates number of free pages,
+      V4L/DVB (3598): Add bit algorithm adapter for the Conexant CX2341X boards.
+    The "rounded up to nearest power of 2 in size" algorithm in
+    V4L/DVB (3598): Add bit algorithm adapter for the Conexant CX2341X boards.
+             * algorithm would be a simple look for multiple zeros in the
+    they'll add random entries to make their own broken algorithms do the
+    two pass algorithm. First pass scans and records the start of the last
+    [IPV6]: ADDRCONF: Use our standard algorithm for randomized ifid.
+    RFC 3041 describes an algorithm to generate random interface
+    algorithm than one described in RFC 3041.
+    So, let's use our standard pseudo random algorithm to simplify
+      [PATCH] ipw2200: Enables the "slow diversity" algorithm
+    The whole algorithm was wrong.  What we need to do is:
+    [PATCH] ipw2200: Enables the "slow diversity" algorithm
+    algorithm causing them to attach to the wrong bus, thus triggering
+    Change the find_next_best_node algorithm to correctly skip
+    Clean up cache_estimate() in mm/slab.c and improves the algorithm from O(n) to
+    [PATCH] ipw2200: Add LEAP authentication algorithm support
+    [PATCH] ipw2100: Add LEAP authentication algorithm support
+    LRO algorithm was described in an OLS 2005 presentation, located at
+    functions that were calles with algorithm block size (8 bytes for DES).
+    They already do this in hardware and the Linux algorithm
+    for the same algorithm, we no longer have to play tricks with Kconfig
+    [CRYPTO] Allow multiple implementations of the same algorithm
+    for the same algorithm registered in the system.
+    for each algorithm that it supports.  While at the same time the
+    user may load software implementations of those same algorithms.
+    by name, or choose any implementation for a given algorithm with
+    crypto algorithm wasn't assigned. This is also fixed.
+    Add support for the hardware accelerated AES crypto algorithm.
+    Add support for the hardware accelerated sha256 crypto algorithm.
+    balancing algorithm would require that if we're scanning 100 pages of
+    [PATCH] FRV: Clean up bootmem allocator's page freeing algorithm
+    Replace cube root algorithim with a faster version using Newton-Raphson.
+       what I hope is a correct algorithm..."
+    algorithm. For advanced congestion control there is little
+    algorithm.
+    Simplifies code a lot by separating the red algorithm and the
+    the whole qdisc first. The new algorithm checks each VQ against
+    Simplifies code a lot by separating the red algorithm and the
+    Extracts the RED algorithm from sch_red.c and puts it into include/net/red.h
+    algorith registration.  We also ensure that the block size is bounded
+    [PATCH] i2c: Drop unused per-i2c-algorithm adapter max
+    There are no more per-i2c-algorithm adapter max. Last time there were
+    [MCAST] IPv6: Fix algorithm to compute Querier's Query Interval
+    [NET]: Use non-recursive algorithm in skb_copy_datagram_iovec()
+    Patch from Joel Sing to fix the default congestion control algorithm
+    [PATCH] ieee80211 quality scaling algorithm extension handler
+    Incorporated Bill Moss' quality scaling algorithm into default wireless
+    [I2C] Add a functionality method, and remove algorithm ids
+    [PATCH] lib/crc16: added crc16 algorithm.
+    [PATCH] kallsyms: change compression algorithm
+    This patch changes the way the compression algorithm works.  The base
+    algorithm is similiar to the previous but we force the compressed token
+    Delete an outdated comment about i2c_algorithm.id being computed
+    [PATCH] I2C: Kill i2c_algorithm.id (7/7)
+    [PATCH] I2C: Kill i2c_algorithm.id (6/7)
+    [PATCH] I2C: Kill i2c_algorithm.id (5/7)
+    Merge the algorithm id part (16 upper bits) of the i2c adapters ids
+    [PATCH] I2C: Kill i2c_algorithm.id (4/7)
+    There are no more users of i2c_algorithm.id, so we can finally drop
+    [PATCH] I2C: Kill i2c_algorithm.id (3/7)
+    Don't rely on i2c_algorithm.id to alter the i2c adapter's id, use the
+    I2C_ALGO_* value directly instead, because i2c_algorithm will soon
+    [PATCH] I2C: Kill i2c_algorithm.id (2/7)
+    Use the adapter id rather than the algorithm id to detect the i2c-isa
+    algorithm ids will soon be gone anyway.
+    [PATCH] I2C: Kill i2c_algorithm.name (1/7)
+    The name member of the i2c_algorithm is never used, although all
+    In terms of algorithmic complexity, the new code is way better. If
+    The function calc_nr uses an iterative algorithm to calculate the number of
+    algorithm for the new textsearch infrastructure.
+    So, the same algorithm used when SMP is enabled should be used when
+    Provides a nice performance improvement. The new algorithm incidentally
+    This data will be useful for making future improvements in the algorithms.
+    Fix the p-persistence CSMA algorithm which in simplex mode was starting
+    1. Fix algorithm for finding the best power of 2 size with mtrr_add().
+    This patch adds hooks for cipher algorithms to implement multi-block
+    underlying algorithm that performs the multi-block operations.
+    for all existing algorithm implementations.  I've measured the gain to be
+    Add support for alternate slave selection algorithms to bonding
+    [IPV4]: Move FIB lookup algorithm choice under IP_ADVANCED_ROUTING
+    FIB lookup algorithm to use.  So give them the safe default of
+         keyring search algorithm to be simplified greatly since no locks need be
+    The algorithm differs between strict/non-strict mode specyfing
+    The runtime performance of the algorithm should be around O(n),
+    [LIB]: Knuth-Morris-Pratt textsearch algorithm
+    Implements a linear-time string-matching algorithm due to Knuth,
+    Morris, and Pratt [1]. Their algorithm avoids the explicit
+    Individual search algorithms are implemented in modules
+    This patch implements Tom Kelly's Scalable TCP congestion control algorithm
+    The algorithm has some nice scaling properties, and has been used a fair bit
+    H-TCP is a congestion control algorithm developed at the Hamilton Institute, by
+    Douglas Leith and Robert Shorten. It is extending the standard Reno algorithm
+    The following patch implements the H-TCP algorithm in it's basic form.
+    [TCP]: Report congestion control algorithm in tcp_diag.
+    [TCP]: Add pluggable congestion control algorithm infrastructure.
+    Allow TCP to have multiple pluggable congestion control algorithms.
+    or modules.  The legacy "new RENO" algorithm is used as a starting
+    Other algorithms can supply template keys through the same interface if needed.
+    of auto fan clock divider based on Jean Delvare's algorithm, and
+    [IPV4]: Add LC-Trie FIB lookup algorithm.
+    and rr multipath algorithms just like the random
+    multipath algorithm does.
+    engineering of the decompressor algorithms used in the pwc driver.
+    [PATCH] x86_64: Update TSC sync algorithm
+    The new TSC sync algorithm recently submitted did not work too well.
+    Detection algorithm is abbreviated as RED instead of GRED.
+    Replace old naive extract-8-lsb-bits algorithm with a better
+    algorithm xor'ing 3 or 4 bit fields at the size of the hashtable
+    idea for this new algorithm.
+    One drawback: the new TSC sync algorithm is less accurate than before.  The
+    One drawback: the new TSC sync algorithm is less accurate than before.  The
