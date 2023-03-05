@@ -1,0 +1,58 @@
+commit 1db3b92cb24cf738a7edbe13ee2f21905adf0c6b
+Author: Neil Armstrong <narmstrong@baylibre.com>
+Date:   Thu Mar 23 17:27:29 2017 +0100
+
+    ARM64: dts: meson-gxbb: Add USB Hub GPIO hog
+    
+    The ODroid-C2 on-board USB Hub needs to to have it's reset signal set to
+    high level in order to be enumerated by the USB Host Controller.
+    
+    But this management must be part of the currently in-development Generic
+    Power Sequence patch that will allow a USB Controller driver to start and stop
+    a power sequence associated to the USB Bus.
+    
+    In the meantime, a simple USB Hog will work to enable the USB Hub.
+    
+    Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+    Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+    Signed-off-by: Kevin Hilman <khilman@baylibre.com>
+
+commit cf68923055cbb3a2d6a819a7197e4f69bf68cc44
+Author: Felipe Balbi <felipe.balbi@linux.intel.com>
+Date:   Fri Oct 14 13:46:50 2016 +0300
+
+    usb: dwc3: gadget: purge dwc3_stop_active_transfers()
+    
+    That function is unnecessarily called from
+    dwc3_gadget_reset_interrupt(). Gadget drivers (and
+    thus, functions) are required to dequeue all pending
+    requests when they get notified about a USB Bus
+    Reset.
+    
+    Trying to make sure there are no pending requests
+    only serves the purpose of working around possibly
+    bad gadgets.
+    
+    Signed-off-by: Felipe Balbi <felipe.balbi@linux.intel.com>
+
+commit 5cbe8c220c1e126dd0855ad57fe4491b267132b9
+Author: Gerard CAUVY <g-cauvy1@ti.com>
+Date:   Thu May 24 12:47:36 2012 +0300
+
+    usb: dwc3: gadget: move AcceptU1Ena and AcceptU2Ena to Reset IRQ
+    
+    According to the databook, the DWC3 Core will
+    reset those bits to 0 on USB Bus Reset. This
+    means we must re-enable those bits on every
+    reset interrupt.
+    
+    Because we will always get a Reset interrupt
+    after loading a gadget driver, we can, instead
+    of re-enabling something that was just lost,
+    move the handling of those bits to the Reset
+    Interrupt.
+    
+    This patch fixes USB30CV U1/U2 Test.
+    
+    Signed-off-by: Gerard CAUVY <g-cauvy1@ti.com>
+    Signed-off-by: Felipe Balbi <balbi@ti.com>

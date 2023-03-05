@@ -1,0 +1,687 @@
+commit ff77ba0514855c106f8683b56a9a79b7464509c3
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Fri Sep 9 11:53:52 2022 +0200
+
+    arm64: dts: renesas: r8a779g0: Add I2C nodes
+    
+    Add device nodes for the I2C Bus Interfaces on the Renesas R-Car V4H
+    (R8A779G0) SoC.
+    
+    Extracted from a larger patch in the BSP by Takeshi Kihara.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Link: https://lore.kernel.org/r/272fd18fed2d7addfbdb7945ae2134988a7c3a7e.1662715538.git.geert+renesas@glider.be
+
+commit e90eba2ecb828ae23718523c66aadf4126a67dbb
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Fri Sep 9 11:25:13 2022 +0200
+
+    clk: renesas: r8a779g0: Add I2C clocks
+    
+    Add the module clocks used by the I2C Bus Interfaces on the Renesas
+    R-Car V4H (R8A779G0) SoC.
+    
+    Extracted from a larger patch in the BSP by Kazuya Mizuguchi.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Link: https://lore.kernel.org/r/f4b94f37950f6e976b68d0b32c324fb026d8b696.1662714852.git.geert+renesas@glider.be
+
+commit a46579194215c3676445fbfa3a48225e01f42f2b
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Fri Sep 9 11:09:02 2022 +0200
+
+    dt-bindings: i2c: renesas,rcar-i2c: Add r8a779g0 support
+    
+    Document support for the I2C Bus Interfaces in the Renesas R-Car V4H
+    (R8A779G0) SoC.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+    Signed-off-by: Wolfram Sang <wsa@kernel.org>
+
+commit bd04437341962d4bff32a8410d69c4ab974c86d1
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Thu Feb 3 16:26:47 2022 +0100
+
+    arm64: dts: renesas: r8a779f0: Add I2C nodes
+    
+    Add device nodes for the I2C Bus Interfaces on the Renesas R-Car S4-8
+    (R8A779F0) SoC.
+    
+    Based on a larger patch in the BSP by LUU HOAI.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Link: https://lore.kernel.org/r/e1c7fb17801bc82a74aa5364212d02ba51535dd2.1643898884.git.geert+renesas@glider.be
+
+commit 180adcd40bcdf07dd1ecc8b5f22efe04adc796e8
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Mon Feb 21 16:43:40 2022 +0100
+
+    pinctrl: renesas: r8a779f0: Add I2C pins, groups, and functions
+    
+    Add pins, groups, and functions for the I2C Bus Interfaces (I2C) on the
+    Renesas R-Car S4-8 (R8A779F0) SoC.
+    
+    Extracted from a larger patch in the BSP by LUU HOAI.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+    Link: https://lore.kernel.org/r/217f5b3e3888b5899c375d3cb1ec8780f6a9e19b.1645457792.git.geert+renesas@glider.be
+
+commit 5447d32c55592610969fa7e825a591c4104f0134
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Thu Feb 3 15:34:28 2022 +0100
+
+    clk: renesas: r8a779f0: Add I2C clocks
+    
+    Add the module clocks used by the I2C Bus Interfaces on the Renesas
+    R-Car S4-8 (R8A779F0) SoC.
+    
+    Extracted from a larger patch in the BSP by LUU HOAI.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+    Link: https://lore.kernel.org/r/e4dcee5f6f521dccd7ac7f2fb6c86cfe4a24d032.1643898820.git.geert+renesas@glider.be
+
+commit ea01b71b07993d5c518496692f476a3c6b5d9786
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Thu Feb 3 15:33:17 2022 +0100
+
+    i2c: rcar: Add R-Car Gen4 support
+    
+    Add support for the I2C Bus Interface on R-Car Gen4 SoCs (e.g. R-Car
+    S4-8) by matching on a family-specific compatible value.
+    
+    While I2C on R-Car Gen4 does support some extra features (Slave Clock
+    Stretch Select), for now it is treated the same as I2C on R-Car Gen3.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+    [wsa: removed incorrect "FM+" from commit message]
+    Signed-off-by: Wolfram Sang <wsa@kernel.org>
+
+commit b36fc8181e3b31ba9e11c6a1938aa5bede10206f
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Thu Feb 3 15:33:16 2022 +0100
+
+    dt-bindings: i2c: renesas,rcar-i2c: Add r8a779f0 support
+    
+    Document support for the I2C Bus Interfaces in the Renesas R-Car S4-8
+    (R8A779F0) SoC, including a new family-specific compatible value for the
+    R-Car Gen4 family.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+    Acked-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Wolfram Sang <wsa@kernel.org>
+
+commit 112dfa5ca16cc95dd6ceef7387a5f0f8a808da56
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Wed Jul 14 15:20:00 2021 +0200
+
+    dt-bindings: i2c: renesas,riic: Add interrupt-names
+    
+    The Renesas RZ/A and RZ/G2L I2C Bus Interface has no less than 8
+    interrupts.  Hence document the "interrupt-names" property, to make it
+    easier to review the interrupt mappings in DTS files.
+    
+    Note that this property cannot be made required yet, as the RIIC nodes
+    in all DTS files lack the property.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+    Link: https://lore.kernel.org/r/a81d0e14e395f297666e8c3a8ce3e292d2606a65.1626267422.git.geert+renesas@glider.be
+
+commit 632ce67773dace482a8c4fcbedd4c19154e38d37
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Fri Jun 18 13:04:11 2021 +0200
+
+    dt-bindings: i2c: renesas,iic: Convert to json-schema
+    
+    Convert the Renesas R-Mobile I2C Bus Interface (IIC) Device Tree binding
+    documentation to json-schema.
+    
+    Document missing properties.
+    R-Mobile A1 and SH-Mobile have multiple interrupts.
+    Update the example to match reality.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Wolfram Sang <wsa@kernel.org>
+
+commit 92b7716f4c54cb61b30e4680ea436a9e0cc6f4de
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Fri May 28 11:19:48 2021 +0200
+
+    dt-bindings: i2c: renesas,riic: Convert to json-schema
+    
+    Convert the Renesas RZ/A I2C Bus Interface (RIIC) Device Tree binding
+    documentation to json-schema.
+    
+    Document missing properties.
+    Update the example to match reality.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Wolfram Sang <wsa@kernel.org>
+
+commit dbed8a803bd3fb64339a6180adaff2cec46242ce
+Author: Michael Hennerich <michael.hennerich@analog.com>
+Date:   Tue Apr 11 14:16:16 2017 +0200
+
+    i2c: mux: ltc4306: LTC4306 and LTC4305 I2C multiplexer/switch
+    
+    This patch adds support for the Analog Devices / Linear Technology
+    LTC4306 and LTC4305 4/2 Channel I2C Bus Multiplexer/Switches.
+    The LTC4306 optionally provides two general purpose input/output pins
+    (GPIOs) that can be configured as logic inputs, opendrain outputs or
+    push-pull outputs via the generic GPIOLIB framework.
+    
+    Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+    Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+    Signed-off-by: Peter Rosin <peda@axentia.se>
+
+commit 84ffac897161745b173eb879513bfa311549b7e4
+Author: Michael Hennerich <michael.hennerich@analog.com>
+Date:   Tue Apr 11 14:16:15 2017 +0200
+
+    dt-bindings: i2c: mux: ltc4306: Add dt-bindings for I2C multiplexer/switch
+    
+    This patch adds support for the Analog Devices / Linear Technology
+    LTC4306 and LTC4305 4/2 Channel I2C Bus Multiplexer/Switches.
+    The LTC4306 optionally provides two general purpose input/output pins
+    (GPIOs) that can be configured as logic inputs, opendrain outputs or
+    push-pull outputs via the generic GPIOLIB framework.
+    
+    Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+    Acked-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Peter Rosin <peda@axentia.se>
+
+commit da621d5022886311d6634b8995c9b9fc9d9b7d36
+Author: Zubair Lutfullah Kakakhel <Zubair.Kakakhel@imgtec.com>
+Date:   Tue Nov 22 17:52:41 2016 +0000
+
+    MIPS: xilfpga: Add DT node for AXI I2C
+    
+    The xilfpga platform has an AXI I2C Bus master with a temperature
+    sensor connected to it.
+    
+    Add the device tree node to use them.
+    
+    Signed-off-by: Zubair Lutfullah Kakakhel <Zubair.Kakakhel@imgtec.com>
+    Cc: linux-mips@linux-mips.org
+    Cc: linux-kernel@vger.kernel.org
+    Patchwork: https://patchwork.linux-mips.org/patch/14594/
+    Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+
+commit 78df445e7807b1ed741d2571280a674f3e4a57bf
+Author: Geert Uytterhoeven <geert+renesas@glider.be>
+Date:   Thu Nov 6 12:52:07 2014 +0100
+
+    i2c: sh_mobile: Add support for r8a73a4 and sh73a0
+    
+    Add support for r8a73a4 (R-Mobile APE6) and sh73a0 (SH-Mobile AG5).
+    On these SoCs, the operating clock runs faster that on previous SoCs,
+    and the internal SCL clock counter gets incremented every 2 clocks of
+    the operating clock, just like on R-Car Gen2.
+    
+    Cfr. the "/2" in the calculation of ICCL/ICCH in section "I2C Bus
+    Interface (IIC)", subsection "Transfer Rate" of the datasheets.
+    
+    Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+
+commit d77d5bae994ce63c5bec55484a0f1ba75ed18081
+Author: Egbert Eich <eich@suse.de>
+Date:   Mon Oct 15 08:21:39 2012 +0200
+
+    drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+    
+    commit 082918471139b07964967cfe5f70230909c82ae1 upstream.
+    
+    radeon_i2c_fini() walks thru the list of I2C bus recs rdev->i2c_bus[]
+    to destroy each of them.
+    radeon_ext_tmds_enc_destroy() however also has code to destroy it's
+    associated I2C bus rec which has been obtained by radeon_i2c_lookup()
+    and is therefore also in the i2c_bus[] list.
+    This causes a double free resulting in a kernel panic when unloading
+    the radeon driver.
+    Removing destroy code from radeon_ext_tmds_enc_destroy() fixes this
+    problem.
+    
+    agd5f: fix compiler warning
+    
+    Signed-off-by: Egbert Eich <eich@suse.de>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+    Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+commit b567aa019fe3d2b9d341650b95c7afcc04a3c812
+Author: Egbert Eich <eich@suse.de>
+Date:   Mon Oct 15 08:21:39 2012 +0200
+
+    drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+    
+    commit 082918471139b07964967cfe5f70230909c82ae1 upstream.
+    
+    radeon_i2c_fini() walks thru the list of I2C bus recs rdev->i2c_bus[]
+    to destroy each of them.
+    radeon_ext_tmds_enc_destroy() however also has code to destroy it's
+    associated I2C bus rec which has been obtained by radeon_i2c_lookup()
+    and is therefore also in the i2c_bus[] list.
+    This causes a double free resulting in a kernel panic when unloading
+    the radeon driver.
+    Removing destroy code from radeon_ext_tmds_enc_destroy() fixes this
+    problem.
+    
+    agd5f: fix compiler warning
+    
+    Signed-off-by: Egbert Eich <eich@suse.de>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ab8cd49a6e1984398984e1657f7b6787c37a9a45
+Author: Egbert Eich <eich@suse.de>
+Date:   Mon Oct 15 08:21:39 2012 +0200
+
+    drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+    
+    commit 082918471139b07964967cfe5f70230909c82ae1 upstream.
+    
+    radeon_i2c_fini() walks thru the list of I2C bus recs rdev->i2c_bus[]
+    to destroy each of them.
+    radeon_ext_tmds_enc_destroy() however also has code to destroy it's
+    associated I2C bus rec which has been obtained by radeon_i2c_lookup()
+    and is therefore also in the i2c_bus[] list.
+    This causes a double free resulting in a kernel panic when unloading
+    the radeon driver.
+    Removing destroy code from radeon_ext_tmds_enc_destroy() fixes this
+    problem.
+    
+    agd5f: fix compiler warning
+    
+    Signed-off-by: Egbert Eich <eich@suse.de>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cbdf1102b66ad6c98824d9f82f4d615c2e2ca270
+Author: Egbert Eich <eich@suse.de>
+Date:   Mon Oct 15 08:21:39 2012 +0200
+
+    drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+    
+    commit 082918471139b07964967cfe5f70230909c82ae1 upstream.
+    
+    radeon_i2c_fini() walks thru the list of I2C bus recs rdev->i2c_bus[]
+    to destroy each of them.
+    radeon_ext_tmds_enc_destroy() however also has code to destroy it's
+    associated I2C bus rec which has been obtained by radeon_i2c_lookup()
+    and is therefore also in the i2c_bus[] list.
+    This causes a double free resulting in a kernel panic when unloading
+    the radeon driver.
+    Removing destroy code from radeon_ext_tmds_enc_destroy() fixes this
+    problem.
+    
+    agd5f: fix compiler warning
+    
+    Signed-off-by: Egbert Eich <eich@suse.de>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 75fa29c7000924060677e0591368045576daad93
+Merge: 5d5c5dca9c2d 8a00b6af4cc5
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue Oct 16 18:14:31 2012 -0700
+
+    Merge branch 'drm-fixes' of git://people.freedesktop.org/~airlied/linux
+    
+    Pull drm fixes from Dave Airlie:
+     "Fixes for i915, nouveau and radeon:
+    
+       - i915: haswell stability, modeset rework fallout, ums fix
+       - nouveau: misc fixes from code rework
+       - radeon: pll rework fixes, more 2 level PTE cleanups.
+       - core: warning fixes on 32-bit."
+    
+    * 'drm-fixes' of git://people.freedesktop.org/~airlied/linux: (31 commits)
+      nouveau: fix warning on 32-bit build.
+      drm/nouveau/bios: fix typo in error message
+      drm/nouveau: only call ttm_agp_tt_create when __OS_HAS_AGP
+      drm/nv50/fb: fix double free of vram mm
+      drm/nouveau/pm: do not stop reclocking if failing to set the fan speed
+      drm/nouveau/pm: fix a typo related to the move to the therm subdev
+      drm/nouveau/hwmon: fix the initialization condition
+      drm: fix warning on 32-bit.
+      drm: radeon: fix printk format warning
+      drm/radeon: fix spelling typos in debugging output
+      drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+      drm/radeon: check if pcie gen 2 is already enabled (v2)
+      drm/radeon/cayman: set VM max pfn at MC init
+      drm/radeon: separate pt alloc from lru add
+      drm/radeon: don't add the IB pool to all VMs v2
+      drm/radeon: allocate page tables on demand v4
+      drm/radeon: update comments to clarify VM setup (v2)
+      drm/radeon: allocate PPLLs from low to high
+      drm/radeon: fix compilation with backlight disabled
+      drm/radeon: use %zu for formatting size_t
+      ...
+
+commit 39df01cd6ce9f6dd755ace0030e2bebe75da7727
+Merge: 3459f6204730 8ad33cdf9763
+Author: Dave Airlie <airlied@redhat.com>
+Date:   Tue Oct 16 10:13:24 2012 +1000
+
+    Merge branch 'drm-fixes-3.7' of git://people.freedesktop.org/~agd5f/linux into drm-fixes
+    
+    Alex writes:
+    "This is the first -fixes pull for 3.7.  I would have preferred
+    to have gotten it out a bit sooner, but I was on holiday last week.
+    - Cleanup of the new 2 level page table code it get it in
+      better shape and using less memory.
+    - Fix some display issues related to the PLL rework.
+    - Fix some cmpiler warnings and errors with certain config
+      options.
+    - Other misc bug fixes."
+    
+    * 'drm-fixes-3.7' of git://people.freedesktop.org/~agd5f/linux:
+      drm/radeon: fix spelling typos in debugging output
+      drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+      drm/radeon: check if pcie gen 2 is already enabled (v2)
+      drm/radeon/cayman: set VM max pfn at MC init
+      drm/radeon: separate pt alloc from lru add
+      drm/radeon: don't add the IB pool to all VMs v2
+      drm/radeon: allocate page tables on demand v4
+      drm/radeon: update comments to clarify VM setup (v2)
+      drm/radeon: allocate PPLLs from low to high
+      drm/radeon: fix compilation with backlight disabled
+      drm/radeon: use %zu for formatting size_t
+
+commit 082918471139b07964967cfe5f70230909c82ae1
+Author: Egbert Eich <eich@suse.de>
+Date:   Mon Oct 15 08:21:39 2012 +0200
+
+    drm/radeon: Don't destroy I2C Bus Rec in radeon_ext_tmds_enc_destroy().
+    
+    radeon_i2c_fini() walks thru the list of I2C bus recs rdev->i2c_bus[]
+    to destroy each of them.
+    radeon_ext_tmds_enc_destroy() however also has code to destroy it's
+    associated I2C bus rec which has been obtained by radeon_i2c_lookup()
+    and is therefore also in the i2c_bus[] list.
+    This causes a double free resulting in a kernel panic when unloading
+    the radeon driver.
+    Removing destroy code from radeon_ext_tmds_enc_destroy() fixes this
+    problem.
+    
+    agd5f: fix compiler warning
+    
+    Signed-off-by: Egbert Eich <eich@suse.de>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+    Cc: stable@vger.kernel.org
+
+commit aad628c1d91a6db57e572e4c1f35e863d81061d7
+Author: Peter Huewe <peter.huewe@infineon.com>
+Date:   Tue Aug 7 11:42:32 2012 +0200
+
+    char/tpm: Add new driver for Infineon I2C TIS TPM
+    
+    This patch adds a driver to support Infineon's SLB 9635 TT 1.2 Soft I2C TPMs
+    which follow the TGC TIS 1.2 TPM specification[1] and Infineon's I2C Protocol
+    Stack Specification 0.20.
+    The I2C Protocol Stack Specification is a simple adaption of the LPC TIS
+    Protocol to the I2C Bus.
+    The I2C TPMs can be used when LPC Bus is not available (i.e. non x86
+    architectures like ARM).
+    
+    The driver is based on the tpm_tis.c driver by Leendert van Dorn and Kyleen
+    Hall and has quite similar functionality.
+    
+    Tested on Nvidia ARM Tegra2 Development Platform and Beagleboard (ARM OMAP)
+    Tested with the Trousers[2] TSS API Testsuite v 0.3 [3]
+    Compile-tested on x86 (32/64-bit)
+    
+    Updates since version 2.1.4:
+    - included "Lock the I2C adapter for a sequence of requests", by Bryan Freed
+    - use __i2c_transfer instead of own implementation of unlocked i2c_transfer
+    - use struct dev_pm_ops for power management via SIMPLE_DEV_PM_OPS
+    
+    Updates since version 2.1.3:
+    - use proper probing mechanism
+    * either add the tpm using I2C_BOARD_INFO to your board file or probe it
+    * during runtime e.g on BeagleBoard using :
+    * "echo tpm_i2c_infineon 0x20 > /sys/bus/i2c/devices/i2c-2/new_device"
+    - fix possible endless loop if hardware misbehaves
+    - improved return codes
+    - consistent spelling i2c/tpm -> I2C/TPM
+    - remove hardcoded sleep values and msleep usage
+    - removed debug statements
+    - added check for I2C functionality
+    - renaming to tpm_i2c_infineon
+    
+    Updates since version 2.1.2:
+    - added sysfs entries for duration and timeouts
+    - updated to new tpm_do_selftest
+    
+    Updates since version 2.1.0:
+    - improved error handling
+    - implemented workarounds needed by the tpm
+    - fixed typos
+    
+    References:
+    [1]
+    http://www.trustedcomputinggroup.org/resources/pc_client_work_group_pc_client_
+    specific_tpm_interface_specification_tis_version_12/
+    [2] http://trousers.sourceforge.net/
+    [3]
+    http://sourceforge.net/projects/trousers/files/TSS%20API%20test%20suite/0.3/
+    
+    Reviewed-by: Andi Shyti <andi.shyti@gmail.com>
+    Acked-by: Marcel Selhorst <tpmdd@selhorst.net>
+    Signed-off-by: Peter Huewe <peter.huewe@infineon.com>
+    Signed-off-by: Bryan Freed <bfreed@chromium.org>
+    Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
+
+commit a6007c036e0a0e10c0b4dbd533576d201b822a90
+Author: Toshiharu Okada <toshiharu-linux@dsn.okisemi.com>
+Date:   Mon Sep 26 16:16:23 2011 +0900
+
+    i2c-eg20t: modified the setting of transfer rate.
+    
+    commit ff35e8b18984ad2a82cbd259fc07f0be4b34b1aa upstream.
+    
+    This patch modified the setting value of
+    I2C Bus Transfer Rate Setting Counter regisrer.
+    
+    Signed-off-by: Toshiharu Okada <toshiharu-linux@dsn.okisemi.com>
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 8d7385000114bd38bdeb6ca175262b56aecd1931
+Author: Toshiharu Okada <toshiharu-linux@dsn.okisemi.com>
+Date:   Mon Sep 26 16:16:23 2011 +0900
+
+    i2c-eg20t: modified the setting of transfer rate.
+    
+    commit ff35e8b18984ad2a82cbd259fc07f0be4b34b1aa upstream.
+    
+    This patch modified the setting value of
+    I2C Bus Transfer Rate Setting Counter regisrer.
+    
+    Signed-off-by: Toshiharu Okada <toshiharu-linux@dsn.okisemi.com>
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit ff35e8b18984ad2a82cbd259fc07f0be4b34b1aa
+Author: Toshiharu Okada <toshiharu-linux@dsn.okisemi.com>
+Date:   Mon Sep 26 16:16:23 2011 +0900
+
+    i2c-eg20t: modified the setting of transfer rate.
+    
+    This patch modified the setting value of
+    I2C Bus Transfer Rate Setting Counter regisrer.
+    
+    Signed-off-by: Toshiharu Okada <toshiharu-linux@dsn.okisemi.com>
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit 3fce1c0ba2b35b68135d8d8a3438f8c8272a01d8
+Author: Mingkai Hu <Mingkai.hu@freescale.com>
+Date:   Tue Jun 28 15:52:34 2011 +0800
+
+    powerpc/85xx: Add p2040 RDB board support
+    
+    P2040RDB Specification:
+    -----------------------
+    2Gbyte unbuffered DDR3 SDRAM SO-DIMM(64bit bus)
+    128 Mbyte NOR flash single-chip memory
+    256 Kbit M24256 I2C EEPROM
+    16 Mbyte SPI memory
+    SD connector to interface with the SD memory card
+    dTSEC1: connected to the Vitesse SGMII PHY (VSC8221)
+    dTSEC2: connected to the Vitesse SGMII PHY (VSC8221)
+    dTSEC3: connected to the Vitesse SGMII PHY (VSC8221)
+    dTSEC4: connected to the Vitesse RGMII PHY (VSC8641)
+    dTSEC5: connected to the Vitesse RGMII PHY (VSC8641)
+    I2C1: Real time clock, Temperature sensor
+    I2C2: Vcore Regulator, 256Kbit I2C Bus EEPROM
+    SATA: Lanes C and Land D of Bank2 are connected to two SATA connectors
+    UART: supports two UARTs up to 115200 bps for console
+    USB 2.0: connected via a internal UTMI PHY to two TYPE-A interfaces
+    PCIe:
+     - Lanes E, F, G and H of Bank1 are connected to one x4 PCIe SLOT1
+     - Lanes C and Land D of Bank2 are connected to one x4 PCIe SLOT2
+    
+    Signed-off-by: Mingkai Hu <Mingkai.hu@freescale.com>
+    Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
+
+commit ae63b13bbeca7f8915c555663f8789a531611e4b
+Author: Guenter Roeck <guenter.roeck@ericsson.com>
+Date:   Sun Oct 24 18:16:58 2010 +0200
+
+    i2c/mux: Driver for PCA9541 I2C Master Selector
+    
+    This patch adds support for PCA9541, an I2C Bus Master Selector.
+    The driver is modeled as single channel I2C Multiplexer to be able to utilize
+    the I2C multiplexer framework.
+    
+    Signed-off-by: Guenter Roeck <guenter.roeck@ericsson.com>
+    Reviewed-by: Tom Grennan <tom.grennan@ericsson.com>
+    Acked-by: Jean Delvare <khali@linux-fr.org>
+
+commit 8159df72d43e237d5bfcff052a8337245b6ac53e
+Author: Heiko Schocher <hs@denx.de>
+Date:   Mon Jun 15 09:38:18 2009 +0200
+
+    83xx: add support for the kmeter1 board.
+    
+    The following series implements basic board support for
+    the kmeter1 board from keymile, based on a MPC8360.
+    
+    This series provides the following functionality:
+    
+    - The board can boot with a serial console on UART1
+    - Ethernet:
+        UCC1 in RGMII mode
+        UCC2 in RGMII mode
+        UCC4 in RMII mode
+        UCC5 in RMII mode
+        UCC6 in RMII mode
+        UCC7 in RMII mode
+        UCC8 in RMII mode
+    
+        following patch is necessary for working UCC in RMII mode:
+    
+        http://lists.ozlabs.org/pipermail/linuxppc-dev/2009-April/070804.html
+    
+    - Flash accessed via MTD layer
+    
+      On this hardware there is an Intel P30 flash, following patch
+      series is necessary for working with this hardware:
+    
+      http://lists.ozlabs.org/pipermail/linuxppc-dev/2009-April/070624.html
+    
+    - I2C using I2C Bus 1 from the MPC8360 cpu
+    
+    Signed-off-by: Heiko Schocher <hs@denx.de>
+    Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
+
+commit aa11e38ce6fe8846fec046a95cecd5d4690c48cd
+Author: Darius Augulis <augulis.darius@gmail.com>
+Date:   Fri Jan 30 10:32:28 2009 +0200
+
+    i2c: iMX/MXC support
+    
+    Implementation of I2C Adapter/Algorithm Driver for I2C Bus integrated
+    in Freescale's i.MX/MXC processors.
+    
+    Signed-off-by: Darius Augulis <augulis.darius@gmail.com>
+    Tested-by: Sascha Hauer <s.hauer@pengutronix.de>
+    Reviewed-by: Wolfram Sang <w.sang@pengutronix.de>
+    Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+
+commit b043b673dc8a73daa233d5d92cf70b32e7351314
+Merge: cd5e25d93e6e fb9c280d4c6d
+Author: Linus Torvalds <torvalds@g5.osdl.org>
+Date:   Sun Apr 2 12:53:57 2006 -0700
+
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/mchehab/v4l-dvb
+    
+    * master.kernel.org:/pub/scm/linux/kernel/git/mchehab/v4l-dvb: (49 commits)
+      V4L/DVB (3667b): cpia2: fix function prototype
+      V4L/DVB (3702): Make msp3400 routing defines more consistent
+      V4L/DVB (3700): Remove obsolete commands from tvp5150.c
+      V4L/DVB (3697): More msp3400 and bttv fixes
+      V4L/DVB (3696): Previous change for cx2341X boards broke the remote support
+      V4L/DVB (3693): Fix msp3400c and bttv stereo/mono/bilingual detection/handling
+      V4L/DVB (3692): Keep experimental SLICED_VBI defines under an #if 0
+      V4L/DVB (3689): Kconfig: fix VP-3054 Secondary I2C Bus build configuration menu dependencies
+      V4L/DVB (3673): Fix budget-av CAM reset
+      V4L/DVB (3672): Fix memory leak in dvr open
+      V4L/DVB (3671): New module parameter 'tv_standard' (dvb-ttpci driver)
+      V4L/DVB (3670): Fix typo in comment
+      V4L/DVB (3669): Configurable dma buffer size for saa7146-based budget dvb cards
+      V4L/DVB (3653h): Move usb v4l docs into Documentation/video4linux
+      V4L/DVB (3667a): Fix SAP + stereo mode at msp3400
+      V4L/DVB (3666): Remove trailing newlines
+      V4L/DVB (3665): Add new NEC uPD64031A and uPD64083 i2c drivers
+      V4L/DVB (3663): Fix msp3400c wait time and better audio mode fallbacks
+      V4L/DVB (3662): Don't set msp3400c-non-existent register
+      V4L/DVB (3661): Add wm8739 stereo audio ADC i2c driver
+      ...
+
+commit 2868c41fc45399b0f0855eb760e1a81881ff0c3d
+Author: Michael Krufky <mkrufky@linuxtv.org>
+Date:   Sat Apr 1 18:00:41 2006 -0300
+
+    V4L/DVB (3689): Kconfig: fix VP-3054 Secondary I2C Bus build configuration menu dependencies
+    
+    This patch fixes a dependency problem that affected the indentation order
+    within the individual frontend selection support menus for cx88-dvb.
+    - created a boolean dependency link for VIDEO_CX88_VP3054, so that
+      it's tristate value will be the same as that of VIDEO_CX88_DVB.
+    - VIDEO_CX88_VP3054 is automatically selected by VIDEO_CX88_DVB_ALL_FRONTENDS,
+      but is otherwise selected by VIDEO_CX88_DVB_VP3054, offered as an option
+      under VIDEO_CX88_DVB_MT352
+    
+    Signed-off-by: Michael Krufky <mkrufky@linuxtv.org>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@infradead.org>
+
+commit bff75d248f27c10d4bf1aaf8d5c81b00623861b9
+Author: Michael Krufky <mkrufky@m1k.net>
+Date:   Mon Jan 23 17:11:07 2006 -0200
+
+    V4L/DVB (3417): make VP-3054 Secondary I2C Bus Support a Kconfig option.
+    
+    - make VP-3054 Secondary I2C Bus Support a Kconfig option.
+    
+    Signed-off-by: Michael Krufky <mkrufky@m1k.net>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@infradead.org>
+
+commit aad99f39bd6e2cd45d19d12fd5af9e5577186553
+Author: Michael Krufky <mkrufky@m1k.net>
+Date:   Mon Jan 23 09:54:12 2006 -0200
+
+    V4L/DVB (3417): make VP-3054 Secondary I2C Bus Support a Kconfig option.
+    
+    - make VP-3054 Secondary I2C Bus Support a Kconfig option.
+    
+    Signed-off-by: Michael Krufky <mkrufky@m1k.net>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@infradead.org>
