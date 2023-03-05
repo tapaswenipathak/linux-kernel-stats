@@ -1,0 +1,3600 @@
+commit 9812e9ed3419b8bd64e4b5261b50d5840fda3e22
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e07d9154bb81ef7da1568d6772aeaacf152e08be
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit ec2bf249bdff8d5eb56cba5665a685b602d045fb
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 0b467eab0aad636ec78067687d632adcb3f04230
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit c3f8c7e9865d1ef1ae71cd7bb5f9b57dc7970f71
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 7c308ecae736fea5e68a2a54ae8fb1e0e4f5e4d0
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit b9870150cc3cb34145e95013a0a15de986438f30
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    [ Upstream commit f0880e2cb7e1f8039a048fdd01ce45ab77247221 ]
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 803184f1ef815b39ec266ff25a0e7f00760e2e69
+Author: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Date:   Fri Sep 23 08:44:38 2022 +0100
+
+    dt-bindings: virtio: Convert virtio,pci-iommu to DT schema
+    
+    Convert the binding that describes the virtio-pci based IOMMU to DT
+    schema. Change the compatible string to "pci<vendor>,<device>", which is
+    defined by the PCI Bus Binding, but keep "virtio,pci-iommu" as an option
+    for backward compatibility.
+    
+    Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+    Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+    Link: https://lore.kernel.org/r/20220923074435.420531-1-jean-philippe@linaro.org
+    Signed-off-by: Rob Herring <robh@kernel.org>
+
+commit f0880e2cb7e1f8039a048fdd01ce45ab77247221
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sat Aug 27 15:03:45 2022 +0200
+
+    Drivers: hv: Never allocate anything besides framebuffer from framebuffer memory region
+    
+    Passed through PCI device sometimes misbehave on Gen1 VMs when Hyper-V
+    DRM driver is also loaded. Looking at IOMEM assignment, we can see e.g.
+    
+    $ cat /proc/iomem
+    ...
+    f8000000-fffbffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:08.0
+        f8000000-f8001fff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+    ...
+    fe0000000-fffffffff : PCI Bus 0000:00
+      fe0000000-fe07fffff : bb8c4f33-2ba2-4808-9f7f-02f3b4da22fe
+        fe0000000-fe07fffff : 2ba2:00:02.0
+          fe0000000-fe07fffff : mlx4_core
+    
+    the interesting part is the 'f8000000' region as it is actually the
+    VM's framebuffer:
+    
+    $ lspci -v
+    ...
+    0000:00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA (prog-if 00 [VGA controller])
+            Flags: bus master, fast devsel, latency 0, IRQ 11
+            Memory at f8000000 (32-bit, non-prefetchable) [size=64M]
+    ...
+    
+     hv_vmbus: registering driver hyperv_drm
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Synthvid Version major 3, minor 5
+     hyperv_drm 0000:00:08.0: vgaarb: deactivate vga console
+     hyperv_drm 0000:00:08.0: BAR 0: can't reserve [mem 0xf8000000-0xfbffffff]
+     hyperv_drm 5620e0c7-8062-4dce-aeb7-520c7ef76171: [drm] Cannot request framebuffer, boot fb still active?
+    
+    Note: "Cannot request framebuffer" is not a fatal error in
+    hyperv_setup_gen1() as the code assumes there's some other framebuffer
+    device there but we actually have some other PCI device (mlx4 in this
+    case) config space there!
+    
+    The problem appears to be that vmbus_allocate_mmio() can use dedicated
+    framebuffer region to serve any MMIO request from any device. The
+    semantics one might assume of a parameter named "fb_overlap_ok"
+    aren't implemented because !fb_overlap_ok essentially has no effect.
+    The existing semantics are really "prefer_fb_overlap". This patch
+    implements the expected and needed semantics, which is to not allocate
+    from the frame buffer space when !fb_overlap_ok.
+    
+    Note, Gen2 VMs are usually unaffected by the issue because
+    framebuffer region is already taken by EFI fb (in case kernel supports
+    it) but Gen1 VMs may have this region unclaimed by the time Hyper-V PCI
+    pass-through driver tries allocating MMIO space if Hyper-V DRM/FB drivers
+    load after it. Devices can be brought up in any sequence so let's
+    resolve the issue by always ignoring 'fb_mmio' region for non-FB
+    requests, even if the region is unclaimed.
+    
+    Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Link: https://lore.kernel.org/r/20220827130345.1320254-4-vkuznets@redhat.com
+    Signed-off-by: Wei Liu <wei.liu@kernel.org>
+
+commit e35f56bb03304abc92c928b641af41ca372966bb
+Author: Frank Li <Frank.Li@nxp.com>
+Date:   Tue Feb 22 10:23:54 2022 -0600
+
+    PCI: endpoint: Support NTB transfer between RC and EP
+    
+    Add NTB function driver and virtual PCI Bus and Virtual NTB driver
+    to implement communication between PCIe Root Port and PCIe EP devices
+    
+    ┌────────────┐         ┌─────────────────────────────────────┐
+    │            │         │                                     │
+    ├────────────┤         │                      ┌──────────────┤
+    │ NTB        │         │                      │ NTB          │
+    │ NetDev     │         │                      │ NetDev       │
+    ├────────────┤         │                      ├──────────────┤
+    │ NTB        │         │                      │ NTB          │
+    │ Transfer   │         │                      │ Transfer     │
+    ├────────────┤         │                      ├──────────────┤
+    │            │         │                      │              │
+    │  PCI NTB   │         │                      │              │
+    │    EPF     │         │                      │              │
+    │   Driver   │         │                      │ PCI Virtual  │
+    │            │         ├───────────────┐      │ NTB Driver   │
+    │            │         │ PCI EP NTB    │◄────►│              │
+    │            │         │  FN Driver    │      │              │
+    ├────────────┤         ├───────────────┤      ├──────────────┤
+    │            │         │               │      │              │
+    │  PCI Bus   │ ◄─────► │  PCI EP Bus   │      │  Virtual PCI │
+    │            │  PCI    │               │      │     Bus      │
+    └────────────┘         └───────────────┴──────┴──────────────┘
+    PCIe Root Port                        PCI EP
+    
+    This driver includes 3 parts:
+     1 PCI EP NTB function driver
+     2 Virtual PCI bus
+     3 PCI virtual NTB driver, which is loaded only by above virtual PCI bus
+    
+    Signed-off-by: Frank Li <Frank.Li@nxp.com>
+    Signed-off-by: Jon Mason <jdmason@kudzu.us>
+
+commit b78dfa059fdd7d0f791132dc0cef39ceafdfd62e
+Author: David Hildenbrand <david@redhat.com>
+Date:   Mon Nov 8 18:35:46 2021 -0800
+
+    kernel/resource: clean up and optimize iomem_is_exclusive()
+    
+    Patch series "virtio-mem: disallow mapping virtio-mem memory via /dev/mem", v5.
+    
+    Let's add the basic infrastructure to exclude some physical memory regions
+    marked as "IORESOURCE_SYSTEM_RAM" completely from /dev/mem access, even
+    though they are not marked IORESOURCE_BUSY and even though "iomem=relaxed"
+    is set.  Resource IORESOURCE_EXCLUSIVE for that purpose instead of adding
+    new flags to express something similar to "soft-busy" or "not busy yet,
+    but already prepared by a driver and not to be mapped by user space".
+    
+    Use it for virtio-mem, to disallow mapping any virtio-mem memory via
+    /dev/mem to user space after the virtio-mem driver was loaded.
+    
+    This patch (of 3):
+    
+    We end up traversing subtrees of ranges we are not interested in; let's
+    optimize this case, skipping such subtrees, cleaning up the function a
+    bit.
+    
+    For example, in the following configuration (/proc/iomem):
+    
+      00000000-00000fff : Reserved
+      00001000-00057fff : System RAM
+      00058000-00058fff : Reserved
+      00059000-0009cfff : System RAM
+      0009d000-000fffff : Reserved
+         000a0000-000bffff : PCI Bus 0000:00
+         000c0000-000c3fff : PCI Bus 0000:00
+         000c4000-000c7fff : PCI Bus 0000:00
+         000c8000-000cbfff : PCI Bus 0000:00
+         000cc000-000cffff : PCI Bus 0000:00
+         000d0000-000d3fff : PCI Bus 0000:00
+         000d4000-000d7fff : PCI Bus 0000:00
+         000d8000-000dbfff : PCI Bus 0000:00
+         000dc000-000dffff : PCI Bus 0000:00
+         000e0000-000e3fff : PCI Bus 0000:00
+         000e4000-000e7fff : PCI Bus 0000:00
+         000e8000-000ebfff : PCI Bus 0000:00
+         000ec000-000effff : PCI Bus 0000:00
+         000f0000-000fffff : PCI Bus 0000:00
+           000f0000-000fffff : System ROM
+      00100000-3fffffff : System RAM
+      40000000-403fffff : Reserved
+         40000000-403fffff : pnp 00:00
+      40400000-80a79fff : System RAM
+      ...
+    
+    We don't have to look at any children of "0009d000-000fffff : Reserved"
+    if we can just skip these 15 items directly because the parent range is
+    not of interest.
+    
+    Link: https://lkml.kernel.org/r/20210920142856.17758-1-david@redhat.com
+    Link: https://lkml.kernel.org/r/20210920142856.17758-2-david@redhat.com
+    Signed-off-by: David Hildenbrand <david@redhat.com>
+    Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+    Cc: Arnd Bergmann <arnd@arndb.de>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: "Michael S. Tsirkin" <mst@redhat.com>
+    Cc: Jason Wang <jasowang@redhat.com>
+    Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+    Cc: Hanjun Guo <guohanjun@huawei.com>
+    Cc: Andy Shevchenko <andy.shevchenko@gmail.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit e82dfe7b5608592c270cc69100cb4322069f949d
+Author: Anilkumar Kolli <akolli@codeaurora.org>
+Date:   Tue Sep 28 12:05:39 2021 +0300
+
+    ath11k: add caldata file for multiple radios
+    
+    If multiple PCI cards are attached, each needs its own caldata file.
+    
+    Added new Caldata file name,
+    PCI Bus:
+            cal-pci-0001:01:00.0.bin
+            cal-pci-0000:01:00.0.bin
+    AHB Bus:
+            cal-ahb-c000000.wifi1.bin
+    
+    Tested-on: IPQ8074 hw2.0 AHB WLAN.HK.2.4.0.1-00009-QCAHKSWPL_SILICONZ-1
+    Tested-on: QCN9074 hw1.0 PCI WLAN.HK.2.4.0.1-01838-QCAHKSWPL_SILICONZ-1
+    
+    Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
+    Signed-off-by: Jouni Malinen <jouni@codeaurora.org>
+    Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
+    Link: https://lore.kernel.org/r/20210721201927.100369-4-jouni@codeaurora.org
+
+commit cfa459132875297aa4512d198a2627f2288847de
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 33b8fcdedbde2b2a508c3d78d4bb34e4067391a0
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a0a79634367cc19bcb8a5eb8d0b7e972303a474e
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 311789b71a09dfa5b71a3dff4165b195b10c4c07
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 23f16034bef0bfe5b707faaa3e4762b671893135
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ffadf0ff5eb926c9d90d483490365f770acd4e4f
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 137dafa722303d5eed1340ded248bcbaea514d58
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95 upstream.
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 44d01fc86d952f5a8b8b32bdb4841504d5833d95
+Author: Maciej W. Rozycki <macro@orcam.me.uk>
+Date:   Tue Apr 20 20:01:47 2021 +0200
+
+    scsi: BusLogic: Fix missing pr_cont() use
+    
+    Update BusLogic driver's messaging system to use pr_cont() for continuation
+    lines, bringing messy output:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address:
+    0xE0012000,
+    Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth:
+    Automatic
+    , Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled
+    , SCAM: Disabled
+    
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    back to order:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+    scsi0:   PCI Bus: 0, Device: 19, Address: 0xE0012000, Host Adapter SCSI ID: 7
+    scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+    scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+    scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+    scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+    scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+    scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+    scsi0:   SCSI Bus Termination: Both Enabled, SCAM: Disabled
+    scsi0: *** BusLogic BT-958 Initialized Successfully ***
+    scsi host0: BusLogic BT-958
+    
+    Also diagnostic output such as with the BusLogic=TraceConfiguration
+    parameter is affected and becomes vertical and therefore hard to read.
+    This has now been corrected, e.g.:
+    
+    pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(95) Status = 28: (Modify I/O Address)
+    blogic_cmd(91) Status = 30:  1 ==>  1: 01
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+    scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+    blogic_cmd(04) Status = 30:  4 ==>  4: 41 41 35 30
+    blogic_cmd(0B) Status = 30:  3 ==>  3: 00 08 07
+    blogic_cmd(0D) Status = 30: 34 ==> 34: 03 01 07 04 00 00 00 00 00 00 00 00 00 00 00 00 FF 42 44 46 FF 00 00 00 00 00 00 00 00 00 FF 00 FF 00
+    blogic_cmd(8D) Status = 30: 14 ==> 14: 45 DC 00 20 00 00 00 00 00 40 30 37 42 1D
+    blogic_cmd(84) Status = 30:  1 ==>  1: 37
+    blogic_cmd(8B) Status = 30:  5 ==>  5: 39 35 38 20 20
+    blogic_cmd(85) Status = 30:  1 ==>  1: 42
+    blogic_cmd(86) Status = 30:  4 ==>  4: FF 05 93 00
+    blogic_cmd(91) Status = 30: 64 ==> 64: 41 46 3E 20 39 35 38 20 20 00 C4 00 04 01 07 2F 07 04 35 FF FF FF FF FF FF FF FF FF FF 01 00 FE FF 08 FF FF 00 00 00 00 00 00 00 01 00 01 00 00 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 FC
+    scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+    
+    etc.
+    
+    Link: https://lore.kernel.org/r/alpine.DEB.2.21.2104201940430.44318@angie.orcam.me.uk
+    Fixes: 4bcc595ccd80 ("printk: reinstate KERN_CONT for printing continuation lines")
+    Cc: stable@vger.kernel.org # v4.9+
+    Acked-by: Khalid Aziz <khalid@gonehiking.org>
+    Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+commit 80ad6dde61894dd880c3690b33eebbbc813e0276
+Author: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Date:   Wed Mar 31 14:17:01 2021 -0700
+
+    ice: print name in /proc/iomem
+    
+    The driver previously printed it's PCI address in
+    the name field for the pci resource, which when displayed
+    via /proc/iomem, would print the same thing twice.
+    
+    It's more useful for debugging to see the driver name, as
+    most other modules do.
+    
+    Here's a diff of before and after this change:
+         99100000-991fffff : 0000:3b:00.1
+       9a000000-a04fffff : PCI Bus 0000:3b
+         9a000000-9bffffff : 0000:3b:00.1
+    -      9a000000-9bffffff : 0000:3b:00.1
+    +      9a000000-9bffffff : ice
+         9c000000-9dffffff : 0000:3b:00.0
+    -      9c000000-9dffffff : 0000:3b:00.0
+    +      9c000000-9dffffff : ice
+         9e000000-9effffff : 0000:3b:00.1
+         9f000000-9fffffff : 0000:3b:00.0
+         a0000000-a000ffff : 0000:3b:00.1
+    
+    Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+    Tested-by: Tony Brelinski <tonyx.brelinski@intel.com>
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+commit 9b24247a24471e1333fb556a12d0e3be30d2a750
+Author: David Hildenbrand <david@redhat.com>
+Date:   Thu Oct 15 20:08:56 2020 -0700
+
+    virtio-mem: try to merge system ram resources
+    
+    virtio-mem adds memory in memory block granularity, to be able to remove
+    it in the same granularity again later, and to grow slowly on demand.
+    This, however, results in quite a lot of resources when adding a lot of
+    memory.  Resources are effectively stored in a list-based tree.  Having a
+    lot of resources not only wastes memory, it also makes traversing that
+    tree more expensive, and makes /proc/iomem explode in size (e.g.,
+    requiring kexec-tools to manually merge resources later when e.g., trying
+    to create a kdump header).
+    
+    Before this patch, we get (/proc/iomem) when hotplugging 2G via virtio-mem
+    on x86-64:
+            [...]
+            100000000-13fffffff : System RAM
+            140000000-33fffffff : virtio0
+              140000000-147ffffff : System RAM (virtio_mem)
+              148000000-14fffffff : System RAM (virtio_mem)
+              150000000-157ffffff : System RAM (virtio_mem)
+              158000000-15fffffff : System RAM (virtio_mem)
+              160000000-167ffffff : System RAM (virtio_mem)
+              168000000-16fffffff : System RAM (virtio_mem)
+              170000000-177ffffff : System RAM (virtio_mem)
+              178000000-17fffffff : System RAM (virtio_mem)
+              180000000-187ffffff : System RAM (virtio_mem)
+              188000000-18fffffff : System RAM (virtio_mem)
+              190000000-197ffffff : System RAM (virtio_mem)
+              198000000-19fffffff : System RAM (virtio_mem)
+              1a0000000-1a7ffffff : System RAM (virtio_mem)
+              1a8000000-1afffffff : System RAM (virtio_mem)
+              1b0000000-1b7ffffff : System RAM (virtio_mem)
+              1b8000000-1bfffffff : System RAM (virtio_mem)
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    With this patch, we get (/proc/iomem):
+            [...]
+            fffc0000-ffffffff : Reserved
+            100000000-13fffffff : System RAM
+            140000000-33fffffff : virtio0
+              140000000-1bfffffff : System RAM (virtio_mem)
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    Of course, with more hotplugged memory, it gets worse.  When unplugging
+    memory blocks again, try_remove_memory() (via offline_and_remove_memory())
+    will properly split the resource up again.
+    
+    Signed-off-by: David Hildenbrand <david@redhat.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: Dan Williams <dan.j.williams@intel.com>
+    Cc: Michael S. Tsirkin <mst@redhat.com>
+    Cc: Jason Wang <jasowang@redhat.com>
+    Cc: Baoquan He <bhe@redhat.com>
+    Cc: Wei Yang <richardw.yang@linux.intel.com>
+    Cc: Anton Blanchard <anton@ozlabs.org>
+    Cc: Ard Biesheuvel <ardb@kernel.org>
+    Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+    Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+    Cc: Dave Jiang <dave.jiang@intel.com>
+    Cc: Eric Biederman <ebiederm@xmission.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: Haiyang Zhang <haiyangz@microsoft.com>
+    Cc: Heiko Carstens <hca@linux.ibm.com>
+    Cc: Jason Gunthorpe <jgg@ziepe.ca>
+    Cc: Juergen Gross <jgross@suse.com>
+    Cc: Julien Grall <julien@xen.org>
+    Cc: Kees Cook <keescook@chromium.org>
+    Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+    Cc: Len Brown <lenb@kernel.org>
+    Cc: Leonardo Bras <leobras.c@gmail.com>
+    Cc: Libor Pechacek <lpechacek@suse.cz>
+    Cc: Michael Ellerman <mpe@ellerman.id.au>
+    Cc: Nathan Lynch <nathanl@linux.ibm.com>
+    Cc: "Oliver O'Halloran" <oohall@gmail.com>
+    Cc: Paul Mackerras <paulus@samba.org>
+    Cc: Pingfan Liu <kernelfans@gmail.com>
+    Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+    Cc: Roger Pau Monné <roger.pau@citrix.com>
+    Cc: Stefano Stabellini <sstabellini@kernel.org>
+    Cc: Stephen Hemminger <sthemmin@microsoft.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Vasily Gorbik <gor@linux.ibm.com>
+    Cc: Vishal Verma <vishal.l.verma@intel.com>
+    Cc: Wei Liu <wei.liu@kernel.org>
+    Link: https://lkml.kernel.org/r/20200911103459.10306-7-david@redhat.com
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 8a725e4694b52ffad755500277d36f3b2eb34755
+Author: David Hildenbrand <david@redhat.com>
+Date:   Thu Jun 4 16:48:48 2020 -0700
+
+    device-dax: add memory via add_memory_driver_managed()
+    
+    Currently, when adding memory, we create entries in /sys/firmware/memmap/
+    as "System RAM".  This will lead to kexec-tools to add that memory to the
+    fixed-up initial memmap for a kexec kernel (loaded via kexec_load()).  The
+    memory will be considered initial System RAM by the kexec'd kernel and can
+    no longer be reconfigured.  This is not what happens during a real reboot.
+    
+    Let's add our memory via add_memory_driver_managed() now, so we won't
+    create entries in /sys/firmware/memmap/ and indicate the memory as "System
+    RAM (kmem)" in /proc/iomem.  This allows everybody (especially
+    kexec-tools) to identify that this memory is special and has to be treated
+    differently than ordinary (hotplugged) System RAM.
+    
+    Before configuring the namespace:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-33fffffff : namespace0.0
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    After configuring the namespace:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-1481fffff : namespace0.0
+              148200000-33fffffff : dax0.0
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    After loading kmem before this change:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-1481fffff : namespace0.0
+              150000000-33fffffff : dax0.0
+                150000000-33fffffff : System RAM
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    After loading kmem after this change:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-1481fffff : namespace0.0
+              150000000-33fffffff : dax0.0
+                150000000-33fffffff : System RAM (kmem)
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    After a proper reboot:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-1481fffff : namespace0.0
+              148200000-33fffffff : dax0.0
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    Within the kexec kernel before this change:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-1481fffff : namespace0.0
+              150000000-33fffffff : System RAM
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    Within the kexec kernel after this change:
+            [root@localhost ~]# cat /proc/iomem
+            ...
+            140000000-33fffffff : Persistent Memory
+              140000000-1481fffff : namespace0.0
+              148200000-33fffffff : dax0.0
+            3280000000-32ffffffff : PCI Bus 0000:00
+    
+    /sys/firmware/memmap/ before this change:
+            0000000000000000-000000000009fc00 (System RAM)
+            000000000009fc00-00000000000a0000 (Reserved)
+            00000000000f0000-0000000000100000 (Reserved)
+            0000000000100000-00000000bffdf000 (System RAM)
+            00000000bffdf000-00000000c0000000 (Reserved)
+            00000000feffc000-00000000ff000000 (Reserved)
+            00000000fffc0000-0000000100000000 (Reserved)
+            0000000100000000-0000000140000000 (System RAM)
+            0000000150000000-0000000340000000 (System RAM)
+    
+    /sys/firmware/memmap/ after a proper reboot:
+            0000000000000000-000000000009fc00 (System RAM)
+            000000000009fc00-00000000000a0000 (Reserved)
+            00000000000f0000-0000000000100000 (Reserved)
+            0000000000100000-00000000bffdf000 (System RAM)
+            00000000bffdf000-00000000c0000000 (Reserved)
+            00000000feffc000-00000000ff000000 (Reserved)
+            00000000fffc0000-0000000100000000 (Reserved)
+            0000000100000000-0000000140000000 (System RAM)
+    
+    /sys/firmware/memmap/ after this change:
+            0000000000000000-000000000009fc00 (System RAM)
+            000000000009fc00-00000000000a0000 (Reserved)
+            00000000000f0000-0000000000100000 (Reserved)
+            0000000000100000-00000000bffdf000 (System RAM)
+            00000000bffdf000-00000000c0000000 (Reserved)
+            00000000feffc000-00000000ff000000 (Reserved)
+            00000000fffc0000-0000000100000000 (Reserved)
+            0000000100000000-0000000140000000 (System RAM)
+    
+    kexec-tools already seem to basically ignore any System RAM that's not on
+    top level when searching for areas to place kexec images - but also for
+    determining crash areas to dump via kdump.  Changing the resource name
+    won't have an impact.
+    
+    Handle unloading of the driver after memory hotremove failed properly, by
+    duplicating the string if necessary.
+    
+    Signed-off-by: David Hildenbrand <david@redhat.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Acked-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+    Cc: Wei Yang <richard.weiyang@gmail.com>
+    Cc: Baoquan He <bhe@redhat.com>
+    Cc: Dave Hansen <dave.hansen@linux.intel.com>
+    Cc: Eric Biederman <ebiederm@xmission.com>
+    Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
+    Cc: Dan Williams <dan.j.williams@intel.com>
+    Link: http://lkml.kernel.org/r/20200508084217.9160-5-david@redhat.com
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 7fb39bf2a1de9dc9e0846a1e3fe74e959a693a0d
+Author: Kishon Vijay Abraham I <kishon@ti.com>
+Date:   Fri May 8 18:36:45 2020 +0530
+
+    PCI: cadence: Fix to read 32-bit Vendor ID/Device ID property from DT
+    
+    The PCI Bus Binding specification (IEEE Std 1275-1994 Revision 2.1 [1])
+    defines both Vendor ID and Device ID to be 32-bits. Fix
+    pcie-cadence-host.c driver to read 32-bit Vendor ID and Device ID
+    properties from device tree.
+    
+    [1] -> https://www.devicetree.org/open-firmware/bindings/pci/pci2_1.pdf
+    
+    Link: https://lore.kernel.org/r/20200508130646.23939-4-kishon@ti.com
+    Signed-off-by: Kishon Vijay Abraham I <kishon@ti.com>
+    Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+    Acked-by: Rob Herring <robh@kernel.org>
+    Acked-by: Tom Joseph <tjoseph@cadence.com>
+
+commit 1bc508b2d16de219b006861d694be5501f910502
+Author: Tuowen Zhao <ztuowen@gmail.com>
+Date:   Wed Oct 16 15:06:29 2019 -0600
+
+    mfd: intel-lpss: Use devm_ioremap_uc for MMIO
+    
+    commit a8ff78f7f773142eb8a8befe5a95dd6858ebd635 upstream.
+    
+    Some BIOS erroneously specifies write-combining BAR for intel-lpss-pci
+    in MTRR. This will cause the system to hang during boot. If possible,
+    this bug could be corrected with a firmware update.
+    
+    This patch use devm_ioremap_uc to overwrite/ignore the MTRR settings
+    by forcing the use of strongly uncachable pages for intel-lpss.
+    
+    The BIOS bug is present on Dell XPS 13 7390 2-in-1:
+    
+    [    0.001734]   5 base 4000000000 mask 6000000000 write-combining
+    
+    4000000000-7fffffffff : PCI Bus 0000:00
+      4000000000-400fffffff : 0000:00:02.0 (i915)
+      4010000000-4010000fff : 0000:00:15.0 (intel-lpss-pci)
+    
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=203485
+    Cc: <stable@vger.kernel.org> # v4.19+
+    Tested-by: AceLan Kao <acelan.kao@canonical.com>
+    Signed-off-by: Tuowen Zhao <ztuowen@gmail.com>
+    Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+    Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Tested-by: Roman Gilg <subdiff@gmail.com>
+    Signed-off-by: Lee Jones <lee.jones@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e06a89985c585fb5f5e0448bf4a166de416777f8
+Author: Tuowen Zhao <ztuowen@gmail.com>
+Date:   Wed Oct 16 15:06:29 2019 -0600
+
+    mfd: intel-lpss: Use devm_ioremap_uc for MMIO
+    
+    commit a8ff78f7f773142eb8a8befe5a95dd6858ebd635 upstream.
+    
+    Some BIOS erroneously specifies write-combining BAR for intel-lpss-pci
+    in MTRR. This will cause the system to hang during boot. If possible,
+    this bug could be corrected with a firmware update.
+    
+    This patch use devm_ioremap_uc to overwrite/ignore the MTRR settings
+    by forcing the use of strongly uncachable pages for intel-lpss.
+    
+    The BIOS bug is present on Dell XPS 13 7390 2-in-1:
+    
+    [    0.001734]   5 base 4000000000 mask 6000000000 write-combining
+    
+    4000000000-7fffffffff : PCI Bus 0000:00
+      4000000000-400fffffff : 0000:00:02.0 (i915)
+      4010000000-4010000fff : 0000:00:15.0 (intel-lpss-pci)
+    
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=203485
+    Cc: <stable@vger.kernel.org> # v4.19+
+    Tested-by: AceLan Kao <acelan.kao@canonical.com>
+    Signed-off-by: Tuowen Zhao <ztuowen@gmail.com>
+    Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+    Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Tested-by: Roman Gilg <subdiff@gmail.com>
+    Signed-off-by: Lee Jones <lee.jones@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a8ff78f7f773142eb8a8befe5a95dd6858ebd635
+Author: Tuowen Zhao <ztuowen@gmail.com>
+Date:   Wed Oct 16 15:06:29 2019 -0600
+
+    mfd: intel-lpss: Use devm_ioremap_uc for MMIO
+    
+    Some BIOS erroneously specifies write-combining BAR for intel-lpss-pci
+    in MTRR. This will cause the system to hang during boot. If possible,
+    this bug could be corrected with a firmware update.
+    
+    This patch use devm_ioremap_uc to overwrite/ignore the MTRR settings
+    by forcing the use of strongly uncachable pages for intel-lpss.
+    
+    The BIOS bug is present on Dell XPS 13 7390 2-in-1:
+    
+    [    0.001734]   5 base 4000000000 mask 6000000000 write-combining
+    
+    4000000000-7fffffffff : PCI Bus 0000:00
+      4000000000-400fffffff : 0000:00:02.0 (i915)
+      4010000000-4010000fff : 0000:00:15.0 (intel-lpss-pci)
+    
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=203485
+    Cc: <stable@vger.kernel.org> # v4.19+
+    Tested-by: AceLan Kao <acelan.kao@canonical.com>
+    Signed-off-by: Tuowen Zhao <ztuowen@gmail.com>
+    Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+    Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Tested-by: Roman Gilg <subdiff@gmail.com>
+    Signed-off-by: Lee Jones <lee.jones@linaro.org>
+
+commit bc605cd79edb68131d3be5b00b949aa312277d39
+Author: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date:   Thu Aug 29 18:44:17 2019 +1000
+
+    powerpc/of/pci: Rewrite pci_parse_of_flags
+    
+    The existing code uses bunch of hardcoded values from the PCI Bus
+    Binding to IEEE Std 1275 spec; and it does so in quite non-obvious
+    way.
+    
+    This defines fields from the cell#0 of the "reg" property of a PCI
+    device and uses them for parsing.
+    
+    This should cause no behavioral change.
+    
+    Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+    [mpe: Unsplit some 80/81 char lines, space the code with some newlines]
+    Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+    Link: https://lore.kernel.org/r/20190829084417.71873-1-aik@ozlabs.ru
+
+commit 2794129e902d8eb69413d884dc6404b8716ed9ed
+Author: Dave Hansen <dave.hansen@linux.intel.com>
+Date:   Mon Feb 25 10:57:36 2019 -0800
+
+    mm/memory-hotplug: Allow memory resources to be children
+    
+    The mm/resource.c code is used to manage the physical address
+    space.  The current resource configuration can be viewed in
+    /proc/iomem.  An example of this is at the bottom of this
+    description.
+    
+    The nvdimm subsystem "owns" the physical address resources which
+    map to persistent memory and has resources inserted for them as
+    "Persistent Memory".  The best way to repurpose this for volatile
+    use is to leave the existing resource in place, but add a "System
+    RAM" resource underneath it. This clearly communicates the
+    ownership relationship of this memory.
+    
+    The request_resource_conflict() API only deals with the
+    top-level resources.  Replace it with __request_region() which
+    will search for !IORESOURCE_BUSY areas lower in the resource
+    tree than the top level.
+    
+    We *could* also simply truncate the existing top-level
+    "Persistent Memory" resource and take over the released address
+    space.  But, this means that if we ever decide to hot-unplug the
+    "RAM" and give it back, we need to recreate the original setup,
+    which may mean going back to the BIOS tables.
+    
+    This should have no real effect on the existing collision
+    detection because the areas that truly conflict should be marked
+    IORESOURCE_BUSY.
+    
+    00000000-00000fff : Reserved
+    00001000-0009fbff : System RAM
+    0009fc00-0009ffff : Reserved
+    000a0000-000bffff : PCI Bus 0000:00
+    000c0000-000c97ff : Video ROM
+    000c9800-000ca5ff : Adapter ROM
+    000f0000-000fffff : Reserved
+      000f0000-000fffff : System ROM
+    00100000-9fffffff : System RAM
+      01000000-01e071d0 : Kernel code
+      01e071d1-027dfdff : Kernel data
+      02dc6000-0305dfff : Kernel bss
+    a0000000-afffffff : Persistent Memory (legacy)
+      a0000000-a7ffffff : System RAM
+    b0000000-bffdffff : System RAM
+    bffe0000-bfffffff : Reserved
+    c0000000-febfffff : PCI Bus 0000:00
+    
+    Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+    Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+    Reviewed-by: Vishal Verma <vishal.l.verma@intel.com>
+    Cc: Dave Jiang <dave.jiang@intel.com>
+    Cc: Ross Zwisler <zwisler@kernel.org>
+    Cc: Vishal Verma <vishal.l.verma@intel.com>
+    Cc: Tom Lendacky <thomas.lendacky@amd.com>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: linux-nvdimm@lists.01.org
+    Cc: linux-kernel@vger.kernel.org
+    Cc: linux-mm@kvack.org
+    Cc: Huang Ying <ying.huang@intel.com>
+    Cc: Fengguang Wu <fengguang.wu@intel.com>
+    Cc: Borislav Petkov <bp@suse.de>
+    Cc: Bjorn Helgaas <bhelgaas@google.com>
+    Cc: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+    Cc: Takashi Iwai <tiwai@suse.de>
+    Cc: Jerome Glisse <jglisse@redhat.com>
+    Cc: Keith Busch <keith.busch@intel.com>
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+
+commit 3747b9d6b0651c3d4b313778fd57a70396112cb8
+Author: Maciej W. Rozycki <macro@linux-mips.org>
+Date:   Tue Nov 13 22:42:30 2018 +0000
+
+    MIPS: SiByte: Set 32-bit bus mask for BCM1250 PCI
+    
+    The Broadcom SiByte BCM1250, BCM1125H and BCM1125 SOCs have an onchip
+    32-bit PCI host bridge, and the two former SOCs also have an onchip HT
+    host bridge.  The HT host bridge, where present, appears in the PCI
+    configuration space as if it was a device on the 32-bit PCI bus behind
+    the PCI host bridge, however at the hardware level its signals are
+    routed separately, so these two devices are actually peer host bridges.
+    
+    As documented[1] and observed in reality the 32-bit PCI host bridge does
+    not support 64-bit addressing as it does not support the Dual Address
+    Cycle (DAC) PCI command, and naturally, being 32-bit only, it has no
+    means to carry the high 32 address bits otherwise.  However the DRAM
+    controller also included in the SOC supports memory amounts of up to
+    16GiB, and due to how the address decoder has been wired in the SOC any
+    memory beyond 1GiB is actually mapped starting from 4GiB physical up,
+    that is beyond the 32-bit addressable limit.  Consequently if the
+    maximum amount of memory has been installed, then it will span up to
+    19GiB.
+    
+    Contrariwise, the HT host bridge does support full 40-bit addressing
+    defined by the HyperTransport (formerly LDT) specification the bridge
+    adheres to, depending on the peripherals revision of the SOC[2] either
+    revision 0.17[3] or revision 1.03[4].  This allows addressing any and
+    all memory installed, and well beyond.
+    
+    Set the bus mask then to limit DMA addressing to 32 bits for all the
+    devices down the 32-bit PCI host bridge, excluding however any devices
+    that are down the HT host bridge.
+    
+    References:
+    
+    [1] "BCM1250/BCM1125/BCM1125H User Manual", Revision 1250_1125-UM100-R,
+        Broadcom Corporation, 21 Oct 2002, Section 8: "PCI Bus and
+        HyperTransport Fabric", "Introduction", p. 190
+    
+    [2] same, Table 140: "HyperTransport Configuration Header (Type 1)", p.
+        245
+    
+    [3] "Lightning Data Transport IO Specification", Revision 0.17, Advanced
+        Micro Devices, 21 Jan 2000, Section 3.2.1.2 "Command Packet", p. 8
+    
+    [4] "HyperTransport I/O Link Specification", Revision 1.03,
+        HyperTransport Technology Consortium, 10 Oct 2001, Section 3.2.1.2
+        "Request Packet", pp. 27-28
+    
+    Signed-off-by: Maciej W. Rozycki <macro@linux-mips.org>
+    Signed-off-by: Paul Burton <paul.burton@mips.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Patchwork: https://patchwork.linux-mips.org/patch/21106/
+    Cc: Ralf Baechle <ralf@linux-mips.org>
+    Cc: linux-mips@linux-mips.org
+    Cc: linux-kernel@vger.kernel.org
+
+commit d76401ade0bb6ab0a70dea317ec115d5425880cf
+Author: Dan Williams <dan.j.williams@intel.com>
+Date:   Sat Jun 2 11:43:39 2018 -0700
+
+    libnvdimm, e820: Register all pmem resources
+    
+    There is currently a mismatch between the resources that will trigger
+    the e820_pmem driver to register/load and the resources that will
+    actually be surfaced as pmem ranges. register_e820_pmem() uses
+    walk_iomem_res_desc() which includes children and siblings. In contrast,
+    e820_pmem_probe() only considers top level resources. For example the
+    following resource tree results in the driver being loaded, but no
+    resources being registered:
+    
+        398000000000-39bfffffffff : PCI Bus 0000:ae
+          39be00000000-39bf07ffffff : PCI Bus 0000:af
+            39be00000000-39beffffffff : 0000:af:00.0
+              39be10000000-39beffffffff : Persistent Memory (legacy)
+    
+    Fix this up to allow definitions of "legacy" pmem ranges anywhere in
+    system-physical address space. Not that it is a recommended or safe to
+    define a pmem range in PCI space, but it is useful for debug /
+    experimentation, and the restriction on being a top-level resource was
+    arbitrary.
+    
+    Cc: Christoph Hellwig <hch@lst.de>
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+
+commit 73edc8f7cceffe537d6888dc20703123769eb3f6
+Author: Andreas Werner <andreas.werner@men.de>
+Date:   Fri Aug 26 09:34:57 2016 +0200
+
+    mcb: Added support for LPC or non PCI based MCB carrier
+    
+    Add support for MCB bases FPGAs connected to the LPC or
+    non PCI Bus.
+    
+    This driver currently supports the SC24 board. The FPGA
+    is connected to the LPC bus and is identified using the BIOS
+    DMI string.
+    
+    Signed-off-by: Andreas Werner <andreas.werner@men.de>
+    Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0ccb7eefeb56c8d3cdce53ede23e06c8be894670
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Sat May 28 18:14:24 2016 -0500
+
+    PCI: xgene: Request host bridge window resources
+    
+    Request host bridge window resources so they appear in ioport_resource and
+    iomem_resource and are reflected in /proc/ioports and /proc/iomem.
+    
+    For example, the following entries did not previously appear in /proc/iomem:
+    
+      e180000000-e1ffffffff : /soc/pcie@1f2b0000
+        e180000000-e182ffffff : PCI Bus 0000:01
+          e180000000-e181ffffff : 0000:01:00.0
+          e182000000-e1820fffff : 0000:01:00.0
+          e182100000-e1821fffff : 0000:01:00.0
+      f000000000-ffffffffff : /soc/pcie@1f2b0000
+    
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+
+commit 224abb67e6eb5ac062de9239163136d5ec3155c8
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Fri Jun 17 15:23:52 2016 -0500
+
+    PCI: Document connection between pci_power_t and hardware PM capability
+    
+    The dev.pme_support field, pci_pm_init(), pci_pme_capable(), and
+    pci_raw_set_power_state() depend on the fact that the pci_power_t values
+    (PCI_D0, PCI_D1, etc.) match the definition of the Capabilities PME_Support
+    and the Control/Status PowerState fields in the Power Management capability
+    (see PCI Bus Power Management spec r1.2, sec 3.2.3).
+    
+    Add a note to this effect at the pci_power_t typedef.
+    
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Reviewed-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+
+commit ffb2d1eb88c3262f7a7001c5afeec6babe144b73
+Author: Roland Dreier <roland@purestorage.com>
+Date:   Thu Jun 2 17:46:10 2016 -0700
+
+    iommu/vt-d: Don't reject NTB devices due to scope mismatch
+    
+    On a system with an Intel PCIe port configured as an NTB device, iommu
+    initialization fails with
+    
+        DMAR: Device scope type does not match for 0000:80:03.0
+    
+    This is because the DMAR table reports this device as having scope 2
+    (ACPI_DMAR_SCOPE_TYPE_BRIDGE):
+    
+        [0A0h 0160   1]      Device Scope Entry Type : 02
+        [0A1h 0161   1]                 Entry Length : 08
+        [0A2h 0162   2]                     Reserved : 0000
+        [0A4h 0164   1]               Enumeration ID : 00
+        [0A5h 0165   1]               PCI Bus Number : 80
+    
+        [0A6h 0166   2]                     PCI Path : 03,00
+    
+    but the device has a type 0 PCI header:
+    
+        80:03.0 Bridge [0680]: Intel Corporation Device [8086:2f0d] (rev 02)
+        00: 86 80 0d 2f 00 00 10 00 02 00 80 06 10 00 80 00
+        10: 0c 00 c0 00 c0 38 00 00 0c 00 00 00 80 38 00 00
+        20: 00 00 00 c8 00 00 10 c8 00 00 00 00 86 80 00 00
+        30: 00 00 00 00 60 00 00 00 00 00 00 00 ff 01 00 00
+    
+    VT-d works perfectly on this system, so there's no reason to bail out
+    on initialization due to this apparent scope mismatch.  Use the class
+    0x0680 ("Other bridge device") as a heuristic for allowing DMAR
+    initialization for non-bridge PCI devices listed with scope bridge.
+    
+    Signed-off-by: Roland Dreier <roland@purestorage.com>
+    Signed-off-by: Joerg Roedel <jroedel@suse.de>
+
+commit a8165d421dabd476d811f89942e345827f7b1497
+Author: chenhui zhao <chenhui.zhao@freescale.com>
+Date:   Fri Jan 15 17:38:20 2016 +0800
+
+    powerpc/fsl-pci: Add a workaround for PCI 5 errata
+    
+    Issue:
+    As a master, the PCI IP block can combine a memory write to the last PCI
+    double word (4 bytes) of a cacheline with a 4 byte memory write to the
+    first PCI double word of the subsequent cacheline. This affects 32-bit
+    PCI target devices that blindly assert STOP on memory-write transactions,
+    without detecting that the data beat being transferred is the last data
+    beat of the transaction. It can cause a hang. PCI-X operation is not
+    affected by this erratum.
+    
+    Workaround:
+    Setting the bit MDS in the PCI Bus Function Register will disable the
+    combining of crossing cacheline boundary requests into one burst
+    transaction. Therefore, it can prevent the errata scenario from
+    occurring.
+    
+    This errata exists in MPC8543, MPC8543E, MPC8545, MPC8545E, MPC8547,
+    MPC8547E, MPC8548 and MPC8548E. Refer to PCI 5 in MPC8548 errata
+    document.
+    
+    Signed-off-by: Zhao Chenhui <chenhui.zhao@freescale.com>
+    Signed-off-by: Zhiqiang Hou <Zhiqiang.Hou@freescale.com>
+    [scottwood: whitespace fix]
+    Signed-off-by: Scott Wood <oss@buserror.net>
+
+commit 2c2c5c5cd213aea38c850bb6edc9b7f77f29802f
+Author: Jon Derrick <jonathan.derrick@intel.com>
+Date:   Wed Feb 24 10:06:37 2016 -0700
+
+    x86/PCI: VMD: Attach VMD resources to parent domain's resource tree
+    
+    Attach the new VMD domain's resources to the VMD device's resources.  This
+    allows /proc/iomem to display a more complete picture.
+    
+    Before:
+      c0000000-c1ffffff : 0000:5d:05.5
+      c2000000-c3ffffff : 0000:5d:05.5
+        c2010000-c2013fff : nvme
+      c4000000-c40fffff : 0000:5d:05.5
+    
+    After:
+      c0000000-c1ffffff : 0000:5d:05.5
+      c2000000-c3ffffff : 0000:5d:05.5
+        c2000000-c3ffffff : VMD MEMBAR1
+          c2000000-c22fffff : PCI Bus 10000:01
+            c2000000-c200ffff : 10000:01:00.0
+            c2010000-c2013fff : 10000:01:00.0
+              c2010000-c2013fff : nvme
+          c2300000-c24fffff : PCI Bus 10000:01
+      c4000000-c40fffff : 0000:5d:05.5
+        c4002000-c40fffff : VMD MEMBAR2
+    
+    Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Reviewed-by: Keith Busch <keith.busch@intel.com>
+
+commit 9babd5c8caa6e62c116efc3a64a09f65af4112b0
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Tue Jan 26 21:57:17 2016 +0100
+
+    resource: Add System RAM resource type
+    
+    The IORESOURCE_MEM I/O resource type is used for all types of
+    memory-mapped ranges, ex. System RAM, System ROM, Video RAM,
+    Persistent Memory, PCI Bus, PCI MMCONFIG, ACPI Tables, IOAPIC,
+    reserved, and so on.
+    
+    This requires walk_system_ram_range(), walk_system_ram_res(),
+    and region_intersects() to use strcmp() against string "System
+    RAM" to search for System RAM ranges in the iomem table, which
+    is inefficient. __ioremap_caller() and reserve_memtype() on x86,
+    for instance, call walk_system_ram_range() for every request to
+    check if a given range is in System RAM ranges.
+    
+    However, adding a new I/O resource type for System RAM is not a
+    viable option, see [1]. There are approx. 3800 references to
+    IORESOURCE_MEM in the kernel/drivers, which makes it very
+    difficult to distinguish their usages between new type and
+    IORESOURCE_MEM.
+    
+    The I/O resource types are also used by the PNP subsystem.
+    Therefore, introduce an extended I/O resource type,
+    IORESOURCE_SYSTEM_RAM, which consists of IORESOURCE_MEM and a
+    new modifier flag IORESOURCE_SYSRAM, see [2].
+    
+    To keep the code 'if (resource_type(r) == IORESOURCE_MEM)' still
+    working for System RAM, resource_ext_type() is added for
+    extracting extended type bits.
+    
+    Link[1]: http://lkml.kernel.org/r/1449168859.9855.54.camel@hpe.com
+    Link[2]: http://lkml.kernel.org/r/CA+55aFy4WQrWexC4u2LxX9Mw2NVoznw7p3Yh=iF4Xtf7zKWnRw@mail.gmail.com
+    
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Dan Williams <dan.j.williams@intel.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Hanjun Guo <hanjun.guo@linaro.org>
+    Cc: Jakub Sitnicki <jsitnicki@gmail.com>
+    Cc: Jiang Liu <jiang.liu@linux.intel.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Luis R. Rodriguez <mcgrof@suse.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Toshi Kani <toshi.kani@hp.com>
+    Cc: linux-arch@vger.kernel.org
+    Cc: linux-mm <linux-mm@kvack.org>
+    Link: http://lkml.kernel.org/r/1453841853-11383-2-git-send-email-bp@alien8.de
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+
+commit 61473c581da9f97ea703b8b1a693300e138456e1
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Zefan Li <lizefan@huawei.com>
+
+commit 0b26cd69480d4d99f39042c6621a05af7496b3da
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Mon Sep 21 18:26:45 2015 -0500
+
+    PCI: Clear IORESOURCE_UNSET when reverting to firmware-assigned address
+    
+    If pci_assign_resource() fails to assign space for a BAR, we may restore
+    the BAR to whatever firmware left there at boot-time (this depends on
+    whether the arch implements pcibios_retrieve_fw_addr()).  The messages we
+    print are not as useful as they could be:
+    
+      pci 0000:00:01.0: BAR 15: assigned [mem 0xc0000000-0xc01fffff 64bit pref]
+      pci 0000:01:00.0: BAR 0: no space for [mem size 0x10000000 pref]
+      pci 0000:01:00.0: BAR 0: trying firmware assignment [mem size 0x10000000 pref]
+      pci 0000:01:00.0: BAR 0: [mem size 0x10000000 pref] conflicts with PCI Bus 0000:00 [mem 0xc0000000-0xffffffff window]
+    
+    The last two lines should contain the actual BAR address, not the size.
+    Clear IORESOURCE_UNSET so we print the address.  If requesting the
+    firmware-assigned resource fails, mark it IORESOURCE_UNSET again.
+    
+    This is a cosmetic change to clarify the message: previously, if
+    pci_revert_fw_address() succeeded, pci_assign_resource() cleared
+    IORESOURCE_UNSET anyway, so this isn't really a functional change.
+    
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=85491#c50
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+
+commit 0fc28ac7a95c9a4cf660d22cc463a5e2ee4ecc5a
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+
+commit 0bc22ecade3c159114322e562b4a5fd753079d57
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Luis Henriques <luis.henriques@canonical.com>
+
+commit dc86cafe9a0c6d10c2e1a7c6d6e3ff1c98b65edc
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 38f69b4caebc05f39c8f27a7d84f4b283699f600
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit b6f2faffa0a189c28a2f2242c0b23fb031ba3075
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 13485fd9b6acd6aa0b9907b3666f691d35e1bf6a
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d upstream.
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 82246668e49b5ff91b3b67e52a3948ce28432dd1
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    [ Upstream commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d ]
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    CC: stable@vger.kernel.org
+    Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+
+commit 1dace0116d0b05c967d94644fc4dfe96be2ecd3d
+Author: Bjorn Helgaas <bhelgaas@google.com>
+Date:   Tue Jun 9 18:54:07 2015 -0500
+
+    x86/PCI: Use host bridge _CRS info on Foxconn K8M890-8237A
+    
+    The Foxconn K8M890-8237A has two PCI host bridges, and we can't assign
+    resources correctly without the information from _CRS that tells us which
+    address ranges are claimed by which bridge.  In the bugs mentioned below,
+    we incorrectly assign a sound card address (this example is from 1033299):
+    
+      bus: 00 index 2 [mem 0x80000000-0xfcffffffff]
+      ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-7f])
+      pci_root PNP0A08:00: host bridge window [mem 0x80000000-0xbfefffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xc0000000-0xdfffffff] (ignored)
+      pci_root PNP0A08:00: host bridge window [mem 0xf0000000-0xfebfffff] (ignored)
+      ACPI: PCI Root Bridge [PCI1] (domain 0000 [bus 80-ff])
+      pci_root PNP0A08:01: host bridge window [mem 0xbff00000-0xbfffffff] (ignored)
+      pci 0000:80:01.0: [1106:3288] type 0 class 0x000403
+      pci 0000:80:01.0: reg 10: [mem 0xbfffc000-0xbfffffff 64bit]
+      pci 0000:80:01.0: address space collision: [mem 0xbfffc000-0xbfffffff 64bit] conflicts with PCI Bus #00 [mem 0x80000000-0xfcffffffff]
+      pci 0000:80:01.0: BAR 0: assigned [mem 0xfd00000000-0xfd00003fff 64bit]
+      BUG: unable to handle kernel paging request at ffffc90000378000
+      IP: [<ffffffffa0345f63>] azx_create+0x37c/0x822 [snd_hda_intel]
+    
+    We assigned 0xfd_0000_0000, but that is not in any of the host bridge
+    windows, and the sound card doesn't work.
+    
+    Turn on pci=use_crs automatically for this system.
+    
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/931368
+    Link: https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1033299
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    CC: stable@vger.kernel.org
+
+commit 18e94a3384368340d438cf67fcaebd72084f34f8
+Author: Aaron Lu <aaron.lu@intel.com>
+Date:   Wed Mar 25 14:31:41 2015 +0800
+
+    PCI: Make a shareable UUID for PCI firmware ACPI _DSM
+    
+    The PCI Firmware Specification, r3.0, sec 4.6.4.1.3, defines a single UUID
+    for an ACPI _DSM method to provide device-specific control functions.  This
+    _DSM method support several functions, including PCI Express Slot
+    Information, PCI Express Slot Number, PCI Bus Capabilities, etc.
+    
+    Move the UUID definition from pci/pci-label.c, where it could be used only
+    for one function, to pci/pci-acpi.c where it can be shared for all these
+    functions.
+    
+    [bhelgaas: changelog]
+    Signed-off-by: Aaron Lu <aaron.lu@intel.com>
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+commit 7461fd913afe3a830b47cf133a6ad53e49a5db8b
+Author: Alexander Duyck <alexander.h.duyck@intel.com>
+Date:   Sat Sep 20 19:53:23 2014 -0400
+
+    fm10k: Add support for debugfs
+    
+    This patch adds limited debugfs support for the driver.  Most of the
+    functionality needed for dumping registers is already provided via ethtool.
+    The only thing we saw that we really neeed was the ability to dump the
+    descriptor rings so as such this patch will add a fm10k directory containing a
+    listing of directories each one with a unique PCI Bus, Device, and Function
+    number.  Each of those BDF directories will have a list of q_vectors, and
+    the q_vectors will contain a file for each of the Rx/Tx rings that are a part
+    of the vector.  For example:
+    
+    # ls -RD /sys/kernel/debug/fm10k/
+    /sys/kernel/debug/fm10k/:
+    0000:01:00.0
+    
+    /sys/kernel/debug/fm10k/0000:01:00.0:
+    q_vector.000  q_vector.001  q_vector.002  q_vector.003
+    
+    /sys/kernel/debug/fm10k/0000:01:00.0/q_vector.000:
+    rx_ring.000  tx_ring.000
+    
+    /sys/kernel/debug/fm10k/0000:01:00.0/q_vector.001:
+    rx_ring.001  tx_ring.001
+    
+    /sys/kernel/debug/fm10k/0000:01:00.0/q_vector.002:
+    rx_ring.002  tx_ring.002
+    
+    /sys/kernel/debug/fm10k/0000:01:00.0/q_vector.003:
+    rx_ring.003  tx_ring.003
+    
+    # cat /sys/kernel/debug/fm10k/0000:01:00.0/q_vector.000/rx_ring.000
+    DES DATA       RSS        STATERR    LENGTH VLAN   DGLORT SGLORT TIMESTAMP
+    ---------------------------------------------------------------------------
+    000 0x00000000 0x00000000 0x00000003 0x002a 0x0000 0x0000 0x0000 0x13951807dc4fedf0
+    001 0x00000000 0x00000000 0x00000003 0x002a 0x0000 0x0000 0x0000 0x1395180906c9f2c8
+    002 0x3731c000 0x00000000 0x00000000 0x0000 0x0000 0x0000 0x0000 0x0000000000000000
+    003 0x3731d000 0x00000000 0x00000000 0x0000 0x0000 0x0000 0x0000 0x0000000000000000
+    004 0xaab3a000 0x00000000 0x00000000 0x0000 0x0000 0x0000 0x0000 0x0000000000000000
+    ...
+    
+    # cat /sys/kernel/debug/fm10k/0000:01:00.0/q_vector.000/tx_ring.000
+    DES BUFFER_ADDRESS     LENGTH VLAN   MSS    HDRLEN FLAGS
+    ---------------------------------------------------------
+    000 0x00000000aa8a1002 0x005a 0x0000 0x0000 0x0000 0xc0
+    001 0x00000000aa8a2002 0x005a 0x0000 0x0000 0x0000 0xc0
+    002 0x000000006bc13202 0x004e 0x0000 0x0000 0x0000 0xc0
+    003 0x000000006bc13c02 0x002a 0x0000 0x0000 0x0000 0xe1
+    004 0x000000006bc13602 0x0062 0x0000 0x0000 0x0000 0xc0
+    
+    Signed-off-by: Alexander Duyck <alexander.h.duyck@intel.com>
+    Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+commit 41534e53786df49b708c1e06f5d6ef9b53fbb689
+Author: Thierry Reding <treding@nvidia.com>
+Date:   Fri Aug 1 14:15:11 2014 +0200
+
+    PCI: tegra: Implement a proper resource hierarchy
+    
+    Currently the resource hierarchy generated from the PCIe host bridge is
+    completely flat:
+    
+        $ cat /proc/iomem
+        00000000-00000fff : /pcie-controller@00003000/pci@1,0
+        00003000-000037ff : pads
+        00003800-000039ff : afi
+        10000000-1fffffff : cs
+        28000000-28003fff : r8169
+        28004000-28004fff : r8169
+        ...
+    
+    The host bridge driver doesn't request all the resources that are used.
+    Windows allocated to each of the root ports aren't tracked, so there is no
+    way for resources allocated to individual devices to be matched up with the
+    correct parent resource by the PCI core.
+    
+    This patch addresses this in two steps.  It first takes the union of all
+    regions associated with the PCIe host bridge (control registers, root port
+    registers, configuration space, I/O and prefetchable as well as non-
+    prefetchable memory regions) and uses it as the new root of the resource
+    hierarchy.
+    
+    Subsequently, regions are allocated from within this new root resource so
+    that the resource tree looks much more like what's expected:
+    
+        # cat /proc/iomem
+        00000000-3fffffff : /pcie-controller@00003000
+          00000000-00000fff : /pcie-controller@00003000/pci@1,0
+          00003000-000037ff : pads
+          00003800-000039ff : afi
+          10000000-1fffffff : cs
+          20000000-27ffffff : non-prefetchable
+          28000000-3fffffff : prefetchable
+            28000000-280fffff : PCI Bus 0000:01
+              28000000-28003fff : 0000:01:00.0
+                28000000-28003fff : r8169
+              28004000-28004fff : 0000:01:00.0
+                28004000-28004fff : r8169
+        ...
+    
+    Signed-off-by: Thierry Reding <treding@nvidia.com>
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+
+commit 5ae0566a0fffa09a77ac5996e3854fe91cd87167
+Author: Jiang Liu <jiang.liu@linux.intel.com>
+Date:   Tue Apr 15 10:35:35 2014 +0800
+
+    iommu/vt-d: fix bug in matching PCI devices with DRHD/RMRR descriptors
+    
+    Commit "59ce0515cdaf iommu/vt-d: Update DRHD/RMRR/ATSR device scope
+    caches when PCI hotplug happens" introduces a bug, which fails to
+    match PCI devices with DMAR device scope entries if PCI path array
+    in the entry has more than one level.
+    
+    For example, it fails to handle
+    [1D2h 0466   1]      Device Scope Entry Type : 01
+    [1D3h 0467   1]                 Entry Length : 0A
+    [1D4h 0468   2]                     Reserved : 0000
+    [1D6h 0470   1]               Enumeration ID : 00
+    [1D7h 0471   1]               PCI Bus Number : 00
+    [1D8h 0472   2]                     PCI Path : 1C,04
+    [1DAh 0474   2]                     PCI Path : 00,02
+    
+    And cause DMA failure on HP DL980 as:
+    DMAR:[fault reason 02] Present bit in context entry is clear
+    dmar: DRHD: handling fault status reg 602
+    dmar: DMAR:[DMA Read] Request device [02:00.2] fault addr 7f61e000
+    
+    Reported-and-tested-by: Davidlohr Bueso <davidlohr@hp.com>
+    Signed-off-by: Jiang Liu <jiang.liu@linux.intel.com>
+    Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+
+commit b5f82ddf22725146d926c56ea4cb80df9b34b6b9
+Author: Jiang Liu <jiang.liu@linux.intel.com>
+Date:   Wed Feb 19 14:07:31 2014 +0800
+
+    iommu/vt-d: Fix error in detect ATS capability
+    
+    Current Intel IOMMU driver only matches a PCIe root port with the first
+    DRHD unit with the samge segment number. It will report false result
+    if there are multiple DRHD units with the same segment number, thus fail
+    to detect ATS capability for some PCIe devices.
+    
+    This patch refines function dmar_find_matched_atsr_unit() to search all
+    DRHD units with the same segment number.
+    
+    An example DMAR table entries as below:
+    [1D0h 0464  2]                Subtable Type : 0002 <Root Port ATS Capability>
+    [1D2h 0466  2]                       Length : 0028
+    [1D4h 0468  1]                        Flags : 00
+    [1D5h 0469  1]                     Reserved : 00
+    [1D6h 0470  2]           PCI Segment Number : 0000
+    
+    [1D8h 0472  1]      Device Scope Entry Type : 02
+    [1D9h 0473  1]                 Entry Length : 08
+    [1DAh 0474  2]                     Reserved : 0000
+    [1DCh 0476  1]               Enumeration ID : 00
+    [1DDh 0477  1]               PCI Bus Number : 00
+    [1DEh 0478  2]                     PCI Path : [02, 00]
+    
+    [1E0h 0480  1]      Device Scope Entry Type : 02
+    [1E1h 0481  1]                 Entry Length : 08
+    [1E2h 0482  2]                     Reserved : 0000
+    [1E4h 0484  1]               Enumeration ID : 00
+    [1E5h 0485  1]               PCI Bus Number : 00
+    [1E6h 0486  2]                     PCI Path : [03, 00]
+    
+    [1E8h 0488  1]      Device Scope Entry Type : 02
+    [1E9h 0489  1]                 Entry Length : 08
+    [1EAh 0490  2]                     Reserved : 0000
+    [1ECh 0492  1]               Enumeration ID : 00
+    [1EDh 0493  1]               PCI Bus Number : 00
+    [1EEh 0494  2]                     PCI Path : [03, 02]
+    
+    [1F0h 0496  1]      Device Scope Entry Type : 02
+    [1F1h 0497  1]                 Entry Length : 08
+    [1F2h 0498  2]                     Reserved : 0000
+    [1F4h 0500  1]               Enumeration ID : 00
+    [1F5h 0501  1]               PCI Bus Number : 00
+    [1F6h 0502  2]                     PCI Path : [03, 03]
+    
+    [1F8h 0504  2]                Subtable Type : 0002 <Root Port ATS Capability>
+    [1FAh 0506  2]                       Length : 0020
+    [1FCh 0508  1]                        Flags : 00
+    [1FDh 0509  1]                     Reserved : 00
+    [1FEh 0510  2]           PCI Segment Number : 0000
+    
+    [200h 0512  1]      Device Scope Entry Type : 02
+    [201h 0513  1]                 Entry Length : 08
+    [202h 0514  2]                     Reserved : 0000
+    [204h 0516  1]               Enumeration ID : 00
+    [205h 0517  1]               PCI Bus Number : 40
+    [206h 0518  2]                     PCI Path : [02, 00]
+    
+    [208h 0520  1]      Device Scope Entry Type : 02
+    [209h 0521  1]                 Entry Length : 08
+    [20Ah 0522  2]                     Reserved : 0000
+    [20Ch 0524  1]               Enumeration ID : 00
+    [20Dh 0525  1]               PCI Bus Number : 40
+    [20Eh 0526  2]                     PCI Path : [02, 02]
+    
+    [210h 0528  1]      Device Scope Entry Type : 02
+    [211h 0529  1]                 Entry Length : 08
+    [212h 0530  2]                     Reserved : 0000
+    [214h 0532  1]               Enumeration ID : 00
+    [215h 0533  1]               PCI Bus Number : 40
+    [216h 0534  2]                     PCI Path : [03, 00]
+    
+    [218h 0536  2]                Subtable Type : 0002 <Root Port ATS Capability>
+    [21Ah 0538  2]                       Length : 0020
+    [21Ch 0540  1]                        Flags : 00
+    [21Dh 0541  1]                     Reserved : 00
+    [21Eh 0542  2]           PCI Segment Number : 0000
+    
+    [220h 0544  1]      Device Scope Entry Type : 02
+    [221h 0545  1]                 Entry Length : 08
+    [222h 0546  2]                     Reserved : 0000
+    [224h 0548  1]               Enumeration ID : 00
+    [225h 0549  1]               PCI Bus Number : 80
+    [226h 0550  2]                     PCI Path : [02, 00]
+    
+    [228h 0552  1]      Device Scope Entry Type : 02
+    [229h 0553  1]                 Entry Length : 08
+    [22Ah 0554  2]                     Reserved : 0000
+    [22Ch 0556  1]               Enumeration ID : 00
+    [22Dh 0557  1]               PCI Bus Number : 80
+    [22Eh 0558  2]                     PCI Path : [02, 02]
+    
+    [230h 0560  1]      Device Scope Entry Type : 02
+    [231h 0561  1]                 Entry Length : 08
+    [232h 0562  2]                     Reserved : 0000
+    [234h 0564  1]               Enumeration ID : 00
+    [235h 0565  1]               PCI Bus Number : 80
+    [236h 0566  2]                     PCI Path : [03, 00]
+    
+    [238h 0568  2]                Subtable Type : 0002 <Root Port ATS Capability>
+    [23Ah 0570  2]                       Length : 0020
+    [23Ch 0572  1]                        Flags : 00
+    [23Dh 0573  1]                     Reserved : 00
+    [23Eh 0574  2]           PCI Segment Number : 0000
+    
+    [240h 0576  1]      Device Scope Entry Type : 02
+    [241h 0577  1]                 Entry Length : 08
+    [242h 0578  2]                     Reserved : 0000
+    [244h 0580  1]               Enumeration ID : 00
+    [245h 0581  1]               PCI Bus Number : C0
+    [246h 0582  2]                     PCI Path : [02, 00]
+    
+    [248h 0584  1]      Device Scope Entry Type : 02
+    [249h 0585  1]                 Entry Length : 08
+    [24Ah 0586  2]                     Reserved : 0000
+    [24Ch 0588  1]               Enumeration ID : 00
+    [24Dh 0589  1]               PCI Bus Number : C0
+    [24Eh 0590  2]                     PCI Path : [02, 02]
+    
+    [250h 0592  1]      Device Scope Entry Type : 02
+    [251h 0593  1]                 Entry Length : 08
+    [252h 0594  2]                     Reserved : 0000
+    [254h 0596  1]               Enumeration ID : 00
+    [255h 0597  1]               PCI Bus Number : C0
+    [256h 0598  2]                     PCI Path : [03, 00]
+    
+    Signed-off-by: Jiang Liu <jiang.liu@linux.intel.com>
+    Signed-off-by: Joerg Roedel <joro@8bytes.org>
+
+commit 2613ba480fb7b40c67eea36d03c9946977828623
+Author: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Date:   Wed Feb 12 15:57:08 2014 -0700
+
+    PCI: mvebu: Call request_resource() on the apertures
+    
+    It is typical for host drivers to request a resource for the aperture; once
+    this is done the PCI core will properly populate resources for all BARs in
+    the system.
+    
+    With this patch cat /proc/iomem will now show:
+    
+      e0000000-efffffff : PCI MEM 0000
+        e0000000-e00fffff : PCI Bus 0000:01
+          e0000000-e001ffff : 0000:01:00.0
+    
+    Tested on Kirkwood.
+    
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Acked-by: Jason Cooper <jason@lakedaemon.net>
+
+commit 339c0fc58618b717565f109d68da50c5bc1a0510
+Author: Betty Dall <betty.dall@hp.com>
+Date:   Thu Dec 5 08:08:24 2013 -0700
+
+    PCI/AER: Support ACPI HEST AER error sources for PCI domains other than 0
+    
+    In the discussion for this set of patches [link below], Bjorn Helgaas
+    pointed out that the ACPI HEST AER error sources do not have the PCIe
+    segment number associated with the bus.  I worked with the ACPI spec and
+    got this change to definition of the "Bus" field into the recently released
+    ACPI Spec 5.0a section 18.3.2.3-5:
+    
+      Identifies the PCI Bus and Segment of the device.  The Bus is encoded in
+      bits 0-7.  For systems that expose multiple PCI segment groups, the
+      segment number is encoded in bits 8-23 and bits 24-31 must be zero.  For
+      systems that do not expose multiple PCI segment groups, bits 8-31 must be
+      zero.  If the GLOBAL flag is specified, this field is ignored.
+    
+    This patch makes use of the new definition in the only place in the kernel
+    that uses the acpi_hest_aer_common's bus field.
+    
+    This depends on 36f3615152c1 ("ACPICA: Add helper macros to extract
+    bus/segment numbers from HEST table.")
+    
+    Link: http://lkml.kernel.org/r/1370542251-27387-1-git-send-email-betty.dall@hp.com
+    Signed-off-by: Betty Dall <betty.dall@hp.com>
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+
+commit 4723d0f2f96e6c910f951d595067eb31e0dd2d01
+Author: Bjorn Helgaas <bjorn.helgaas@hp.com>
+Date:   Wed Sep 22 11:09:19 2010 -0600
+
+    x86/PCI: coalesce overlapping host bridge windows
+    
+    Some BIOSes provide PCI host bridge windows that overlap, e.g.,
+    
+        pci_root PNP0A03:00: host bridge window [mem 0xb0000000-0xffffffff]
+        pci_root PNP0A03:00: host bridge window [mem 0xafffffff-0xdfffffff]
+        pci_root PNP0A03:00: host bridge window [mem 0xf0000000-0xffffffff]
+    
+    If we simply insert these as children of iomem_resource, the second window
+    fails because it conflicts with the first, and the third is inserted as a
+    child of the first, i.e.,
+    
+        b0000000-ffffffff PCI Bus 0000:00
+          f0000000-ffffffff PCI Bus 0000:00
+    
+    When we claim PCI device resources, this can cause collisions like this
+    if we put them in the first window:
+    
+        pci 0000:00:01.0: address space collision: [mem 0xff300000-0xff4fffff] conflicts with PCI Bus 0000:00 [mem 0xf0000000-0xffffffff]
+    
+    Host bridge windows are top-level resources by definition, so it doesn't
+    make sense to make the third window a child of the first.  This patch
+    coalesces any host bridge windows that overlap.  For the example above,
+    the result is this single window:
+    
+        pci_root PNP0A03:00: host bridge window [mem 0xafffffff-0xffffffff]
+    
+    This fixes a 2.6.34 regression.
+    
+    Reference: https://bugzilla.kernel.org/show_bug.cgi?id=17011
+    Reported-and-tested-by: Anisse Astier <anisse@astier.eu>
+    Reported-and-tested-by: Pramod Dematagoda <pmd.lotr.gandalf@gmail.com>
+    Signed-off-by: Bjorn Helgaas <bjorn.helgaas@hp.com>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+
+commit dc9887dc02e37bcf83f4e792aa14b07782ef54cf
+Author: Bjorn Helgaas <bjorn.helgaas@hp.com>
+Date:   Tue Oct 26 15:41:44 2010 -0600
+
+    x86/PCI: allocate space from the end of a region, not the beginning
+    
+    Allocate from the end of a region, not the beginning.
+    
+    For example, if we need to allocate 0x800 bytes for a device on bus
+    0000:00 given these resources:
+    
+        [mem 0xbff00000-0xdfffffff] PCI Bus 0000:00
+          [mem 0xc0000000-0xdfffffff] PCI Bus 0000:02
+    
+    the available space at [mem 0xbff00000-0xbfffffff] is passed to the
+    alignment callback (pcibios_align_resource()).  Prior to this patch, we
+    would put the new 0x800 byte resource at the beginning of that available
+    space, i.e., at [mem 0xbff00000-0xbff007ff].
+    
+    With this patch, we put it at the end, at [mem 0xbffff800-0xbfffffff].
+    
+    Reference: https://bugzilla.kernel.org/show_bug.cgi?id=16228#c41
+    Signed-off-by: Bjorn Helgaas <bjorn.helgaas@hp.com>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+
+commit e7f8567db9a7f6b3151b0b275e245c1cef0d9c70
+Author: Bjorn Helgaas <bjorn.helgaas@hp.com>
+Date:   Tue Oct 26 15:41:33 2010 -0600
+
+    resources: support allocating space within a region from the top down
+    
+    Allocate space from the top of a region first, then work downward,
+    if an architecture desires this.
+    
+    When we allocate space from a resource, we look for gaps between children
+    of the resource.  Previously, we always looked at gaps from the bottom up.
+    For example, given this:
+    
+        [mem 0xbff00000-0xf7ffffff] PCI Bus 0000:00
+          [mem 0xbff00000-0xbfffffff] gap -- available
+          [mem 0xc0000000-0xdfffffff] PCI Bus 0000:02
+          [mem 0xe0000000-0xf7ffffff] gap -- available
+    
+    we attempted to allocate from the [mem 0xbff00000-0xbfffffff] gap first,
+    then the [mem 0xe0000000-0xf7ffffff] gap.
+    
+    With this patch an architecture can choose to allocate from the top gap
+    [mem 0xe0000000-0xf7ffffff] first.
+    
+    We can't do this across the board because iomem_resource.end is initialized
+    to 0xffffffff_ffffffff on 64-bit architectures, and most machines can't
+    address the entire 64-bit physical address space.  Therefore, we only
+    allocate top-down if the arch requests it by clearing
+    "resource_alloc_from_bottom".
+    
+    Signed-off-by: Bjorn Helgaas <bjorn.helgaas@hp.com>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+
+commit 286468210d83ce0ca1e37e346ed9f4457a161650
+Author: Stefan Richter <stefanr@s5r6.in-berlin.de>
+Date:   Tue Jul 27 10:26:33 2010 +0200
+
+    firewire: new driver: nosy - IEEE 1394 traffic sniffer
+    
+    This adds the traffic sniffer driver for Texas Instruments PCILynx/
+    PCILynx2 based cards.  The use cases for nosy are analysis of
+    nonstandard protocols and as an aid in development of drivers,
+    applications, or firmwares.
+    
+    Author of the driver is Kristian Høgsberg.  Known contributers are
+    Jody McIntyre and Jonathan Woithe.
+    
+    Nosy programs PCILynx chips to operate in promiscuous mode, which is a
+    feature that is not found in OHCI-1394 controllers.  Hence, only special
+    hardware as mentioned in the Kconfig help text is suitable for nosy.
+    
+    This is only the kernelspace part of nosy.  There is a userspace
+    interface to it, called nosy-dump, proposed to be added into the tools/
+    subdirectory of the kernel sources in a subsequent change.  Kernelspace
+    and userspave component of nosy communicate via a 'misc' character
+    device file called /dev/nosy with a simple ioctl() and read() based
+    protocol, as described by nosy-user.h.
+    
+    The files added here are taken from
+    git://anongit.freedesktop.org/~krh/nosy commit ee29be97 (2009-11-10)
+    with the following changes by Stefan Richter:
+      - Kconfig and Makefile hunks are written from scratch.
+      - Commented out version printk in nosy.c.
+      - Included missing <linux/sched.h>, reported by Stephen Rothwell.
+    
+    "git shortlog nosy{-user.h,.c,.h}" from nosy's git repository:
+    
+    Jonathan Woithe (2):
+          Nosy updates for recent kernels
+          Fix uninitialised memory (needed for 2.6.31 kernel)
+    
+    Kristian Høgsberg (5):
+          Pull over nosy from mercurial repo.
+          Use a misc device instead.
+          Add simple AV/C decoder.
+          Don't break down on big payloads.
+          Set parent device for misc device.
+    
+    As a low-level IEEE 1394 driver, its files are placed into
+    drivers/firewire/ although nosy is not part of the firewire driver
+    stack.
+    
+    I am aware of the following literature from Texas Instruments about
+    PCILynx programming:
+          SCPA020A - PCILynx 1394 to PCI Bus Interface TSB12LV21BPGF
+                     Functional Specification
+          SLLA023  - Initialization and Asynchronous Programming of the
+                     TSB12LV21A 1394 Device
+    
+    Signed-off-by: Stefan Richter <stefanr@s5r6.in-berlin.de>
+    Acked-by: Kristian Høgsberg <krh@bitplanet.net>
+
+commit ef7c80c1f18f2c5eea2dabd214f12e0c93ac29cf
+Author: Kashyap, Desai <kashyap.desai@lsi.com>
+Date:   Mon Apr 5 14:20:07 2010 +0530
+
+    [SCSI] mpt2sas: Added support for PCIe Advanced Error Recovery.
+    
+    Added support in the driver to support EEH and
+    PCIe Advanced Error Recovery. This involves adding new
+    pci_error_handler interface for recovering the controller from PCI Bus
+    errors, such as SERR and PERR. Some tools are available for simulating
+    PCI errors in order to validate this interface:
+    http://www.kernel.org/pub/linux/utils/pci/aer-inject
+    
+    Signed-off-by: Kashyap Desai <kashyap.desai@lsi.com>
+    Signed-off-by: James Bottomley <James.Bottomley@suse.de>
+
+commit ca8463926306580c25e62eb901a206530d480cae
+Author: Tim Yamin <plasm@roo.me.uk>
+Date:   Fri Mar 19 14:22:58 2010 -0700
+
+    PCI quirk: only apply CX700 PCI bus parking quirk if external VT6212L is present
+    
+    Apply the CX700 quirk only when an external VT6212L is present (which
+    is the case for the errant hardware the quirk was written for), don't
+    touch the settings otherwise -- Hauppage PVR-500 tuners need PCI Bus
+    Parking in order to work and when that's turned on everything seems
+    to behave fine.
+    
+    I guess the underlying problem is a combination of an external VT6212L
+    and the CX700 rather than the CX700's PCI being broken completely for
+    all cases...
+    
+    Reported-by: Jeroen Roos <jeroen@roosnl.com>
+    Signed-off-by: Tim Yamin <plasm@roo.me.uk>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+
+commit 7a96e87d6e58a07235a2bc3eff9b093af4937a72
+Author: Dominik Brodowski <linux@dominikbrodowski.net>
+Date:   Sat Mar 13 17:42:39 2010 +0100
+
+    pcmcia: pd6729, i82092: use parent (PCI) resources
+    
+    A newly added parent resource entry for the root PCI bus, such as
+    
+    40000000-ffffffff : PCI Bus #00
+    
+    means that the pd6729 and i82092 drivers cannot allocate iomem as
+    freely as before, unless they do so as PCI devices. Therefore, set
+    socket->cb_dev so that rsrc_nonstatic.c does the right thing.
+    
+    Reported-by: Komuro <komurojun-mbn@nifty.com>
+    Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+
+commit deb2d2ecd43dfc51efe71eed7128fda514da96c6
+Author: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date:   Tue Aug 11 15:52:06 2009 +1000
+
+    PCI/GPU: implement VGA arbitration on Linux
+    
+    Background:
+    Graphic devices are accessed through ranges in I/O or memory space. While most
+    modern devices allow relocation of such ranges, some "Legacy" VGA devices
+    implemented on PCI will typically have the same "hard-decoded" addresses as
+    they did on ISA. For more details see "PCI Bus Binding to IEEE Std 1275-1994
+    Standard for Boot (Initialization Configuration) Firmware Revision 2.1"
+    Section 7, Legacy Devices.
+    
+    The Resource Access Control (RAC) module inside the X server currently does
+    the task of arbitration when more than one legacy device co-exists on the same
+    machine. But the problem happens when these devices are trying to be accessed
+    by different userspace clients (e.g. two server in parallel). Their address
+    assignments conflict. Therefore an arbitration scheme _outside_ of the X
+    server is needed to control the sharing of these resources. This document
+    introduces the operation of the VGA arbiter implemented for Linux kernel.
+    
+    Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+    Signed-off-by: Tiago Vignatti <tiago.vignatti@nokia.com>
+    Signed-off-by: Dave Airlie <airlied@redhat.com>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+
+commit b0ab1f1632e9df08ddc86e0996253edb3f8e8e8c
+Author: Rafael J. Wysocki <rjw@sisk.pl>
+Date:   Mon May 18 22:51:12 2009 +0200
+
+    PCI PM: Follow PCI_PM_CTRL_NO_SOFT_RESET during transitions from D3
+    
+    commit f62795f1e892ca9269849fa83de97621da7e02c0 upstream.
+    
+    According to the PCI PM specification (PCI Bus Power Management
+    Interface Specification, Rev. 1.2, Section 5.4.1) we are supposed to
+    reinitialize devices that have PCI_PM_CTRL_NO_SOFT_RESET clear during
+    all transitions from PCI_D3hot to PCI_D0, but we only do it if the
+    device's current_state field is equal to PCI_UNKNOWN.
+    
+    This may lead to problems if a device with PCI_PM_CTRL_NO_SOFT_RESET
+    unset is put into PCI_D3hot at run time by its driver and
+    pci_set_power_state() is used to put it back into PCI_D0, because in
+    that case the device will remain uninitialized after
+    pci_set_power_state() has returned.  Prevent that from happening by
+    modifying pci_raw_set_power_state() to reinitialize devices with
+    PCI_PM_CTRL_NO_SOFT_RESET unset during all transitions from D3 to D0.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit d58c84b663ef7991ca6e06de059d097b68510507
+Author: Rafael J. Wysocki <rjw@sisk.pl>
+Date:   Mon May 18 22:51:12 2009 +0200
+
+    PCI PM: Follow PCI_PM_CTRL_NO_SOFT_RESET during transitions from D3
+    
+    commit f62795f1e892ca9269849fa83de97621da7e02c0 upstream.
+    
+    According to the PCI PM specification (PCI Bus Power Management
+    Interface Specification, Rev. 1.2, Section 5.4.1) we are supposed to
+    reinitialize devices that have PCI_PM_CTRL_NO_SOFT_RESET clear during
+    all transitions from PCI_D3hot to PCI_D0, but we only do it if the
+    device's current_state field is equal to PCI_UNKNOWN.
+    
+    This may lead to problems if a device with PCI_PM_CTRL_NO_SOFT_RESET
+    unset is put into PCI_D3hot at run time by its driver and
+    pci_set_power_state() is used to put it back into PCI_D0, because in
+    that case the device will remain uninitialized after
+    pci_set_power_state() has returned.  Prevent that from happening by
+    modifying pci_raw_set_power_state() to reinitialize devices with
+    PCI_PM_CTRL_NO_SOFT_RESET unset during all transitions from D3 to D0.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 6b188e72edf2e40a1ba972e31694d5d10b91dbb0
+Author: Rafael J. Wysocki <rjw@sisk.pl>
+Date:   Mon May 18 22:51:12 2009 +0200
+
+    PCI PM: Follow PCI_PM_CTRL_NO_SOFT_RESET during transitions from D3
+    
+    commit f62795f1e892ca9269849fa83de97621da7e02c0 upstream.
+    
+    According to the PCI PM specification (PCI Bus Power Management
+    Interface Specification, Rev. 1.2, Section 5.4.1) we are supposed to
+    reinitialize devices that have PCI_PM_CTRL_NO_SOFT_RESET clear during
+    all transitions from PCI_D3hot to PCI_D0, but we only do it if the
+    device's current_state field is equal to PCI_UNKNOWN.
+    
+    This may lead to problems if a device with PCI_PM_CTRL_NO_SOFT_RESET
+    unset is put into PCI_D3hot at run time by its driver and
+    pci_set_power_state() is used to put it back into PCI_D0, because in
+    that case the device will remain uninitialized after
+    pci_set_power_state() has returned.  Prevent that from happening by
+    modifying pci_raw_set_power_state() to reinitialize devices with
+    PCI_PM_CTRL_NO_SOFT_RESET unset during all transitions from D3 to D0.
+    
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit f62795f1e892ca9269849fa83de97621da7e02c0
+Author: Rafael J. Wysocki <rjw@sisk.pl>
+Date:   Mon May 18 22:51:12 2009 +0200
+
+    PCI PM: Follow PCI_PM_CTRL_NO_SOFT_RESET during transitions from D3
+    
+    According to the PCI PM specification (PCI Bus Power Management
+    Interface Specification, Rev. 1.2, Section 5.4.1) we are supposed to
+    reinitialize devices that have PCI_PM_CTRL_NO_SOFT_RESET clear during
+    all transitions from PCI_D3hot to PCI_D0, but we only do it if the
+    device's current_state field is equal to PCI_UNKNOWN.
+    
+    This may lead to problems if a device with PCI_PM_CTRL_NO_SOFT_RESET
+    unset is put into PCI_D3hot at run time by its driver and
+    pci_set_power_state() is used to put it back into PCI_D0, because in
+    that case the device will remain uninitialized after
+    pci_set_power_state() has returned.  Prevent that from happening by
+    modifying pci_raw_set_power_state() to reinitialize devices with
+    PCI_PM_CTRL_NO_SOFT_RESET unset during all transitions from D3 to D0.
+    
+    Cc: stable@kernel.org
+    Signed-off-by: Rafael J. Wysocki <rjw@sisk.pl>
+    Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
+
+commit d522af581c6abd0e064278345ca638b0553a93fa
+Author: Suresh Siddha <suresh.b.siddha@intel.com>
+Date:   Mon Oct 20 17:57:02 2008 -0300
+
+    V4L/DVB (9356): [PATCH] saa7134: fix resource map sanity check conflict
+    
+    Impact: driver could possibly stomp on resources outside of its scope
+    
+    {mchehab@redhat.com: I got two versions of the same patch (identical,
+    except for whitespacing). One authored by Andy Burns and another
+    authored by Suresh Siddha. Due to that, I'm applying the one that has
+    less CodingStyle errors. I'm also adding both comments and the SOB's for
+    both patches, since they are both interesting}
+    
+    Suresh Siddha commented:
+    
+      Alexey Fisher reported:
+    
+      > resource map sanity check conflict: 0xcfeff800 0xcff007ff 0xcfe00000
+      > 0xcfefffff PCI Bus 0000:01
+    
+      BAR base is located in the middle of the 4K page and the hardcoded
+      size argument makes the request span two pages causing the conflict.
+    
+      Fix the hard coded size argument in ioremap().
+    
+    Andy Burns commented:
+    
+      I have already sent this patch on the linux-dvb list, but it didn't get
+      much attention, so re-sending direct, I hope you all don't mind.
+    
+      While attempting to run mythtv in a xen domU, I encountered problems
+      loading the driver for my saa7134 card, with an error from ioremap().
+    
+      This error was due to the driver allocating an incorrectly sized mmio
+      area, which was trapped by xen's permission checks, but this would go
+      un-noticed on a kernel without xen.
+    
+      My card has a 1K sized mmio area, I've had information that other cards
+      have 2K areas, perhaps others have different sizes, yet the driver
+      always attempts to map 4K.  I realise that the granularity of mapping is
+      the page size, which typically would be 4K, but unless the card's base
+      address happens to fall on a 4K boundary (mine does not) then the
+      base+4K will end up spanning two pages, and this is when the error
+      occurs under xen.
+    
+      My patch uses the pci_resource_len macro to determine the size required
+      for the user's particular card, instead of the hardcoded 4K value. I've
+      tested with a couple of printk() inside ioremap() that the start address
+      and size do get rounded to the closest page boundary.
+    
+      With this patch I am able to successfully load the saa7134 driver and
+      run mythtv under xen with my card, subject to correct pollirq settings
+      in case of shared IRQ, I am still seeing occasional DMA panics, which I
+      think are related to swiotlb handling by dom0/domU, usually the panic
+      occurs when changing mux, once tuned to a mux, 12 hour continuous
+      recordings are possible without errors.
+    
+    Reported-by: Alexey Fisher <bug-track@fisher-privat.net>
+    Tested-by: Alexey Fisher <bug-track@fisher-privat.net>
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Signed-off-by: Andy Burns <andy@burns.net>
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+
+commit 1f98757776eafe31065be9118db6051afcf8643c
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat Nov 1 10:17:22 2008 -0700
+
+    x86: Clean up late e820 resource allocation
+    
+    This makes the late e820 resources use 'insert_resource_expand_to_fit()'
+    instead of doing a 'reserve_region_with_split()', and also avoids
+    marking them as IORESOURCE_BUSY.
+    
+    This results in us being perfectly happy to use pre-existing PCI
+    resources even if they were marked as being in a reserved region, while
+    still avoiding any _new_ allocations in the reserved regions.  It also
+    makes for a simpler and more accurate resource tree.
+    
+    Example resource allocation from Jonathan Corbet, who has firmware that
+    has an e820 reserved entry that covered a big range (e0000000-fed003ff),
+    and that had various PCI resources in it set up by firmware.
+    
+    With old kernels, the reserved range would force us to re-allocate all
+    pre-existing PCI resources, and his reserved range would end up looking
+    like this:
+    
+            e0000000-fed003ff : reserved
+              fec00000-fec00fff : IOAPIC 0
+              fed00000-fed003ff : HPET 0
+    
+    where only the pre-allocated special regions (IOAPIC and HPET) were kept
+    around.
+    
+    With 2.6.28-rc2, which uses 'reserve_region_with_split()', Jonathan's
+    resource tree looked like this:
+    
+            e0000000-fe7fffff : reserved
+            fe800000-fe8fffff : PCI Bus 0000:01
+             fe800000-fe8fffff : reserved
+            fe900000-fe9d9aff : reserved
+            fe9d9b00-fe9d9bff : 0000:00:1f.3
+             fe9d9b00-fe9d9bff : reserved
+            fe9d9c00-fe9d9fff : 0000:00:1a.7
+             fe9d9c00-fe9d9fff : reserved
+            fe9da000-fe9dafff : 0000:00:03.3
+             fe9da000-fe9dafff : reserved
+            fe9db000-fe9dbfff : 0000:00:19.0
+             fe9db000-fe9dbfff : reserved
+            fe9dc000-fe9dffff : 0000:00:1b.0
+             fe9dc000-fe9dffff : reserved
+            fe9e0000-fe9fffff : 0000:00:19.0
+             fe9e0000-fe9fffff : reserved
+            fea00000-fea7ffff : 0000:00:02.0
+             fea00000-fea7ffff : reserved
+            fea80000-feafffff : 0000:00:02.1
+             fea80000-feafffff : reserved
+            feb00000-febfffff : 0000:00:02.0
+             feb00000-febfffff : reserved
+            fec00000-fed003ff : reserved
+             fec00000-fec00fff : IOAPIC 0
+             fed00000-fed003ff : HPET 0
+    
+    and because the reserved entry had been split and moved into the
+    individual resources, and because it used the IORESOURCE_BUSY flag, the
+    drivers that actually wanted to _use_ those resources couldn't actually
+    attach to them:
+    
+            e1000e 0000:00:19.0: BAR 0: can't reserve mem region [0xfe9e0000-0xfe9fffff]
+            HDA Intel 0000:00:1b.0: BAR 0: can't reserve mem region [0xfe9dc000-0xfe9dffff]
+    
+    with this patch, the resource tree instead becomes
+    
+            e0000000-fed003ff : reserved
+              fe800000-fe8fffff : PCI Bus 0000:01
+              fe9d9b00-fe9d9bff : 0000:00:1f.3
+              fe9d9c00-fe9d9fff : 0000:00:1a.7
+                fe9d9c00-fe9d9fff : ehci_hcd
+              fe9da000-fe9dafff : 0000:00:03.3
+              fe9db000-fe9dbfff : 0000:00:19.0
+                fe9db000-fe9dbfff : e1000e
+              fe9dc000-fe9dffff : 0000:00:1b.0
+                fe9dc000-fe9dffff : ICH HD audio
+              fe9e0000-fe9fffff : 0000:00:19.0
+                fe9e0000-fe9fffff : e1000e
+              fea00000-fea7ffff : 0000:00:02.0
+              fea80000-feafffff : 0000:00:02.1
+              feb00000-febfffff : 0000:00:02.0
+              fec00000-fec00fff : IOAPIC 0
+              fed00000-fed003ff : HPET 0
+    
+    ie the one reserved region now ends up surrounding all the PCI resources
+    that were allocated inside of it by firmware, and because it is not
+    marked BUSY, drivers have no problem attaching to the pre-allocated
+    resources.
+    
+    Reported-and-tested-by: Jonathan Corbet <corbet@lwn.net>
+    Cc: Yinghai Lu <yinghai@kernel.org>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: Robert Hancock <hancockr@shaw.ca>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+
+commit 268364a0f48aee2f851f9d1ef8a6cda0f3039ef1
+Author: Yinghai Lu <yhlu.kernel@gmail.com>
+Date:   Thu Sep 4 21:02:44 2008 +0200
+
+    IO resources: add reserve_region_with_split()
+    
+    add reserve_region_with_split() to not lose e820 reserved entries if
+    they overlap with existing IO regions:
+    
+    with test case by extend 0xe0000000 - 0xeffffff to 0xdd800000 -
+    we get:
+            e0000000-efffffff : PCI MMCONFIG 0
+                     e0000000-efffffff : reserved
+    
+    and in /proc/iomem we get:
+            found conflict for reserved [dd800000, efffffff], try to reserve with split
+                __reserve_region_with_split: (PCI Bus #80) [dd000000, ddffffff], res: (reserved) [dd800000, efffffff]
+                __reserve_region_with_split: (PCI Bus #00) [de000000, dfffffff], res: (reserved) [de000000, efffffff]
+            initcall pci_subsys_init+0x0/0x121 returned 0 after 381 msecs
+    in dmesg
+    
+    various fixes and improvements suggested by Linus.
+    
+    Signed-off-by: Yinghai Lu <yhlu.kernel@gmail.com>
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>
+
+commit 152151daece9d5dfd86e652b95846072c0d2b566
+Author: Dave Jones <davej@redhat.com>
+Date:   Tue Jul 15 19:54:53 2008 -0400
+
+    8139too: Force usage of PIO on OQO2
+    
+    The OQO model 2 has an RTL8139 from Atheros that doesn't like MMIO.
+    It fails on modprobe, with a 'PCI Bus error' message.
+    
+    Force it to always use polled IO.
+    
+    Signed-off-by: Dave Jones <davej@redhat.com>
+    Signed-off-by: Jeff Garzik <jgarzik@redhat.com>
+
+commit bc043274560f398225dad7f0e24c6a7610d3c08a
+Author: Tim Yamin <tim.yamin@zonbu.com>
+Date:   Sun Mar 30 20:58:59 2008 +0100
+
+    PCI: Update VIA CX700 quirk
+    
+    This follows up 53a9bf4267b8b1f958dbeb7c8c1ef21c82229b71. Some newer
+    CX700 BIOSes from our vendor have PCI Bus Parking disabled but PCI
+    Master read caching enabled. This creates problems such as system
+    freezing when both the network controller and the USB controller are
+    active and one of them is pretty busy (e.g. heavy network traffic).
+    
+    This patch separates the checks and both the bus parking and the read
+    caching are disabled independently if either is enabled by the BIOS.
+    
+    Signed-off-by: Tim Yamin <tim.yamin@zonbu.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit cb3576fa34e36907e292f408cb6c258f4fd112ad
+Author: Gary Hade <garyhade@us.ibm.com>
+Date:   Fri Feb 8 14:00:52 2008 -0800
+
+    PCI: Include PCI domain in PCI bus names on x86/x86_64
+    
+    The PCI bus names included in /proc/iomem and /proc/ioports are
+    of the form 'PCI Bus #XX' where XX is the bus number.  This patch
+    changes the naming to 'PCI Bus XXXX:YY' where XXXX is the domain
+    number and YY is the bus number.  For example, PCI bus 14 in
+    domain 0 will show as 'PCI Bus 0000:14' instead of 'PCI Bus #14'.
+    This change makes the naming consistent with other architectures
+    such as ia64 where multiple PCI domain support has been around
+    longer.
+    
+    Signed-off-by: Gary Hade <garyhade@us.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 1e934dda0c77c8ad13fdda02074f2cfcea118a56
+Author: Yinghai Lu <Yinghai.Lu@Sun.COM>
+Date:   Fri Feb 22 13:37:26 2008 -0800
+
+    x86: insert_resorce for lapic addr after e820_reserve_resources
+    
+    when comparing the e820 direct from BIOS, and the one by kexec:
+    
+     BIOS-provided physical RAM map:
+    - BIOS-e820: 0000000000000000 - 0000000000097400 (usable)
+    + BIOS-e820: 0000000000000100 - 0000000000097400 (usable)
+      BIOS-e820: 0000000000097400 - 00000000000a0000 (reserved)
+      BIOS-e820: 00000000000e6000 - 0000000000100000 (reserved)
+      BIOS-e820: 0000000000100000 - 00000000dffa0000 (usable)
+    - BIOS-e820: 00000000dffae000 - 00000000dffb0000 type 9
+    + BIOS-e820: 00000000dffae000 - 00000000dffb0000 (reserved)
+      BIOS-e820: 00000000dffb0000 - 00000000dffbe000 (ACPI data)
+      BIOS-e820: 00000000dffbe000 - 00000000dfff0000 (ACPI NVS)
+      BIOS-e820: 00000000dfff0000 - 00000000e0000000 (reserved)
+      BIOS-e820: 00000000fec00000 - 00000000fec01000 (reserved)
+    - BIOS-e820: 00000000fee00000 - 00000000fee01000 (reserved)
+                 =======> that is the local apic address... somewhere we lost it
+      BIOS-e820: 00000000ff700000 - 0000000100000000 (reserved)
+      BIOS-e820: 0000000100000000 - 0000004020000000 (usable)
+    
+    found one entry about reserved is missing for the kernel by kexec.
+    
+    it turns out init_apic_mappings is called before e820_reserve_resources
+    in setup_arch. but e820_reserve_resources is using request_resource.
+    it will not handle the conflicts.
+    
+    there are three ways to fix it:
+    
+    1. change request_resource in e820_reserve_resources to to insert_resource
+    2. move init_apic_mappings after e820_reserve_resources
+    3. use late_initcall to insert lapic resource.
+    
+    this patch is using method 3, that is less intrusive.
+    
+    in later version could consider to use method 1.
+    
+    before patch
+    fed20000-ffffffff : PCI Bus #00
+      fee00000-fee00fff : Local APIC
+      fefff000-feffffff : pnp 00:09
+      ff700000-ffffffff : reserved
+    
+    with patch will get map in first kernel
+    
+    fed20000-ffffffff : PCI Bus #00
+      fee00000-fee00fff : Local APIC
+        fee00000-fee00fff : reserved
+      fefff000-feffffff : pnp 00:09
+      ff700000-ffffffff : reserved
+    
+    Signed-off-by: Yinghai Lu <yinghai.lu@sun.com>
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>
+
+commit 53a9bf4267b8b1f958dbeb7c8c1ef21c82229b71
+Author: Tim Yamin <tim.yamin@zonbu.com>
+Date:   Thu Nov 1 23:14:54 2007 +0000
+
+    PCI: VIA CX700 quirk to disable PCI Bus Parking
+    
+    PCI Bus Parking and PCI Master read caching on the VIA CX700 is buggy and
+    can lead to problems such as USB2.0 packet loss if a VT6212L controller
+    is on the PCI bus. It's disabled by default, but some BIOSes turn these
+    features on and this patch reverts the configuration to the safe defaults.
+    
+    Signed-off-by: Tim Yamin <tim.yamin@zonbu.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 6c763eb9ead86c612492b59287b36c0dcf7d09b1
+Merge: dcc1a66a0942 cf34a8e07f02
+Author: Linus Torvalds <torvalds@g5.osdl.org>
+Date:   Thu Jun 22 15:07:59 2006 -0700
+
+    Merge master.kernel.org:/pub/scm/linux/kernel/git/gregkh/pci-2.6
+    
+    * master.kernel.org:/pub/scm/linux/kernel/git/gregkh/pci-2.6: (27 commits)
+      [PATCH] PCI: nVidia quirk to make AER PCI-E extended capability visible
+      [PATCH] PCI: fix issues with extended conf space when MMCONFIG disabled because of e820
+      [PATCH] PCI: Bus Parity Status sysfs interface
+      [PATCH] PCI: fix memory leak in MMCONFIG error path
+      [PATCH] PCI: fix error with pci_get_device() call in the mpc85xx driver
+      [PATCH] PCI: MSI-K8T-Neo2-Fir: run only where needed
+      [PATCH] PCI: fix race with pci_walk_bus and pci_destroy_dev
+      [PATCH] PCI: clean up pci documentation to be more specific
+      [PATCH] PCI: remove unneeded msi code
+      [PATCH] PCI: don't move ioapics below PCI bridge
+      [PATCH] PCI: cleanup unused variable about msi driver
+      [PATCH] PCI: disable msi mode in pci_disable_device
+      [PATCH] PCI: Allow MSI to work on kexec kernel
+      [PATCH] PCI: AMD 8131 MSI quirk called too late, bus_flags not inherited ?
+      [PATCH] PCI: Move various PCI IDs to header file
+      [PATCH] PCI Bus Parity Status-broken hardware attribute, EDAC foundation
+      [PATCH] PCI: i386/x86_84: disable PCI resource decode on device disable
+      [PATCH] PCI ACPI: Rename the functions to avoid multiple instances.
+      [PATCH] PCI: don't enable device if already enabled
+      [PATCH] PCI: Add a "enable" sysfs attribute to the pci devices to allow userspace (Xorg) to enable devices without doing foul direct access
+      ...
+
+commit bd8481e1646d7649fa101ee57a5139b9da3c2436
+Author: Doug Thompson <norsk5@yahoo.com>
+Date:   Mon May 8 17:06:09 2006 -0700
+
+    [PATCH] PCI Bus Parity Status-broken hardware attribute, EDAC foundation
+    
+    Currently, the EDAC (error detection and correction) modules that are in
+    the kernel contain some features that need to be moved. After some good
+    feedback on the PCI Parity detection code and interface
+    (http://www.ussg.iu.edu/hypermail/linux/kernel/0603.1/0897.html) this
+    patch ADDs an new attribute to the pci_dev structure: Namely the
+    'broken_parity_status' bit.
+    
+    When set this indicates that the respective hardware generates false
+    positives of Parity errors.
+    
+    The EDAC "blacklist" solution was inferior and will be removed in a
+    future patch.
+    
+    Also in this patch is a PCI quirk.c entry for an Infiniband PCI-X card
+    which generates false positive parity errors.
+    
+    I am requesting comments on this AND on the possibility of a exposing
+    this 'broken_parity_status' bit to userland via the PCI device sysfs
+    directory for devices. This access would allow for enabling of this
+    feature on new devices and for old devices that have their drivers
+    updated. (SLES 9 SP3 did this on an ATI motherboard video device). There
+    is a need to update such a PCI attribute between kernel releases.
+    
+    This patch just adds a storage place for the attribute and a quirk entry
+    for a known bad PCI device. PCI Parity reaper/harvestor operations are
+    in EDAC itself and will be refactored to use this PCI attribute instead
+    of its own mechanisms (which are currently disabled) in the future.
+    
+    Signed-off-by: Doug Thompson <norsk5@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 8c4b2cf9af9b4ecc29d4f0ec4ecc8e94dc4432d7
+Author: Bernhard Kaindl <bk@suse.de>
+Date:   Sat Feb 18 01:36:55 2006 -0800
+
+    [PATCH] PCI: PCI/Cardbus cards hidden, needs pci=assign-busses to fix
+    
+    "In some cases, especially on modern laptops with a lot of PCI and cardbus
+    bridges, we're unable to assign correct secondary/subordinate bus numbers
+    to all cardbus bridges due to BIOS limitations unless we are using
+    "pci=assign-busses" boot option." -- Ivan Kokshaysky (from a patch comment)
+    
+    Without it, Cardbus cards inserted are never seen by PCI because the parent
+    PCI-PCI Bridge of the Cardbus bridge will not pass and translate Type 1 PCI
+    configuration cycles correctly and the system will fail to find and
+    initialise the PCI devices in the system.
+    
+    Reference: PCI-PCI Bridges: PCI Configuration Cycles and PCI Bus Numbering:
+    http://www.science.unitn.it/~fiorella/guidelinux/tlk/node72.html
+    
+    The reason for this is that:
+     ``All PCI busses located behind a PCI-PCI bridge must reside between the
+    secondary bus number and the subordinate bus number (inclusive).''
+    
+    "pci=assign-busses" makes pcibios_assign_all_busses return 1 and this
+    turns on PCI renumbering during PCI probing.
+    
+    Alan suggested to use DMI automatically set assign-busses on problem systems.
+    
+    The only question for me was where to put it.  I put it directly before
+    scanning PCI bus into pcibios_scan_root() because it's called from legacy,
+    acpi and numa and so it can be one place for all systems and configurations
+    which may need it.
+    
+    AMD64 Laptops are also affected and fixed by assign-busses, and the code is
+    also incuded from arch/x86_64/pci/ that place will also work for x86_64
+    kernels, I only ifdef'-ed the x86-only Laptop in this example.
+    
+    Affected and known or assumed to be fixed with it are (found by googling):
+    
+    * ASUS Z71V and L3s
+    * Samsung X20
+    * Compaq R3140us and all Compaq R3000 series laptops with TI1620 Controller,
+      also Compaq R4000 series (from a kernel.org bugreport)
+    * HP zv5000z (AMD64 3700+, known that fixup_parent_subordinate_busnr fixes it)
+    * HP zv5200z
+    * IBM ThinkPad 240
+    * An IBM ThinkPad (1.8 GHz Pentium M) debugged by Pavel Machek
+      gives the correspondig message which detects the possible problem.
+    * MSI S260 / Medion SIM 2100 MD 95600
+    
+    The patch also expands the "try pci=assign-busses" warning so testers will
+    help us to update the DMI table.
+    
+    Cc: Ivan Kokshaysky <ink@jurassic.park.msu.ru>
+    Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>
+    Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+    Cc: Russell King <rmk@arm.linux.org.uk>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 4f41d5a4e665d05b4e74eef164469b7d81932ef1
+Author: Bjorn Helgaas <bjorn.helgaas@hp.com>
+Date:   Mon Nov 7 15:13:59 2005 -0700
+
+    [IA64] add the MMIO regions that are translated to I/O port space to /proc/iomem
+    
+    ia64 translates normal loads and stores to special MMIO regions into I/O port
+    accesses.  Reserve these special MMIO regions in /proc/iomem.
+    
+    Sample /proc/iomem:
+        f8100000000-f81003fffff : PCI Bus 0000:80 I/O Ports 00000000-00000fff
+        f8100400000-f81007fffff : PCI Bus 0000:8e I/O Ports 00001000-00001fff
+        f8100800000-f8100ffffff : PCI Bus 0000:9c I/O Ports 00002000-00003fff
+        f8101000000-f81017fffff : PCI Bus 0000:aa I/O Ports 00004000-00005fff
+    
+    and corresponding /proc/ioports:
+        00000000-00000fff : PCI Bus 0000:80
+        00001000-00001fff : PCI Bus 0000:8e
+        00002000-00003fff : PCI Bus 0000:9c
+        00004000-00005fff : PCI Bus 0000:aa
+    
+    Signed-off-by: Bjorn Helgaas <bjorn.helgaas@hp.com>
+    Signed-off-by: Tony Luck <tony.luck@intel.com>
+
+commit e1dd23a0012c3929737798fda9fede0e783f4ff3
+Author: Jens Axboe <axboe@suse.de>
+Date:   Wed Jun 8 13:02:25 2005 +0200
+
+    [PATCH] sata_sil: Fix FIFO PCI Bus Arbitration kernel oops
+    
+    Correct this.
+    
+    diff --git a/drivers/scsi/sata_sil.c b/drivers/scsi/sata_sil.c
