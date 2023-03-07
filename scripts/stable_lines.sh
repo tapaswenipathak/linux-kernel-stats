@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SRCDIR=~/torvalds/linux
+SRCDIR=~/linux-stable
 
 cd $SRCDIR
 
