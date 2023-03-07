@@ -18,6 +18,7 @@ declare -a search_terms=(
   "mmu_gather"
   "vm_area_struct"
   "inode buffer"
+  "bio_list"
   "page"
   "task_struct"
   "kvec"
