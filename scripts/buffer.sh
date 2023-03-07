@@ -17,7 +17,7 @@ declare -a search_terms=(
   "physical address"
   "mmu_gather"
   "vm_area_struct"
-  "inode"
+  "inode buffer"
   "page"
   "task_struct"
   "kvec"
