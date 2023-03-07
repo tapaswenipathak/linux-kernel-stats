@@ -83,7 +83,7 @@ cd $SRCDIR_a
         fi
     done >> ~/data_dir/output_no_of_directories_drivers.txt
 
-SRCDIR_a=~/linux-stable/linux-stable
+SRCDIR_a=~/linux-stable
 cd $SRCDIR_a
     #declaring an array containing all versions
     declare -a all_versions=($(git tag -l | sort -V))  
