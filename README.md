@@ -17,18 +17,19 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 
 ## Table of Contents
 - [How to run the scripts](#how-to-run-the-scripts)
-  - [Clone / download](#clone--download)
+  - [Clone / Download](#clone--download)
   - [Run files separately using commands](#run-files-separately-using-commands)
   - [Run using makeFile](#run-using-makefile)
 - [Contributing Guide](#contributing-guide)
   - [Open Stats](#open-stats)
+  - [Contributing Guidelines](#contributing-guidelines)
   - [Raise a PR](#raise-a-pr)
   - [Create tickets](#create-tickets)
   - [Report issue](#report-issue)
 - [Contact Us](#contact-us)
 
 ## How to run the scripts   
-#### Clone / download
+#### Clone / Download
 ##### Step 1
 [A] To clone the Linux Kernel Stable Tree, make a folder named "linux-stable" in the home location : home/usernameclone the repo in the folder "linux-stable" using ``` https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git ```. This will download the current kernel source repository.
 
