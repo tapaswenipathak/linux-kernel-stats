@@ -30,9 +30,9 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 ## How to run the scripts   
 #### Clone / download
 ##### Step 1
-[A] To clone the Linux Kernel Stable Tree. Make a folder named "linux-stable" in the home location : home/usernameclone the repo in the folder "linux-stable" using ``` git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git ```. "This will download the current kernel source repository"
+[A] To clone the Linux Kernel Stable Tree, make a folder named "linux-stable" in the home location : home/usernameclone the repo in the folder "linux-stable" using ``` https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git ```. This will download the current kernel source repository.
 
-[B] Adiitionaly, you will need to clone, following 
+[B] Adiitionaly, you will need to clone the following in the same directory as used above: 
    * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git ```
    * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git ```
    * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git ```
@@ -40,7 +40,7 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 
 
 ##### Step 2
-Now, Clone the repository that contains scripts using : ``` git clone https://github.com/tapaswenipathak/ linux-kernel-stats ```
+Now, clone the repository that contains the scripts using : ``` git clone https://github.com/tapaswenipathak/linux-kernel-stats ```
 
 Now, Run the script files using : 
 - ``` bash loc.sh ```
@@ -50,9 +50,9 @@ Now, Run the script files using :
 #### Run files separately using commands 
 First, your script must declare which interpreter to use. You do this in the first line of the file. If it's a shell script, it should be #!/bin/sh or #!/bin/bash.
 
-So here's a script that writes your username: ``` echo whoami.sh```
+So here's a script that writes your username: ``` echo-whoami.sh```
 - To make it executable, use:
-```chmod +x echo-whoami.sh```
+```chmod a+x echo-whoami.sh```
 - Then you can run it using:
 ```./echo-whoami.sh```
 
@@ -61,7 +61,7 @@ So here's a script that writes your username: ``` echo whoami.sh```
 ## Contributing Guide
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-Contributions are welcome!If you feel this excites you feel free to contribute! Below are some open stats which are open for contribution. Happy open Source!
+Contributions are welcome! If you feel this excites you, then feel free to contribute! Below are some open stats which are open for contribution. Happy open Source!
 
 ### Open Stats 
 A brief summary of various devices in the drivers directory can be found in the link below.
@@ -71,22 +71,21 @@ A brief summary of various devices in the drivers directory can be found in the 
 ### Raise a PR
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-Various linux kernel stats are open for the contribution. To contribute Fork the Repo and create a Branch for any issue that you are working upon. Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
+Various linux kernel stats are open for the contribution. To contribute, fork the repository and create a branch for any issue that you are working upon. Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
 
 
 ### Create tickets
 Take a look at the Existing Issues or create your own Tickets.
 
 ### Report issue
-If you find any incorrect information on this repository, kindly report an issue mentioning the reason, and attaching screenshot.
+If you find any incorrect information on this repository, kindly report it by creating an issue, mentioning the reason, and attaching a screenshot.
 
 ## Contact Us
-Feel free to connect with us for discussing regarding our findings.
+Feel free to connect with us for discussions regarding our findings.
 
 - Kavita Meena <kavita23meena.2002@gmail.com>
 - Madhu Patel <Patelmadhu06@gmail.com>
 - Tapasweni Pathak <tapaswenipathak@gmail.com>
-
 
 
 
