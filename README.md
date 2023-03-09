@@ -23,6 +23,8 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 - [Contributing Guide](#contributing-guide)
   - [Open Stats](#open-stats)
   - [Contributing Guidelines](#contributing-guidelines)
+  - [How to Contribute](#how-to-contribute)
+  - [Pull Request Guidelines](#pull-request-guidelines)
   - [Raise a PR](#raise-a-pr)
   - [Create tickets](#create-tickets)
   - [Report issue](#report-issue)
