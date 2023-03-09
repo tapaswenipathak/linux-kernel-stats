@@ -61,24 +61,51 @@ So here's a script that writes your username: ``` echo-whoami.sh```
 ## Contributing Guide
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-Contributions are welcome! If you feel this excites you, then feel free to contribute! Below are some open stats which are open for contribution. Happy open Source!
-
 ### Open Stats 
 A brief summary of various devices in the drivers directory can be found in the link below.
 ```ymlus 
  https://www.dropbox.com/scl/fi/z5mz0uol3zl0xy166wqpe/Drivers.paper?dl=0&rlkey=wt412tfnsnxq7uznaie4x88rp
 ```
+ 
+### Contributing Guidelines
+We welcome contributions to our project and thank you for taking the time to improve it. Here are some guidelines to follow when contributing:
+
+### Getting Started
+Before contributing, please make sure to:
+
+- Read the README file to understand the purpose and scope of the project.
+- Look through the existing issues and pull requests to see if your contribution has already been addressed or discussed.
+- If you're making significant changes or adding a new feature, consider opening an issue first to discuss it with the project maintainers.
+- 
+### How to Contribute
+There are several ways to contribute to our project:
+
+- **Reporting Bugs**: If you find a bug, please open an issue and describe the problem in detail. Include steps to reproduce the issue and any error messages you receive.
+- **Fixing Bugs**: If you'd like to fix a bug, please create a pull request with your changes. Be sure to include a description of the problem and how your changes address it.
+- **Adding Features**: If you're adding a new feature, please open an issue first to discuss it with the project maintainers. Once you have approval, create a pull request with your changes and a detailed description of the new feature.
+- **Improving Documentation**: If you notice any errors or omissions in the documentation, please create a pull request with your changes. Be sure to explain why your changes are necessary and how they improve the documentation.
+
+### Pull Request Guidelines
+When creating a pull request, please follow these guidelines:
+
+- Make sure your code is well-formatted and follows the project's coding conventions.
+- Include tests to ensure your changes are working correctly.
+- Explain the purpose of your changes and how they address any issues or feature requests.
+- Be responsive to feedback from the project maintainers.
+
 ### Raise a PR
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 Various linux kernel stats are open for the contribution. To contribute, fork the repository and create a branch for any issue that you are working upon. Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
-
 
 ### Create tickets
 Take a look at the Existing Issues or create your own Tickets.
 
 ### Report issue
 If you find any incorrect information on this repository, kindly report it by creating an issue, mentioning the reason, and attaching a screenshot.
+
+### Conclusion
+Thank you for considering contributing to our project! We appreciate your time and effort, and we look forward to working with you.
 
 ## Contact Us
 Feel free to connect with us for discussions regarding our findings.
