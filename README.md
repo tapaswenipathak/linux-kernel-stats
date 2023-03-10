@@ -36,9 +36,9 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 [A] To clone the Linux Kernel Stable Tree, make a folder named "linux-stable" in the home location : home/usernameclone the repo in the folder "linux-stable" using ``` https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git ```. This will download the current kernel source repository.
 
 [B] Adiitionaly, you will need to clone the following in the same directory as used above: 
-   * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git ```
-   * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git ```
-   * ``` git clone https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git ```
+   * ``` git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/xiang/erofs-utils.git ```
+   * ``` git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/legion/kbd.git ```
+   * ``` git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/tglx/history.git ```
    * ``` git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive ```
 
 
