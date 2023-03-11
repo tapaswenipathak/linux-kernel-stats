@@ -6,12 +6,16 @@ This repository has statistical study about linux Kernel which includes several 
 
 
 ## Introduction
-Evolution is essential and indispensable for a software System "else it will become progressively less satisfactory". The software evolution can be characterized using various parameters version number, lines of code, number of patches and other software matrices. Linux has an interesting history and is arguably the most popular open source operating system, its history is actually quite short considering the timeline of operating systems.  In the early days of computing, programmers developed on the bare hardware in the hardware's language. The lack of an operating system meant that only one application (and one user) could use the large and expensive device at a time. Early operating systems were developed in the 1950s to provide a simpler development experience. Examples include the General Motors Operating System (GMOS) developed for the IBM 701 and the FORTRAN Monitor System (FMS) developed by North American Aviation for the IBM 709.
-In the 1960s, Massachusetts Institute of Technology (MIT) and a host of companies developed an experimental operating system called Multics (or Multiplexed Information and Computing Service) for the GE-645. One of the developers of this operating system, AT&T, dropped out of Multics and developed their own operating system in 1970 called Unics. Along with this operating system was the C language, for which C was developed and then rewritten to make operating system development portable.
+Software evolution is essential and indispensable for a software system, "else it will become progressively less satisfactory." The software evolution can be characterized using various parameters such as version number, lines of code, number of patches, and other software matrices.
 
-Twenty years later, Andrew Tanenbaum created a microkernel version of UNIX®, called MINIX (for minimal UNIX), that ran on small personal computers. This open source operating system inspired Linus Torvalds' initial development of Linux in the early 1990s. And is still evolving.
+Linux has an interesting history and is arguably the most popular open-source operating system. In the early days of computing, programmers developed on the bare hardware in the hardware's language. The lack of an operating system meant that only one application (and one user) could use the large and expensive device at a time. Early operating systems were developed in the 1950s to provide a simpler development experience. Examples include the General Motors Operating System (GMOS) developed for the IBM 701 and the FORTRAN Monitor System (FMS) developed by North American Aviation for the IBM 709.
 
-We have conducted a thorough review of the evolution of the Kernel from 17 Sept 1991 to the present in this post and attached the results obtained. 
+In the 1960s, Massachusetts Institute of Technology (MIT) and a host of companies developed an experimental operating system called Multics (or Multiplexed Information and Computing Service) for the GE-645. One of the developers of this operating system, AT&T, dropped out of Multics and developed their operating system in 1970 called Unics. Along with this operating system was the C language, for which C was developed and then rewritten to make operating system development portable.
+
+Twenty years later, Andrew Tanenbaum created a microkernel version of UNIX®, called MINIX (for minimal UNIX), that ran on small personal computers. This open-source operating system inspired Linus Torvalds' initial development of Linux in the early 1990s. Linux is still evolving.
+
+We have conducted a thorough review of the evolution of the Kernel from 17 Sept 1991 to the present in this post and attached the results obtained.
+
 
 ## Abstract
 
@@ -28,6 +32,9 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
   - [Raise a PR](#raise-a-pr)
   - [Create tickets](#create-tickets)
   - [Report issue](#report-issue)
+- [Troubleshooting Guide](#troubleshooting-guide)
+  - [Scripts are not working](#scripts-are-not-working)
+  - [Missing files or Repositories](#missing-files-or-repositories)
 - [Contact Us](#contact-us)
 
 ## How to run the scripts   
@@ -105,6 +112,14 @@ Take a look at the Existing Issues or create your own Tickets.
 
 ### Report issue
 If you find any incorrect information on this repository, kindly report it by creating an issue, mentioning the reason, and attaching a screenshot.
+
+## Troubleshooting Guide
+
+### Scripts are not working
+If the script files are not running, make sure that the script file has executable permissions. You can check it by running `ls -l <filename>` command and check if there is executable permission set for the user. If not, run `chmod +x <filename>` to make it executable. 
+
+### Missing files or Repositories
+The working URLs have been mentioned in [Clone / Download](#clone--download), but if any of the repositories or files are missing during cloning or running the scripts, make sure that you have the correct URLs for the repositories and the files. You can verify the URLs from the repository's official website. If you have the correct URLs, check your internet connection and try again.
 
 ### Conclusion
 Thank you for considering contributing to our project! We appreciate your time and effort, and we look forward to working with you.
