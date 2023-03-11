@@ -17,8 +17,6 @@ Twenty years later, Andrew Tanenbaum created a microkernel version of UNIX®, ca
 We have conducted a thorough review of the evolution of the Kernel from 17 Sept 1991 to the present in this post and attached the results obtained.
 
 
-## Abstract
-
 ## Table of Contents
 - [How to run the scripts](#how-to-run-the-scripts)
   - [Clone / Download](#clone--download)
@@ -30,7 +28,6 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
   - [How to Contribute](#how-to-contribute)
   - [Pull Request Guidelines](#pull-request-guidelines)
   - [Raise a PR](#raise-a-pr)
-  - [Create tickets](#create-tickets)
   - [Report issue](#report-issue)
 - [Troubleshooting Guide](#troubleshooting-guide)
   - [Scripts are not working](#scripts-are-not-working)
@@ -107,24 +104,22 @@ When creating a pull request, please follow these guidelines:
 
 Various linux kernel stats are open for the contribution. To contribute, fork the repository and create a branch for any issue that you are working upon. Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
 
-#### PR template
+#### PR Template
 Make sure to follow these steps in order while raising a Pull Request:
 > Title of PR should be short and precise
 > Mention all the changes you have made in detail.
-> Comment the external resources you have used if any. Also, if data files are uploaded to an external file manager, provide the link in the comments. 
+> Mention the external resources you have used if any. Also, if data files are uploaded to an external file manager, provide the URL(s) in the comments. 
 > Mention any descrepencies if you faced any, or open a ticket regarding the same.
 > If any other issues/PRs are corelated, mention them in the comments. 
 
-### Create tickets
-Take a look at the Existing Issues or create your own Tickets.
-
-### Report issue
+### Report an Issue
 If you find any incorrect information on this repository, kindly report it by creating an issue, mentioning the reason, and attaching a screenshot.
 
 #### Issue Template
 Make sure to follow these steps in order while raising an Issue:
 > Title of Issue should be short but precise.
 > Explain the issue as detailed as possible, attaching a screenshot.
+> If the issue still persists but you have made updates regarding the same, then mention the updates regarding the issue in the comments.
 
 ## Troubleshooting Guide
 
