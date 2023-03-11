@@ -106,20 +106,20 @@ Various linux kernel stats are open for the contribution. To contribute, fork th
 
 #### PR Template
 Make sure to follow these steps in order while raising a Pull Request:
-> Title of PR should be short and precise
-> Mention all the changes you have made in detail.
-> Mention the external resources you have used if any. Also, if data files are uploaded to an external file manager, provide the URL(s) in the comments. 
-> Mention any descrepencies if you faced any, or open a ticket regarding the same.
-> If any other issues/PRs are corelated, mention them in the comments. 
+- Title of PR should be short and precise
+- Mention all the changes you have made in detail.
+- Mention the external resources you have used if any. Also, if data files are uploaded to an external file manager, provide the URL(s) in the comments. 
+- Mention any descrepencies if you faced any, or open a ticket regarding the same.
+- If any other issues/PRs are corelated, mention them in the comments. 
 
 ### Report an Issue
 If you find any incorrect information on this repository, kindly report it by creating an issue, mentioning the reason, and attaching a screenshot.
 
 #### Issue Template
 Make sure to follow these steps in order while raising an Issue:
-> Title of Issue should be short but precise.
-> Explain the issue as detailed as possible, attaching a screenshot.
-> If the issue still persists but you have made updates regarding the same, then mention the updates regarding the issue in the comments.
+- Title of Issue should be short but precise.
+- Explain the issue as detailed as possible, attaching a screenshot.
+- If the issue still persists but you have made updates regarding the same, then mention the updates regarding the issue in the comments.
 
 ## Troubleshooting Guide
 
