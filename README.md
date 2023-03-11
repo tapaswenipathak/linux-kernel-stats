@@ -78,7 +78,7 @@ A brief summary of various devices in the drivers directory can be found in the 
 ```
 
 Note on data source for version 2.0:
-> The source repository used for version 2.0 of the scripts was not the official one. As a result, we were unable to obtain results for v2.0 using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
+> The source repository used for version 2.0 of the linux kernel was not the official one. As a result, we were unable to obtain results for v2.0 using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
 
  
 ### Contributing Guidelines
