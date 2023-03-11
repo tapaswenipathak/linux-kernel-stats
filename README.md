@@ -83,10 +83,9 @@ Before contributing, please make sure to:
 ### How to Contribute
 There are several ways to contribute to our project:
 
-- **Reporting Bugs**: If you find a bug, please open an issue and describe the problem in detail. Include steps to reproduce the issue and any error messages you receive.
-- **Fixing Bugs**: If you'd like to fix a bug, please create a pull request with your changes. Be sure to include a description of the problem and how your changes address it.
-- **Adding Features**: If you're adding a new feature, please open an issue first to discuss it with the project maintainers. Once you have approval, create a pull request with your changes and a detailed description of the new feature.
-- **Improving Documentation**: If you notice any errors or omissions in the documentation, please create a pull request with your changes. Be sure to explain why your changes are necessary and how they improve the documentation.
+- **Reporting Bugs**: If you find a bug, please open an issue and describe the problem. Make sure to include steps to reproduce the issue and any error messages you receive regarding that issue.
+- **Fixing Bugs**: If you'd like to fix a bug, please create a pull request with your changes. Make sure to include a description of the problem and how your changes will address it.
+- **Improving Documentation**: If you notice any errors or omissions in the documentation, please create a pull request with your changes. Make sure to explain why the changes you made are necessary and how they can improve the documentation.
 
 ### Pull Request Guidelines
 When creating a pull request, please follow these guidelines:
