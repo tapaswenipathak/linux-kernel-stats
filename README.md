@@ -32,6 +32,7 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 - [Troubleshooting Guide](#troubleshooting-guide)
   - [Scripts are not working](#scripts-are-not-working)
   - [Missing files or Repositories](#missing-files-or-repositories)
+  - [Missing dependencies](#missing-dependencies)
 - [Contact Us](#contact-us)
 
 ## How to run the scripts   
