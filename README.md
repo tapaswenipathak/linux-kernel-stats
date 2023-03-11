@@ -107,11 +107,24 @@ When creating a pull request, please follow these guidelines:
 
 Various linux kernel stats are open for the contribution. To contribute, fork the repository and create a branch for any issue that you are working upon. Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
 
+#### PR template
+Make sure to follow these steps in order while raising a Pull Request:
+> Title of PR should be short and precise
+> Mention all the changes you have made in detail.
+> Comment the external resources you have used if any. Also, if data files are uploaded to an external file manager, provide the link in the comments. 
+> Mention any descrepencies if you faced any, or open a ticket regarding the same.
+> If any other issues/PRs are corelated, mention them in the comments. 
+
 ### Create tickets
 Take a look at the Existing Issues or create your own Tickets.
 
 ### Report issue
 If you find any incorrect information on this repository, kindly report it by creating an issue, mentioning the reason, and attaching a screenshot.
+
+#### Issue Template
+Make sure to follow these steps in order while raising an Issue:
+> Title of Issue should be short but precise.
+> Explain the issue as detailed as possible, attaching a screenshot.
 
 ## Troubleshooting Guide
 
