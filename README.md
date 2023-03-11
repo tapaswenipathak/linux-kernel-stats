@@ -58,11 +58,11 @@ Now, Run the script files using :
 #### Run files separately using commands 
 First, your script must declare which interpreter to use. You do this in the first line of the file. If it's a shell script, it should be #!/bin/sh or #!/bin/bash.
 
-So here's a script that writes your username: ``` echo-whoami.sh```
+So here's a script that writes your username: ``` echo-whoami.sh ```
 - To make it executable, use:
-```chmod a+x echo-whoami.sh```
+``` chmod a+x echo-whoami.sh ```
 - Then you can run it using:
-```./echo-whoami.sh```
+``` ./echo-whoami.sh ```
 
 #### Run using makeFile
 Make sure to have `make` installed in your device. If not, then install it using `sudo apt install make`. 
