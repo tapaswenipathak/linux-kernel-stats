@@ -121,6 +121,9 @@ If the script files are not running, make sure that the script file has executab
 ### Missing files or Repositories
 The working URLs have been mentioned in [Clone / Download](#clone--download), but if any of the repositories or files are missing during cloning or running the scripts, make sure that you have the correct URLs for the repositories and the files. You can verify the URLs from the repository's official website. If you have the correct URLs, check your internet connection and try again.
 
+### Missing dependencies
+If the scripts (eg: python scripts) are dependent on any libraries or packages that are not installed in your system, make sure to install them using your package manager. Check the script file for any dependencies mentioned in the comments or documentation.
+
 ### Conclusion
 Thank you for considering contributing to our project! We appreciate your time and effort, and we look forward to working with you.
 
