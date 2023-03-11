@@ -65,6 +65,8 @@ So here's a script that writes your username: ``` echo-whoami.sh```
 ```./echo-whoami.sh```
 
 #### Run using makeFile
+Make sure to have `make` installed in your device. If not, then install it using `sudo apt install make`. 
+Now, go to the directory which contains the Makefile and type the command `make` and execute it. This will run all the code mentioned in `all:` which is mentioned in the Makefile.
 
 ## Contributing Guide
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
