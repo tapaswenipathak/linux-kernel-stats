@@ -53,7 +53,7 @@ Now, clone the repository that contains the scripts using : ``` git clone https:
 Now, Run the script files using : 
 - ``` bash loc.sh ```
 - ``` bash glimpseindex_cocci.sh ```
-- ``` bash patches.sh```
+- ``` bash patches.sh ```
 
 #### Run files separately using commands 
 First, your script must declare which interpreter to use. You do this in the first line of the file. If it's a shell script, it should be #!/bin/sh or #!/bin/bash.
