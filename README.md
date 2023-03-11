@@ -28,7 +28,7 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
   - [How to Contribute](#how-to-contribute)
   - [Pull Request Guidelines](#pull-request-guidelines)
   - [Raise a PR](#raise-a-pr)
-  - [Report issue](#report-issue)
+  - [Report an Issue](#report-an-issue)
 - [Troubleshooting Guide](#troubleshooting-guide)
   - [Scripts are not working](#scripts-are-not-working)
   - [Missing files or Repositories](#missing-files-or-repositories)
