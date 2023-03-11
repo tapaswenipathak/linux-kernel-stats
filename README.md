@@ -76,6 +76,10 @@ A brief summary of various devices in the drivers directory can be found in the 
 ```ymlus 
  https://www.dropbox.com/scl/fi/z5mz0uol3zl0xy166wqpe/Drivers.paper?dl=0&rlkey=wt412tfnsnxq7uznaie4x88rp
 ```
+
+Note on data source for version 2.0:
+> The source repository used for version 2.0 of the scripts was not the official one. As a result, we were unable to obtain results for v2.0 using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
+
  
 ### Contributing Guidelines
 We welcome contributions to our project and thank you for taking the time to improve it. Here are some guidelines to follow when contributing:
