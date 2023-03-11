@@ -21,7 +21,7 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 - [How to run the scripts](#how-to-run-the-scripts)
   - [Clone / Download](#clone--download)
   - [Run files separately using commands](#run-files-separately-using-commands)
-  - [Run using makeFile](#run-using-makefile)
+  - [Run using Makefile](#run-using-makefile)
 - [Contributing Guide](#contributing-guide)
   - [Open Stats](#open-stats)
   - [Contributing Guidelines](#contributing-guidelines)
@@ -64,7 +64,7 @@ So here's a script that writes your username: ``` echo-whoami.sh ```
 - Then you can run it using:
 ``` ./echo-whoami.sh ```
 
-#### Run using makeFile
+#### Run using Makefile
 Make sure to have `make` installed in your device. If not, then install it using `sudo apt install make`. 
 Now, go to the directory which contains the Makefile and type the command `make` and execute it. This will run all the code mentioned in `all:` which is mentioned in the Makefile.
 
