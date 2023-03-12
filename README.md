@@ -18,6 +18,7 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 
 
 ## Table of Contents
+- [Technology Stack](#technology-stack)
 - [How to run the scripts](#how-to-run-the-scripts)
   - [Clone / Download](#clone--download)
   - [Run files separately using commands](#run-files-separately-using-commands)
@@ -34,6 +35,20 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
   - [Missing files or Repositories](#missing-files-or-repositories)
   - [Missing dependencies](#missing-dependencies)
 - [Contact Us](#contact-us)
+
+## Technology Stack
+The Linux Kernel Stats repository has been developed using a combination of bash and python scripts. The bash scripts are used for data collection, while the python scripts are used for data processing and visualization.
+
+The following tools and libraries were used in the development of this repository:
+
+Bash
+Python 3.x
+Git
+Bash was used for its simplicity and ease of use in collecting system information, while Python 3.10.10 was used for data processing web scraping.
+
+Git was used for version control and collaborative development. All code changes were tracked using Git, and changes were made using the standard Git workflow of branching, committing, and merging.
+
+The Linux Kernel Stats repository was developed on a Linux-based operating system. It is recommended to run the scripts on a Linux-based system to ensure full compatibility and accurate results.
 
 ## How to run the scripts   
 #### Clone / Download
