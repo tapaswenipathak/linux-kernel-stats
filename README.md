@@ -169,6 +169,32 @@ The linux-kernel-stats project is developed using various tools and technologies
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 ### Open Stats 
+A driver is a software component that allows the operating system to communicate with a specific hardware device. Drivers act as a bridge between the hardware and software, enabling them to communicate and work together effectively.
+
+The following drivers were used for analysis:
+| Driver Name             | Description                                          |
+| -----------------------|------------------------------------------------------|
+| Bluetooth               | Wireless communication technology                     |
+| BU Mechanism            | Driver model for devices with Back Up power           |
+| CD ROM                  | Driver for reading and writing CDs and DVDs           |
+| Clocking mechanism      | Driver for controlling clocking in hardware systems   |
+| CPU Handling            | Driver for managing CPU performance and power usage   |
+| DMA Handling            | Driver for Direct Memory Access data transfers        |
+| Firmware Specification  | Driver for firmware installation and updates          |
+| GPU Handling            | Driver for graphics processing units                  |
+| Hardware Tracing        | Driver for monitoring and diagnosing hardware issues  |
+| Machintosh              | Driver for macOS systems                              |
+| Media                   | Driver for audio and video devices                     |
+| Memory                  | Driver for managing system memory                     |
+| Message Parsing         | Driver for interpreting message formats               |
+| Performance             | Driver for optimizing system performance              |
+| Power                   | Driver for managing power usage and distribution      |
+| Spin Lock Mechanism     | Driver for providing mutual exclusion synchronization |
+| Staging                 | Driver for experimental or incomplete features        |
+| Technologies with NFC   | Driver for Near Field Communication devices           |
+| Video                   | Driver for video devices and display systems           |
+
+
 A brief summary of various devices in the drivers directory can be found in the link below.
 ```ymlus 
  https://www.dropbox.com/scl/fi/z5mz0uol3zl0xy166wqpe/Drivers.paper?dl=0&rlkey=wt412tfnsnxq7uznaie4x88rp
