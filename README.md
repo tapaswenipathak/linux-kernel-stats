@@ -41,9 +41,9 @@ The Linux Kernel Stats repository has been developed using a combination of bash
 
 The following tools and libraries were used in the development of this repository:
 
-Bash
-Python 3.x
-Git
+- Bash
+- Python 3.x
+- Git
 Bash was used for its simplicity and ease of use in collecting system information, while Python 3.10.10 was used for data processing web scraping.
 
 Git was used for version control and collaborative development. All code changes were tracked using Git, and changes were made using the standard Git workflow of branching, committing, and merging.
