@@ -70,6 +70,11 @@ The Linux Kernel Stats repository was developed on a Linux-based operating syste
 ##### Step 2
 Now, clone the repository that contains the scripts using : ``` git clone https://github.com/tapaswenipathak/linux-kernel-stats ```
 
+Install the following dependencies before proceeding to execute the python scripts:
+- [requests](https://pypi.org/project/requests/) 
+- [bs4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup)
+- [lxml](https://lxml.de/installation.html) 
+
 Now, Run the script files using : 
 - ``` bash loc.sh ```
 - ``` bash glimpseindex_cocci.sh ```
