@@ -127,6 +127,7 @@ The following directories are available in `data_dir`:
 The following files are available in `data_dir`:
 
 `Firmware.txt`: Contains output related to firmware.<br>
+`output_buffer_dump.txt`: contains data dump related to buffers in linux kernel versions. <br>
 `filesizeof_get_short_logs.txt`: Contains file sizes of output files of shortlogs from initial version to the latest version.<br>
 `no_of_directories_drivers.txt`: Contains output related to the number of directories in drivers.<br>
 `no_of_directories_staging.txt`: Contains staging output related to the number of directories in drivers.<br>
