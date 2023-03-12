@@ -147,9 +147,7 @@ Note on data source for version 2.0:
 > The source repository used for version 2.0 of the linux kernel was not the official one. As a result, we were unable to obtain results for v2.0 using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
 
 ### Usage:
-To run the scripts, navigate to the root directory of the repository and execute the following command:
-
-> `make` 
+To run the scripts, navigate to the root directory of the repository and execute the `make` command.
 This command will run all of the scripts and generate the data files in the data directory. Refer to [How to run the scripts](#how-to-run-the-scripts) for more details.
 
 ### Contributing
