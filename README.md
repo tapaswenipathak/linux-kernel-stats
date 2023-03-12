@@ -37,17 +37,20 @@ We have conducted a thorough review of the evolution of the Kernel from 17 Sept 
 - [Contact Us](#contact-us)
 
 ## Technology Stack
-The Linux Kernel Stats repository has been developed using a combination of bash and python scripts. The bash scripts are used for data collection, while the python scripts are used for data processing and visualization.
+The Linux Kernel Stats repository has been developed using a combination of bash and python scripts. The bash scripts are used for data collection, while the python scripts are used for data processing. The development environment used for the repo was Ubuntu 20.04 LTS.
+
 
 The following tools and libraries were used in the development of this repository:
 
-- Bash
-- Python 3.x
-- Git
+- [Bash](https://www.gnu.org/software/bash/)
+- [Python 3.x](https://www.python.org/)
+- [Git](https://git-scm.com/)
 
-Bash was used for its simplicity and ease of use in collecting system information, while Python 3.10.10 was used for data processing web scraping.
+Bash was used for its simplicity and ease of use in collecting system information, while Python 3.10.10 was used for data processing and web scraping.
 
-Git was used for version control and collaborative development. All code changes were tracked using Git, and changes were made using the standard Git workflow of branching, committing, and merging.
+The code was written and tested using Git version control system. Git was used for version control and collaborative development. All code changes were tracked using Git, and changes were made using the standard Git workflow of branching, committing, and merging.
+
+The repo also uses various Linux command-line tools such as grep, awk, and curl for data processing and analysis.
 
 The Linux Kernel Stats repository was developed on a Linux-based operating system. It is recommended to run the scripts on a Linux-based system to ensure full compatibility and accurate results.
 
