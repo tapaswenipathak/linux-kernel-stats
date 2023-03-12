@@ -54,7 +54,7 @@ Bash was used for its simplicity and ease of use in collecting system informatio
 
 Git was used for version control and collaborative development. All code changes were tracked using Git, and changes were made using the standard Git workflow of branching, committing, and merging.
 
-Some of the scripts in the repository also use various Linux command-line tools such as grep, awk, and curl for data (extraction) processing and analysis.
+Some of the scripts in the repository also use various Linux command-line tools such as grep, awk, and curl for data extraction, processing and analysis.
 
 The Linux Kernel Stats repository was developed on a Linux-based operating system. It is recommended to run the scripts on a Linux-based system to ensure full compatibility and accurate results.
 
