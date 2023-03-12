@@ -155,7 +155,7 @@ There may be discrepancies and irregularities in the data collected by the linux
 It is important to keep in mind that the data collected by the linux-kernel-stats project is based on the publicly available data.
 
 Note on data source from (kbd and erofs-utils):
-> The source repository used for version 2.0 of the linux kernel was not the official one. As a result, we were unable to obtain results for v2.0 using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
+> The source repository used (kbd and erof-utils) for the linux kernel versions were not the official ones. As a result, we were unable to obtain results for some versions in those sources, using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
 
 ### Usage:
 To run the scripts, navigate to the root directory of the repository and execute the `make` command.
