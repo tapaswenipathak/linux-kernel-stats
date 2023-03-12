@@ -1,0 +1,829 @@
+commit 46db5850d3c10ede04f645bd1e8bd7bcbc65acb9
+Author: Linus Torvalds <torvalds@cs.Helsinki.FI>
+Date:   Sun Jul 18 20:13:34 1993 -0400
+
+    [ANNOUNCE]: linux 0.99 patchlevel 11
+    
+    Nic.funet.fi now contains the newest linux kernel: this is 0.99
+    patchlevel 11. I've had a few problems with the "ls" and "dir" commands
+    on nic, so if this is true for others as well, you may not be able to
+    see the files, but they are available as:
+    
+            pub/OS/Linux/PEOPLE/Linus:
+    
+                    - RELEASE-0.99.11  --  release notes
+                    - README  --  same as RELEASE..
+                    - linux-0.99.11.tar.gz  --  full sources
+                    - linux-0.99.patch11.gz  --  patches against pl10
+    
+    I don't know if I'll actually have the energy to update the RELEASE
+    files every time, but that's the idea (with README being a copy of the
+    latest one).  The README gives info on what changed, how to install it,
+    how to compile the kernel, and what to do with error dumps like "unable
+    to handler kernel paging request" and the like.  Maybe it results in
+    better bug-reports.  Maybe not.
+    
+    Pl11 uses (as you all know by now) C++, so you'll need to have g++
+    installed.  Also, there seems to be problems compiling the newer kernels
+    with gcc-2.3.3: there have been various reports that even pl10 (which
+    isn't C++) had problems which go away when compiled with gcc-2.4.3 or
+    newer.
+    
+    As always, please send any bug-reports etc at least Cc'd to me: I'll be
+    wanting to know if things work or not.
+    
+                    Linus
+    
+    <RELEASE-0.99.11>
+    
+            Linux kernel release 0.99 patchlevel 11
+    
+    These are the release notes for linux version 0.99.11.  Read them
+    carefully, as they explain how to install the kernel, and what to do if
+    something goes wrong.
+    
+    CHANGES since 0.99 patchlevel 10 and earlier:
+    
+     - The keyboard is dynamically changeable (this is true of pl10 as
+       well), and you need to get the "keytables.tar.z" archive to set the
+       keyboard to suit your taske unless you want to live with the default
+       US keymaps.
+    
+       Use the "loadkeys map/xxx.map" command to load the keyboard map: you
+       can edit the maps to suit yourself if you can't find a suitable one.
+       The syntax of the keyboard maps should be obvious after looking at
+       the examples.
+    
+     - The memory manager has been cleaned up substantially, and mmap()
+       works for MAP_PRIVATE.  MAP_SHARED is still not supported for
+       anything else than /dev/mem, but even so it actually is usable for a
+       lot of applications.  The shared library routines have been rewritten
+       to use mmap() instead of the old hardcoded behaviour.
+    
+     - The kernel is now compiled with C++ instead of plain C.  Very few
+       actual C++ features are used, but even so C++ allows for more
+       type-checking and type-safe linkage.
+    
+     - The filesystem routines have been cleaned up for multiple block
+       sizes.  None of the filesystems use it yet, but people are working on
+       it.
+    
+     - named pipes and normal pipes should hopefully have the right select()
+       semantics in the presense/absense of writers.
+    
+     - QIC-02 tape driver by Hennus Bergman
+    
+     - selection patches in the default kernel
+    
+     - fixed a bug in the pty code which led to busy waiting in some
+       circumstances instead of sleeping.
+    
+     - Compressed SLIP support (Charles Hedrick). See net/inet/CONFIG
+    
+    INTERNAL kernel changes:
+    
+     - the 'clear_bit()' function was changed to return the previous setting
+       of the bit instead of the old "error-code".  This makes use of the
+       bit operations more logical.
+    
+     - udelay() function for short delays (busy-waiting) added.  Used
+       currently only by the QIC driver.
+    
+     - fork() and sheduler changes to make task switches happen only from
+       kernel mode to kernel mode.  Cleaner and more portable than the old
+       code which counted on being able to task-switch directly into user
+       mode.
+    
+     - debugging malloc code.
+    
+    INSTALLING the kernel:
+    
+     - if you install by patching, you need a *clean* 0.99.10 source tree,
+       which presumably exists in /usr/src/linux.  If so, to get the kernel
+       patched, just do a
+    
+                    cd /usr/src
+                    patch -p0 < linux-0.99.patch11
+    
+       and you should be ok.  You may want to remove the backup files (xxx~
+       or xxx.orig), and make sure that there are no failed patches (xxx# or
+       xxx.rej).
+    
+     - If you install the full sources, do a
+    
+                    cd /usr/src
+                    tar xvf linux-0.99.11.tar
+    
+       to get it all put in place.
+    
+     - make sure your /usr/include/linux and /usr/include/asm directories
+       are just symlinks to the kernel sources:
+    
+                    cd /usr/include
+                    rm -rf linux
+                    rm -rf asm
+                    ln -s /usr/src/linux/include/linux .
+                    ln -s /usr/src/linux/include/asm .
+    
+     - make sure you have no stale .o files and dependencies lying around:
+    
+                    cd /usr/src/linux
+                    make mrproper
+                    make dep
+    
+       You should now have the sources correctly installed.
+    
+    CONFIGURING the kernel:
+    
+     - do a "make config" to configure the basic kernel.  "make config"
+       needs bash to work: it will search for bash in $BASH, /bin/bash and
+       /bin/sh (in that order), so hopefully one of those is correct.
+    
+     - edit net/inet/CONFIG to configure the networking parts of the kernel.
+       The comments should hopefully clarify it all.
+    
+     - Check the top Makefile for further site-dependent configuration
+       (default SVGA mode etc).
+    
+    COMPILING the kernel:
+    
+     - make sure you have gcc-2.4.3 or newer available with g++.  It seems
+       older gcc versions can have problems compiling linux 0.99.10 and
+       newer versions.  If you upgrade, remember to get the new binutils
+       package too (for as/ld/nm and company)
+    
+     - do a "make zImage" to create a compressed kernel image.  If you want
+       to make a bootdisk (without root filesystem or lilo), insert a floppy
+       in your A: drive, and do a "make zdisk".  It is also possible to do
+       "make zlilo" if you have lilo installed to suit the kernel makefiles,
+       but you may want to check your particular lilo setup first.
+    
+     - keep a backup kernel handy in case something goes wrong.
+    
+     - reboot with the new kernel.
+    
+    IF SOMETHING GOES WRONG:
+    
+     - if you have problems that seem to be due to kernel bugs, please mail
+       them to me (Linus.Torvalds@Helsinki.FI), and possibly to any other
+       relevant mailing-list or to the newsgroup.  The mailing-lists are
+       useful especially for SCSI and NETworking problems, as I can't test
+       either of those personally anyway.
+    
+     - In all bug-reports, *please* tell what kernel you are talking about,
+       how to duplicate the problem, and what your setup is (use your common
+       sense).  If the problem is new, tell me so, and if the problem is
+       old, please try to tell me when you first noticed it.
+    
+     - if the bug results in a message like
+    
+            unable to handle kernel paging request at address C0000010
+            Oops: 0002
+            EIP:   0010:xxxxxxxx
+            eax: xxxxxxxx   ebx: xxxxxxxx   ecx: xxxxxxxx   edx: xxxxxxxx
+            esi: xxxxxxxx   edi: xxxxxxxx   ebp: xxxxxxxx
+            ds: xxxx  es: xxxx  fs: xxxx  gs: xxxx
+            Pid: xx, process nr: xx
+            xx xx xx xx xx xx xx xx xx xx
+    
+       or similar kernel debugging information on your screen or in your
+       system log, please duplicate it *exactly*.  The dump may look
+       incomprehensible to you, but it does contain information that may
+       help debugging the problem.  The text above the dump is also
+       important: it tells something about why the kernel dumped code (in
+       the above example it's due to a bad kernel pointer)
+    
+     - in debugging dumps like the above, it helps enourmously if you can
+       look up what the EIP value means.  The hex value as such doesn't help
+       me or anybody else very much: it will depend on your particular
+       kernel setup.  What you should do is take the hex value from the EIP
+       line (ignore the "0010:"), and look it up in the kernel namelist to
+       see which kernel function contains the offending address.
+    
+       To find out the kernel function name, you'll need to find the system
+       binary associated with the kernel that exhibited the symptom.  In the
+       case of compressed kernels, this will be 'linux/tools/zSystem', while
+       uncompressed kernels use the file 'tools/system'.  To extract the
+       namelist and match it against the EIP from the kernel crash, do:
+    
+                    nm tools/zSystem | sort | less
+    
+       This will give you a list of kernel addresses sorted in ascending
+       order, from which it is simple to find the function that contains the
+       offending address.  Note that the address given by the kernel
+       debugging messages will not necessarily match exactly with the
+       function addresses (in fact, that is very unlikely), so you can't
+       just 'grep' the list: the list will, however, give you the starting
+       point of each kernel function, so by looking for the function that
+       has a starting address lower than the one you are searching for but
+       is followed by a function with a higher address you will find the one
+       you want.  In fact, it may be a good idea to include a bit of
+       "context" in your problem report, giving a few lines around the
+       interesting one.
+    
+       If you for some reason cannot do the above (you have a pre-compiled
+       kernel image or similar), telling me as much about your setup as
+       possible will help.
+    
+    -----
+    
+    From: torvalds@cc.helsinki.fi (Linus Torvalds)
+    Subject: ALPHA-pl11 available on nic: C++ support
+    Date: Sun, 4 Jul 93 00:03:03 GMT
+    
+    For those brave souls that enjoy testing new releases, there is an
+    ALPHA-release of the 0.99.11 version available on nic.funet.fi in the
+    usual place (pub/OS/Linux/PEOPLE/Linus).  This has a few changes from
+    the last one, the most notable being that it is compiled using C++, as
+    there was some interest in that on the c.o.l newsgroup.  Note that very
+    few C++ features are actually used: the major changes were some minor
+    syntactic editing and the addition of 'extern "C"' to functions called
+    from assembly code.  The C++ changes are not the same as those done by
+    Tristan (although you should thank him for getting it rolling), as I
+    wanted to resolve the differences between C and C++ a bit differently.
+    
+    The C++ changes shouldn't actually change the way the kernel works, and
+    it's mainly used currently to do stricter pointer checking.  The name
+    mangling probably breaks the kmem based 'ps' once again..  Actual code
+    changes for this test-version:
+    
+     - I added the patches by Charles Hedrick for SLIP: this actually means
+       that only CSLIP is available for now, so..  The net code is still not
+       ready: Fred is working on it, so this is just an interim version when
+       it comes to networking (there are some other minor patches in there as
+       well).
+    
+     - The mm has been cleaned up since pl10, and mmap() actually works for
+       most things, while malloc() will return NULL when the kernel thinks
+       there isn't enough memory.  Similarly, the buffer cache code should
+       now support different block sizes (although this is still in the
+       "early alpha" stage.  Most of the changes by Eric Youngdale, with mm
+       cleanups by me.
+    
+     - A problem with the dynamic inode code (insufficient inode
+       invalidation) that could result in fs corruption under some
+       circumstances is fixed.
+    
+    People who have written drivers etc should probably check out the
+    changes I did due to the stricter C++ pointer checking.
+    
+                    Linus
+
+commit d99dedeec6209a2772ff0525eea13509181b9a2c
+Author: Linus Torvalds <torvalds@cc.helsinki.fi>
+Date:   Mon Dec 21 23:36:46 1992 +0000
+
+    ANNOUNCE: linux 0.99 patchlevel 1
+    
+    Linux-0.99.1 is now available on nic.funet.fi, and will probably show up
+    on the other linux ftp sites within days, unless everybody has gone off
+    for the holidays. The directory is /pub/OS/Linux/PEOPLE/Linus, and it's
+    available both as a patch against 0.99 and as complete source. The
+    patch is pretty clean, although most people probably have changed 0.99
+    slightly to get rid of the setup and/or inode.c problems, so if you
+    have, you'll have to revert or patch by hand.
+    
+    Patch 1 addresses the following problems:
+     - configuration. Hope there are no silly problems left..
+     - inode.c: initialization changes (the missing NULL and some other
+       minor fixes).
+     - some SCSI tape driver patches (Kai M{kisara)
+     - tcp/ip patches (Ross Biro, some code by me)
+     - keyboard patches (mainly changed initialization - hope the keyboard
+       lockups are gone).
+     - completed /proc-fs: it should now contain all info needed by 'ps'
+       (Micheal K Johnson).
+     - various minor fixes (the minix-fs link overflow checking etc)
+    
+    Patch1 also contains support for extended VC switching - this is for the
+    upcoming X11 that understands VC's. One result of this is that console
+    redirection now redirects *only* messages actually sent to /dev/console
+    (aka /dev/tty0), not just to any foreground VC. Wait for Xfree-1.2 to
+    be able to switch VC's while under X (yes, including several X-sessions
+    active at the same time..).
+    
+    I hope there are still people out there that aren't too busy stuffing
+    themself with turkey to try out a new kernel release. There is just
+    over a week left of this year, and I need feedback in order to be able
+    to release 1.0.
+    
+                    Linus
+    
+    PS. Thanks to everybody who has sent me Christmas/New Year/Birthday
+    cards. Some contained money, some didn't, and I enjoyed them all.
+    Thanks.
+
+commit d72651cda1a12e51ae4b03a8fe0e280d89aecc33
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Sat Sep 5 18:46:06 1992 +0000
+
+    0.97 patchlevel 3 available
+    
+    Well, 0.97.pl3 is available both as full source (linux-0.97.3.tar.Z) and
+    as a context diff (linux-0.97.patch3.Z) on nic.funet.fi, in the normal
+    directory (pob/OS/Linux/testing/Linus). It seems some line is once more
+    down on the way to the US, so I haven't uploaded it to tsx-11 yet.
+    Also, I haven't been able to use the pub/Linux/Linus directory on
+    sunsite (it dies on me when I try to send the group password), so I
+    don't know when sunsite will get the new release.
+    
+    Patch3 is almost 100kB even compressed, as there were quite big changes
+    in the mm and minix fs. No major new features: there are two new system
+    calls: swapoff(const char * swapfile) and wait4(), and linux accepts
+    several swap-files, but the rest of the thing is mostly bug-fixes or
+    simply rewrites.
+    
+    Major changes:
+     - new swap-page handling: linux no longer uses just one bit to keep
+       track of used swap-space, but a counter for each swap-page. This
+       allows processes to share swap-pages after a fork(), and should
+       result in /major/ performance increases on machines with less memory.
+       I've seen better performance even with 8MB - I wouldn't be surprised
+       if 4MB machines would re-compile the kernel noticeably faster under
+       pl3. I'd be interested to hear numbers.
+     - The low 1MB memory that isn't used directly by the kernel is now
+       swappable memory, instead of being hardcoded for buffer cache. The
+       patches for this were originally by tytso, and I expanded on it a bit
+       more. This might also help better performance on 2-4MB machines.
+       Note that this does /not/ mean that you can use 1M machines for
+       linux: linux still needs some extended memory.
+     - the dosfs has been upgraded to dosfs.8 - patches by almesber.
+     - I edited the minix fs pretty heavily to remove a couple of race-
+       conditions. The same races still exist in the extended fs, as I
+       didn't have time to edit that yet. The minix-fs took precedence as I
+       know that better, and extfs isn't "official" yet anyway.
+    
+    other changes:
+    
+     - the mouse-driver now handles both Logitech (minor = 0) and PS/2
+       (minor = 1) busmice.
+     - there is a proc-fs for access to user memory/files etc.
+     - better support for the tcp/ip patches (but see below...)
+     - corrected symlink and /dev/[k]mem behaviour
+     - Lars Wirzenius' README (with minimal comments by me) and the GNU
+       COPYING notice are now part of the normal kernel setup, and can be
+       found in the tar-archive.
+     - the floppy ioctl() to get the FD parameters no longer requires root
+       priviledges. Thus, the msdos emulator runs even for a normal user.
+    
+    Some comments on patchlevel 3:
+    
+            mm:
+    
+    The swap-page handling resulted in a reduction of swap-file (or
+    partition) size to a maximum of 16MB per file. It's nothing inherent to
+    the code, but it eased some algorithms, so I didn't bother coding around
+    it. After all, 16MB is enough for most people, and if you want more,
+    you can have up to 128 swapfiles of 16MB each. If I get enough
+    hate-mail about it, I might just try to find the energy to correct it.
+    Maybe.
+    
+    Bigger swapfiles will still work, but linux will take advantage of only
+    the low 16MB. Also, there is no nifty logic to try to optimize the
+    usage of the swap-files: pages are simply allocated from one swap-file
+    until it fills up, and then the next swap-file is used.
+    
+    The memory management changes break ps/free once more, but not very
+    much. Also, I changed the load-average counting, so 'w' also needs
+    slight editing. On the other hand, I made '/dev/kmem' mmap()able, and
+    'ps' and 'free' should be edited to take advantage of that: it should
+    result in much faster operation, as well as possibly using less real
+    memory.
+    
+            fs:
+    
+    The fs changes should remove at least two races - the races don't happen
+    very often, but they were theoretically possible, and might be the
+    reason for some fs corruption problems that have been reported. The
+    changes are related to the use of bmap() - the bmap interface doesn't
+    really lend itself to some things that it was used for. Re-writing
+    internal fs-functions not to use bmap not only should have removed any
+    races, but also actually resulted in cleaner code.
+    
+    The proc-fs code isn't too beautiful, and I'll probably leave it out
+    from 0.98 unless I can make it loadable. We'll see. If anybody wants
+    to use it, you can do something like
+    
+      # mount -t proc /dev/ram /proc
+    
+    Instead of /dev/ram you can use any block device - it's not used, and is
+    only a dummy as the proc-fs doesn't actually use any external device.
+    (but note that the device is still marked as mounted, so you cannot
+    mount it for anything else).
+    
+            kernel/mm/lib:
+    
+    The TCP/IP patches are also essentially in 0.97.pl3 - not the full
+    TCP/IP directory, only the patches to the main kernel. NOTE!! I don't
+    like the 'grab_malloc_pages()' function, so I left that out, and added a
+    GFP_ATOMIC priority to get_free_page() that should be used instead. I
+    hope this will be used (Ross?), as it's a lot cleaner.
+    
+    Also, I hope the tcp/ip people will clean up malloc() so that it doesn't
+    panic instead of returning NULL etc. Ugly, ugly. This is related to
+    the get_free_page(GFP_ATOMIC) changes, and I'd like to have patches as
+    soon as possible - tcp/ip won't be part of the standard kernel until
+    that can be cleaned up.
+    
+                    Linus
+
+commit 67406b341328a6503eaa3de23e553be903ed5891
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Sat Jul 18 20:54:48 1992 +0000
+
+    0.96c second patch
+    
+    The subject pretty much says it all: I've sent out the "weekly patch"
+    and I'd be very interested in comments. As with patch1, there are some
+    very fundamental changes in the kernel, and they might have some
+    problems. I'd want as many as possible to test out linux-0.96c.pl2, as
+    that has always been the best way to test out the changes. Everything
+    works on my machine, but that doesn't guarantee it will work on other
+    setups...
+    
+    The MAJOR change in 0.96c.pl2 is the totally rewritten sleep/wakeup
+    code. That, together with the IRQ code introduced in pl1 and slightly
+    edited in pl2, means that two very fundamental things in the linux
+    kernel have changed in the last two weeks. The code is cleaner, easier
+    to add devices to, and hopefully faster, but it's still a bit risky to
+    change this kind of very low-level behaviour.
+    
+    Select() is now implemented using the vfs jump tables, and thanks to the
+    better sleep/wakup interface, select() performance should be noticeably
+    better. At least xload seems to give lower load-averages, and I hope
+    ka9q will work better with the new kernel. Note that things like the
+    tty code doesn't yet take full advantage of the new features the
+    rewritten sleep offers, but I wanted to get a good testing-release out
+    before actually tweaking all the routines to use the new interface.
+    
+    The IRQ routines have changed slightly, and all known bugs are fixed.
+    
+    While I'm most interested to hear comments about the IRQ and
+    select/sleep/wakup code, there are a few other changes in pl2:
+    
+     - Swiss keyboard support.
+    
+     - Screen blanking now only reacts to key-presses and kernel messages:
+    normal tty output doesn't make the screen unblank.
+    
+     - DOS-fs version 5 is in. It wouldn't hurt to try it out. It's
+    somewhat alpha still, but it seems to work. mtools should be a thing of
+    the past once the dosfs is a bit more tested.
+    
+     - core-file magic number, and a minor bug in ptrace is fixed
+    
+     - a bus-mouse is supported. I'd like to hear if it still works after I
+    did the select() patches "blind" (I can't test it on my machine).
+    
+     - iopl changing is possible (but requires root priviledges): this
+    allows access to all IO ports, as well as the interrupt flag. Don't use
+    it unless /absolutely/ necessary: a bug in your program will most likely
+    crash the machine if you are running with IO priviledges. It's needed
+    for some X VGA drivers.
+    
+    As a result of all the changes, the diff is pretty big. Apply and build
+    it with something like:
+    
+            cd /usr/src
+            zcat linux-0.96c.patch2.Z | patch -p0
+            cd linux
+            make dep
+            make clean
+            make Image
+    
+    assuming you have the 0.96c.pl1 kernel in /usr/src/linux. I've had some
+    reports that my patches won't always go in cleanly: I know for a fact
+    that patch1 patches cleanly (I rebuilt 0.96c.pl1 by downloading it all
+    from banjo), so the error is in your end.
+    
+    Possible problems:
+    
+     - The VESA code in setup.S has some problems. I haven't even looked
+    into it yet, so if it won't work for you, please either (a) use the
+    unpatched setup.S from 0.96c, or (b) try to find the problem and tell
+    me. (b) is preferable, of course. I'd like to have VESA support, but
+    if the bug isn't found, I'll have to use the non-VESA version for 0.97.
+    
+     - The IRQ code in 0.96c.pl1 could overrun the stack if linux got
+    un-ending interrupt requests, resulting in a re-boot. With pl2, this
+    shouldn't happen: linux should print out something like "Recursive
+    interrupt on IRQx. Shutting down" and simply disable the problematic
+    IRQ line. If you see this message, I'd be very interested to hear about
+    it (which IRQ, what devices you have, etc).
+    
+     - And any new or old bugs I haven't found yet.
+    
+    I have one report that 0.96c.pl1 has problems with the inode table, and
+    panics on bootup with a "no more inodes in mem" report. Can anybody
+    confirm this sighting? I haven't found the reason for it, and haven't
+    seen it myself. I'm hoping it's an installation problem, but if anybody
+    else sees the same behaviour, I'm SOL.
+    
+                    Linus
+
+commit 2288d80abfb91ee08da7989ca1dd2338cc949fd3
+Author: Linus Benedict Torvalds <torvalds@klaava.Helsinki.FI>
+Date:   Sun Aug 23 22:17:41 1992 +0000
+
+    linux-0.97 patchlevel 2
+    
+    As promised, 0.97.pl2 is out today (well, over here it's already
+    tomorrow, so I guess I'm 35 minutes late. Naughty, naughty). Right
+    now, the patch (and full source for those that don't like to patch up
+    the system) is available at "nic.funet.fi: pub/OS/Linux/testing/Linus",
+    but I'll try to put it on some other sites as well if I'm able and
+    energetic enough. Probably tomorrow - together with a binary for those
+    that aren't willing to comple the kernel on their own.
+    
+    0.97.2 has mostly my mm/fs patches, along with some relatively minor
+    diffs by others (including file locking by Doug Evans). User-level
+    changes are minor: but the mm has changed a lot, and the vfs routines
+    have been changed to keep track of the error-messages a bit better.
+    Also, the vfs-interface to "follow_link()" changed slightly: people who
+    are making filesystems should look at the changes (but they are
+    relatively minor, and shouldn't result in any problems - both the
+    extended fs and minix fs needed just a simple change in their respective
+    symlink.c files).
+    
+    The mm changes /might/ lower performance slightly, as the paging TLB's
+    are now flushed at every task-switch due to the new system, but I doubt
+    it's noticeable. The other performance changes (dynamic buffers etc) in
+    0.97(.pl1) should overshadow that particular problem.
+    
+    I hope this release means that these kinds of low-level rewrites aren't
+    needed for a while: the last couple of releases have changed some very
+    fundamental things. Nothing seems to have suffered too badly, but I'd
+    be happier if it all got tested more thoroughly. Anyway, discounting
+    the ps/free etc suite of programs, everything I have tried has worked
+    flawlessly despite the big kernel changes.
+    
+    I'm still worried about the reports about messed-up buffers, but have
+    been unable to reproduce the problem, and nobody has so far
+    disillusioned me about my guess that it's a problem with the SCSI code
+    (which at least gives me an excuse for not doing anything about it :-).
+    Other problems include at least one report of spontaneous re-booting,
+    which is totally inexplicable, so I'm blaming hardware once more until I
+    can get better data on the thing.
+    
+    As to patches sent by others: 0.97.2 contains very little of that kind
+    of code. I've been too busy either working, or implementing my own
+    changes that I have simply ignored them for the most part. Remind me
+    (or resend them relative to the new kernel) if you have a patch that is
+    still needed.
+    
+    There is one new system call: 'vm86(struct vm86_struct * info)'. It's
+    not ready for general use yet - it works, but will probably need some
+    tweaking before being practical. But supporting a virtual 86 mode was
+    so easy after the mm rewrite that I felt it was worth implementing: the
+    vm86 code is less than 50 lines of C right now.
+    
+                    Linus
+    
+    PS. The bright spot of the week goes to "The Oxford Beer Trolls" - all
+    UK inhabitants should probably be locked into some (big) mental
+    institution and TOBT should probably have a wing of their own, but
+    thanks to them linux can now call itself "beerware" :-)
+
+commit 7aadf253807264ad5561479e2a8b9de9602f966d
+Author: Linus Benedict Torvalds <torvalds@cc.helsinki.fi>
+Date:   Sun Dec 8 17:51:24 1991 +0200
+
+    linux-0.11 available
+    
+    The subject says it all: I have uploaded linux version 0.11 to
+    nic.funet.fi and tupac-amaru. They won't show up for a while on nic,
+    but are already visible in pub/msdos/replace/incoming at amaru. rtx-11
+    is so slow to use from here that I didn't upload them there: I guess
+    they'll show up within a couple of days (tytso?).
+    
+    The files uploaded were:
+            bootimage.Z - US keyboard compressed bootimage
+            rootimage.Z - 1200kB compressed root image
+            linux-0.11.tar.Z - sources
+            as86.tar.Z - linux binaries for bruce evans'
+                                      16-bit assembler and loader.
+            INSTALL-0.11 - updated install-info
+    
+    This version has a lot of corrections, and is stable at least on my
+    machine. I /hope/ every known bug is fixed, but no promises (and all
+    unknown bugs are still there, probably with reinforcements ;-). Those
+    who like to use caps lock as a ctrl-key, you'll have to re-patch the
+    kernel. It's not implemented in the standard version.
+    
+                    Linus
+    
+    PS. I'll be a bit busy with the #"$/% physics-course I'm taking, so I
+    might not be as active on the net this coming week as I would like to.
+    
+    PPS. corsini: the problem you have with the recompiled uemacs sounds
+    like it isn't resetting the ISIG bit in c_lflags when moving to raw
+    mode. Search for c_lflags in the source: it should effectively be set to
+    zero (I think) - no signals, no canonical mode etc.
+    
+    <INSTALL-0.11>
+    
+                    Using Linux v0.11
+                    Linus Torvalds 08.12.91
+    
+    NOTE: Users of 0.10, please check the "changed" list before using 0.11.
+    
+                    Booting linux
+    
+    Linux-0.11 can easily be booted by getting the 2 files bootimage-0.11.Z
+    and rootimage-0.11.Z from the linux archive, uncompressing them and
+    writing them out to disks of the same size (ie 2 1.44M floppies or 2
+    1.2M floppies). Writing the disks is done with the "rawrite.exe" program
+    from dos, or with "dd" from unix. Linux is then booted simply by
+    inserting the bootdiskette in drive A, and rebooting the machine. If
+    everything goes well, linux will ask you to insert the root-disk after
+    loading the system. Hopefully linux will then correctly load the shell
+    executable, and leave you as root on the new system (prompt '# ').
+    
+                    Using it.
+    
+    You can get a complete list of available commands by pressing <tab>
+    twice: the root-disk contains mostly setup-programs needed to install
+    the system on a harddisk.  You can test them a bit, reading directories
+    etc.
+    
+    In order to install linux on the harddisk, first check out your harddisk
+    by executing the command "fdisk" - it should show you all the partitions
+    available.  If you have only 1 AT-harddisk, you should get a
+    errormessage, just ignore it.  At my system fdisk reports the following:
+    
+    /dev/hd1:  20476 blocks minix
+    /dev/hd2:  19975 blocks minix
+    /dev/hd3:   1020 blocks minix
+    /dev/hd4:    170 blocks active 16-bit DOS (>=32M)
+    /dev/hd6:  41641 blocks active minix
+    
+    The partition type given (12-bit DOS, minix etc) doesn{t really mean
+    anything, unless it's a "extended partition", in which case you
+    shouldn't use that partition for anything: linux doesn't yet understand
+    them. When later using "mkfs" to make a linux file system, it won't
+    change the output of fdisk, so fdisk may well report "DOS", while in
+    fact you have made it a linux partition.
+    
+    If fdisk doesn't print out anything but errors, linux is unable to read
+    your harddisk, and you are f**ked.  Play around with the floppy version,
+    but you won't be able to do anything real.
+    
+                    Making a filesystem
+    
+    In order to really use linux, you will have to make a filesystem on your
+    harddisk. This starts by deciding which partition you can use. Look
+    again at what fdisk reports, and try to figure out which of the
+    partitions you are using for DOS, OS/2 etc. /dev/hdX where X={1,2,3,4}
+    always refers to the first harddisk, X={6,7,8,9} always refers to the
+    second disk. /dev/hd0 and /dev/hd5 are special: they are all of the
+    drive, and mkfs will refuse to use them for a filesystem.
+    
+    When you are certain you know which device points to which partition,
+    you make a filesystem on the partition of your choice by writing:
+    
+            mkfs -c /dev/hdX blocks
+    
+    where "-c" means that you want mkfs to check for errors, "dev/hdX" is
+    the free partition you intend to use for linux, and "blocks" is the
+    number of blocks fdisk reports for that particular partition. NOTE! mkfs
+    will overwrite the partition you selected, so be doubly (or triply) sure
+    that you don't mind that.
+    
+    Note that when using the "-c" flag, mkfs will read through the entire
+    partition: this can take some time. If there are read errors, mkfs will
+    mark the particular block as bad, and continue: linux will also print a
+    little message "harddisk I/O error". After running mkfs these messages
+    should never occur again: if they do, your data may be corrupted.
+    
+                    Mounting the filesystem
+    
+    After mkfs has exited, it's time to mount the file-system, and do the
+    necessary things to make it a root file system. Mount the new filesystem
+    on /user by writing:
+    
+            cd /
+            mount /dev/hdX /user
+    
+    If you get errors for this, mkfs failed, and there is probably something
+    seriously wrong.
+    
+    After mounting the device, you want to move all the files on the current
+    floppy-root to the new fs. This can most easily be done by writing:
+    
+            cd /user
+            for i in bin dev etc usr tmp floppy
+            do
+            cp +recursive +verbose /$i $i
+            done
+            sync
+    
+    which will also tell you what it is doing (/bin/sh -> bin/sh etc).
+    
+    After that, you should have a new filesystem that contains the bare
+    necessities to start hacking linux. Play around some more, and exit
+    linux by writing "logout or exit". This should result in
+    
+            child 4 died with error code 0000
+            #
+    
+    Do a couple of syncs (3 is a magic number), and reboot the machine.
+    ALWAYS remember to sync before rebooting: terrible things happen if you
+    don't.
+    
+                    Using the harddisk as root
+    
+    Once you have happily made a new root, you will want to boot up with it.
+    This is done by changing a word at offset 508 in the boot-image. The
+    word (in 386-order, ie low byte first) tells the system which device to
+    use as root: it is initially 0, which means that we want to use a floppy
+    of the same type as the boot-disk (and this is the reason that you may
+    not use a 360kB boot-disk even though the system fits on one: it has to
+    be the same type as the root-diskette).
+    
+    In order to use the harddisk as root, this value has to be changed to
+    point to the correct device. Harddisks have a major number of 3 under
+    linux, and the minor nr is the same as the number X in /dev/hdX. The
+    complete device number is then calculated with
+    
+            DEV_NO = (major<<8)+minor
+    
+    or alternatively major*256+minor. Thus /dev/hd1 is (3<<8)+1 = 0x301,
+    /dev/hd6 = 0x0306 etc. Assuming the partition you made into the new root
+    was /dev/hd2, you will have to write 0x0302 into the boot-image. That
+    is, you should change the 508th byte in the image to 0x02, and the 509th
+    byte to 0x03. There is a sample program for this in some of the older
+    INSTALL-notes, if you don't understand what it's all about.
+    
+                    Ok, I got the root on hd, what now?
+    
+    As you have probably noticed, you cannot get very far with the binaries
+    found on the original root-diskette. So the first thing you want to do
+    is to import some new binaries. To do this you need to tell linux what
+    kind of floppies you have, as that's the easiest way to import things.
+    
+    As with harddisk, floppies have device numbers, but this time major = 2
+    instead of 3. The minor number is not as easy: it's a composite that
+    tells which drive (A, B, C or D) and what type of drive (360kB, 1.2M,
+    1.44M etc). The formula is 'minor = type*4+nr', where nr is 0-3 for A-D,
+    and type is 2 for 1.2M disks, and 7 for 1.44M disks. There are other
+    types, but these should suffice for now.
+    
+    Thus if you have a 1.2M A-drive, and want to call it "floppy0", you have
+    to tell linux so. This is done with the "mknod" command. mknod takes 4
+    paramters: the unix name of the device, a "b" or a "c" depending on
+    whether it's a Block of Character device, and the major and minor
+    numbers. Thus to make "floppy0" a 1.2M A-drive, you write:
+    
+            mknod /dev/floppy0 b 2 8
+    
+    b is for Block-device, the 2 is for floppy, and the 8 is 4*2+0, where
+    the 2 is 1.2M-drive and the 0 is drive A. Likewise to make a "floppy1"
+    device that is a 1.44M drive in B, you write:
+    
+            mknod /dev/floppy1 b 2 29
+    
+    where 29 = 4*7 + 1.  There are a couple of standard names, for users
+    that are used to minix (major, minor in parentheses): /dev/PS0 is a
+    1.44M in A (2,28), /dev/PS1 a 1.44M in B (2,29), /dev/at0 is a 1.2M in A
+    (2,8), /dev/at1 is a 1.2M in B (2,9). Use mknod to make those that fit
+    your computer.
+    
+    After you have made these special block devices, you can now read a
+    floppy under linux. The easiest way to import things into linux is by
+    writing a tar-file to a floppy with rawrite.exe, and then using:
+    
+            tar xvf /dev/floppy0
+    
+    to untar it under linux. This way you can get the gcc binaries etc
+    available from the linux-carrying sites.
+    
+                    Changes from 0.10:
+    
+    - /bin/update is no longer automatically executed upon bootup: instead
+    the file /etc/rc is evaluated by the shell. This file can then start the
+    update process, mount andy needed filesystems, possibly fsck'ing them
+    first. A minimal /etc/rc looks like this:
+    
+            /bin/update &
+            > /etc/mtab
+            echo " Ok."
+    
+    - init() restarts the shell every time it is exited: logout from the
+    login shell results in a "child xxx died with error code yyy", a sync
+    and then a new shell as root.
+    
+    - floppies work a lot better than in 0.10. Even using two floppies at
+    the same time seems to work out ok. Reading big chunks at a time is also
+    faster then in 0.10 (I think).
+    
+    - harddisk errors are handled better. Use the "-c" option in mkfs to map
+    out all errors.
+    
+    - linux accepts most video-cards: harcules, MDA, CGA etc seem to work.
+    
+    - ^G beeps on the console, so command completion under bash etc will
+    notify of errors.
+    
+    - sticky directories, corrected handling of uid/gid bits, and better
+    handling of protections when not root. Most of these won't be noticeable
+    until we get a init/login.

@@ -1,27 +1,56 @@
 #!/bin/bash
-SRCDIR_e=~/linux-stable/linux-stable
-cd $SRCDIR_e
-
-#declaring an array containing all versions
-declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))  
-
-#total no. of versions
-n=${#all_versions[@]}  
+cd ~/linux-stable/linux-stable
 
 myArray=("bluetooth" "BLUETOOTH" "BLUETOOTH_VER")
 
-for ((i=2; i<=$n; i++)); do
-    git checkout -fq ${all_versions[$i]}
+for ((i=3; i<=6; i++)); do
+    git checkout -fq v$i.0
     if [[ $? -eq 0 ]]; then
         for string in ${myArray[@]}; do
-           if git log | grep -E "$string" | grep -q .
-           then 
-            echo -e "\e[6;35m \n ${all_versions[$i]} \n \e[0m"
-            file_name="${string}_${all_versions[$i]}.txt"
-            git log | grep -E "$string"
-           # > "$file_name"
+           if [ -n "$(git log --all --grep="$string")" ]; then 
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo -e "\e[6;35m \n ${string} \n \e[0m"
+                git log --all --grep="$string" 
            else
-           echo -e "\e[6;35m \n ${all_versions[$i]}\n \e[0m"
-           echo "No such string '$string' exists in the git log."
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo "No such string exists in version v$i.0 in the git log." 
+                continue
+           fi
+        done 
+    else
+        continue
+    fi
+done 
 
+cd ..
 
+cd ~/kbd
+    git checkout 2.0.0
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m" 
+            git log --all --grep="$string"
+         else
+            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+            echo "No such string exists in version 2.0.0 in the git log."
+            continue
+        fi
+    done 
+   
+cd ..
+
+cd ~/archive
+
+    git checkout v1.0
+    
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m"
+            git log --all --grep="$string" 
+         else
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo "No such string exists in version v$i.0 in the git log." 
+        fi
+    done 
