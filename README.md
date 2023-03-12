@@ -107,15 +107,15 @@ The following directories are available in `data_dir`:
 `ShortLog_Bluetooth`: Contains final shortlogs related to Bluetooth support. <br>
 `ShortLog_Crypto`: Contains final shortlogs related to cryptography. <br>
 `Shortlog_DMA`: Contains final shortlogs related to Direct Memory Access (DMA).<br>
-`bus_protocols`: Contains files related to bus protocols.<br>
+`bus_protocols`: Contains logs related to bus protocols.<br>
 `clock_config_support_data_dump`: Contains data dump files related to clock support configuration.<br>
-`firmware_dump`: Contains output related to firmware.<br>
+`firmware_dump`: Contains logs related to firmware.<br>
 `list_of_orgs`: Contains a list of organizations that support the Linux kernel.<br>
-`message passing`: Contains files related to message passing.<br>
+`message passing`: Contains files and logs related to message passing.<br>
 `power_handeling`: Contains grep files related to power handling.<br>
 `shortLog_Media`: Contains final shortlogs related to media support.<br>
-`shortlogs_2.1`: Contains updated shortlogs for version 2.1 of the kernel.<br>
-`shortlogs_3.1`: Contains updated shortlogs for version 3.1 of the kernel.<br>
+`shortlogs_2.1`: Contains shortlogs for version 2.1 of the kernel.<br>
+`shortlogs_3.1`: Contains shortlogs for version 3.1 of the kernel.<br>
 `spinlock`: Contains files related to spinlock support.<br>
 
 #### Files
