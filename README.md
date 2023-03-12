@@ -78,19 +78,21 @@ Install the following dependencies before proceeding to execute the python scrip
 - [bs4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup)
 - [lxml](https://lxml.de/installation.html) 
 
-Now, Run the script files using : 
-- ``` bash loc.sh ```
-- ``` bash glimpseindex_cocci.sh ```
-- ``` bash patches.sh ```
 
 #### Run files separately using commands 
 First, your script must declare which interpreter to use. You do this in the first line of the file. If it's a shell script, it should be #!/bin/sh or #!/bin/bash.
 
-So here's a script that writes your username: ``` echo-whoami.sh ```
+Here's an example for how to run a script:
+This is a script that writes your username: ``` echo-whoami.sh ```
 - To make it executable, use:
 ``` chmod a+x echo-whoami.sh ```
 - Then you can run it using:
-``` ./echo-whoami.sh ```
+``` ./echo-whoami.sh ``` or ```bash echo-whoami.sh```
+
+So, you can run individual script files like this: 
+- ``` bash loc.sh ```
+- ``` bash glimpseindex_cocci.sh ```
+- ``` bash patches.sh ```
 
 #### Run using Makefile
 Make sure to have `make` installed in your device. If not, then install it using `sudo apt install make`. 
