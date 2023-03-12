@@ -106,6 +106,12 @@ It is important to keep in mind that the data collected by the linux-kernel-stat
 Note on data source for version 2.0:
 > The source repository used for version 2.0 of the linux kernel was not the official one. As a result, we were unable to obtain results for v2.0 using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
 
+### Contributing
+If you would like to contribute to the linux-kernel-stats project, please refer to the [Contributing Guide](#contributing-guide) for guidelines on how to contribute.
+
+### Tools Used
+The linux-kernel-stats project is developed using various tools and technologies, including Bash, Python, and Git. The data is collected using scripts that are run periodically to collect data on the Linux kernel releases. See [Technology Stack](#technology-stack).
+
 ## Contributing Guide
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
