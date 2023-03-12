@@ -122,7 +122,7 @@ The following directories are available in `data_dir`:
 The following files are available in `data_dir`:
 
 `Firmware.txt`: Contains output related to firmware.<br>
-`filesizeof_get_short_logs.txt`: Contains extracted shortlogs from initial version to the latest version.<br>
+`filesizeof_get_short_logs.txt`: Contains file sizes of output files of shortlogs from initial version to the latest version.<br>
 `no_of_directories_drivers.txt`: Contains output related to the number of directories in drivers.<br>
 `no_of_directories_staging.txt`: Contains staging output related to the number of directories in drivers.<br>
 `output_diffstat_allVersions.txt`: Contains output related to commits, lines of code added, and removed of all versions of the kernel.<br>
@@ -133,7 +133,7 @@ The following files are available in `data_dir`:
 `output_list_of_drivers.txt`: Contains output related to the list of drivers.<br>
 `output_loc.txt`: Contains updated output of the loc.sh script.<br>
 `output_no_of_directories_drivers.txt`: Contains output related to the number of directories in drivers.<br>
-`output_patches.txt`: Contains updated output of the patches.sh script.<br>
+`output_patches.txt`: Contains output of the patches.sh script.<br>
 `output_releaseDates.txt`: Contains output related to the release dates of the kernel versions.<br>
 `output_release_notes.txt`: Contains data dump and release notes.<br>
 `versions_till_now.txt`: Contains the list of kernel versions till now.<br>
