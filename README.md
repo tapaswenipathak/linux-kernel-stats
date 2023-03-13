@@ -266,9 +266,15 @@ Thank you for considering contributing to our project! We appreciate your time a
 ## Contact Us
 Feel free to connect with us for discussions regarding our findings.
 
+- Abhishek Dutt <duttabhishek0@gmail.com>
+- Chirag Suthar <chiragsuthar236@gmail.com>
+- Dheeraj Reddy <meetdheerajreddy@gmail.com>
 - Kavita Meena <kavita23meena.2002@gmail.com>
 - Madhu Patel <Patelmadhu06@gmail.com>
+- Mahika Haryanvi <mahikaharyanvi.it@gmail.com>
+- Pankaj Goswami <pankajgoswami1109@gmail.com>
 - Tapasweni Pathak <tapaswenipathak@gmail.com>
+
 
 
 
