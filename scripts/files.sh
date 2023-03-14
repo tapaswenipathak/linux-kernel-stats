@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Displays list files in all versions of linux kernel (v0.01 to latest)
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 

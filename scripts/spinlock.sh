@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#displays the names of files consisting all types of spinlock in linux kernel v3.0 to v6.0
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR
 

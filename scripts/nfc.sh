@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Obtains git log (grep) files for NFC driver, for all versions of Linux kernel versions
+# Contributor: patelmadhu06@gmail.com 
+
 cd ~/kbd
 
 myArray=("NFC" "NFC device*" "Near Field Communication (NFC)" "Near Field Communication (NFC) devices" "NFC_CMD_GET_DEVICE" "NFC_CMD_START_POLL" "NFC_CMD_STOP_POLL" "NFC_CMD_GET_TARGET" "NFC_EVENT_DEVICE_ADDED" "NFC_EVENT_DEVICE_REMOVED" "NFC_EVENT_TARGETS_FOUND" "PF_NFC" "nfc_protocol")

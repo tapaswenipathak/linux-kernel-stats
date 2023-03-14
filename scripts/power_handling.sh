@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Obtains git log files for various keywords related to power handling, for all versions of linux kernel
+# Contributor: kavita23meena.2002@gmail.com
 SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR
 

@@ -3,6 +3,10 @@ import os
 from bs4 import BeautifulSoup
 from lxml import html
 
+# Performs web scraping on given url for various linux kernel versions and the URLs for
+# respective release notes. 
+# Contributor: meetdheerajreddy@gmail.com
+
 url = "https://en.wikipedia.org/wiki/Linux_kernel_version_history"
 html_content = requests.get(url).text
 soup = BeautifulSoup(html_content, 'html.parser')

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Obtains the grep files for buffer provided for all linux kernel versions 
+# Contributor: meetdheerajreddy@gmail.com
+
 if [ ! -d "buffer_gitlogs" ]; then
     mkdir buffer_gitlogs
 fi

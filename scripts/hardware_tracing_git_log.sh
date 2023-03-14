@@ -1,5 +1,6 @@
 #!/bin/bash
 # Script to get logs related to Hardware Tracing
+# Contributor: duttabhishek0@gmail.com
 
 if [ ! -d ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/ ];then
     mkdir ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/

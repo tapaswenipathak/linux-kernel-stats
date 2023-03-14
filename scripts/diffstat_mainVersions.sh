@@ -1,5 +1,9 @@
 # !/bin/bash
 
+# Displays diffstat b/w main releases of linux kernel
+# (missing versions: ``` v0.95, v0.96 ```)
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 

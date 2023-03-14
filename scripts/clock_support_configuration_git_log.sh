@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Obtains the gitlog (grep) files for Clock Support Configuration, from all linux kernel versions
+# Contributor: duttabhishek0@gmail.com
+
 if [ ! -d ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/ ];then
     mkdir ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/
     echo "Working.."

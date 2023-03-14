@@ -1,3 +1,8 @@
+#!/bin/sh
+
+# Obtains shortlogs of crypto driver, for all linux versions.
+# Contributor: patelmadhu06@gmail.com
+
 SRCDIR_e=~/linux-stable/linux-stable
 cd $SRCDIR_e
 

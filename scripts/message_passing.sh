@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Obtains the grep files for message passing systems, from all linux versions 
+# grep search is case insensitive
+# Contributor: meetdheerajreddy@gmail.com
+
 if [ ! -d "mps_gitlogs" ]; then
     mkdir mps_gitlogs
 fi
