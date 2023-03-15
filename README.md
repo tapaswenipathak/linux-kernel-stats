@@ -155,7 +155,7 @@ There may be discrepancies and irregularities in the data collected by the linux
 It is important to keep in mind that the data collected by the linux-kernel-stats project is based on the publicly available data.
 
 Note on data source from (kbd and erofs-utils):
-> The source repository used (kbd and erof-utils) for the linux kernel versions were not the official ones. As a result, we were unable to obtain results for some versions in those sources, using the scripts provided in this repository. We are currently working on updating the scripts to work with the official repository, and we apologize for any inconvenience this may cause.
+> The source repository used (kbd and erof-utils) for the linux kernel versions were not the official ones. As a result, it was not possible to obtain results for some versions using the scripts provided in this repository. The scripts are being updated to work with the official repository. The work is still in progress and it will be updated in the future.
 
 ### Usage:
 To run the scripts, navigate to the root directory of the repository and execute the `make` command.
@@ -203,7 +203,7 @@ A brief summary of various devices in the drivers directory can be found in the 
 ```
 
 ### Contributing Guidelines
-We welcome contributions to our project and here are some guidelines to follow when contributing:
+Contributions to the project are welcome and the following guidelines should be followed when contributing:
 
 ### Getting Started
 Before contributing, please make sure to:
@@ -261,7 +261,7 @@ The working URLs have been mentioned in [Clone / Download](#clone--download), bu
 If the scripts (eg: python scripts) are dependent on any libraries or packages that are not installed in your system, make sure to install them using your package manager. Check the script file for any dependencies mentioned in the comments or documentation.
 
 ### Conclusion
-Thank you for considering contributing to our project! We appreciate your time and effort, and we look forward to working with you.
+Thank you for considering contributing to the project. Your time and effort are much appreciated, and the team looks forward to collaborating with you.
 
 ## Contact Us
 Feel free to connect with us for discussions regarding our findings.
