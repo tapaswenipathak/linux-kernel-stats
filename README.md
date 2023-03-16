@@ -271,7 +271,6 @@ Feel free to connect with us for discussions regarding our findings.
 - Dheeraj Reddy <meetdheerajreddy@gmail.com>
 - Kavita Meena <kavita23meena.2002@gmail.com>
 - Madhu Patel <patelmadhu06@gmail.com>
-- Mahika Haryanvi <mahikaharyanvi.it@gmail.com>
 - Pankaj Goswami <pankajgoswami1109@gmail.com>
 - Tapasweni Pathak <tapaswenipathak@gmail.com>
 
