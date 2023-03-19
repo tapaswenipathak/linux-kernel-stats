@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# drivers.sh gives the count of no.of lines in each type of driver present in each version of linux kernel
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR/drivers
 

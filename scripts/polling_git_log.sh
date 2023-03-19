@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Script for git log files for Polling for all linux versions 
+# Contributor: duttabhishek0@gmail.com
+
 if [ ! -d ~/linux-kernel-stats/data_dir/polling_data_dump/ ];then
     mkdir ~/linux-kernel-stats/data_dir/polling_data_dump/
     echo "Working.."

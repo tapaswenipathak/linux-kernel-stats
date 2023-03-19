@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Displays all git logs for spinlock and related keywords 
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR
 

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Generates list of all versions until time of executing this script.
+# Contributor: patelmadhu06@gmail.com
+
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 
