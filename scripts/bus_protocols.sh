@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Obtains the grep files for types of bus protocols supported, for all linux kernel versions 
+# Contributor: meetdheerajreddy@gmail.com
+
 if [ ! -d "bp_gitlogs" ]; then
     mkdir bp_gitlogs
 fi

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# list of all drivers for each version since 1991 to 2023
+# Contributor: patelmadhu06@gmail.com
+
 SRCDIR=~/linux-stable
 cd $SRCDIR/drivers
 

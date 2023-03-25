@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# No. of files present in each version of linux kernel
+# ```Output is diff on every run```
+# Contributor: kavita23meena.2002@gmail.com 
+
 SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR
 

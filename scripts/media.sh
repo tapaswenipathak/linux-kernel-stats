@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Obtains grep files for the media driver, for all linux kernel versions.
+# Contributor: patelmadhu06@gmail.com
+
 cd ~/linux-stable/linux-stable
 
 myArray=("H.264" "HEVC" "*NXP*" "*Xcieve*" "*TEA*" "*Infineon*" "*Philips*" "*Rafael*" "*Silicon*" "*NXP*" "*Quantek*" "*Sharp*" "*MaxLinear*" "*Microtune*" "*Mirics*" "*Freescale*" "*Maxim*" "*Montage*" "*ITE*" "*FCI*" "*Fitipower*" 

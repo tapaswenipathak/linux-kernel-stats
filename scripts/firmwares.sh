@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Obtains the grep files for firmware, from all linux kernel versions 
+# Contributor: duttabhishek0@gmail.com
+
 # for v2.6.39.4 to v6.0
 SRCDIR=~/linux-stable
 # Directory to store the text extracted from grep command

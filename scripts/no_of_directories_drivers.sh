@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Obtains the number of directories in each version of linux kernel
+# Contributors: meetdheerajreddy@gmail.com, patelmadhu06@gmail.com
+
 SRCDIR_a=~/archive
 cd $SRCDIR_a
     #declaring an array containing all versions

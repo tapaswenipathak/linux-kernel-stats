@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# # Obtains the gitlog (grep) files for cpu threshold driver, from all linux kernel versions
+# Contributor: patelmadhu06@gmail.com
+
 cd ~/linux-stable/linux-stable
 
 myArray=("idle_time" "get_cpu_idle_time_jiffy"  "cpuidle" "CPUIdle" "cpuidle_state" "cpuidle_state_usage" "scaling_min_freq" "scaling_max_freq" "sched_load_balance" "*sched_load_balance" "*cfs_quota_us" "cfs_quota_us" "get_cpu_idle_time" "cpufreq" "MAX_CPUS_IN_ONE_REQ" "cpu_model" "cpufreq_sysfs_present" "alloc_cpu_set" "free__cpu_set" "create_cpu_map" "get_cpu_count" "cpu_threshhold")
