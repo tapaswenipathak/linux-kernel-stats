@@ -1,3 +1,9 @@
+#!/bin/sh
+
+# Obtains shortlogs of bluetooth driver, for all linux kernel versions.
+# grep search is case insensitive
+# Contributor: patelmadhu06@gmail.com
+
 SRCDIR_e=~/linux-stable/linux-stable
 cd $SRCDIR_e
 

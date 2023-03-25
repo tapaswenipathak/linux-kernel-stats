@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Obtains git logs files for DMA driver and its related keywords, for different linux kernel versions.
+# Contributor: patelmadhu06@gmail.com
+
 cd ~/kbd
 
 myArray=("dma_pool_alloc" "dma_pool_free" "dma_pool_destroy"  "dma_pool_create" "dma_map_*" "dma_addr_t" "dma_set_mask_and_coherent" "dma_set_mask" "dma_set_coherent_mask" "DMA_TO_DEVICE" "DMA_FROM_DEVICE" "dma_mapping_error" "dma_map_page" "dma_api" "dma-api" "DMA_API" "DMA-API" "DMADEVICES" "dma_buf" "dma_buffer" "DMA_ENGINE" "DMA_VIRTUAL_CHANNELS")

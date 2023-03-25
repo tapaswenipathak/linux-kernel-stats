@@ -1,5 +1,8 @@
 # !/bin/bash
 
+# displays no. of patches for all versions of linux kernel (v0.01 till latest)
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 

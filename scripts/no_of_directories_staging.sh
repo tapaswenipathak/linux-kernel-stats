@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Obtains the no. of staging directories for each version of linux kernel
+# Contributor: patelmadhu06@gmail.com
+
 SRCDIR_a=~/archive
 cd $SRCDIR_a
     #declaring an array containing all versions

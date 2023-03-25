@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Obtains grep files of the sound driver, for all linux versions.
+# grep search is case insensitive
+# Contributor: patelmadhu06@gmail.com
+
 cd ~/linux-stable/linux-stable
 
 myArray=("SOUND" "sound" "SOUND_OSS_CORE" "dmasound" "SND" "ALSA" "pcmcia" "sparc" "parisc" "soc" "x86" "synth" "xen" "virtio" "sound_core" "SND_DRIVERS" "soundcard" "SND_VIRMIDI")

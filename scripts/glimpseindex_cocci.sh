@@ -1,5 +1,6 @@
 #! /bin/bash
 
+#Contributor: tapaswenipathak@gmail.com
 if [ ! -z $1 ]; then
 DIR=$1
 else

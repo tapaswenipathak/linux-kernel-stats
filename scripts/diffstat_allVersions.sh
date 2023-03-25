@@ -1,5 +1,7 @@
 # !/bin/bash
 
+# Displays no. of files changed, insertions, deletions b/w two consecutive versions; for all versions.
+# Contributor: kavita23meena.2002@gmail.com
 SRCDIR_a=~/archive
 cd $SRCDIR_a
 
