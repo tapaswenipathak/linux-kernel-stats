@@ -1,20 +1,11 @@
-# version targetted = v6.1-rc1
-
-
-
 #!/bin/bash
-SRCDIR_e=~/linux-stable/
-cd $SRCDIR_e
 
-if [ ! -d ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/dma/ ];then
-    mkdir ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/dma/
-    echo "Working.."
-else
-    echo "Working..."
-fi
+# Obtains git logs files for DMA driver and its related keywords, for different linux kernel versions.
+# Contributor: patelmadhu06@gmail.com
 
+cd ~/kbd
 
-keywordArray=(
+myArray=(
     "dma_pool_alloc"
     "dma_pool_free"
     "dma_pool_destroy"
@@ -38,17 +29,69 @@ keywordArray=(
     "DMA_ENGINE"
     "DMA_VIRTUAL_CHANNELS"
 )
+git checkout 2.0.0
+for string in ${myArray[@]}; do
+    if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m" 
+        git log --all --grep="$string" 
+     else
+        echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+        echo "No such string exists in version 2.0.0 in the git log." 
+        continue
+    fi
+done 
+   
+cd ..
 
+cd ~/archive
+    git checkout v1.0
+    
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m"
+            git log --all --grep="$string" 
+         else
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo "No such string exists in version v$i.0 in the git log." 
+            continue
+        fi
+    done 
+   
+cd ..
+SRCDIR_e=~/linux-stable/linux-stable
+cd $SRCDIR_e
+
+for ((i=3; i<=6; i++)); do
+    git checkout -fq v$i.0
+    if [[ $? -eq 0 ]]; then
+        for string in ${myArray[@]}; do
+           if [ -n "$(git log --all --grep="$string")" ]; then 
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo -e "\e[6;35m \n ${string} \n \e[0m"
+                git log --all --grep="$string"
+           else
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo "No such string exists in version v$i.0 in the git log." 
+                continue
+           fi
+        done 
+    else
+        continue
+    fi
+done
+# Extended Version
 ver_name="v6.1-rc1"
-git checkout ${ver_name}
 
-for keyword in ${keywordArray[@]}; do
-   if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
-    file_name="${keyword}_${ver_name}.txt"
-    git log --all --grep="$keyword" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/dma/$file_name
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string"
    else
-   echo "No such string '$keyword' exists in the git log."
+        echo -e "\e[6;35m \n $ver_name\n \e[0m"
+        echo "No such string exists in version $ver_name in the git log." 
+        continue
    fi
 done 
-
-

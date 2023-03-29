@@ -1,21 +1,11 @@
-# version targetted = v6.1-rc1
-
-
-
 #!/bin/bash
-SRCDIR_e=~/linux-stable/
-cd $SRCDIR_e
 
-if [ ! -d ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/power_handling/ ];then
-    mkdir ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/power_handling/
-    echo "Working.."
-else
-    echo "Working..."
-fi
+# Obtains git log files for various keywords related to power handling, for all versions of linux kernel
+# Contributor: kavita23meena.2002@gmail.com
+SRCDIR=~/linux-stable/linux-stable
+cd $SRCDIR
 
-
-keywordArray=(
-    "power"
+power_keywords=( "power"
     "cpufreq_register_driver"
     "cpufreq_register_governor"
     "cpufreq_set_policy"
@@ -31,19 +21,20 @@ keywordArray=(
     "thermal_zone_get_temp"
     "thermal_cooling_device_register"
     "thermal_cooling_device_set_cur_state"
-
 )
 
+for ((i=3; i<=6; i++)); do
+    git checkout -fq v$i.0
+    for k in "${power_keywords[@]}"; do
+        git log --all --grep="$k"
+    done
+done
+
+# Extended Version
 ver_name="v6.1-rc1"
 git checkout ${ver_name}
 
-for keyword in ${keywordArray[@]}; do
-   if [ -n "$(git log --all --grep="$keyword")" ];then 
-    file_name="${keyword}_${ver_name}.txt"
-    git log --all --grep="$keyword" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/power_handling/$file_name
-   else
-   echo "No such string '$keyword' exists in the git log."
-   fi
-done 
-
+for k in "${power_keywords[@]}"; do
+    git log --all --grep="$k"
+done
 

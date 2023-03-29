@@ -1,20 +1,12 @@
-# version targetted = v5.3
-
-
 #!/bin/bash
-SRCDIR_e=~/linux-stable/
-cd $SRCDIR_e
 
-if [ ! -d ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/rom_types/ ];then
-    mkdir ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/rom_types/
-    echo "Working.."
-else
-    echo "Working..."
-fi
+# Obtains git logs of romtype driver for all linux kernel versions
+# grep search is case insensitive
+# Contributor: patelmadhu06@gmail.com
 
+cd ~/linux-stable/linux-stable
 
-keywordArray=(
-    "rom"
+myArray=( "rom"
     "rom_length"
     "ROM"
     "ROMs"
@@ -67,24 +59,72 @@ keywordArray=(
     "NOR flash"
 )
 
+for ((i=3; i<=6; i++)); do
+    git checkout -fq v$i.0
+    if [[ $? -eq 0 ]]; then
+        for string in ${myArray[@]}; do
+           if [ -n "$(git log --all --grep="$string")" ]; then 
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo -e "\e[6;35m \n ${string} \n \e[0m"
+                git log --all --grep="$string" 
+           else
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo "No such string exists in version v$i.0 in the git log."
+                continue
+           fi
+        done 
+    else
+        continue
+    fi
+done 
+
 ver_name="v5.3"
 git checkout ${ver_name}
 
-
-# Count of keywords
-m=${#keywordArray[@]}
-
-for ((j=0; j < m; j++)); do
-   if [ -n "$(git log --all --grep="${keywordArray[$j]}")" ];then
-        file_name="$(echo ${keywordArray[$j]} | tr -d ' ')"
-        file_name+="${ver_name}.txt"
-        echo $file_name
-        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
-        git log --all --grep="${keywordArray[$j]}" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/rom_types/$file_name
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
    else
-       echo -e "\e[6;35m \n ${ver_name}\n \e[0m"
-       echo "No such string '${keywordArray[$j]}' exists in the git log(for version ${ver_name})."
+        echo -e "\e[6;35m \n ${ver_name}\n \e[0m"
+        echo "No such string exists in version ${ver_name} in the git log."
+        continue
    fi
 done 
 
+cd ..
+
+cd ~/kbd
+    git checkout 2.0.0
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m" 
+            git log --all --grep="$string" 
+         else
+            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+            echo "No such string exists in version 2.0.0 in the git log." 
+            continue
+        fi
+    done 
+   
+cd ..
+
+cd ~/archive
+
+    git checkout v1.0
+    
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m"
+            git log --all --grep="$string" 
+         else
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo "No such string exists in version v$i.0 in the git log." 
+            continue
+        fi
+    done 
+   
 

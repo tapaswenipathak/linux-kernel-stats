@@ -1,19 +1,11 @@
-# version targetted = v5.5-rc7
-
-
 #!/bin/bash
-SRCDIR_e=~/linux-stable/
-cd $SRCDIR_e
 
-if [ ! -d ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/cpu_threshhold/ ];then
-    mkdir ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/cpu_threshhold/
-    echo "Working.."
-else
-    echo "Working..."
-fi
+# # Obtains the gitlog (grep) files for cpu threshold driver, from all linux kernel versions
+# Contributor: patelmadhu06@gmail.com
 
+cd ~/linux-stable/linux-stable
 
-keywordArray=(
+myArray=(
     "idle_time"
     "get_cpu_idle_time_jiffy"
     "cpuidle"
@@ -36,16 +28,72 @@ keywordArray=(
     "cpu_threshhold"
 )
 
+for ((i=3; i<=6; i++)); do
+    git checkout -fq v$i.0
+    if [[ $? -eq 0 ]]; then
+        for string in ${myArray[@]}; do
+           if [ -n "$(git log --all --grep="$string")" ]; then 
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo -e "\e[6;35m \n ${string} \n \e[0m"
+                git log --all --grep="$string" 
+           else
+                echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+                echo "No such string exists in version v$i.0 in the git log."
+                continue
+           fi
+        done 
+    else
+        continue
+    fi
+done 
+
 ver_name="v5.5-rc7"
 git checkout ${ver_name}
 
-for keyword in ${keywordArray[@]}; do
-   if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
-    file_name="${keyword}_${ver_name}.txt"
-    git log --all --grep="$keyword" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/cpu_threshhold/$file_name
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
    else
-   echo "No such string '$keyword' exists in the git log."
+        echo -e "\e[6;35m \n $ver_name \n \e[0m"
+        echo "No such string exists in version $ver_name in the git log."
+        continue
    fi
 done 
 
+cd ..
+
+cd ~/kbd
+    git checkout 2.0.0
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m" 
+            git log --all --grep="$string" 
+         else
+            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+            echo "No such string exists in version 2.0.0 in the git log." 
+            continue
+        fi
+    done 
+   
+cd ..
+
+cd ~/archive
+
+    git checkout v1.0
+    
+    for string in ${myArray[@]}; do
+        if [ -n "$(git log --all --grep="$string")" ]; then 
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo -e "\e[6;35m \n ${string} \n \e[0m"
+            git log --all --grep="$string"
+         else
+            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo "No such string exists in version v$i.0 in the git log." 
+            continue
+        fi
+    done 
+   
 

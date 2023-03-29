@@ -1,20 +1,12 @@
-# version targetted = v5.17.1
-
-
 #!/bin/bash
-SRCDIR_e=~/linux-stable/
-cd $SRCDIR_e
 
-if [ ! -d ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/spinLog/ ];then
-    mkdir ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/spinLog/
-    echo "Working.."
-else
-    echo "Working..."
-fi
+# Displays all git logs for spinlock and related keywords 
+# Contributor: kavita23meena.2002@gmail.com
 
+SRCDIR=~/linux-stable/linux-stable
+cd $SRCDIR
 
-keywordArray=(
-    "spinlock"
+spinlock_keywords=("spinlock"
     "spinlock_t"
     "rwlock_t"
     "ticket_spin_lock"
@@ -45,24 +37,16 @@ keywordArray=(
     "spin_unlock_irqrestore"
 )
 
+for ((i=3; i<=6; i++)); do
+    git checkout -fq v$i.0
+    for k in ${spinlock_keywords[@]}; do
+        git log --all --grep=$k
+    done
+done
+
 ver_name="v5.17.1"
 git checkout ${ver_name}
 
-
-# Count of keywords
-m=${#keywordArray[@]}
-
-for ((j=0; j < m; j++)); do
-   if [ -n "$(git log --all --grep="${keywordArray[$j]}")" ];then
-        file_name="$(echo ${keywordArray[$j]} | tr -d ' ')"
-        file_name+="${ver_name}.txt"
-        echo $file_name
-        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
-        git log --all --grep="${keywordArray[$j]}" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/spinLog/$file_name
-   else
-       echo -e "\e[6;35m \n ${ver_name}\n \e[0m"
-       echo "No such string '${keywordArray[$j]}' exists in the git log(for version ${ver_name})."
-   fi
-done 
-
-
+for k in ${spinlock_keywords[@]}; do
+    git log --all --grep=$k
+done

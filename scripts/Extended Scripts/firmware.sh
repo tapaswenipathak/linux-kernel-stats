@@ -1,30 +1,32 @@
-# version targetted = v2.6.16-rc1
-
 #!/bin/bash
-SRCDIR_e=~/linux-stable/
-cd $SRCDIR_e
 
-if [ ! -d ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/firmware_dump/ ];then
-    mkdir ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/firmware_dump/
-    echo "Working.."
+# Obtains the grep files for firmware, from all linux kernel versions 
+# Contributor: duttabhishek0@gmail.com
+
+# for v2.6.39.4 to v6.0
+SRCDIR=~/linux-stable
+# Directory to store the text extracted from grep command
+DIRNAME="Firmware_raw"
+
+cd $SRCDIR
+if [ ! -d "~/linux-kernel-stats/data_dir/$DIRNAME" ]; then
+  # Create the directory if it doesn't exist
+  mkdir "~/linux-kernel-stats/data_dir/$DIRNAME"
+  echo "Fetching firmware information"
 else
-    echo "Working..."
+    echo "Fetching firmware information"
 fi
 
+# Checkout to the specific tag
+git checkout -fq refs/tags/v2.6.39.4
+grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/2.6.39.4.txt
 
-firmwareArray=("firmware" "fwname" "qcom" "advansys" "Intel" "fuc409c" "fuc41ac" "fuc41ad" "fuc409d" "wd719x" "FIRMWARE_BCM2048" "FIRMWARE_TI1271" "FIRMWARE_MT7622" "isp1000" "OR51132_VSB_FIRMWARE" "OR51132_QAM_FIRMWARE" 
-    "qlogic" "SAA7164_REV2_FIRMWARE" "SAA7164_REV3_FIRMWARE" "38C0800" "38C1600"  "FIRMWARE_MT7663" "FIRMWARE_MT7668" "QTN_PCI_PEARL_FW_NAME" "mcode")
+for((i=3; i<=6; i++)); do
+    git checkout -fq refs/tags/v$i.0
+    grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$i.0.txt
+done
+echo "Firmware info stored at ~/linux-kernel-stats/data_dir/$DIRNAME "
 
 ver_name="v2.6.16-rc1"
-git checkout ${ver_name}
-
-for keyword in ${firmwareArray[@]}; do
-   if [ -n "$(git log --all --grep="$keyword")" ];then 
-    file_name="${keyword}_${ver_name}.txt"
-    git log --all --grep="$keyword" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/firmware_dump/$file_name
-   else
-   echo "No such string '$keyword' exists in the git log."
-   fi
-done 
-
-
+git checkout -fq ${ver_name}
+grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$ver_name.txt
