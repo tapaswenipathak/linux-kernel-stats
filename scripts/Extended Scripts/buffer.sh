@@ -70,8 +70,8 @@ done
 ver_name="v5.15-rc7"
 git checkout ${ver_name}
 
-for keyword in ${keywordArray[@]}; do
-   if [ -n "$(git log --all --grep="$keyword")" ];then 
+for keyword in ${search_terms[@]}; do
+   if [ -n "$(git log --all --grep="${keyword}")" ];then 
     file_name="${keyword}_${ver_name}.txt"
     git log --all --grep="$keyword" > ~/linux-kernel-research/linux-kernel-stats/data_dir/extended_scripts/buffer/$file_name
    else
