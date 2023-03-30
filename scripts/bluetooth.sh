@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Obtains the grep files for bluetooth driver from all linux kernel versions 
+# grep search is case insensitive
+# Contributor: patelmadhu06@gmail.com
 cd ~/linux-stable/linux-stable
 
 myArray=("bluetooth" "BLUETOOTH" "BLUETOOTH_VER")

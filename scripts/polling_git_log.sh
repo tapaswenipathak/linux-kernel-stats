@@ -1,36 +1,37 @@
 #!/bin/bash
 
-# Obtains the gitlog (grep) files for Clock Support Configuration, from all linux kernel versions
+# Script for git log files for Polling for all linux versions 
 # Contributor: duttabhishek0@gmail.com
 
-if [ ! -d ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/ ];then
-    mkdir ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/
+if [ ! -d ~/linux-kernel-stats/data_dir/polling_data_dump/ ];then
+    mkdir ~/linux-kernel-stats/data_dir/polling_data_dump/
     echo "Working.."
 else
     echo "Working..."
 fi
 
 keywordArray=(
-    "jiffies"
-    "clocksource"
-    "timekeeping"
-    "timer"
-    "chrony"
-    "adjtime"
-    "clock_gettime"
-    "clockevents"
-    "timeconst"
-    "hrtimer"
-    "CLOCK_MONOTONIC"
-    "CLOCK_REALTIME"
-    "CLOCK_MONOTONIC"
-    "clocksource_driver"
-    "timecounter"
-    "tick"
-    ".*ktime.*"
-    ".*time.*"
-    ".*clock.*"
-    ".*power.*"
+    "poll"
+    "polling"
+    "poll_wait"
+    "epoll"
+    "epoll_wait"
+    "select"
+    "poll_initwait"
+    "poll_schedule_timeout"
+    "poll_freewait"
+    "interrupt handler"
+    "interrupt"
+    "waitqueue"
+    "tasklet"
+    "Workqueue"
+    "poll_idle"
+    "poll_freewait"
+    "poll_schedule_timeout"
+    "poll_wait"
+    "poll_softirq"
+    "poll_restart"
+    "poll_interrupt"
     )
 
 # for v1.0
@@ -40,10 +41,10 @@ cd $SRCDIR_1
 git checkout -fq "v1.0"
 for keyword in "${keywordArray[@]}"; do
     if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
-            if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_v1.0.txt ]; then
+            if [ ! -f ~/linux-kernel-stats/data_dir/polling_data_dump/$keyword_v1.0.txt ]; then
                 echo -e "\e[6;35m \n v1.0 \n \e[0m"
                 file_name="${keyword}_v1.0.txt"
-                git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$file_name
+                git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/polling_data_dump/$file_name
             fi    
     else
        echo -e "\e[6;35m \n v1.0 \n \e[0m"
@@ -60,10 +61,10 @@ cd $SRCDIR_2
 git checkout -fq "2.0.0"
 for keyword in "${keywordArray[@]}"; do
     if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
-        if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_v2.0.txt ]; then
+        if [ ! -f ~/linux-kernel-stats/data_dir/polling_data_dump/$keyword_v2.0.txt ]; then
             echo -e "\e[6;35m \n v2.0 \n \e[0m"
             file_name="${keyword}_v2.0.txt"
-            git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$file_name
+            git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/polling_data_dump/$file_name
         fi
     else
        echo -e "\e[6;35m \n v2.0 \n \e[0m"
@@ -88,10 +89,10 @@ for ((i=n-1; i>=0; --i)); do
     if [[ $? -eq 0 ]]; then
         for keyword in ${keywordArray[@]}; do
            if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then
-                if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_${all_versions[$i]}.txt ]; then
+                if [ ! -f ~/linux-kernel-stats/data_dir/polling_data_dump/$keyword_${all_versions[$i]}.txt ]; then
                     echo -e "\e[6;35m \n ${all_versions[$i]} \n \e[0m"
                     file_name="${keyword}_${all_versions[$i]}.txt"
-                    git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$file_name
+                    git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/polling_data_dump/$file_name
                 fi
            else
                echo -e "\e[6;35m \n ${all_versions[$i]}\n \e[0m"

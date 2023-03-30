@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# List of organisations supported for v1.0 to v6.0
+# Contributor: kavita23meena.2002@gmail.com
+
 cd ~/archive
 git checkout -fq v1.0
 grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' CREDITS | awk -F "@" '{print $2}' | sort -u >   /home/kavita/github/data_directory/org/v1.0_orgs.txt

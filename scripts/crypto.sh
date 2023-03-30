@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Obtains grep files for the crypto driver, for all linux versions.
+# Contributor: patelmadhu06@gmail.com
+
 cd ~/linux-stable/linux-stable
 
 myArray=("AES" "3DES" "DES" "TDES" "SHA1" "SHA2" "MD5" "HMAC-SHA1" "SHA256" "HMAC-SHA256" "SHA224" "SHA384" "SHA512" "PAES" "ECDH" "CRC" "GHASH" "ablkcipher" "ahash" "aead" "*Triple DES*" 

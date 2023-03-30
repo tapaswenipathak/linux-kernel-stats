@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Generates No. of lines of code of Subsystems present in each version of linux kernel
+# Contributor: kavita23meena.2002@gmail.com
+
 SRCDIR=~/linux-stable/linux-stable
 cd $SRCDIR
 

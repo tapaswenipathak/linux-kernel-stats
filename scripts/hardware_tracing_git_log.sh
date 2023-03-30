@@ -1,36 +1,33 @@
 #!/bin/bash
-
-# Obtains the gitlog (grep) files for Clock Support Configuration, from all linux kernel versions
+# Script to get logs related to Hardware Tracing
 # Contributor: duttabhishek0@gmail.com
 
-if [ ! -d ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/ ];then
-    mkdir ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/
+if [ ! -d ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/ ];then
+    mkdir ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/
     echo "Working.."
 else
     echo "Working..."
 fi
 
 keywordArray=(
-    "jiffies"
-    "clocksource"
-    "timekeeping"
-    "timer"
-    "chrony"
-    "adjtime"
-    "clock_gettime"
-    "clockevents"
-    "timeconst"
-    "hrtimer"
-    "CLOCK_MONOTONIC"
-    "CLOCK_REALTIME"
-    "CLOCK_MONOTONIC"
-    "clocksource_driver"
-    "timecounter"
-    "tick"
-    ".*ktime.*"
-    ".*time.*"
-    ".*clock.*"
-    ".*power.*"
+    "perf"
+    "ftrace"
+    "kprobes"
+    "uprobes"
+    "trace-cmd"
+    "LTTng"
+    "BPF"
+    "eBPF"
+    "ktap"
+    "SystemTap"
+    "CoreSight"
+    "TPIU"
+    "ETB"
+    "STM"
+    "PTM"
+    "CTI"
+    "TMC"
+    "ETF"
     )
 
 # for v1.0
@@ -40,10 +37,10 @@ cd $SRCDIR_1
 git checkout -fq "v1.0"
 for keyword in "${keywordArray[@]}"; do
     if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
-            if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_v1.0.txt ]; then
+            if [ ! -f ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/$keyword_v1.0.txt ]; then
                 echo -e "\e[6;35m \n v1.0 \n \e[0m"
                 file_name="${keyword}_v1.0.txt"
-                git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$file_name
+                git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/$file_name
             fi    
     else
        echo -e "\e[6;35m \n v1.0 \n \e[0m"
@@ -60,10 +57,10 @@ cd $SRCDIR_2
 git checkout -fq "2.0.0"
 for keyword in "${keywordArray[@]}"; do
     if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then 
-        if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_v2.0.txt ]; then
+        if [ ! -f ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/$keyword_v2.0.txt ]; then
             echo -e "\e[6;35m \n v2.0 \n \e[0m"
             file_name="${keyword}_v2.0.txt"
-            git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$file_name
+            git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/$file_name
         fi
     else
        echo -e "\e[6;35m \n v2.0 \n \e[0m"
@@ -88,10 +85,10 @@ for ((i=n-1; i>=0; --i)); do
     if [[ $? -eq 0 ]]; then
         for keyword in ${keywordArray[@]}; do
            if [ -n "$(git log --all --grep="$keyword" --regexp-ignore-case)" ];then
-                if [ ! -f ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$keyword_${all_versions[$i]}.txt ]; then
+                if [ ! -f ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/$keyword_${all_versions[$i]}.txt ]; then
                     echo -e "\e[6;35m \n ${all_versions[$i]} \n \e[0m"
                     file_name="${keyword}_${all_versions[$i]}.txt"
-                    git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/clock_config_support_data_dump/$file_name
+                    git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/hw_tracing_data_dump/$file_name
                 fi
            else
                echo -e "\e[6;35m \n ${all_versions[$i]}\n \e[0m"

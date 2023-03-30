@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Obtains the gitlog files for firmware, from all linux kernel versions
+# grep search is case insensitive
+# Contributor: duttabhishek0@gmail.com
+
 SRCDIR_e=~/linux-stable/
 dir_name="firmware"
 cd $SRCDIR_e

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Obtains release notes for various linux kernel versions. 
+# Contributor: duttabhishek0@gmail.com
+
 # The name of the directory to create
 dir_name="release_notes"
 base_url="https://mirrors.edge.kernel.org/pub/linux/kernel"

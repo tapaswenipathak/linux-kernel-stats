@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Obtains shortlogs for each version of linux kernel
+# Contributor: meetdheerajreddy@gmail.com
+
 # Check if shortlogs directory exists, if not create it
 if [ ! -d "shortlogs" ]; then
   mkdir shortlogs
