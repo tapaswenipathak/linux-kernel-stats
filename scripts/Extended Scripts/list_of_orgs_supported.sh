@@ -5,15 +5,15 @@
 
 cd ~/archive
 git checkout -fq v1.0
-grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' CREDITS | awk -F "@" '{print $2}' | sort -u >   ~/linux-kernel-stats/data_dir/extended_scripts/${ver_name}_orgs.txt
+grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' CREDITS | awk -F "@" '{print $2}' | sort -u >   ~/linux-kernel-stats/data_dir/extended_scripts/v1.0_orgs.txt
 
 cd ~/linux_v2.0
-grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u  >  ~/linux-kernel-stats/data_dir/extended_scripts/${ver_name}_orgs.txt
+grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u  >  ~/linux-kernel-stats/data_dir/extended_scripts/v2.0_orgs.txt
 
 cd ~/linux-stable/linux-stable
 for ((i=3; i<=6; i++)); do
     git checkout -fq v$i.0
-    grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u >  ~/linux-kernel-stats/data_dir/extended_scripts/${ver_name}_orgs.txt
+    grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u >  ~/linux-kernel-stats/data_dir/extended_scripts/v$i.0_orgs.txt
 done
 
 # Extended Version

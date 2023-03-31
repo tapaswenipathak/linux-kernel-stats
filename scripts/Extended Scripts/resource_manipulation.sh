@@ -62,7 +62,7 @@ cd $SRCDIR_2
 git checkout -fq "2.0.0"
 for ((j=0; j < m; j++)); do
         if [ -n "$(git log --all --grep="${keywordArray[$j]}")" ];then
-        echo -e "\e[6;35m \n v1.0 \n \e[0m"
+        echo -e "\e[6;35m \n v2.0 \n \e[0m"
         file_name="$(echo ${keywordArray[$j]} | tr -d ' ')"
         file_name+="v2.0.txt"
         git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/resource_manipulation_data_dump/$file_name

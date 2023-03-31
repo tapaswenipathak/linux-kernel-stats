@@ -56,7 +56,7 @@ ver_name="v4.8-rc1"
 git checkout ${ver_name}
 
 for term in "${search_terms[@]}"; do
-    filename="v$i.0_$term.bus_protocols.txt"
+    filename="v${ver_name}_$term.bus_protocols.txt"
     
     if [ ! -f "../bp_gitlogs/$filename" ]; then
       git log --all --grep="$term" > "../bp_gitlogs/$filename"

@@ -50,7 +50,7 @@ git checkout ${ver_name}
 
 for string in ${myArray[@]}; do
    if [ -n "$(git log --all --grep="$string")" ]; then 
-        echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+        echo -e "\e[6;35m \n v$ver_name \n \e[0m"
         echo -e "\e[6;35m \n ${string} \n \e[0m"
         git log --all --grep="$string" 
    else

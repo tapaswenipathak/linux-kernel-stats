@@ -86,12 +86,12 @@ ver_name="v6.1-rc1"
 
 for string in ${myArray[@]}; do
    if [ -n "$(git log --all --grep="$string")" ]; then 
-        echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+        echo -e "\e[6;35m \n ${ver_name}\n \e[0m"
         echo -e "\e[6;35m \n ${string} \n \e[0m"
         git log --all --grep="$string"
    else
-        echo -e "\e[6;35m \n $ver_name\n \e[0m"
-        echo "No such string exists in version $ver_name in the git log." 
+        echo -e "\e[6;35m \n ${ver_name}\n \e[0m"
+        echo "No such string exists in version ${ver_name} in the git log." 
         continue
    fi
 done 
