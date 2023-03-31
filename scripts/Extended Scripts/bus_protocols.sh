@@ -52,3 +52,15 @@ for ((i=3; i<=6; i++)); do
   done
 done
 
+ver_name="v4.9-rc7"
+git checkout ${ver_name}
+
+for term in "${search_terms[@]}"; do
+    filename="${ver_name}_$term.bus_protocols.txt"
+
+    if [ ! -f "../bp_gitlogs/$filename" ]; then
+      git log --all --grep="$term" > "../bp_gitlogs/$filename"
+    fi
+    #git log --all --grep="$term" > "../bp_gitlogs/v$i.0_$term.bus_protocols.txt"
+done
+
