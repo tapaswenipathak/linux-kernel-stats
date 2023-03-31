@@ -97,7 +97,7 @@ git checkout ${ver_name}
 
 # Loop through the search terms and search the git log for each term
   for term in "${search_terms[@]}"; do
-    filename="$ver_name_$term.gitlog.txt"
+    filename="${ver_name}_$term.gitlog.txt"
     
     if [ ! -f "../mps_gitlogs/$filename" ]; then
       git log --all --grep="$term" > "../mps_gitlogs/$filename"

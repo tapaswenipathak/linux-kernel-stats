@@ -79,12 +79,12 @@ cd $SRCDIR_3
 
 #declaring an array containing all versions
 declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))  
-#total no. of versions
-n=${#all_versions[@]}  
 # Version to be extended to
 ver_name="v4.16"
 # Add the version to the array
 versions+=${ver_name}
+#total no. of versions
+n=${#all_versions[@]}  
 
 for ((i=n-1; i>=0; --i)); do
     git checkout -fq ${all_versions[$i]}

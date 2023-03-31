@@ -80,12 +80,12 @@ cd $SRCDIR_3
 
 #declaring an array containing all versions
 declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))  
-#total no. of versions
-n=${#all_versions[@]} 
 # Extended version
 ver_name="v6.2-rc1"
-
+# Add the version to the array
 all_versions+=${ver_name} 
+#total no. of versions
+n=${#all_versions[@]} 
 
 
 for ((i=n-1; i>=0; --i)); do
