@@ -11,7 +11,7 @@ declare -a all_versions=($(git tag -l | sort -V))
 
 # Declaring the extended version
 ver_name="v6.0-rc1"
-all_versions+=${ver_name}
+all_versions+=("$ver_name")
 
 #total no. of versions
 n=${#all_versions[@]}  
