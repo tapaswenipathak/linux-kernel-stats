@@ -79,7 +79,9 @@ declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))
 
 # Extend the version
 ver_name="v3.5"
-all_versions+=${ver_name}
+#Add the version to the array
+all_versions+=("$ver_name")
+
 #total no. of versions
 n=${#all_versions[@]}  
 
