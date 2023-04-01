@@ -157,7 +157,6 @@ It is important to keep in mind that the data collected by the linux-kernel-stat
 Note on data source from (kbd and erofs-utils):
 > The source repository used (kbd and erof-utils) for the linux kernel versions were not the official ones. As a result, it was not possible to obtain results for some versions using the scripts provided in this repository. The scripts are being updated to work with the official repository. The work is still in progress and it will be updated in the future.
 
-
 ### Usage:
 To run the scripts, navigate to the root directory of the repository and execute the `make` command.
 This command will run all of the scripts and generate the data files in the data directory. Refer to [How to run the scripts](#how-to-run-the-scripts) for more details.
@@ -204,9 +203,7 @@ A brief summary of various devices in the drivers directory can be found in the 
 ```
 
 ### Contributing Guidelines
-
 Contributions to the project are welcome and the following guidelines should be followed when contributing:
-
 
 ### Getting Started
 Before contributing, please make sure to:
@@ -266,7 +263,6 @@ If the scripts (eg: python scripts) are dependent on any libraries or packages t
 ### Conclusion
 Thank you for considering contributing to the project. Your time and effort are much appreciated, and the team looks forward to collaborating with you.
 
-
 ## Contact Us
 Feel free to connect with us for discussions regarding our findings.
 
@@ -277,6 +273,7 @@ Feel free to connect with us for discussions regarding our findings.
 - Madhu Patel <patelmadhu06@gmail.com>
 - Pankaj Goswami <pankajgoswami1109@gmail.com>
 - Tapasweni Pathak <tapaswenipathak@gmail.com>
+
 
 
 
