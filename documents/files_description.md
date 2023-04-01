@@ -1,6 +1,6 @@
-Report
+# **Report**
 
-**[General Statistics]{.underline}**
+## **<u>General Statistics</u>**
 
 We have documented a total of 47 scripts that cover a wide range of
 topics related to the Linux operating system. These scripts which are
@@ -21,11 +21,11 @@ This project provides a valuable resource for anyone looking to gain a
 deeper understanding of the Linux operating system and its various
 components. By studying these scripts and the underlying concepts they
 represent, readers can gain insights into how the Linux kernel works,
-it's various specifications and drivers, and how it can be optimized and
+it’s various specifications and drivers, and how it can be optimized and
 customized to meet specific needs and requirements.
 
 The Linux Kernel Stats repository on GitHub is a collection of scripts
-and tools that provide statistical information about the Linux kernel\'s
+and tools that provide statistical information about the Linux kernel's
 development over time. These tools are designed to extract information
 from the Git repositories of various versions of the Linux kernel and
 generate reports and statistical analysis.
@@ -69,7 +69,7 @@ The following are important categories:
 > is one of the most critical tasks of an operating system. It involves
 > creating, scheduling, executing, and terminating processes, and
 > ensuring that they run correctly and efficiently. The
-> \"message_passing.sh\" script extracts information about the
+> "message_passing.sh" script extracts information about the
 > message-passing mechanisms used in the Linux kernel, such as pipes,
 > signals, sockets, and more. Message passing is a communication
 > paradigm that allows processes to exchange data by sending messages to
@@ -81,12 +81,12 @@ The following are important categories:
 
 > Process synchronization is crucial for ensuring the correct execution
 > order of processes and threads and preventing race conditions. It
-> ensures that different threads do not interfere with each other\'s
-> execution. The \"spinlock.sh\" script extracts information about the
+> ensures that different threads do not interfere with each other's
+> execution. The "spinlock.sh" script extracts information about the
 > spinlock mechanisms used in the Linux kernel, such as raw spinlocks,
 > queued spinlocks, and more. Spinlocks are synchronization primitives
 > that allow only one thread to access a critical section of code at a
-> time. The \"spinlock_log.sh\" script provides a log of the same
+> time. The "spinlock_log.sh" script provides a log of the same
 > information. It can be useful for developers and researchers
 > interested in understanding how spinlocks work and how to use them in
 > their own code.
@@ -95,7 +95,7 @@ The following are important categories:
 
 > Memory management is an essential aspect of the operating system that
 > deals with the allocation, deallocation, and management of memory
-> resources. One of the scripts named \"buffer.sh\" extracts information
+> resources. One of the scripts named "buffer.sh" extracts information
 > about buffer management in the Linux kernel. Buffers are used to store
 > data temporarily, and their efficient management is critical for the
 > performance of the system. The script uses gitlog to retrieve
@@ -108,9 +108,9 @@ The following are important categories:
 > various peripherals such as disks, keyboards, printers, etc. The
 > scripts in this category extract information and statistics about the
 > different drivers in the Linux kernel. For instance, the
-> \"bluetooth.sh\" script retrieves information about the Bluetooth
-> driver, while \"sound.sh\" script provides details about the sound
-> driver and the \"bus_protocols.sh\" script provides information about
+> "bluetooth.sh" script retrieves information about the Bluetooth
+> driver, while "sound.sh" script provides details about the sound
+> driver and the "bus_protocols.sh" script provides information about
 > the different bus protocols used in the Linux kernel, such as USB,
 > PCI, and more.
 
@@ -120,7 +120,7 @@ The following are important categories:
 > system, as it is responsible for managing files and directories. In
 > the Linux operating system, the file system interface provides a
 > unified way of accessing and manipulating files, regardless of the
-> underlying file system. The \"files.sh\" script provides information
+> underlying file system. The "files.sh" script provides information
 > about the all the files used in the Linux kernel, such as regular
 > files, directories, symbolic links, and device files.
 >
@@ -145,18 +145,18 @@ The following are important categories:
 > statistics about various aspects of the Linux operating system,
 > including versioning, hardware tracing, patch management, resource
 > manipulation, power handling, release dates, and more. For instance,
-> the \"loc.sh\" script counts the number of lines of code in the
-> kernel, while \"patches.sh\" script retrieves information about the
-> patches applied to the kernel. The \"polling_git_log.sh\" script
-> provides information about the different polling mechanisms used in
-> the Linux kernel, while the \"romtypes.sh\" script provides
-> information about the romtype driver in Linux Kernel. The scripts use
-> gitlog and grep to retrieve and filter the required information from
-> the kernel repositories. These scripts can be useful for developers,
-> researchers, and anyone interested in understanding the inner workings
-> of the Linux operating system.
+> the "loc.sh" script counts the number of lines of code in the kernel,
+> while "patches.sh" script retrieves information about the patches
+> applied to the kernel. The "polling_git_log.sh" script provides
+> information about the different polling mechanisms used in the Linux
+> kernel, while the "romtypes.sh" script provides information about the
+> romtype driver in Linux Kernel. The scripts use gitlog and grep to
+> retrieve and filter the required information from the kernel
+> repositories. These scripts can be useful for developers, researchers,
+> and anyone interested in understanding the inner workings of the Linux
+> operating system.
 
-**Script Analysis**
+## **Script Analysis**
 
 The purpose of this document is to provide a detailed analysis of the
 scripts written. The analysis will cover the input, logic of code, and
@@ -171,680 +171,670 @@ scripts and their functions and make modifications if necessary. It will
 also serve as a useful reference for future development and maintenance
 of the scripts.
 
-**bluetooth.sh**:
+### **bluetooth.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Searches for the grep files containing
-\"bluetooth\" and related keywords in the versions v1.0 to v6.0 of the
-Linux kernel, using grep command. The search is case insensitive.
+<u>Logic</u>: Searches for the grep files containing "bluetooth" and
+related keywords in the versions v1.0 to v6.0 of the Linux kernel, using
+grep command. The search is case insensitive.
 
-[Ideal Output]{.underline}: The output should store all the grep files
-and commits containing \"bluetooth\" and related keywords in each
-version of the Linux kernel, in a text file.
+<u>Ideal Output</u>: The output should store all the grep files and
+commits containing "bluetooth" and related keywords in each version of
+the Linux kernel, in a text file.
 
-**buffer.sh**:
+### **buffer.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Searches for the grep files containing \"buffer\"
-and related keywords in the versions v1.0 to v6.0 of the Linux kernel,
-using grep command.
-
-[Ideal Output]{.underline}: The output should store all the grep files
-and commits containing \"buffer\" and related keywords in each version
-of the Linux kernel, in a text file.
-
-**bus_protocols.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: Searches for the grep files containing \"bus\" and
+<u>Logic</u>: Searches for the grep files containing "buffer" and
 related keywords in the versions v1.0 to v6.0 of the Linux kernel, using
 grep command.
 
-[Ideal Output]{.underline}: The output should store all the grep files
-and commits containing \"bus\" and related keywords in each version of
-the Linux kernel, in a text file.
+<u>Ideal Output</u>: The output should store all the grep files and
+commits containing "buffer" and related keywords in each version of the
+Linux kernel, in a text file.
 
-**clock_support_configuration_git_log.sh**:
+### **bus_protocols.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Searches for the grep files containing keywords
-related to Clock support configuration, in the versions v1.0 to v6.0 of
-the Linux kernel, using grep command.
+<u>Logic</u>: Searches for the grep files containing "bus" and related
+keywords in the versions v1.0 to v6.0 of the Linux kernel, using grep
+command.
 
-[Ideal Output]{.underline}: The output should store all the grep files
-and commits of related keywords in each version of the Linux kernel, in
-a text file.
+<u>Ideal Output</u>: The output should store all the grep files and
+commits containing "bus" and related keywords in each version of the
+Linux kernel, in a text file.
 
-**commits.sh**:
+### **clock_support_configuration_git_log.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: All versions are stored in an array. With the help
-of a for loop, the code loops through each version in the repository and
+<u>Logic</u>: Searches for the grep files containing keywords related to
+Clock support configuration, in the versions v1.0 to v6.0 of the Linux
+kernel, using grep command.
+
+<u>Ideal Output</u>: The output should store all the grep files and
+commits of related keywords in each version of the Linux kernel, in a
+text file.
+
+### **commits.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
+
+<u>Logic</u>: All versions are stored in an array. With the help of a
+for loop, the code loops through each version in the repository and
 displays the commit history for all versions of the Linux kernel,
 starting from version v0.01 to the latest version available.
 
-[Ideal Output]{.underline}: The output should display the commit history
-of each version of the Linux kernel, including the commit message,
-author, and date.
+<u>Ideal Output</u>: The output should display the commit history of
+each version of the Linux kernel, including the commit message, author,
+and date.
 
-**cpu_threshold.sh**:
+### **cpu_threshold.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Searches for the gitlog files containing the
-keywords related to "cpu threshold" driver in the versions v1.0 to v6.0
-of the Linux kernel.
-
-[Ideal Output]{.underline}: The output should store all the gitlogs
-containing the related keywords of \"cpu threshold" driver in each
-version of the Linux kernel, in a text file.
-
-**crypto.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: Searches for the gitlog files containing the
-keywords related to "crypto" driver in the versions v1.0 to v6.0 of the
+<u>Logic</u>: Searches for the gitlog files containing the keywords
+related to “cpu threshold” driver in the versions v1.0 to v6.0 of the
 Linux kernel.
 
-[Ideal Output]{.underline}: The output should store all the gitlogs
-containing the related keywords of \"crypto" driver in each version of
-the Linux kernel, in a text file.
+<u>Ideal Output</u>: The output should store all the gitlogs containing
+the related keywords of "cpu threshold” driver in each version of the
+Linux kernel, in a text file.
 
-**diffstat_allVersions.sh**:
+### **crypto.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions. It takes all the release versions as inputs.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Loops through each version of linux kernel to
-display the difference in the number of files changed, insertions, and
-deletions between two consecutive versions of the Linux kernel, for all
-versions available.
+<u>Logic</u>: Searches for the gitlog files containing the keywords
+related to “crypto” driver in the versions v1.0 to v6.0 of the Linux
+kernel.
 
-[Ideal Output]{.underline}: The output should display the difference in
-the number of files changed, insertions, and deletions between two
+<u>Ideal Output</u>: The output should store all the gitlogs containing
+the related keywords of "crypto” driver in each version of the Linux
+kernel, in a text file.
+
+### **diffstat_allVersions.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions. It takes all the release versions as inputs.
+
+<u>Logic</u>: Loops through each version of linux kernel to display the
+difference in the number of files changed, insertions, and deletions
+between two consecutive versions of the Linux kernel, for all versions
+available.
+
+<u>Ideal Output</u>: The output should display the difference in the
+number of files changed, insertions, and deletions between two
 consecutive versions of the Linux kernel, for each version available.
 
-**diffstat_mainVersions.sh**:
+### **diffstat_mainVersions.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions. It takes main release versions as inputs.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions. It takes main release versions as inputs.
 
-[Logic]{.underline}: Loops through each version of linux kernel to
-display the difference in the number of files changed, insertions, and
-deletions between two consecutive main releases of the Linux kernel,
-excluding versions v0.95 and v0.96.
+<u>Logic</u>: Loops through each version of linux kernel to display the
+difference in the number of files changed, insertions, and deletions
+between two consecutive main releases of the Linux kernel, excluding
+versions v0.95 and v0.96.
 
-[Ideal Output]{.underline}: The output should display the difference in
-the number of files changed, insertions, and deletions between two
+<u>Ideal Output</u>: The output should display the difference in the
+number of files changed, insertions, and deletions between two
 consecutive main releases of the Linux kernel, excluding versions v0.95
 and v0.96.
 
-**dma.sh**:
+### ### **dma.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Searches for the gitlog files containing the
-keywords related to "dma" driver in the versions v1.0 to v6.0 of the
-Linux kernel. The script uses the git log command with appropriate
-filters and searches for keywords related to the DMA driver to obtain
-the relevant logs.
+<u>Logic</u>: Searches for the gitlog files containing the keywords
+related to “dma” driver in the versions v1.0 to v6.0 of the Linux
+kernel. The script uses the git log command with appropriate filters and
+searches for keywords related to the DMA driver to obtain the relevant
+logs.
 
-[Ideal Output]{.underline}: The output should store all the gitlogs
-containing the related keywords of \"dma" driver in each version of the
-Linux kernel, in a text file.
+<u>Ideal Output</u>: The output should store all the gitlogs containing
+the related keywords of "dma” driver in each version of the Linux
+kernel, in a text file.
 
-**drivers.sh**:
+### **drivers.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: Stores all versions of the linux kernel in an array
-and loops through each version to count the number of lines of code in
-each type of driver present. The script uses the grep command to search
-for lines starting with drivers/ and counts the number of lines for each
+<u>Logic</u>: Stores all versions of the linux kernel in an array and
+loops through each version to count the number of lines of code in each
+type of driver present. The script uses the grep command to search for
+lines starting with drivers/ and counts the number of lines for each
 driver type (network, sound, USB, etc.) for each version.
 
-[Ideal Output]{.underline}: The output should display the number of
-lines of code in each type of driver present in each version of the
-Linux kernel.
+<u>Ideal Output</u>: The output should display the number of lines of
+code in each type of driver present in each version of the Linux kernel.
 
-**duration_mainVersions.sh**:
+### **duration_mainVersions.sh**:
 
-[Input]{.underline}: It takes main release versions as inputs.
+<u>Input</u>: It takes main release versions as inputs.
 
-[Logic]{.underline}: This script generates the duration of development
-for main versions of the Linux kernel. It loops through all versions,
-applies certain filters to extract previous date and current date.
+<u>Logic</u>: This script generates the duration of development for main
+versions of the Linux kernel. It loops through all versions, applies
+certain filters to extract previous date and current date.
 
-[Ideal Output]{.underline}: produces the time difference between these
-two versions.
+<u>Ideal Output</u>: produces the time difference between these two
+versions.
 
-**extension.sh**:
+### **extension.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: It uses the find command and certain filters and
-displays the corresponding extensions for each version.
+<u>Logic</u>: It uses the find command and certain filters and displays
+the corresponding extensions for each version.
 
-[Ideal Output]{.underline}: This script displays the extensions for all
+<u>Ideal Output</u>: This script displays the extensions for all
 versions of the Linux kernel (v0.01 to the latest version).
 
-**files.sh**:
+### **files.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script uses a for loop to iterate over all the
+<u>Logic</u>: This script uses a for loop to iterate over all the
 version directories in the kernel repository, and uses the find command
 with certain filters to extract .git files and displays the list of
 files in each directory.
 
-[Ideal output]{.underline}: A list of files in each version directory of
-the Linux kernel repository, starting from version v0.01 till the latest
+<u>Ideal output</u>: A list of files in each version directory of the
+Linux kernel repository, starting from version v0.01 till the latest
 version.
 
-**firmware_git_log-q.sh**:
+### **firmware_git_log-q.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script uses a for loop to iterate over all the
+<u>Logic</u>: This script uses a for loop to iterate over all the
 version directories in the kernel repository, and uses the git log
 command with a grep search to obtain the log files for the firmware. The
 search is case-insensitive.
 
-[Ideal output]{.underline}: The git log files for the firmware for all
-versions of the Linux kernel repository, with the search term
-highlighted.
+<u>Ideal output</u>: The git log files for the firmware for all versions
+of the Linux kernel repository, with the search term highlighted.
 
-**firmware_git_log.sh**:
+### **firmware_git_log.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script is similar to firmware_git_log-q.sh,
-except that it doesn\'t use the -q option with grep, and therefore,
-doesn\'t highlight the search term.
+<u>Logic</u>: This script is similar to firmware_git_log-q.sh, except
+that it doesn't use the -q option with grep, and therefore, doesn't
+highlight the search term.
 
-[Ideal output]{.underline}: The git log files for the firmware for all
-versions of the Linux kernel repository.
+<u>Ideal output</u>: The git log files for the firmware for all versions
+of the Linux kernel repository.
 
-**firmware_git_shortlog-q.sh**:
+### **firmware_git_shortlog-q.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script uses a for loop to iterate over all the
+<u>Logic</u>: This script uses a for loop to iterate over all the
 version directories in the kernel repository, and uses the gitlog
 command with a grep search to obtain the log files for the firmware. The
 search is case-insensitive.
 
-[Ideal output]{.underline}: The shortlog files for the firmware for all
+<u>Ideal output</u>: The shortlog files for the firmware for all
 versions of the Linux kernel repository, with the search term
 highlighted.
 
-**firmwares.sh**:
+### **firmwares.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script uses a for loop to iterate over all the
+<u>Logic</u>: This script uses a for loop to iterate over all the
 version directories in the kernel repository, and uses the grep command
 to obtain the grep files for the firmware. The search is
 case-insensitive.
 
-[Ideal output]{.underline}: The grep files for the firmware for all
-versions of the Linux kernel repository, with the search term
-highlighted.
+<u>Ideal output</u>: The grep files for the firmware for all versions of
+the Linux kernel repository, with the search term highlighted.
 
-**get_linus_releasenotes_links.py**:
+### **get_linus_releasenotes_links.py**:
 
-[Input]{.underline}: A URL to scrape for release notes. (wikipedia URL
-for linux kernel history)
+<u>Input</u>: A URL to scrape for release notes. (wikipedia URL for
+linux kernel history)
 
-[Logic]{.underline}: This script uses web scraping to obtain the URLs
-for the release notes of different versions of the Linux kernel. It gets
-the html page of the URL and applies filters through various tags to
-obtain required information.
+<u>Logic</u>: This script uses web scraping to obtain the URLs for the
+release notes of different versions of the Linux kernel. It gets the
+html page of the URL and applies filters through various tags to obtain
+required information.
 
-[Ideal output]{.underline}: A list of URLs for the release notes of
-different versions of the Linux kernel, saved into a text file.
+<u>Ideal output</u>: A list of URLs for the release notes of different
+versions of the Linux kernel, saved into a text file.
 
-**get_release_notes.sh**:
+### **get_release_notes.sh**:
 
-[Input]{.underline}: A URL to scrape for release notes.
+<u>Input</u>: A URL to scrape for release notes.
 (https://mirrors.edge.kernel.org/pub/linux/kernel)
 
-[Logic]{.underline}: This script uses web scraping through bash script
-to obtain the URLs for the release notes of different versions of the
-Linux kernel. It gets the html page of the URL and applies filters
-through various tags to obtain required information.
+<u>Logic</u>: This script uses web scraping through bash script to
+obtain the URLs for the release notes of different versions of the Linux
+kernel. It gets the html page of the URL and applies filters through
+various tags to obtain required information.
 
-[Ideal output]{.underline}: A list of URLs for the release notes of
-different versions of the Linux kernel, saved into a text file for each
-version.
+<u>Ideal output</u>: A list of URLs for the release notes of different
+versions of the Linux kernel, saved into a text file for each version.
 
-**get_shortlogs.sh**:
+### **get_shortlogs.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the shortlogs for each version
-of the Linux kernel. It does this by iterating over all the versions of
-the Linux kernel and using the git shortlog command to obtain the
-shortlog for each version. The output is saved to a file named
+<u>Logic</u>: This script obtains the shortlogs for each version of the
+Linux kernel. It does this by iterating over all the versions of the
+Linux kernel and using the git shortlog command to obtain the shortlog
+for each version. The output is saved to a file named
 shortlog_version.txt for each version.
 
-[Ideal Output]{.underline}: The ideal output of this script is a set of
-files named shortlog_version.txt, where version is the version number of
-the Linux kernel. Each of these files contains the shortlog for the
+<u>Ideal Output</u>: The ideal output of this script is a set of files
+named shortlog_version.txt, where version is the version number of the
+Linux kernel. Each of these files contains the shortlog for the
 corresponding version of the Linux kernel. The format of the shortlog is
 similar to the output of the git shortlog command, with each commit
 message on a separate line and the commit author and date listed before
 the commit message. The output is saved to the current working
 directory.
 
-**glimpseindex_cocci.sh**:
+### **glimpseindex_cocci.sh**:
 
-[Input]{.underline}: None
+<u>Input</u>: None
 
-[Logic]{.underline}: This script generates a glimpse index for
-Coccinelle, which is a program matching and transformation engine for C
-code. The glimpse index makes it easier to search for patterns in
-Coccinelle scripts.
+<u>Logic</u>: This script generates a glimpse index for Coccinelle,
+which is a program matching and transformation engine for C code. The
+glimpse index makes it easier to search for patterns in Coccinelle
+scripts.
 
-[Ideal Output]{.underline}: A glimpse index for Coccinelle.
+<u>Ideal Output</u>: A glimpse index for Coccinelle.
 
-**hardware_tracing_git_log.sh**:
+### **hardware_tracing_git_log.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: All keywords are stored in an array. Then, for v1.0
-to v6.0, grep command is used to find related commits. This script then
+<u>Logic</u>: All keywords are stored in an array. Then, for v1.0 to
+v6.0, grep command is used to find related commits. This script then
 uses git log command to obtain files related to hardware tracing from
 all versions of the Linux kernel.
 
-[Ideal Output]{.underline}: Git log files related to hardware tracing
-from all versions of the Linux kernel.
+<u>Ideal Output</u>: Git log files related to hardware tracing from all
+versions of the Linux kernel.
 
-**list_of_drivers.sh**:
+### **list_of_drivers.sh**:
 
-[Input]{.underline}: Uses linux-stable git repository which contain
-various linux kernel versions.
+<u>Input</u>: Uses linux-stable git repository which contain various
+linux kernel versions.
 
-[Logic]{.underline}: This script generates a list of all the drivers for
-each version of the Linux kernel from 1991 to 2023, by looping through
-an array containing all versions and applying filters to find drivers.
+<u>Logic</u>: This script generates a list of all the drivers for each
+version of the Linux kernel from 1991 to 2023, by looping through an
+array containing all versions and applying filters to find drivers.
 
-[Ideal Output]{.underline}: A list of all the drivers for each version
-of the Linux kernel from 1991 to 2023.
+<u>Ideal Output</u>: A list of all the drivers for each version of the
+Linux kernel from 1991 to 2023.
 
-**list_of_org.sh**:
+### **list_of_org.sh**:
 
-[Input]{.underline}: Uses linux-stable git repository which contain
-various linux kernel versions.
+<u>Input</u>: Uses linux-stable git repository which contain various
+linux kernel versions.
 
-[Logic]{.underline}: This script generates a list of organizations
-supported for each version of the Linux kernel from v1.0 to v6.0 using
-the grep command and stores each output in a separate text file.
+<u>Logic</u>: This script generates a list of organizations supported
+for each version of the Linux kernel from v1.0 to v6.0 using the grep
+command and stores each output in a separate text file.
 
-[Ideal Output]{.underline}: A list of text files containing a list of
+<u>Ideal Output</u>: A list of text files containing a list of
 organizations supported for each version of the Linux kernel from v1.0
 to v6.0.
 
-**loc.sh**:
+### **loc.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script displays the lines of code for each
-version of the Linux kernel from v0.01 till the latest version by
-looping through each version which is stored in an array.
+<u>Logic</u>: This script displays the lines of code for each version of
+the Linux kernel from v0.01 till the latest version by looping through
+each version which is stored in an array.
 
-[Ideal Output]{.underline}: The lines of code for each version of the
-Linux kernel from v0.01 till the latest version.
+<u>Ideal Output</u>: The lines of code for each version of the Linux
+kernel from v0.01 till the latest version.
 
-**media.sh**:
+### **media.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: All keywords are stored in an array. It uses the
-git grep command to search for the keywords related to the media driver
-in all files in the Linux kernel repository. This script then obtains
-the grep files for the media driver from Linux kernel versions v1.0 to
-v6.0.
+<u>Logic</u>: All keywords are stored in an array. It uses the git grep
+command to search for the keywords related to the media driver in all
+files in the Linux kernel repository. This script then obtains the grep
+files for the media driver from Linux kernel versions v1.0 to v6.0.
 
-[Ideal Output]{.underline}: The output is a list of files containing the
+<u>Ideal Output</u>: The output is a list of files containing the
 keywords related to the media driver for each version of the Linux
 kernel.
 
-**message_passing.sh**:
+### **message_passing.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: All keywords are stored in an array. It uses the
-git grep command to search for the keywords related to the message
-passing systems in all files in the Linux kernel repository. This script
-then obtains the grep files for the media driver from Linux kernel
-versions v1.0 to v6.0.
+<u>Logic</u>: All keywords are stored in an array. It uses the git grep
+command to search for the keywords related to the message passing
+systems in all files in the Linux kernel repository. This script then
+obtains the grep files for the media driver from Linux kernel versions
+v1.0 to v6.0.
 
-[Ideal Output]{.underline}: The output is a list of files containing the
+<u>Ideal Output</u>: The output is a list of files containing the
 keywords related to the message passing systems for each version of the
 Linux kernel.
 
-**nfc.sh**:
+### **nfc.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the git log (grep) files for
-the NFC driver for all versions of the Linux kernel. It uses the git
-grep command to search for the string \"NFC\" and it's related keywords
-in all files in the Linux kernel repository.
+<u>Logic</u>: This script obtains the git log (grep) files for the NFC
+driver for all versions of the Linux kernel. It uses the git grep
+command to search for the string "NFC" and it’s related keywords in all
+files in the Linux kernel repository.
 
-[Ideal Output]{.underline}: The output is a list of files containing the
-string \"NFC\" and related keywords for each version of the Linux
-kernel.
+<u>Ideal Output</u>: The output is a list of files containing the string
+"NFC" and related keywords for each version of the Linux kernel.
 
-**no.of_lines_files.sh**:
+### **no.of_lines_files.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script stores all versions in an array. It
-uses the find and wc commands to count the number of lines in each file
-in the Linux kernel repository. It then displays the number of lines in
-each file for all versions of the Linux kernel (v0.01 to latest).
+<u>Logic</u>: This script stores all versions in an array. It uses the
+find and wc commands to count the number of lines in each file in the
+Linux kernel repository. It then displays the number of lines in each
+file for all versions of the Linux kernel (v0.01 to latest).
 
-[Ideal Output]{.underline}: The output is a list of files and the number
-of lines in each file for each version of the Linux kernel.
+<u>Ideal Output</u>: The output is a list of files and the number of
+lines in each file for each version of the Linux kernel.
 
-**no_of_directories_drivers.sh**:
+### **no_of_directories_drivers.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script stores all versions in an array. It
-uses the find and wc commands to count the number of directories in each
+<u>Logic</u>: This script stores all versions in an array. It uses the
+find and wc commands to count the number of directories in each file in
+the Linux kernel repository. It then displays the number of directories
+in each file for all versions of the Linux kernel (v0.01 to latest).
+
+<u>Ideal Output</u>: The output is a list of files and the number of
+directories in each file for each version of the Linux kernel.
+
+### **no_of_directories_staging.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
+
+<u>Logic</u>: This script stores all versions in an array. It uses the
+find and wc commands to count the number of staging directories in each
 file in the Linux kernel repository. It then displays the number of
-directories in each file for all versions of the Linux kernel (v0.01 to
-latest).
-
-[Ideal Output]{.underline}: The output is a list of files and the number
-of directories in each file for each version of the Linux kernel.
-
-**no_of_directories_staging.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: This script stores all versions in an array. It
-uses the find and wc commands to count the number of staging directories
-in each file in the Linux kernel repository. It then displays the number
-of staging directories in each file for all versions of the Linux kernel
+staging directories in each file for all versions of the Linux kernel
 (v0.01 to latest).
 
-[Ideal Output]{.underline}: The output is a list of files and the number
-of staging directories in each file for each version of the Linux
-kernel.
+<u>Ideal Output</u>: The output is a list of files and the number of
+staging directories in each file for each version of the Linux kernel.
 
-**no_of_files.sh**:
+### **no_of_files.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: All versions are stored in an array. Then, we loop
-through the array to find and display the number of files present in
-each version of the Linux kernel. The output is different on every run.
+<u>Logic</u>: All versions are stored in an array. Then, we loop through
+the array to find and display the number of files present in each
+version of the Linux kernel. The output is different on every run.
 
-[Ideal Output]{.underline}: The number of files present in each version
-of the Linux kernel.
+<u>Ideal Output</u>: The number of files present in each version of the
+Linux kernel.
 
-**patches.sh**:
+### **patches.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: All versions are stored in an array. Then, the
-gitlog command and wc command along with certain filters are used to
-obtain the number of patches for all versions of the Linux kernel from
-v0.01 to the latest version.
+<u>Logic</u>: All versions are stored in an array. Then, the gitlog
+command and wc command along with certain filters are used to obtain the
+number of patches for all versions of the Linux kernel from v0.01 to the
+latest version.
 
-[Ideal Output]{.underline}: The number of patches for all versions of
-the Linux kernel from v0.01 to the latest version.
+<u>Ideal Output</u>: The number of patches for all versions of the Linux
+kernel from v0.01 to the latest version.
 
-**polling_git_log.sh**:
+### **polling_git_log.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script uses the git log command to obtain the
-git log files for the Polling subsystem for all versions of the Linux
-kernel. It loops through all the versions of the Linux kernel and uses
-git log to obtain the logs for the Polling subsystem in each version.
-The logs are stored in separate files for each version in a directory
-named \"polling_data_dump\".
+<u>Logic</u>: This script uses the git log command to obtain the git log
+files for the Polling subsystem for all versions of the Linux kernel. It
+loops through all the versions of the Linux kernel and uses git log to
+obtain the logs for the Polling subsystem in each version. The logs are
+stored in separate files for each version in a directory named
+"polling_data_dump".
 
-[Ideal Output]{.underline}: A directory containing git log files for the
+<u>Ideal Output</u>: A directory containing git log files for the
 Polling subsystem for all versions of the Linux kernel.
 
-**power_handling.sh**:
+### **power_handling.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the git log files for various
-keywords related to power handling for all versions of the Linux kernel.
-It loops through all the versions of the Linux kernel and uses git log
-to obtain the logs for the power handling related keywords in each
-version. The logs are stored in separate files for each version in a
-directory.
+<u>Logic</u>: This script obtains the git log files for various keywords
+related to power handling for all versions of the Linux kernel. It loops
+through all the versions of the Linux kernel and uses git log to obtain
+the logs for the power handling related keywords in each version. The
+logs are stored in separate files for each version in a directory.
 
-[Ideal Output]{.underline}: Git log files for various keywords related
-to power handling for all versions of the Linux kernel.
+<u>Ideal Output</u>: Git log files for various keywords related to power
+handling for all versions of the Linux kernel.
 
-**releaseDates_mainVersions.sh**:
+### **releaseDates_mainVersions.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script stores each version in an array and
-loops through the array to generate the release dates of all main
-versions of the Linux kernel. It obtains the necessary information from
-the repository and extracts the release dates using git log command with
+<u>Logic</u>: This script stores each version in an array and loops
+through the array to generate the release dates of all main versions of
+the Linux kernel. It obtains the necessary information from the
+repository and extracts the release dates using git log command with
 certain filters.
 
-[Ideal Output]{.underline}: Release dates of all main versions of the
-Linux kernel.
+<u>Ideal Output</u>: Release dates of all main versions of the Linux
+kernel.
 
-**resource_manipulation_git_log.sh**:
+### **resource_manipulation_git_log.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script uses the git log command to obtain the
-git log files for the Resource Manipulation subsystem for all versions
-of the Linux kernel. It loops through all the versions of the Linux
-kernel and uses git log to obtain the logs for the Resource Manipulation
-subsystem in each version. The logs are stored in separate files for
-each version in a directory named \"resource_manipulation_logs\".
+<u>Logic</u>: This script uses the git log command to obtain the git log
+files for the Resource Manipulation subsystem for all versions of the
+Linux kernel. It loops through all the versions of the Linux kernel and
+uses git log to obtain the logs for the Resource Manipulation subsystem
+in each version. The logs are stored in separate files for each version
+in a directory named "resource_manipulation_logs".
 
-[Ideal Output]{.underline}: A directory with text files containing git
-logs for the Resource Manipulation subsystem for all versions of the
-Linux kernel.
+<u>Ideal Output</u>: A directory with text files containing git logs for
+the Resource Manipulation subsystem for all versions of the Linux
+kernel.
 
-**romtypes.sh**:
+### **romtypes.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the git log files of the
-romtype driver for all versions of the Linux kernel. It loops through
-all the versions of the Linux kernel and uses git log to obtain the logs
-for the romtype driver in each version. The logs are stored in separate
-files for each version in a directory named \"romtype_logs\". The search
-is case-insensitive.
+<u>Logic</u>: This script obtains the git log files of the romtype
+driver for all versions of the Linux kernel. It loops through all the
+versions of the Linux kernel and uses git log to obtain the logs for the
+romtype driver in each version. The logs are stored in separate files
+for each version in a directory named "romtype_logs". The search is
+case-insensitive.
 
-[Ideal Output]{.underline}: A directory with text files that contain git
-logs of the romtype driver for all versions of the Linux kernel.
+<u>Ideal Output</u>: A directory with text files that contain git logs
+of the romtype driver for all versions of the Linux kernel.
 
-**short_logs_bluetooth.sh**:
+### **short_logs_bluetooth.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the shortlogs of the bluetooth
-driver for all versions of the Linux kernel. All the keywords are stored
-in an array. It loops through all the versions of the Linux kernel, uses
-grep to search for those keywords and uses git log to obtain the
-shortlog of the Bluetooth driver in each version. The shortlogs are
-stored in separate files for each version in a directory named
-\"bluetooth_shortlogs\". The search is case-insensitive.
-
-[Ideal Output]{.underline}: A directory with text files which contain
-gitlogs of the Bluetooth driver for all versions of the Linux kernel.
-
-**short_logs_crypto.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: This script obtains the shortlogs of the crypto
-driver for all versions of the Linux kernel. All the keywords are stored
-in an array. It loops through all the versions of the Linux kernel, uses
-grep to search for those keywords and uses git log to obtain the
-shortlog of the Crypto driver for each version. The shortlogs are then
-saved in a text file named \"crypto_shortlogs.txt\".
-
-[Ideal Output]{.underline}: A text file named \"crypto_shortlogs.txt\"
-containing the shortlogs of the Crypto driver for all versions of the
-Linux kernel. The shortlogs are listed in chronological order, with the
-most recent version first. Each entry in the shortlog includes the
-commit hash, author, date, and a brief summary of the changes made to
-the Crypto driver in that version.
-
-**short_logs_dma.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: This script obtains the shortlogs of the DMA driver
+<u>Logic</u>: This script obtains the shortlogs of the bluetooth driver
 for all versions of the Linux kernel. All the keywords are stored in an
 array. It loops through all the versions of the Linux kernel, uses grep
 to search for those keywords and uses git log to obtain the shortlog of
-the DMA driver. It uses grep to search the shortlog for the term \"dma\"
+the Bluetooth driver in each version. The shortlogs are stored in
+separate files for each version in a directory named
+"bluetooth_shortlogs". The search is case-insensitive.
+
+<u>Ideal Output</u>: A directory with text files which contain gitlogs
+of the Bluetooth driver for all versions of the Linux kernel.
+
+### **short_logs_crypto.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
+
+<u>Logic</u>: This script obtains the shortlogs of the crypto driver for
+all versions of the Linux kernel. All the keywords are stored in an
+array. It loops through all the versions of the Linux kernel, uses grep
+to search for those keywords and uses git log to obtain the shortlog of
+the Crypto driver for each version. The shortlogs are then saved in a
+text file named "crypto_shortlogs.txt".
+
+<u>Ideal Output</u>: A text file named "crypto_shortlogs.txt" containing
+the shortlogs of the Crypto driver for all versions of the Linux kernel.
+The shortlogs are listed in chronological order, with the most recent
+version first. Each entry in the shortlog includes the commit hash,
+author, date, and a brief summary of the changes made to the Crypto
+driver in that version.
+
+### **short_logs_dma.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
+
+<u>Logic</u>: This script obtains the shortlogs of the DMA driver for
+all versions of the Linux kernel. All the keywords are stored in an
+array. It loops through all the versions of the Linux kernel, uses grep
+to search for those keywords and uses git log to obtain the shortlog of
+the DMA driver. It uses grep to search the shortlog for the term "dma"
 (case insensitive).
 
 Ideal Output: A list of shortlogs of the DMA driver for all versions of
-the Linux kernel, with the search term \"dma\" highlighted.
+the Linux kernel, with the search term "dma" highlighted.
 
-**short_logs_media.sh**:
+### **short_logs_media.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the shortlogs of the media
-driver for all versions of the Linux kernel. All keywords are stored in
-an array. It loops through all the versions of the Linux kernel, uses
-grep to search for those keywords and uses git log to obtain the
-shortlog of the media driver.
+<u>Logic</u>: This script obtains the shortlogs of the media driver for
+all versions of the Linux kernel. All keywords are stored in an array.
+It loops through all the versions of the Linux kernel, uses grep to
+search for those keywords and uses git log to obtain the shortlog of the
+media driver.
 
-[Ideal Output]{.underline}: A list of shortlogs of the media driver for
-all versions of the Linux kernel.
+<u>Ideal Output</u>: A list of shortlogs of the media driver for all
+versions of the Linux kernel.
 
-**sound.sh**:
+### **sound.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script obtains the grep files of the sound
-driver for all versions of the Linux kernel. It loops through all the
+<u>Logic</u>: This script obtains the grep files of the sound driver for
+all versions of the Linux kernel. It loops through all the versions of
+the Linux kernel and uses grep to search for files containing the term
+"sound" (case insensitive) and related keywords.
+
+<u>Ideal Output</u>: A list of grep files of the sound driver for all
+versions of the Linux kernel.
+
+### **spinlock.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
+
+<u>Logic</u>: This script displays the names of files consisting all
+types of spinlock in Linux kernel v1.0 to v6.0. It loops through the
 versions of the Linux kernel and uses grep to search for files
-containing the term \"sound\" (case insensitive) and related keywords.
-
-[Ideal Output]{.underline}: A list of grep files of the sound driver for
-all versions of the Linux kernel.
-
-**spinlock.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: This script displays the names of files consisting
-all types of spinlock in Linux kernel v1.0 to v6.0. It loops through the
-versions of the Linux kernel and uses grep to search for files
-containing the term \"spinlock" and it's types, in the linux kernel
+containing the term "spinlock” and it’s types, in the linux kernel
 repository and its subdirectories.
 
-[Ideal Output]{.underline}: A list of file names consisting of all types
-of spinlock in Linux kernel v1.0 to v6.0.
+<u>Ideal Output</u>: A list of file names consisting of all types of
+spinlock in Linux kernel v1.0 to v6.0.
 
-**spinlock_log.sh**:
+### **spinlock_log.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script displays all git logs for spinlock and
-related keywords. It uses git log to search for commits containing the
-terms \"spinlock\", \"mutex\", \"semaphore\", \"rwlock\", and \"futex\"
-and more.
+<u>Logic</u>: This script displays all git logs for spinlock and related
+keywords. It uses git log to search for commits containing the terms
+"spinlock", "mutex", "semaphore", "rwlock", and "futex" and more.
 
-[Ideal Output]{.underline}: A list of git logs for spinlock and related
+<u>Ideal Output</u>: A list of git logs for spinlock and related
 keywords.
 
-**stable_lines.sh**:
+### **stable_lines.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script generates the number of lines of code
-of stable subsystems present in each version of the Linux kernel. It
-loops through all the versions of the Linux kernel and uses find command
-and awk to count the number of lines of code of stable subsystems.
+<u>Logic</u>: This script generates the number of lines of code of
+stable subsystems present in each version of the Linux kernel. It loops
+through all the versions of the Linux kernel and uses find command and
+awk to count the number of lines of code of stable subsystems.
 
-[Ideal Output]{.underline}: A list of the number of lines of code of
-stable subsystems present in each version of the Linux kernel.
-
-**subsystems.sh**:
-
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
-
-[Logic]{.underline}: This script generates the number of lines of code
-of subsystems present in each version of the Linux kernel. It loops
-through all the versions of the Linux kernel and uses find and awk
-commands to count the number of lines of code of each subsystem.
-
-[Ideal Output]{.underline}: A list of the number of lines of code of
+<u>Ideal Output</u>: A list of the number of lines of code of stable
 subsystems present in each version of the Linux kernel.
 
-**versions_till_now.sh**:
+### **subsystems.sh**:
 
-[Input]{.underline}: Uses git repositories which contain various linux
-kernel versions.
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
 
-[Logic]{.underline}: This script generates a list of all versions until
-the time of executing the script. It loops through each repository of
-linux kernel and uses git tag command to list all the versions of the
-Linux kernel until the current time.
+<u>Logic</u>: This script generates the number of lines of code of
+subsystems present in each version of the Linux kernel. It loops through
+all the versions of the Linux kernel and uses find and awk commands to
+count the number of lines of code of each subsystem.
 
-[Ideal Output]{.underline}: A list of all versions of the Linux kernel
-until the current time.
+<u>Ideal Output</u>: A list of the number of lines of code of subsystems
+present in each version of the Linux kernel.
+
+### **versions_till_now.sh**:
+
+<u>Input</u>: Uses git repositories which contain various linux kernel
+versions.
+
+<u>Logic</u>: This script generates a list of all versions until the
+time of executing the script. It loops through each repository of linux
+kernel and uses git tag command to list all the versions of the Linux
+kernel until the current time.
+
+<u>Ideal Output</u>: A list of all versions of the Linux kernel until
+the current time.
