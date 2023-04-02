@@ -44,9 +44,18 @@ for ((i=3; i<=6; i++)); do
     done
 done
 
-ver_name="v5.17.1"
-git checkout ${ver_name}
+# Extend version
+ver_name1="v5.17.1"
+git checkout ${ver_name1}
 
 for k in ${spinlock_keywords[@]}; do
     git log --all --grep=$k
 done
+
+ver_name2="v5.19.15"
+git checkout ${ver_name2}
+
+for k in ${spinlock_keywords[@]}; do
+    git log --all --grep=$k
+done
+

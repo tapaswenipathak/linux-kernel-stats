@@ -31,10 +31,21 @@ for ((i=3; i<=6; i++)); do
 done
 
 # Extended Version
-ver_name="v6.1-rc1"
-git checkout ${ver_name}
+ver_name1="v3.19-rc3"
+git checkout ${ver_name1}
 
 for k in "${power_keywords[@]}"; do
     git log --all --grep="$k"
 done
 
+ver_name2="v6.1-rc1"
+git checkout ${ver_name2}
+
+for k in "${power_keywords[@]}"; do
+    git log --all --grep="$k"
+done
+
+
+for k in "${power_keywords[@]}"; do
+    git log --all --grep="$k"
+done

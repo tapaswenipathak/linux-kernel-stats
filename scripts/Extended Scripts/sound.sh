@@ -45,20 +45,35 @@ for ((i=3; i<=6; i++)); do
     fi
 done 
 
-ver_name="v4.8-rc1"
-git checkout ${ver_name}
+ver_name1="v4.8-rc1"
+git checkout ${ver_name1}
 
 for string in ${myArray[@]}; do
    if [ -n "$(git log --all --grep="$string")" ]; then 
-        echo -e "\e[6;35m \n v$ver_name \n \e[0m"
+        echo -e "\e[6;35m \n $ver_name1 \n \e[0m"
         echo -e "\e[6;35m \n ${string} \n \e[0m"
         git log --all --grep="$string" 
    else
-        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
-        echo "No such string exists in version ${ver_name} in the git log." 
+        echo -e "\e[6;35m \n ${ver_name1} \n \e[0m"
+        echo "No such string exists in version ${ver_name1} in the git log." 
         continue
    fi
 done 
+
+ver_name2="v4.20.10"
+git checkout ${ver_name2}
+
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n $ver_name2 \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
+   else
+        echo -e "\e[6;35m \n ${ver_name2} \n \e[0m"
+        echo "No such string exists in version ${ver_name2} in the git log." 
+        continue
+   fi
+done
 
 cd ..
 

@@ -14,7 +14,7 @@ if [ ! -d "~/linux-kernel-stats/data_dir/$DIRNAME" ]; then
   mkdir "~/linux-kernel-stats/data_dir/$DIRNAME"
   echo "Fetching firmware information"
 else
-    echo "Fetching firmware information"
+	echo "Fetching firmware information"
 fi
 
 # Checkout to the specific tag
@@ -22,11 +22,16 @@ git checkout -fq refs/tags/v2.6.39.4
 grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/2.6.39.4.txt
 
 for((i=3; i<=6; i++)); do
-    git checkout -fq refs/tags/v$i.0
-    grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$i.0.txt
+	git checkout -fq refs/tags/v$i.0
+	grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$i.0.txt
 done
 echo "Firmware info stored at ~/linux-kernel-stats/data_dir/$DIRNAME "
 
-ver_name="v2.6.16-rc1"
-git checkout -fq ${ver_name}
-grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$ver_name.txt
+ver_name1="v2.6.16-rc1"
+git checkout -fq ${ver_name1}
+grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$ver_name1.txt
+
+
+ver_name2="v4.20"
+git checkout -fq ${ver_name2}
+grep -q -r "fwname" > ~/linux-kernel-stats/data_dir/$DIRNAME/$ver_name2.txt

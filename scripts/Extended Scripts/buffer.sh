@@ -67,6 +67,18 @@ for ((i=3; i<=6; i++)); do
 done
 
 # Extended Version
+ver_name="v5.16-rc1"
+git checkout ${ver_name}
+
+for keyword in ${search_terms[@]}; do
+   if [ -n "$(git log --all --grep="$keyword")" ];then 
+    file_name="${keyword}_${ver_name}.txt"
+    git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/extended_scripts_2/buffer/$file_name
+   else
+   echo "No such string '$keyword' exists in the git log."
+   fi
+done
+
 ver_name="v5.15-rc7"
 git checkout ${ver_name}
 

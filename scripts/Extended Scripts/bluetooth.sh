@@ -40,6 +40,20 @@ for string in ${myArray[@]}; do
    fi
 done 
 
+ver_name="v5.2-rc1"
+git checkout ${ver_name}
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n $ver_name \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
+   else
+        echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+        echo "No such string exists in version v$i.0 in the git log." 
+        continue
+   fi
+done
+
 cd ..
 
 cd ~/kbd

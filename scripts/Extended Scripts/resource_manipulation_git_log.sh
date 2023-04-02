@@ -62,7 +62,7 @@ cd $SRCDIR_2
 git checkout -fq "2.0.0"
 for ((j=0; j < m; j++)); do
         if [ -n "$(git log --all --grep="${keywordArray[$j]}")" ];then
-        echo -e "\e[6;35m \n v2.0 \n \e[0m"
+        echo -e "\e[6;35m \n v1.0 \n \e[0m"
         file_name="$(echo ${keywordArray[$j]} | tr -d ' ')"
         file_name+="v2.0.txt"
         git log --all --grep="$keyword" > ~/linux-kernel-stats/data_dir/resource_manipulation_data_dump/$file_name
@@ -80,9 +80,18 @@ cd $SRCDIR_3
 
 #declaring an array containing all versions
 declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))  
+
 # Extended Version
-ver_name="v5.17.1"
-all_versions+=${ver_name}
+ver_name1="v3.9-rc3"
+# Add the version to the array
+all_versions+=("$ver_name1")
+
+# Extended Version
+ver_name2="v5.17.1"
+# Add the version to the array
+all_versions+=("$ver_name2")
+
+
 #total no. of versions
 n=${#all_versions[@]}  
 

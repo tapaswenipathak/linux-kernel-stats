@@ -79,13 +79,20 @@ SRCDIR_3=~/linux-stable/
 cd $SRCDIR_3
 
 #declaring an array containing all versions
-declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))  
+declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V)) 
+
 # Extended version
-ver_name="v6.2-rc1"
-# Add the version to the array
-all_versions+=${ver_name} 
+ver_name1="v3.13"
+#Add the version to the array
+all_versions+=("$ver_name1")
+
+# Extended version
+ver_name2="v6.2-rc1"
+#Add the version to the array
+all_versions+=("$ver_name2")
+
 #total no. of versions
-n=${#all_versions[@]} 
+n=${#all_versions[@]}  
 
 
 for ((i=n-1; i>=0; --i)); do

@@ -27,7 +27,7 @@ declare -a search_terms=(
 cd ~/archive
 echo "Searching for message passing in Linux version v1.0"
 
-git checkout -fq "v1.0 &> /dev/null
+git checkout -fq "v1.0" &> /dev/null
 git log --all --grep="bus" > "../bp_gitlogs/v1.0_bus_bus_protocols.txt"
 git log --all --grep=".*bus.*" > "../bp_gitlogs/v1.0_allbus_bus_protocols.txt"
 
