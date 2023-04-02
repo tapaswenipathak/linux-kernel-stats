@@ -1,27 +1,3 @@
-<!-----
-
-Yay, no errors, warnings, or alerts!
-
-Conversion time: 0.41 seconds.
-
-
-Using this Markdown file:
-
-1. Paste this output into your source file.
-2. See the notes and action items below regarding this conversion run.
-3. Check the rendered output (headings, lists, code blocks, tables) for proper
-   formatting and use a linkchecker before you publish this page.
-
-Conversion notes:
-
-* Docs to Markdown version 1.0β34
-* Sun Apr 02 2023 08:06:49 GMT-0700 (PDT)
-* Source doc: Script Details
-* This is a partial selection. Check to make sure intra-doc links work.
------>
-
-
-
 # <span style="text-decoration:underline;">Linux Scripts Version Details</span>
 
 
