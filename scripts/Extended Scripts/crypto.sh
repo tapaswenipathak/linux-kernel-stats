@@ -5,9 +5,34 @@
 
 cd ~/linux-stable/linux-stable
 
-myArray=("AES" "3DES" "DES" "TDES" "SHA1" "SHA2" "MD5" "HMAC-SHA1" "SHA256" "HMAC-SHA256" "SHA224" "SHA384" "SHA512" "PAES" "ECDH" "CRC" "GHASH" "ablkcipher" "ahash" "aead" "*Triple DES*" 
-    "*SHA1 digest algorithms*" "*SHA256 digest algorithms*" "*SHA384 digest algorithms*" "*SHA512 digest algorithms*" "GHASH digest algorithms")
-
+myArray=(
+    "AES"
+    "3DES"
+    "DES"
+    "TDES"
+    "SHA1"
+    "SHA2"
+    "MD5"
+    "HMAC-SHA1"
+    "SHA256"
+    "HMAC-SHA256"
+    "SHA224"
+    "SHA384"
+    "SHA512"
+    "PAES"
+    "ECDH"
+    "CRC" 
+    "GHASH"
+    "ablkcipher"
+    "ahash"
+    "aead"
+    "*Triple DES*" 
+    "*SHA1 digest algorithms*"
+    "*SHA256 digest algorithms*"
+    "*SHA384 digest algorithms*"
+    "*SHA512 digest algorithms*"
+    "GHASH digest algorithms"
+)
 for ((i=3; i<=6; i++)); do
     git checkout -fq v$i.0
     if [[ $? -eq 0 ]]; then
@@ -27,6 +52,22 @@ for ((i=3; i<=6; i++)); do
     fi
 done 
 
+
+ver_name="v5.6-rc1"
+git checkout ${ver_name}
+
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
+   else
+        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
+        echo "No such string exists in version ${ver_name} in the git log." 
+        continue
+   fi
+done
+
 ver_name="v5.11"
 git checkout ${ver_name}
 
@@ -40,7 +81,7 @@ for string in ${myArray[@]}; do
         echo "No such string exists in version $ver_name in the git log." 
         continue
    fi
-done 
+done
 
 cd ..
 
@@ -65,12 +106,12 @@ cd ~/archive
     
     for string in ${myArray[@]}; do
         if [ -n "$(git log --all --grep="$string")" ]; then 
-            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo -e "\e[6;35m \n v1.0 \n \e[0m"
             echo -e "\e[6;35m \n ${string} \n \e[0m"
             git log --all --grep="$string" 
          else
-            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
-            echo "No such string exists in version v$i.0 in the git log." 
+            echo -e "\e[6;35m \n v1.0 \n \e[0m"
+            echo "No such string exists in version v1.0 in the git log." 
             continue
         fi
     done

@@ -5,19 +5,42 @@
 
 cd ~/kbd
 
-myArray=("dma_pool_alloc" "dma_pool_free" "dma_pool_destroy"  "dma_pool_create" "dma_map_*" "dma_addr_t" "dma_set_mask_and_coherent" "dma_set_mask" "dma_set_coherent_mask" "DMA_TO_DEVICE" "DMA_FROM_DEVICE" "dma_mapping_error" "dma_map_page" "dma_api" "dma-api" "DMA_API" "DMA-API" "DMADEVICES" "dma_buf" "dma_buffer" "DMA_ENGINE" "DMA_VIRTUAL_CHANNELS")
-    git checkout 2.0.0
-    for string in ${myArray[@]}; do
-        if [ -n "$(git log --all --grep="$string")" ]; then 
-            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
-            echo -e "\e[6;35m \n ${string} \n \e[0m" 
-            git log --all --grep="$string" 
-         else
-            echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
-            echo "No such string exists in version 2.0.0 in the git log." 
-            continue
-        fi
-    done 
+myArray=(
+    "dma_pool_alloc"
+    "dma_pool_free"
+    "dma_pool_destroy"
+    "dma_pool_create"
+    "dma_map_*"
+    "dma_addr_t"
+    "dma_set_mask_and_coherent"
+    "dma_set_mask"
+    "dma_set_coherent_mask"
+    "DMA_TO_DEVICE"
+    "DMA_FROM_DEVICE"
+    "dma_mapping_error"
+    "dma_map_page"
+    "dma_api"
+    "dma-api"
+    "DMA_API"
+    "DMA-API"
+    "DMADEVICES"
+    "dma_buf"
+    "dma_buffer"
+    "DMA_ENGINE"
+    "DMA_VIRTUAL_CHANNELS"
+)
+git checkout 2.0.0
+for string in ${myArray[@]}; do
+    if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m" 
+        git log --all --grep="$string" 
+     else
+        echo -e "\e[6;35m \n version 2.0.0 \n \e[0m"
+        echo "No such string exists in version 2.0.0 in the git log." 
+        continue
+    fi
+done 
    
 cd ..
 
@@ -57,18 +80,33 @@ for ((i=3; i<=6; i++)); do
     else
         continue
     fi
-done 
+done
 
-ver_name="v4.1-rc5"
-git checkout $ver_name
+# Extended Version
+ver_name1="v4.1-rc5"
+git checkout $ver_name1
 for string in ${myArray[@]}; do
    if [ -n "$(git log --all --grep="$string")" ]; then 
-        echo -e "\e[6;35m \n $ver_name \n \e[0m"
+        echo -e "\e[6;35m \n $ver_name1 \n \e[0m"
         echo -e "\e[6;35m \n ${string} \n \e[0m"
         git log --all --grep="$string"
    else
-        echo -e "\e[6;35m \n $ver_name\n \e[0m"
-        echo "No such string exists in version $ver_name in the git log." 
+        echo -e "\e[6;35m \n $ver_name1 \n \e[0m"
+        echo "No such string exists in version $ver_name1 in the git log." 
+        continue
+   fi
+done
+
+ver_name2="v6.1-rc1"
+git checkout $ver_name2
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n ${ver_name2}\n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string"
+   else
+        echo -e "\e[6;35m \n ${ver_name2}\n \e[0m"
+        echo "No such string exists in version ${ver_name2} in the git log." 
         continue
    fi
 done 

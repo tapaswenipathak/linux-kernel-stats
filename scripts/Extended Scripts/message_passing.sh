@@ -91,20 +91,32 @@ for ((i=3; i<=6; i++)); do
   done
 done
 
-#Extended version
-ver_name="v5.13.10"
-git checkout ${ver_name}
+# Extended Version
+ver_name1="v5.17.1"
+git checkout ${ver_name1}
 
 # Loop through the search terms and search the git log for each term
   for term in "${search_terms[@]}"; do
-    filename="$ver_name_$term.gitlog.txt"
-
+    filename="${ver_name1}_$term.gitlog.txt"
+    
     if [ ! -f "../mps_gitlogs/$filename" ]; then
       git log --all --grep="$term" > "../mps_gitlogs/$filename"
     fi
     #git log --all --grep="$term" > "../mps_gitlogs/v$i.0_$term.gitlog.txt"
   done
 
+ver_name2="v5.13.10"
+git checkout ${ver_name2}
+
+# Loop through the search terms and search the git log for each term
+  for term in "${search_terms[@]}"; do
+    filename="$ver_name2_$term.gitlog.txt"
+
+    if [ ! -f "../mps_gitlogs/$filename" ]; then
+      git log --all --grep="$term" > "../mps_gitlogs/$filename"
+    fi
+    #git log --all --grep="$term" > "../mps_gitlogs/v$i.0_$term.gitlog.txt"
+  done
 
 
 echo "Done searching git logs"
