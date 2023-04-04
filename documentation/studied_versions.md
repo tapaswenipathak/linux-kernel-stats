@@ -29,18 +29,18 @@
 * **Studied Extensions**
     * We’ve studied the full log for the version, v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.0 to v1.5, v2.0 to v6.1.
 * **Studied the firmwares** 
-	* We’ve studied the full log for the version starting from v2.6.39.4, v3.0 to v6.0, v2.6.16-rc1, and v2.0.
+	* We’ve studied the full log for the version v2.6.39.4, v3.0 to v6.0, v2.6.16-rc1, and v2.0.
 * **Studied Hardware Tracing**
-    * We’ve studied the full log for the version starting from v3.0 to v6.0,v3.5, and v4.1.
+    * We’ve studied the full log for the version v3.0 to v6.0,v3.5, and v4.1.
 * **Studied List of organizations supported**
-    * We’ve studied the full logs for the version starting from v1.0 to v6.0, v3.10-rc7, and v4.8-rc1.
+    * We’ve studied the full log for the version v1.0 to v6.0, v3.10-rc7, and v4.8-rc1.
 * **Studied media**
     * We’ve studied the full log for the version v1.0 to v6.0, v4.3, and v6.2-rc1.
     * We’ve studied the short log for the version v3.0 to v6.0.
 * **Studied Message Passing systems.**
     * We’ve studied the full log for the version v1.0 to v6.0, v5.13.10, and v5.17.1
 * **Studied NFC driver**
-	* We’ve studied the full log for the version from v1.0  to v6.0, v5.5.10 and v5.11-rc1.
+	* We’ve studied the full log for the version v1.0 to v6.0, v5.5.10 and v5.11-rc1.
 * **Studied number of lines in each file**
     * We’ve studied the full log for the version v0.01 to v0.99.15, v1.0 to v1.5, v2.0 to v6.2-rc3.
 * **Studied number of directories**
@@ -62,4 +62,4 @@
 * **Studied Sound**
     * We’ve studied version v1.0 to v6.0, v4.20.10, and v4.8-rc1.
 * **Studied Spinlock**
-    * We’ve studied  version v3.0 to v6.0, v5.17.1, and v5.19.15
+    * We’ve studied version v3.0 to v6.0, v5.17.1, and v5.19.15
