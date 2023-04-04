@@ -1,4 +1,4 @@
-# **Report**
+# **Files_Description**
 
 ### **<u>General Statistics</u>**
 
@@ -292,7 +292,7 @@ number of files changed, insertions, and deletions between two
 consecutive main releases of the Linux kernel, excluding versions v0.95
 and v0.96.
 
-### ### **dma.sh**:
+### **dma.sh**:
 
 <u>Input</u>: Uses git repositories which contain various linux kernel
 versions.
@@ -315,7 +315,7 @@ versions.
 <u>Logic</u>: Stores all versions of the linux kernel in an array and
 loops through each version to count the number of lines of code in each
 type of driver present. The script uses the grep command to search for
-lines starting with drivers/ and counts the number of lines for each
+lines starting with `drivers/` and counts the number of lines for each
 driver type (network, sound, USB, etc.) for each version.
 
 <u>Output</u>: The output will display the number of lines of
@@ -350,7 +350,7 @@ versions.
 
 <u>Logic</u>: This script uses a for loop to iterate over all the
 version directories in the kernel repository, and uses the find command
-with certain filters to extract .git files and displays the list of
+with certain filters to extract `.git` files and displays the list of
 files in each directory.
 
 <u>Output</u>: A list of files in each version directory of the
@@ -375,7 +375,7 @@ of the Linux kernel repository, with the search term highlighted.
 <u>Input</u>: Uses git repositories which contain various linux kernel
 versions.
 
-<u>Logic</u>: This script is similar to firmware_git_log-q.sh, except
+<u>Logic</u>: This script is similar to `firmware_git_log-q.sh`, except
 that it doesn't use the -q option with grep, and therefore, doesn't
 highlight the search term.
 
@@ -454,17 +454,6 @@ similar to the output of the git shortlog command, with each commit
 message on a separate line and the commit author and date listed before
 the commit message. The output is saved to the current working
 directory.
-
-### **glimpseindex_cocci.sh**:
-
-<u>Input</u>: None
-
-<u>Logic</u>: This script generates a glimpse index for Coccinelle,
-which is a program matching and transformation engine for C code. The
-glimpse index makes it easier to search for patterns in Coccinelle
-scripts.
-
-<u>Output</u>: A glimpse index for Coccinelle.
 
 ### **hardware_tracing_git_log.sh**:
 
