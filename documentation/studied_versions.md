@@ -52,9 +52,9 @@
 * **Studied Power Handling**
     * We’ve studied version v1.0, v3.0 to v6.0, v3.19-rc3, and v6.1-rc1.
 * **Studied Release Date**
-    * We’ve studied versions v0.01 to v0.99.15, v1.0 to v1.5, and v2.0 to v6.1
+    * We’ve studied version v0.01 to v0.99.15, v1.0 to v1.5, and v2.0 to v6.1
 * **Studied Release Notes**
-    * We’ve studied the versions v1.0 to v1.3, v2.0 to v2.6, and v3.0 to v6.1
+    * We’ve studied version v1.0 to v1.3, v2.0 to v2.6, and v3.0 to v6.1
 * **Studied Resource Manipulation**
     * We’ve studied the full log for the version v3.0 to v6.0, v3.9-rc3 and v5.17.1.
 * **Studied Rom Types**
