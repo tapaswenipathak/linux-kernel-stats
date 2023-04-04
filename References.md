@@ -1,0 +1,14 @@
+
+- https://kernel.org/doc/mirror/ols2007v1.pdf#page=239
+- https://www.researchgate.net/profile/Andrzej-Wasowski/publication/220789837_Evolution_of_the_Linux_Kernel_Variability_Model/links/54ccb7f10cf298d6565ac185/Evolution-of-the-Linux-Kernel-Variability-Model.pdf
+- https://www.researchgate.net/profile/Zbigniew-Kalbarczyk/publication/4021632_Characterization_of_Linux_kernel_behavior_under_errors/links/0912f5108050e2df0f000000/Characterization-of-Linux-kernel-behavior-under-errors.pdf
+- https://ieeexplore.ieee.org/abstract/document/9307663
+- https://www.usenix.org/system/files/atc19-bai.pdf
+- https://hal.inria.fr/hal-00838528/
+- https://link.springer.com/article/10.1007/s10664-011-9191-7
+- https://dl.acm.org/doi/abs/10.1145/2642937.2642990
+- https://ieeexplore.ieee.org/abstract/document/5639840
+- https://www.sciencedirect.com/science/article/abs/pii/S0164121211002822
+- https://link.springer.com/article/10.1007/s11432-011-4337-1
+- https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=7cd0c2621a3b71bcf6dc7638c215de33b2d212ee
+- https://www.sciencedirect.com/science/article/pii/S1383762121000436
