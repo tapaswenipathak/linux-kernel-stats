@@ -21,7 +21,7 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
-    done >> ~/data_dir/output_no_of_directories_drivers.txt
+    done >> ~/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
 
 SRCDIR_a=~/erofs-utils
 cd $SRCDIR_a
@@ -42,7 +42,7 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
-    done >> ~/data_dir/output_no_of_directories_drivers.txt
+    done >> ~/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
 
 SRCDIR_a=~/kbd
 cd $SRCDIR_a
@@ -63,7 +63,7 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
-    done >> ~/data_dir/output_no_of_directories_drivers.txt
+    done >> ~/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
 
 SRCDIR_a=~/history
 cd $SRCDIR_a
@@ -84,7 +84,7 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
-    done >> ~/data_dir/output_no_of_directories_drivers.txt
+    done >> ~/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
 
 SRCDIR_a=~/linux-stable
 cd $SRCDIR_a
@@ -105,4 +105,4 @@ cd $SRCDIR_a
         else
             paste <(echo "${all_versions[$i]}", "no drivers directory")
         fi
-    done >> ~/data_dir/output_no_of_directories_drivers.txt
+    done >> ~/linux-kernel-stats/data_dir/output_no_of_directories_drivers.txt
