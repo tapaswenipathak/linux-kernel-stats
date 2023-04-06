@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o scripts/releaseDates_mainVersions.o scripts/get_linus_releasenotes_links.py scripts/firmwares.sh scripts/message_passing.sh scripts/bus_protocols.sh scripts/buffer.sh
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o scripts/duration_AllVersions.o scripts/releaseDates_mainVersions.o scripts/get_linus_releasenotes_links.py scripts/firmwares.sh scripts/message_passing.sh scripts/bus_protocols.sh scripts/buffer.sh
 
 
 
@@ -126,6 +126,11 @@ scripts/no_of_directories_staging.o:
 scripts/duration_mainVersions.o:
 	(echo "Duration of development of main versions of linux kernel")
 	(cd scripts; bash duration_mainVersions.sh)
+	
+# following command will run the file named duration_AllVersions.sh
+scripts/duration_AllVersions.o:
+	(echo "Duration of development of main versions of linux kernel")
+	(cd scripts; bash duration_AllVersions.sh)
 
 # following command will run the file named releaseDates_mainVersions.sh
 scripts/releaseDates_mainVersions.o:
