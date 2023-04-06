@@ -78,10 +78,16 @@ cd $SRCDIR_3
 declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V)) 
 
 # Extend the version
-ver_name="v3.5"
+
+ver_name1="v3.5"
 
 #Add the version to the array
-all_versions+=("$ver_name")
+all_versions+=("$ver_name1")
+
+# Extend the version
+ver_name2="v4.1"
+#Add the version to the array
+all_versions+=("$ver_name2")
 
 #total no. of versions
 n=${#all_versions[@]}  
