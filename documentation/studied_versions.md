@@ -20,11 +20,11 @@
     * We’ve studied the short log for the version v3.0 to v6.0.
 * **Studied Diffstats**
     * We’ve studied the full log for the version v0.01 to v1.0-pre1, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.2-rc8.
-* **Studied DMA driver Version**
+* **Studied DMA driver version**
     * We’ve studied the full log for the version v1.0 to v6.0,v6.0-rc1, v4.1-rc5, and v6.1-rc1.
-* **Studied the drivers**
-    * We’ve studied the full log for the version v1.0 to v6.0, and v6.2-rc1.
-* **Studied the Duration**
+* **Studied the Drivers**
+    * We’ve studied the full log for the version v2.6.12 to v6.2-rc1.
+* **Studied the Duration main versions**
     * We’ve studied the full log for the version v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.1.
 * **Studied Extensions**
     * We’ve studied the full log for the version, v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.1.
