@@ -1,5 +1,5 @@
 
-all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/stable_lines.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o scripts/releaseDates_mainVersions.o scripts/get_linus_releasenotes_links.py scripts/firmwares.o scripts/message_passing.o  scripts/bus_protocols.o scripts/buffer.o scripts/bluetooth.o scripts/clock_support_configuration_git_log.o scripts/cpu_threshold.o scripts/crypto.o scripts/dma.o scripts/firmware_git_log-q.o scripts/firmware_git_log.o scripts/firmware_git_shortlog-q.o scripts/nfc.o scripts/no_of_files.o scripts/polling_git_log.o scripts/power_handling.o scripts/resource_manipulation_git_log.o scripts/romtypes.o scripts/short_logs_bluetooth.o scripts/short_logs_crypto.o scripts/short_logs_dma.o scripts/short_logs_media.o scripts/sound.o scripts/spinlock.o scripts/spinlock_log.o scripts/stable_lines.o scripts/subsystems.o scripts/versions_till_now.o
+all : scripts/loc.o scripts/patches.o scripts/extension.o scripts/drivers.o scripts/subsystems.o scripts/glimpseindex_cocci.o scripts/list_of_drivers.o scripts/no_of_directories_drivers.o scripts/commits.o scripts/files.o scripts/no.of_lines_files.o scripts/diffstat_allVersions.o scripts/diffstat_mainVersions.o scripts/get_release_notes.o scripts/get_shortlogs.o scripts/versions_till_now.o scripts/no_of_directories_staging.o scripts/duration_mainVersions.o scripts/releaseDates_mainVersions.o scripts/get_linus_releasenotes_links.py scripts/firmwares.o scripts/message_passing.o  scripts/bus_protocols.o scripts/buffer.o scripts/bluetooth.o scripts/clock_support_configuration_git_log.o scripts/cpu_threshold.o scripts/crypto.o scripts/dma.o scripts/firmware_git_log-q.o scripts/firmware_git_log.o scripts/firmware_git_shortlog-q.o scripts/nfc.o scripts/no_of_files.o scripts/polling_git_log.o scripts/power_handling.o scripts/resource_manipulation_git_log.o scripts/romtypes.o scripts/short_logs_bluetooth.o scripts/short_logs_crypto.o scripts/short_logs_dma.o scripts/short_logs_media.o scripts/sound.o scripts/spinlock.o scripts/spinlock_log.o scripts/subsystems.o scripts/versions_till_now.o
 
 
 # PREREQUISITE - 
@@ -45,12 +45,6 @@ scripts/extension.o:
 scripts/drivers.o:
 	@(echo "Number of lines in drivers present in each version of linux kernel")
 	@(cd scripts; bash drivers.sh)
-
-
-# Following command will run the file named stable_lines.sh
-scripts/stable_lines.o:
-	@(echo "Number of stable lines in each version of linux kernel")
-	@(cd scripts; bash stable_lines.sh)
 
 
 # Following command will run the file named subsystems.sh
