@@ -12,24 +12,24 @@
 * **Studied Clock Support Configuration Version**
     * We’ve studied the full log for the version v3.0 to v6.0, v4.14, and v4.16
 * **Studied commits**
-    * We’ve studied the full log for the version v1.0 to v1.5, v2.5.0 to v2.6.9-rc4, v0.99 to v2.5.1, and v2.6.11 to v6.2-rc8.
+    * We’ve studied the full log for the version v0.01 to v1.0-pre1, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.2-rc8.
 * **Studied CPU Threshold Driver Version**
     * We’ve studied the full log for the version v1.0, v3.0 to v6.0, v5.5-rc7, and v5.10-rc7.
 * **Studied Crypto Driver Version**
     * We’ve studied the full log for the version v1.0 to v6.0, v5.6-rc1, and v5.11.
     * We’ve studied the short log for the version v3.0 to v6.0.
 * **Studied Diffstats**
-    * We’ve studied the full log for the version v1.0 to v1.5, v2.5.0 to v2.6.9-rc4, v0.99 to v2.5.1, v2.6.11 to v6.2-rc8.
+    * We’ve studied the full log for the version v0.01 to v1.0-pre1, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.2-rc8.
 * **Studied DMA driver Version**
     * We’ve studied the full log for the version v1.0 to v6.0,v6.0-rc1, v4.1-rc5, and v6.1-rc1.
 * **Studied the drivers**
     * We’ve studied the full log for the version v1.0 to v6.0, and v6.2-rc1.
 * **Studied the Duration**
-    * We’ve studied the full log for the version v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.0 to v1.5, v2.0 to v6.1.
+    * We’ve studied the full log for the version v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.1.
 * **Studied Extensions**
-    * We’ve studied the full log for the version, v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.0 to v1.5, v2.0 to v6.1.
+    * We’ve studied the full log for the version, v0.01, v0.11, v0.12, v0.97, v0.98, v0.99, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.1.
 * **Studied the firmwares** 
-	* We’ve studied the full log for the version v2.6.39.4, v3.0 to v6.0, v2.6.16-rc1, and v2.0.
+	* We’ve studied the full log for the version v2.0, v2.6.16-rc1, v2.6.39.4, and v3.0 to v6.0.
 * **Studied Hardware Tracing**
     * We’ve studied the full log for the version v3.0 to v6.0,v3.5, and v4.1.
 * **Studied List of organizations supported**
@@ -42,7 +42,7 @@
 * **Studied NFC driver**
 	* We’ve studied the full log for the version v1.0 to v6.0, v5.5.10 and v5.11-rc1.
 * **Studied number of lines in each file**
-    * We’ve studied the full log for the version v0.01 to v0.99.15, v1.0 to v1.5, v2.0 to v6.2-rc3.
+    * We’ve studied the full log for the version v0.01 to v1.0-pre1, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.2-rc3.
 * **Studied number of directories**
     * We’ve studied version v2.6.12 to v6.1-rc1
 * **Studied Patches**
@@ -52,7 +52,7 @@
 * **Studied Power Handling**
     * We’ve studied version v1.0, v3.0 to v6.0, v3.19-rc3, and v6.1-rc1.
 * **Studied Release Date**
-    * We’ve studied version v0.01 to v0.99.15, v1.0 to v1.5, and v2.0 to v6.1
+    * We’ve studied version v0.01 to v1.0-pre1, v1.1 to v1.5, v2.0 to v2.4.0, v2.5.0 to v2.6.11.5, and v2.6.12 to v6.1.
 * **Studied Release Notes**
     * We’ve studied version v1.0 to v1.3, v2.0 to v2.6, and v3.0 to v6.1
 * **Studied Resource Manipulation**
