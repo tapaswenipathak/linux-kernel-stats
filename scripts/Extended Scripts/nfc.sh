@@ -5,7 +5,30 @@
 
 cd ~/kbd
 
-myArray=("NFC" "NFC device*" "Near Field Communication (NFC)" "Near Field Communication (NFC) devices" "NFC_CMD_GET_DEVICE" "NFC_CMD_START_POLL" "NFC_CMD_STOP_POLL" "NFC_CMD_GET_TARGET" "NFC_EVENT_DEVICE_ADDED" "NFC_EVENT_DEVICE_REMOVED" "NFC_EVENT_TARGETS_FOUND" "PF_NFC" "nfc_protocol")
+myArray=("message passing"
+    "IPC"
+    "pipes"
+    "sockets"
+    "mailbox"
+    "message queue"
+    "RPC"
+    "shared memory"
+    "semaphore"
+    "asynchronous messaging"
+    "message protocol"
+    "multicast"
+    "broadcast"
+    "ZeroMQ"
+    "JMS"
+    "MPI"
+    "rendezvous"
+    "SCTP"
+    "sctp_association"
+    "sctp_sendmsg"
+    "tipc"
+    "netlink"
+    "netlink_unicast"
+)
     git checkout 2.0.0
     for string in ${myArray[@]}; do
         if [ -n "$(git log --all --grep="$string")" ]; then 
@@ -57,17 +80,33 @@ for ((i=3; i<=6; i++)); do
 done 
 
 # Extend the version
-ver_name="v5.5.10"
-git checkout ${ver_name}
+ver_name1="v5.5.10"
+git checkout ${ver_name1}
 
 for string in ${myArray[@]}; do
    if [ -n "$(git log --all --grep="$string")" ]; then 
-        echo -e "\e[6;35m \n $ver_name \n \e[0m"
+        echo -e "\e[6;35m \n $ver_name1 \n \e[0m"
         echo -e "\e[6;35m \n ${string} \n \e[0m"
         git log --all --grep="$string" 
    else
-        echo -e "\e[6;35m \n $ver_name \n \e[0m"
-        echo "No such string exists in version $ver_name in the git log." 
+        echo -e "\e[6;35m \n $ver_name1 \n \e[0m"
+        echo "No such string exists in version $ver_name1 in the git log." 
+        continue
+   fi
+done
+
+ver_name2="v5.11-rc1"
+git checkout ${ver_name2}
+
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        cho -e "\e[6;35m \n ${ver_name2} \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
+   else
+        echo -e "\e[6;35m \n ${ver_name2} \n \e[0m"
+        echo "No such string exists in version ${ver_name2} in the git log." 
         continue
    fi
 done 
+

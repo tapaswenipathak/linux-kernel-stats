@@ -16,7 +16,13 @@ for ((i=3; i<=6; i++)); do
     grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u >  /home/kavita/github/data_directory/org/v$i.0_orgs.txt
 done
 
+# Extend the version
 ver_name="v3.10-rc7"
+git checkout ${ver_name}
+
+grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u >  ~/linux-kernel-stats/data_dir/extended_scripts/${ver_name}_orgs.txt
+
+ver_name="v4.8-rc1"
 git checkout ${ver_name}
 
 grep -Eio '[[:alnum:]_\.-]+@[[:alnum:]_\.-]+\.[[:alpha:].]{2,}' MAINTAINERS | awk -F "@" '{print $2}' | sort -u >  ~/linux-kernel-stats/data_dir/extended_scripts/${ver_name}_orgs.txt

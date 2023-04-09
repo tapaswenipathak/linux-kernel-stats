@@ -5,7 +5,28 @@
 
 cd ~/linux-stable/linux-stable
 
-myArray=("idle_time" "get_cpu_idle_time_jiffy"  "cpuidle" "CPUIdle" "cpuidle_state" "cpuidle_state_usage" "scaling_min_freq" "scaling_max_freq" "sched_load_balance" "*sched_load_balance" "*cfs_quota_us" "cfs_quota_us" "get_cpu_idle_time" "cpufreq" "MAX_CPUS_IN_ONE_REQ" "cpu_model" "cpufreq_sysfs_present" "alloc_cpu_set" "free__cpu_set" "create_cpu_map" "get_cpu_count" "cpu_threshhold")
+myArray=(
+    "idle_time"
+    "get_cpu_idle_time_jiffy"
+    "cpuidle"
+    "CPUIdle"
+    "cpuidle_state"
+    "cpuidle_state_usage"
+    "scaling_min_freq"
+    "scaling_max_freq"
+    "*sched_load_balance"
+    "*cfs_quota_us"
+    "get_cpu_idle_time"
+    "cpufreq"
+    "MAX_CPUS_IN_ONE_REQ"
+    "cpu_model"
+    "cpufreq_sysfs_present"
+    "alloc_cpu_set"
+    "free__cpu_set"
+    "create_cpu_map"
+    "get_cpu_count"
+    "cpu_threshhold"
+)
 
 for ((i=3; i<=6; i++)); do
     git checkout -fq v$i.0
@@ -26,6 +47,21 @@ for ((i=3; i<=6; i++)); do
     fi
 done 
 
+ver_name="v5.5-rc7"
+git checkout ${ver_name}
+
+for string in ${myArray[@]}; do
+   if [ -n "$(git log --all --grep="$string")" ]; then 
+        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
+        echo -e "\e[6;35m \n ${string} \n \e[0m"
+        git log --all --grep="$string" 
+   else
+        echo -e "\e[6;35m \n ${ver_name} \n \e[0m"
+        echo "No such string exists in version ${ver_name} in the git log."
+        continue
+   fi
+done
+
 ver_name="v5.10-rc7"
 git checkout ${ver_name}
 
@@ -39,7 +75,7 @@ for string in ${myArray[@]}; do
         echo "No such string exists in version $ver_name in the git log."
         continue
    fi
-done 
+done
 
 cd ..
 
@@ -65,12 +101,12 @@ cd ~/archive
     
     for string in ${myArray[@]}; do
         if [ -n "$(git log --all --grep="$string")" ]; then 
-            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
+            echo -e "\e[6;35m \n v1.0 \n \e[0m"
             echo -e "\e[6;35m \n ${string} \n \e[0m"
             git log --all --grep="$string"
          else
-            echo -e "\e[6;35m \n v$i.0 \n \e[0m"
-            echo "No such string exists in version v$i.0 in the git log." 
+            echo -e "\e[6;35m \n v1.0 \n \e[0m"
+            echo "No such string exists in version v1.0 in the git log." 
             continue
         fi
     done 
