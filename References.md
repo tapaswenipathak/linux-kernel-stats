@@ -49,5 +49,55 @@
 - https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=7adcbbf12a30964be7ec4c81a9618fccd7fc0639
 - https://dl.acm.org/doi/abs/10.1145/2452537.2452546
 - https://link.springer.com/article/10.1007/s11704-009-0053-Z
+- https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/cje.2018.03.015
+- https://www.researchgate.net/publication/228949142_The_nature_and_composition_of_the_Linux_kernel_developer_community_a_dynamic_analysis
+- https://www.researchgate.net/publication/220623536_Minding_the_gap_RD_in_the_Linux_kernel
+- https://pdos.csail.mit.edu/papers/chen-kbugs.pdf
+- https://www.researchgate.net/publication/226798249_Taxonomy_of_Linux_Kernel_Vulnerability_Solutions
+- https://www.researchgate.net/publication/282619311_Research_of_Performance_Linux_Kernel_File_Systems
+- https://ssbaner2.cs.illinois.edu/publications/apsys2020/Paper.pdf
+- https://www.researchgate.net/publication/225206921_Linux_26_kernel_exploits
+- https://www.sciencedirect.com/science/article/pii/S1383762121000436
+- https://www.usenix.org/system/files/woot20-paper-cho.pdf
+- https://www.tandfonline.com/doi/full/10.1080/09540091.2023.2192442
+- https://www.researchgate.net/publication/271482328_Software-implemented_fault_injection_in_operating_system_kernel_mutex_data_structure
+- https://dl.acm.org/doi/10.1145/3456727.3463783
+- https://www.mendeley.com/catalogue/241e871a-814c-36f9-97a6-372402774163/
+- https://www.mendeley.com/catalogue/29cb17d7-0862-3b1e-b522-25d7dd69ccb1/
+- https://www.mendeley.com/catalogue/bc2f82cc-1888-3eda-ace8-768edc10dc89/
+- https://www.mendeley.com/catalogue/3c2a993e-0d39-39be-b543-af8cfd491306/
+- https://www.mendeley.com/catalogue/15f004c0-0c7e-34bd-a495-b8c03b75c2be/
+- https://www.mendeley.com/catalogue/3b1b4927-d68a-30b8-a7bd-721b0ff2f017/
+- https://www.mendeley.com/catalogue/d36c734a-5b14-3431-9a54-6494468207b8/
+- https://www.mendeley.com/catalogue/3feedbf6-0478-3b2f-98d0-23b7fd094498/
+- https://www.mendeley.com/catalogue/82bf6806-1e99-3c75-a77b-edf6ead30bd5/
+- https://www.mendeley.com/catalogue/425a0643-3a5b-34f1-b51c-15459f5966eb/
+- https://www.mendeley.com/catalogue/438c5f2f-ff53-3b09-a9ed-4ca7ef1361f8/
+- https://www.usenix.org/conference/usenixsecurity21/presentation/bai
+- https://www.usenix.org/conference/atc19/presentation/bai
+- https://www.usenix.org/conference/usenixsecurity19/presentation/zhang-tong
+- https://www.usenix.org/conference/usenixsecurity15/technical-sessions/presentation/bates
+- https://www.usenix.org/conference/osdi20/presentation/nelson
+- https://www.usenix.org/legacy/publications/library/proceedings/usenix2000/general/full_papers/yaghmour/yaghmour.pdf
+- https://www.usenix.org/conference/usenixsecurity20/presentation/votipka-understanding
+- https://www.usenix.org/conference/atc18/presentation/ma-shiqing
+- https://www.usenix.org/conference/usenixsecurity23/presentation/kol
+- https://www.usenix.org/conference/usenixsecurity23/presentation/caiyuandao
+- https://www.usenix.org/system/files/sec21-talebi.pdf
+- https://www.usenix.org/system/files/sec21-wu-qiushi.pdf
+- https://www.usenix.org/system/files/atc19-bai.pdf
+- https://www.usenix.org/system/files/conference/usenixsecurity17/sec17-machiry.pdf
+- https://www.usenix.org/system/files/nsdi19-zhuo.pdf
+- https://www.usenix.org/system/files/atc19-narayanan.pdf
+- https://www.usenix.org/legacy/publications/library/proceedings/usenix03/tech/freenix03/full_papers/arcangeli/arcangeli.pdf
+- https://www.usenix.org/system/files/hotcloud19-paper-lei.pdf
+- https://www.usenix.org/system/files/conference/hotstorage16/hotstorage16_ahn.pdf
+- https://www.usenix.org/system/files/conference/hotdep12/hotdep12-final11.pdf
+- https://www.usenix.org/system/files/conference/hotdep12/hotdep12-final19.pdf
+- https://www.usenix.org/system/files/conference/osdi12/osdi12-final-4.pdf
+- https://www.usenix.org/legacy/publications/library/proceedings/osdi04/tech/swift/swift.pdf
+- https://www.usenix.org/legacy/events/osdi02/tech/full_papers/goel/goel.pdf
+- https://www.usenix.org/legacy/events/osdi10/tech/full_papers/Boyd-Wickizer.pdf
+- 
 
-
+- 
