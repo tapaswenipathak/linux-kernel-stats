@@ -95,9 +95,9 @@ done
 git checkout -fq v1.5
 prev_date=$(git log -1 --pretty=format:%cs v1.5)
 cd ~/kbd
-git checkout -fq v2.0
-echo -ne "v2.0\t"
-curr_date=$(git log -1 --pretty=format:%cs v2.0)
+git checkout -fq 2.0.0
+echo -ne "v2.0.0\t"
+curr_date=$(git log -1 --pretty=format:%cs 2.0.0)
 prev_date_sec=$(date -d "$prev_date"  '+%s')
 curr_date_sec=$(date -d "$curr_date"  '+%s')
 d=$(expr $curr_date_sec - $prev_date_sec)
@@ -108,8 +108,8 @@ echo "$duration"
 SRCDIR_c=~/kbd
 cd $SRCDIR_c
  
-git checkout -fq v2.0
-prev_date=$(git log -1 --pretty=format:%cs v2.0)
+git checkout -fq 2.0.0
+prev_date=$(git log -1 --pretty=format:%cs 2.0.0)
 git checkout -fq v2.1.0
 echo -ne "v2.1.0\t"
 curr_date=$(git log -1 --pretty=format:%cs v2.1.0)
