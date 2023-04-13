@@ -51,4 +51,3 @@ for ((i=3; i<=6; i++)); do
     #git log --all --grep="$term" > "../bp_gitlogs/v$i.0_$term.bus_protocols.txt"
   done
 done
-
