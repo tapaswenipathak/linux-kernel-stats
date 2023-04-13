@@ -10,6 +10,7 @@ cd $SRCDIR/drivers
 declare -a all_versions=($(git tag -l | sort -V)) 
 
 # Declaring the extended version
+
 ver_name1="v6.0-rc1"
 #Add the version to the array
 all_versions+=("$ver_name1")
