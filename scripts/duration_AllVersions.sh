@@ -55,7 +55,7 @@ cd ~/erofs-utils
 
 
 
-for dir in ~/kbd ~/history ~/linux-stable; do
+for dir in ~/kbd ~/history ~/linux-stable/linux-stable; do
     cd "$dir"
     previous_date=""
     previous_tag=""
