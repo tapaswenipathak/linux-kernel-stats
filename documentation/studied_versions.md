@@ -63,3 +63,7 @@
     * We’ve studied version v1.0 to v6.0, v4.20.10, and v4.8-rc1.
 * **Studied Spinlock**
     * We’ve studied version v3.0 to v6.0, v5.17.1, and v5.19.15
+
+After version 1.3 of the kernel, Torvalds decided that Linux had evolved enough to warrant a new major number, so he released version 2.0.0 in June 1996.<sup>[[1]]</sup>
+
+[1]: https://en.wikipedia.org/wiki/Linux_kernel#cite_ref-Christine_Bresnahan_&_Richard_Blum_2016_108_41-0
