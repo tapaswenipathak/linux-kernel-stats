@@ -23,12 +23,13 @@ for ((i=0; i<=$n; i++)); do
         echo ${all_versions[$i]}
         # Check if the driver directory exists
         if [ ! -d drivers ]; then
-            echo "No drivers"
-            exit 0
+          echo "No drivers"
+          exit 0
+        else
+          for d in $(find . -maxdepth 1 -type d | sed -e '/.*drivers\/$/d' | sort) ; do
+          echo "$(basename $d)"
+          done 
         fi
-        for d in $(find . -maxdepth 1 -type d | sed -e '/.*drivers\/$/d' | sort) ; do
-            echo "$(basename $d)"
-        done 
     else
         continue
     fi   
