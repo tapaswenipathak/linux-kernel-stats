@@ -7,7 +7,6 @@ filename="duration_allversions.txt"
 
 # change directory to the repository path
 cd ~/archive
-    #echo "archive:"
     previous_date=""
     previous_tag=""
     for tag in $(git tag | grep -vE '^[0-9]+\.' | sort -V); do
@@ -33,7 +32,6 @@ cd ~/archive
 
 # Second loop for erofs-utils repo
 cd ~/erofs-utils
-    #echo "erofs-utils:"
     previous_date=""
     previous_tag=""
     for tag in $(git tag | grep -vE '^[0-9]+\.' | sort -V); do
@@ -58,7 +56,6 @@ cd ~/erofs-utils
 
 
 for dir in ~/kbd ~/history ~/linux-stable; do
-    #echo "$dir: "
     cd "$dir"
     previous_date=""
     previous_tag=""
