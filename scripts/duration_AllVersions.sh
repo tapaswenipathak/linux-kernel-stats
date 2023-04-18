@@ -6,7 +6,7 @@
 filename="duration_allversions.txt"
 
 # change directory to the repository path
-cd ~/linux-kernel-stats/archive
+cd ~/archive
     #echo "archive:"
     previous_date=""
     previous_tag=""
@@ -32,7 +32,7 @@ cd ~/linux-kernel-stats/archive
 
 
 # Second loop for erofs-utils repo
-cd ~/linux-kernel-stats/erofs-utils
+cd ~/erofs-utils
     #echo "erofs-utils:"
     previous_date=""
     previous_tag=""
@@ -57,7 +57,7 @@ cd ~/linux-kernel-stats/erofs-utils
 
 
 
-for dir in ~/linux-kernel-stats/kbd ~/linux-kernel-stats/history ~/linux-kernel-stats/linux-stable; do
+for dir in ~/kbd ~/history ~/linux-stable; do
     #echo "$dir: "
     cd "$dir"
     previous_date=""
