@@ -3,6 +3,8 @@
 # list of all drivers for each version since 1991 to 2023
 # Contributor: patelmadhu06@gmail.com
 
+# Handling case when linux-stable is downloaded
+# as a zip file, it creates a sub-directory with same name.
 SRCDIR=~/linux-stable/
 if [ -d $SRCDIR/linux-stable ]; then
   cd $SRCDIR/linux-stable/
