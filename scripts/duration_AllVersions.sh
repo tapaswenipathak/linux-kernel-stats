@@ -6,8 +6,7 @@
 filename="duration_allversions.txt"
 
 # change directory to the repository path
-cd ~/linux-kernel-stats/archive
-    #echo "archive:"
+cd ~/archive
     previous_date=""
     previous_tag=""
     for tag in $(git tag | grep -vE '^[0-9]+\.' | sort -V); do
@@ -32,8 +31,7 @@ cd ~/linux-kernel-stats/archive
 
 
 # Second loop for erofs-utils repo
-cd ~/linux-kernel-stats/erofs-utils
-    #echo "erofs-utils:"
+cd ~/erofs-utils
     previous_date=""
     previous_tag=""
     for tag in $(git tag | grep -vE '^[0-9]+\.' | sort -V); do
@@ -57,8 +55,7 @@ cd ~/linux-kernel-stats/erofs-utils
 
 
 
-for dir in ~/linux-kernel-stats/kbd ~/linux-kernel-stats/history ~/linux-kernel-stats/linux-stable; do
-    #echo "$dir: "
+for dir in ~/kbd ~/history ~/linux-stable/linux-stable; do
     cd "$dir"
     previous_date=""
     previous_tag=""
@@ -81,4 +78,3 @@ for dir in ~/linux-kernel-stats/kbd ~/linux-kernel-stats/history ~/linux-kernel-
         previous_tag="$tag"
     done
 done
-
