@@ -78,3 +78,4 @@ for dir in ~/kbd ~/history ~/linux-stable/linux-stable; do
         previous_tag="$tag"
     done
 done
+
