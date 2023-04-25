@@ -76,7 +76,11 @@ cd ..
 
 # for v3.0 to v6.0
 SRCDIR_3=~/linux-stable/
-cd $SRCDIR_3
+if [ -d $SRCDIR_3/linux-stable ]; then
+  cd $SRCDIR_3/linux-stable/
+else
+  cd $SRCDIR_3
+fi
 
 #declaring an array containing all versions
 declare -a all_versions=($(git tag -l | grep -E '.*\.0$' | sort -V))  
