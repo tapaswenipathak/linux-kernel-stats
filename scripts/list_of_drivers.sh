@@ -3,14 +3,13 @@
 # list of all drivers for each version since 1991 to 2023
 # Contributor: patelmadhu06@gmail.com
 
-SRCDIR=~/linux-stable
-if [ -d "$SRCDIR/drivers" ]; then
-  cd "$SRCDIR/drivers"
-elif [ -d "$SRCDIR/linux-stable/drivers" ]; then
-  cd "$SRCDIR/linux-stable/drivers"
+# Handling case when linux-stable is downloaded
+# as a zip file, it creates a sub-directory with same name.
+SRCDIR=~/linux-stable/
+if [ -d $SRCDIR/linux-stable ]; then
+  cd $SRCDIR/linux-stable/
 else
-  echo "Directory not found"
-  exit 1
+  cd $SRCDIR
 fi
 
 #declaring an array containing all versions
@@ -24,10 +23,16 @@ for ((i=0; i<=$n; i++)); do
     if [[ $? -eq 0 ]]; then
         echo ""
         echo ${all_versions[$i]}
-        for d in $(find . -maxdepth 1 -type d | sed -e '/.*drivers\/$/d' | sort) ; do
-            echo "$(basename $d)"
-        done 
+        # Check if the driver directory exists
+        if [ ! -d drivers ]; then
+          echo "No drivers"
+          exit 0
+        else
+          for d in $(find . -maxdepth 1 -type d | sed -e '/.*drivers\/$/d' | sort) ; do
+          echo "$(basename $d)"
+          done 
+        fi
     else
         continue
     fi   
-done 
+done
