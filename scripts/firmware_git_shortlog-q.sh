@@ -8,6 +8,12 @@ SRCDIR_e=~/linux-stable/
 dir_name="firmware"
 cd $SRCDIR_e
 
+if [ -d $SRCDIR_e/linux-stable ]; then
+  cd $SRCDIR_e/linux-stable/
+else
+  cd $SRCDIR_e
+fi
+
 if [ ! -d ~/linux-kernel-stats/data_dir/firmware_dump/ ];then
     mkdir ~/linux-kernel-stats/data_dir/firmware_dump/
     echo "Working.."
